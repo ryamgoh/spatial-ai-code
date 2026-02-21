@@ -1,22 +1,40 @@
 """
 Finetune a model using Axolotl API.
+
 Usage:
-    uv run finetune <config_name>
+    uv run finetune <config_name> [--resume]
+
 Example:
     uv run finetune qwen3-7b-lora
-This will load configs/models/qwen3-7b-lora.yaml and run Axolotl training.
+    uv run finetune qwen3-7b-lora --resume
 """
 
+import argparse
+import signal
 import sys
 from pathlib import Path
+
 import yaml
 from axolotl.cli.config import load_cfg
+from axolotl.common.datasets import load_datasets
+from axolotl.train import setup_signal_handler, train
 from axolotl.utils.dict import DictDefault
 from axolotl.utils import set_pytorch_cuda_alloc_conf
-from axolotl.common.datasets import load_datasets
-from axolotl.train import train
 
 CONFIGS_DIR = Path("configs/models")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Finetune a model using Axolotl")
+    parser.add_argument(
+        "config_name",
+        type=str,
+        help="Name of the config file (without .yaml extension)",
+    )
+    parser.add_argument(
+        "--resume", action="store_true", help="Resume from the latest checkpoint"
+    )
+    return parser.parse_args()
 
 
 def load_yaml_config(config_path: Path) -> DictDefault:
@@ -26,14 +44,23 @@ def load_yaml_config(config_path: Path) -> DictDefault:
     return DictDefault(config_dict)
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: uv run finetune <config_name>")
-        print("Example: uv run finetune qwen3-7b-lora")
-        sys.exit(1)
+def find_latest_checkpoint(output_dir: Path) -> Path | None:
+    """Find the latest checkpoint in the output directory."""
+    if not output_dir.exists():
+        return None
 
-    config_name = sys.argv[1]
-    config_path = CONFIGS_DIR / f"{config_name}.yaml"
+    checkpoints = list(output_dir.glob("checkpoint-*"))
+    if not checkpoints:
+        return None
+
+    checkpoints.sort(key=lambda x: int(x.name.split("-")[1]))
+    return checkpoints[-1]
+
+
+def main():
+    args = parse_args()
+
+    config_path = CONFIGS_DIR / f"{args.config_name}.yaml"
 
     if not config_path.exists():
         print(f"Error: Config not found: {config_path}")
@@ -44,25 +71,35 @@ def main():
 
     print(f"Loading config: {config_path}")
 
-    # Load YAML config into DictDefault
     config = load_yaml_config(config_path)
-
-    # Validate the configuration
     cfg = load_cfg(config)
 
-    # Set PyTorch CUDA allocation config
     set_pytorch_cuda_alloc_conf()
 
-    # Load, parse and tokenize the datasets
     print("Loading datasets...")
     dataset_meta = load_datasets(cfg=cfg)
 
-    print(f"Starting training: {config_name}")
+    resume_from_checkpoint = None
+    if args.resume:
+        output_dir = Path(cfg.output_dir)
+        checkpoint = find_latest_checkpoint(output_dir)
+        if checkpoint:
+            resume_from_checkpoint = str(checkpoint)
+            print(f"Resuming from checkpoint: {checkpoint}")
+        else:
+            print("No checkpoint found, starting fresh training")
+
+    print(f"Starting training: {args.config_name}")
     print(f"Output directory: {cfg.output_dir}")
+    if resume_from_checkpoint:
+        print(f"Resuming from: {resume_from_checkpoint}")
     print("-" * 50)
 
-    # Run training
-    model, tokenizer, trainer = train(cfg=cfg, dataset_meta=dataset_meta)
+    model, tokenizer, trainer = train(
+        cfg=cfg,
+        dataset_meta=dataset_meta,
+        resume_from_checkpoint=resume_from_checkpoint,
+    )
 
     print("-" * 50)
     print(f"Training complete! Model saved to: {cfg.output_dir}")
