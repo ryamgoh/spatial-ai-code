@@ -1,0 +1,19 @@
+task: task_bool
+group: custom
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test: ./data/task_bool.jsonl
+output_type: multiple_choice
+choices:
+  - "True"
+  - "False"
+doc_to_text: "Question: {{question}}\n\nAnswer:"
+doc_to_target: "{{answer}}"
+doc_to_choice: "{{choices}}"
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
