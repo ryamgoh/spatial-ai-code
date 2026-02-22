@@ -1,0 +1,37 @@
+# SciQ: Science Question Answering Dataset (Shuffled)
+# https://huggingface.co/datasets/allenai/sciq
+#
+# This version shuffles answer choices to eliminate position bias
+task: sciq_shuffled
+dataset_path: allenai/sciq
+test_split: test
+output_type: multiple_choice
+
+process_docs: !function utils.process_docs
+
+doc_to_text: | 
+  {{question}}
+  A. {{choice_a}}
+  B. {{choice_b}}
+  C. {{choice_c}}
+  D. {{choice_d}}
+  Answer:"
+doc_to_target: "{{correct_index}}"
+doc_to_choice:
+  - "{{choice_a}}"
+  - "{{choice_b}}"
+  - "{{choice_c}}"
+  - "{{choice_d}}"
+
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: mcc
+    aggregation: !function utils.mcc
+    higher_is_better: true
+
+
+metadata:
+  version: 1.0
+  note: "Answer choices are shuffled to eliminate position bias."

@@ -105,13 +105,14 @@ def get_runs_to_analyze(args) -> list[dict]:
 
 def load_run_results(run: dict) -> RunResult:
     """Load results for a single run."""
-    results_path = Path(run["results_path"]) / "results.json"
+    run_id = run["id"]
+    results_path = Path(run.get("results_path", f"results/{run_id}")) / "results.json"
 
     if not results_path.exists():
-        print(f"Warning: Results file not found for run {run['id']}: {results_path}")
+        print(f"Warning: Results file not found for run {run_id}: {results_path}")
         return RunResult(
-            run_id=run["id"],
-            model=run.get("model", "unknown"),
+            run_id=run_id,
+            model=run.get("base_model") or run.get("model", "unknown"),
             timestamp=(
                 datetime.fromisoformat(run["timestamp"])
                 if run.get("timestamp")
@@ -127,36 +128,36 @@ def load_run_results(run: dict) -> RunResult:
         if isinstance(task_data, dict) and "results" in task_data:
             metrics = task_data.get("results", {}).get(task_name, {})
 
+            def get_metric(metrics_dict: dict, *keys: str) -> float | None:
+                for key in keys:
+                    if key in metrics_dict:
+                        return metrics_dict[key]
+                    for k in metrics_dict:
+                        if k.startswith(key + ",") or k == key:
+                            return metrics_dict[k]
+                return None
+
             task_metrics = TaskMetrics(
                 task_name=task_name,
-                accuracy=metrics.get("acc") or metrics.get("accuracy"),
-                f1=metrics.get("f1"),
-                exact_match=metrics.get("exact_match") or metrics.get("em"),
-                bleu=metrics.get("bleu"),
-                rouge=metrics.get("rouge") or metrics.get("rougeL"),
+                accuracy=get_metric(metrics, "acc", "accuracy"),
+                f1=get_metric(metrics, "f1"),
+                exact_match=get_metric(metrics, "exact_match", "em"),
             )
 
-            # Collect any other metrics
-            known_metrics = {
-                "acc",
-                "accuracy",
-                "f1",
-                "exact_match",
-                "em",
-                "bleu",
-                "rouge",
-                "rougeL",
-            }
+            known_prefixes = ("acc", "accuracy", "f1", "exact_match", "em", "mcc")
             for key, value in metrics.items():
-                if key not in known_metrics and not key.endswith("_stderr"):
+                base_key = key.split(",")[0]
+                if not any(
+                    base_key.startswith(prefix) for prefix in known_prefixes
+                ) and not key.endswith("_stderr"):
                     if isinstance(value, (int, float)):
                         task_metrics.custom_metrics[key] = value
 
             task_results.append(task_metrics)
 
     return RunResult(
-        run_id=run["id"],
-        model=run.get("model", "unknown"),
+        run_id=run_id,
+        model=run.get("base_model") or run.get("model", "unknown"),
         timestamp=(
             datetime.fromisoformat(run["timestamp"])
             if run.get("timestamp")
@@ -207,7 +208,11 @@ def compute_per_task_breakdown(
 
 def load_responses(run: dict, task_name: str) -> list[dict]:
     """Load response JSONL for a specific task."""
-    responses_path = Path(run["results_path"]) / f"responses_{task_name}.jsonl"
+    run_id = run.get("id")
+    responses_path = (
+        Path(run.get("results_path", f"results/{run_id}"))
+        / f"responses_{task_name}.jsonl"
+    )
 
     if not responses_path.exists():
         return []
@@ -249,40 +254,54 @@ def compute_error_analysis(
 
             for resp in responses:
                 target = resp.get("target")
-                predicted = resp.get("response")
+                filtered_resps = resp.get("filtered_resps")
 
-                # Handle different response formats
-                if isinstance(predicted, list):
-                    predicted = predicted[0] if predicted else None
+                predicted = None
+                num_choices = 0
+                if isinstance(filtered_resps, list) and len(filtered_resps) > 0:
+                    num_choices = len(filtered_resps)
+                    if (
+                        isinstance(filtered_resps[0], list)
+                        and len(filtered_resps[0]) >= 1
+                    ):
+                        scores = [r[0] for r in filtered_resps]
+                        predicted = scores.index(max(scores))
 
-                if (
-                    predicted
-                    and target
-                    and str(predicted).strip() != str(target).strip()
-                ):
+                labels = (
+                    [chr(65 + i) for i in range(num_choices)] if num_choices > 0 else []
+                )
+
+                if predicted is not None and target is not None and predicted != target:
+                    predicted_label = (
+                        labels[predicted] if predicted < len(labels) else str(predicted)
+                    )
+                    expected_label = (
+                        labels[target] if target < len(labels) else str(target)
+                    )
                     wrong_answers.append(
                         {
                             "doc_id": resp.get("doc_id"),
                             "predicted": predicted,
                             "expected": target,
+                            "predicted_label": predicted_label,
+                            "expected_label": expected_label,
                         }
                     )
 
             if wrong_answers:
                 pattern = f"Misclassification in {task.task_name}"
-                for wa in wrong_answers[:5]:  # Limit examples
+                for wa in wrong_answers[:5]:
                     errors_by_pattern[pattern].append(
-                        f"{run_id} doc={wa['doc_id']}: predicted={wa['predicted']}, expected={wa['expected']}"
+                        f"{run_id} doc={wa['doc_id']}: predicted={wa['predicted_label']} (idx {wa['predicted']}), expected={wa['expected_label']} (idx {wa['expected']})"
                     )
 
-    # Convert to ErrorCategory list
     error_categories = []
     for pattern, examples in errors_by_pattern.items():
         error_categories.append(
             ErrorCategory(
                 category=pattern,
                 count=len(examples),
-                examples=examples[:5],  # Limit to 5 examples
+                examples=examples[:5],
             )
         )
 
@@ -367,27 +386,30 @@ def save_analysis(analysis: AnalysisResult, output_path: Path) -> None:
 
 
 def main():
+    # Step 1: Parse command-line arguments
     args = parse_args()
 
-    # Get runs to analyze
+    # Step 2: Get runs to analyze (by --last or --runs)
     runs = get_runs_to_analyze(args)
 
     print(f"\nRuns to analyze:")
     for run in runs:
-        print(f"  - {run['id']}: {run.get('model')} (tasks: {run.get('tasks')})")
+        print(
+            f"  - {run['id']}: {run.get('base_model') or run.get('model')} (tasks: {run.get('tasks')})"
+        )
 
-    # Load results for each run
+    # Step 3: Load results for each run
     print("\nLoading results...")
     run_results = [load_run_results(run) for run in runs]
 
-    # Compute analysis
+    # Step 4: Compute analysis metrics
     print("Computing analysis...")
     summary = compute_summary(run_results)
     per_task_breakdown = compute_per_task_breakdown(run_results)
     error_analysis = compute_error_analysis(run_results, runs)
     best_run = find_best_run(summary)
 
-    # Create analysis result
+    # Step 5: Create analysis result object
     analysis = AnalysisResult(
         runs_compared=[r.run_id for r in run_results],
         generated_at=datetime.now(),
@@ -397,14 +419,13 @@ def main():
         best_run=best_run,
     )
 
-    # Print results
+    # Step 6: Print results to console
     print_analysis(analysis, verbose=args.verbose)
 
-    # Save if output specified
+    # Step 7: Save analysis to JSON file
     if args.output:
         save_analysis(analysis, Path(args.output))
     else:
-        # Save to results directory with timestamp
         output_path = (
             RESULTS_DIR / f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         )

@@ -1,0 +1,28 @@
+# SciQ: Science Question Answering Dataset
+# https://huggingface.co/datasets/allenai/sciq
+#
+# IMPORTANT: This task places correct_answer at position D
+# For proper evaluation with shuffled answers, see sciq_shuffled.yaml
+task: sciq
+group: science
+dataset_path: allenai/sciq
+dataset_kwargs:
+  split: test
+output_type: multiple_choice
+
+doc_to_text: "{{question}}\nA. {{distractor1}}\nB. {{distractor2}}\nC. {{distractor3}}\nD. {{correct_answer}}\nAnswer:"
+doc_to_target: "{{correct_answer}}"
+doc_to_choice:
+  - "{{distractor1}}"
+  - "{{distractor2}}"
+  - "{{distractor3}}"
+  - "{{correct_answer}}"
+
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 1.0
+  note: "Correct answer is always at position D. Consider using shuffled version for fairer evaluation."

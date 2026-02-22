@@ -1,0 +1,31 @@
+model: vllm
+model_args:
+  pretrained: Qwen/Qwen2.5-0.5B
+  dtype: bfloat16
+  gpu_memory_utilization: 0.7
+
+include_path: ../configs/tasks
+
+tasks:
+  - sciq_shuffled
+  - sciq
+
+num_fewshot: 0
+batch_size: auto
+device: cuda:0
+
+log_samples: true
+
+# wandb_args:
+#   project: llm-evals
+#   name: qwen-2.5-0.5b
+#   tags:
+#     - mistral
+#     - instruct
+#     - production
+
+# hf_hub_log_args:
+#   hub_results_org: my-org
+#   results_repo_name: llm-eval-results
+#   push_results_to_hub: true
+#   public_repo: false

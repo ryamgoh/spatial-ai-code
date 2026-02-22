@@ -2,11 +2,11 @@
 Finetune a model using Axolotl API.
 
 Usage:
-    uv run finetune <config_name> [--resume]
+    cd finetune && uv run python finetune.py <config_name> [--resume]
 
 Example:
-    uv run finetune qwen3-7b-lora
-    uv run finetune qwen3-7b-lora --resume
+    cd finetune && uv run python finetune.py qwen3-7b-lora
+    cd finetune && uv run python finetune.py qwen3-7b-lora --resume
 """
 
 import argparse
@@ -21,7 +21,7 @@ from axolotl.train import setup_signal_handler, train
 from axolotl.utils.dict import DictDefault
 from axolotl.utils import set_pytorch_cuda_alloc_conf
 
-CONFIGS_DIR = Path("configs/models")
+CONFIGS_DIR = Path(__file__).parent.parent / "configs" / "models"
 
 
 def parse_args():
