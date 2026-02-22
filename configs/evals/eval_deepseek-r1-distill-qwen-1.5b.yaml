@@ -7,7 +7,7 @@ model_args:
   reasoning_parser: deepseek_r1
   enforce_eager: true
   max_num_seqs: 16 # Lower batch size (default is 256)
-include_path: ../configs/tasks
+include_path: ../configs/evals/tasks
 tasks:
   # - sciq_shuffled_gen
   - spatial_eval_gen

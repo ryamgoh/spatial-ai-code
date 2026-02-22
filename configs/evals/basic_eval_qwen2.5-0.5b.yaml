@@ -4,7 +4,7 @@ model_args:
   dtype: bfloat16
   gpu_memory_utilization: 0.7
 
-include_path: ../configs/tasks
+include_path: ../configs/evals/tasks
 
 tasks:
   - sciq_shuffled
