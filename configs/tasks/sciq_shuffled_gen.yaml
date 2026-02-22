@@ -12,9 +12,9 @@ doc_to_text: |-
   
   Answer:
 doc_to_target: "{{['A', 'B', 'C', 'D'][correct_index]}}"
-generation_kwargs:
-  until: ["\n\n", "Question:"]
-  do_sample: false
+# generation_kwargs:
+  # until: ["\n\n", "Question:"]
+  # do_sample: false
 filter_list:
   - name: "extract-answer"
     filter:

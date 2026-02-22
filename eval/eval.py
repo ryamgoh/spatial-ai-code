@@ -44,6 +44,7 @@ def run_evaluation(config_path: Path) -> dict:
         num_fewshot=config.num_fewshot,
         batch_size=config.batch_size,
         device=config.device,
+        limit=config.limit,
         task_manager=task_manager,
         log_samples=config.log_samples,
         gen_kwargs=gen_kwargs,

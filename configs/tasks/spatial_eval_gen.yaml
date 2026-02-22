@@ -10,17 +10,23 @@ output_type: generate_until
 
 process_docs: !function utils.filter_spatialmap
 
-doc_to_target: "{{['A', 'B', 'C', 'D'][correct_index]}}"
+doc_to_text: |-
+  {{text}}
+doc_to_target: "{{oracle_option}}"
+
 generation_kwargs:
-  until: ["\n\n", "Question:"]
-  do_sample: false
+  until: []
+
 filter_list:
   - name: "extract-answer"
     filter:
       - function: "regex"
-        regex_pattern: "\\b([A-D])\\b"
-        group_select: -1  # Take last match
+        # regex_pattern: "\\b([A-D])\\b"
+        # regex_pattern: '"answer"\s*:\s*"([A-D])"'
+        regex_pattern: "Answer: ([A-D])"
+        # group_select: -1
       - function: "take_first"
+
 metric_list:
   - metric: !function utils.acc_gen
     aggregation: mean
