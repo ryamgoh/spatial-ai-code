@@ -1,0 +1,50 @@
+"""
+Convert reason_train.json to Axolotl-compatible format.
+
+Usage:
+    cd finetune && uv run python convert_json.py
+"""
+
+import json
+from pathlib import Path
+
+
+def convert_item(item: dict) -> dict:
+    reasoning = item["assistant"]["reasoning"]
+    coords = item["assistant"]["coordinates"]
+    answer = item["assistant"]["answer"]
+
+    structured = json.dumps(
+        {"coordinates": coords, "answer": answer}, ensure_ascii=False
+    )
+
+    return {
+        "system": item["system"],
+        "user": item["user"],
+        "assistant": f"{reasoning}\n\n{structured}",
+    }
+
+
+def main():
+    input_path = Path(__file__).parent.parent / "reason_train.json"
+    output_path = Path(__file__).parent.parent / "reason_train_converted.json"
+
+    print(f"Loading: {input_path}")
+    with open(input_path) as f:
+        data = json.load(f)
+
+    print(f"Converting {len(data)} samples...")
+    converted = [convert_item(item) for item in data]
+
+    with open(output_path, "w") as f:
+        json.dump(converted, f, indent=2, ensure_ascii=False)
+
+    print(f"Saved: {output_path}")
+    print(f"Sample output:\n{'-' * 50}")
+    print(f"System: {converted[0]['system'][:100]}...")
+    print(f"User: {converted[0]['user'][:100]}...")
+    print(f"Assistant: {converted[0]['assistant'][:200]}...")
+
+
+if __name__ == "__main__":
+    main()

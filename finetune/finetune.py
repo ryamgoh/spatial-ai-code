@@ -21,7 +21,7 @@ from axolotl.train import setup_signal_handler, train
 from axolotl.utils.dict import DictDefault
 from axolotl.utils import set_pytorch_cuda_alloc_conf
 
-CONFIGS_DIR = Path(__file__).parent.parent / "configs" / "models"
+CONFIGS_DIR = Path(__file__).parent.parent / "configs" / "finetune"
 
 
 def parse_args():
