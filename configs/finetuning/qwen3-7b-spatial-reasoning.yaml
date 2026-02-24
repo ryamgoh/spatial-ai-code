@@ -40,6 +40,10 @@ chat_template: qwen3
 datasets:
   - path: ../reason_train_converted.json
     type: chat_template
+    field_messages: null  # disable messages field
+    field_system: system
+    field_user: user
+    field_assistant: assistant
 dataloader_prefetch_factor: 8
 dataloader_num_workers: 2
 dataloader_pin_memory: true
