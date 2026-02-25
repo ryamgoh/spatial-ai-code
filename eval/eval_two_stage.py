@@ -31,6 +31,7 @@ class VLLMTwoPass(LM):
         gpu_memory_utilization: float = 0.8,
         max_model_len: int = 8192,
         lora_path: str | None = None,
+        max_lora_rank: int = 64,
         **kwargs,
     ):
         super().__init__()
@@ -54,6 +55,7 @@ class VLLMTwoPass(LM):
             max_model_len=max_model_len,
             enforce_eager=True,
             enable_lora=bool(lora_path),
+            max_lora_rank=max_lora_rank,
         )
 
         self.llm = LLM(**llm_kwargs)

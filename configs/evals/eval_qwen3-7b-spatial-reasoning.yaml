@@ -2,6 +2,7 @@ model: vllm_two_pass
 model_args:
   pretrained: Qwen/Qwen3-7B
   lora_path: ../finetune/outputs/qwen3-7b-spatial-reasoning
+  max_lora_rank: 64
   max_thinking_tokens: 4096
   dtype: bfloat16
   gpu_memory_utilization: 0.8
