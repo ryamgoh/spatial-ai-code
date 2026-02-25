@@ -30,6 +30,7 @@ class VLLMTwoPass(LM):
         dtype: str = "bfloat16",
         gpu_memory_utilization: float = 0.8,
         max_model_len: int = 8192,
+        peft_model: str | None = None,
         **kwargs,
     ):
         super().__init__()
@@ -42,13 +43,18 @@ class VLLMTwoPass(LM):
         self.choices = choices if choices is not None else ["A", "B", "C", "D"]
 
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained)
-        self.llm = LLM(
+
+        llm_kwargs = dict(
             model=pretrained,
             dtype=dtype,
             gpu_memory_utilization=gpu_memory_utilization,
             max_model_len=max_model_len,
             enforce_eager=True,
         )
+        if peft_model:
+            llm_kwargs["peft_model"] = peft_model
+
+        self.llm = LLM(**llm_kwargs)
         self.SamplingParams = SamplingParams
         self.StructuredOutputsParams = StructuredOutputsParams
 
