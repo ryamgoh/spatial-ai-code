@@ -30,17 +30,20 @@ class VLLMTwoPass(LM):
         dtype: str = "bfloat16",
         gpu_memory_utilization: float = 0.8,
         max_model_len: int = 8192,
-        peft_model: str | None = None,
+        lora_path: str | None = None,
         **kwargs,
     ):
         super().__init__()
         from vllm import LLM, SamplingParams
         from vllm.sampling_params import StructuredOutputsParams
+        from vllm.lora.request import LoRARequest
         from transformers import AutoTokenizer
 
         self.model_path = pretrained
         self.max_thinking_tokens = max_thinking_tokens
         self.choices = choices if choices is not None else ["A", "B", "C", "D"]
+        self.lora_path = lora_path
+        self.LoRARequest = LoRARequest
 
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained)
 
@@ -50,13 +53,23 @@ class VLLMTwoPass(LM):
             gpu_memory_utilization=gpu_memory_utilization,
             max_model_len=max_model_len,
             enforce_eager=True,
+            enable_lora=bool(lora_path),
         )
-        if peft_model:
-            llm_kwargs["peft_model"] = peft_model
 
         self.llm = LLM(**llm_kwargs)
         self.SamplingParams = SamplingParams
         self.StructuredOutputsParams = StructuredOutputsParams
+
+    @property
+    def tokenizer_name(self) -> str:
+        return self.model_path
+
+    def _get_lora_request(self):
+        if not self.lora_path:
+            return None
+        return self.LoRARequest(
+            lora_name="adapter", lora_id=1, lora_path=self.lora_path
+        )
 
     @property
     def tokenizer_name(self) -> str:
@@ -83,6 +96,7 @@ class VLLMTwoPass(LM):
         params1 = self.SamplingParams(
             max_tokens=max_tokens,
             temperature=0.0,
+            lora_request=self._get_lora_request(),
         )
         outputs1 = self.llm.generate(prompts_stage1, params1)
 
@@ -95,6 +109,7 @@ class VLLMTwoPass(LM):
         params2 = self.SamplingParams(
             max_tokens=1,
             temperature=0.0,
+            lora_request=self._get_lora_request(),
             structured_outputs=self.StructuredOutputsParams(
                 regex="[" + "".join(self.choices) + "]"
             ),
