@@ -1,5 +1,5 @@
 """
-Convert reason_train.json to Axolotl-compatible format.
+Convert reason_train.json to Axolotl-compatible messages format.
 
 Usage:
     cd finetune && uv run python convert_json.py
@@ -19,9 +19,11 @@ def convert_item(item: dict) -> dict:
     )
 
     return {
-        "system": item["system"],
-        "user": item["user"],
-        "assistant": f"{reasoning}\n\n{structured}",
+        "messages": [
+            {"role": "system", "content": item["system"]},
+            {"role": "user", "content": item["user"]},
+            {"role": "assistant", "content": f"{reasoning}\n\n{structured}"},
+        ]
     }
 
 
@@ -41,9 +43,7 @@ def main():
 
     print(f"Saved: {output_path}")
     print(f"Sample output:\n{'-' * 50}")
-    print(f"System: {converted[0]['system'][:100]}...")
-    print(f"User: {converted[0]['user'][:100]}...")
-    print(f"Assistant: {converted[0]['assistant'][:200]}...")
+    print(f"Messages: {converted[0]['messages']}")
 
 
 if __name__ == "__main__":
