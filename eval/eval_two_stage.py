@@ -67,7 +67,9 @@ class VLLMTwoPass(LM):
     def _get_lora_request(self):
         if not self.lora_path:
             return None
-        return self.LoRARequest(lora_name="adapter", lora_path=self.lora_path)
+        return self.LoRARequest(
+            lora_name="adapter", lora_int_id=1, lora_path=self.lora_path
+        )
 
     @property
     def tokenizer_name(self) -> str:
