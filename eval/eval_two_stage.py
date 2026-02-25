@@ -96,9 +96,9 @@ class VLLMTwoPass(LM):
         params1 = self.SamplingParams(
             max_tokens=max_tokens,
             temperature=0.0,
-            lora_request=self._get_lora_request(),
         )
-        outputs1 = self.llm.generate(prompts_stage1, params1)
+        lora_req = self._get_lora_request()
+        outputs1 = self.llm.generate(prompts_stage1, params1, lora_request=lora_req)
 
         thinking_outputs = [o.outputs[0].text for o in outputs1]
 
@@ -109,12 +109,11 @@ class VLLMTwoPass(LM):
         params2 = self.SamplingParams(
             max_tokens=1,
             temperature=0.0,
-            lora_request=self._get_lora_request(),
             structured_outputs=self.StructuredOutputsParams(
                 regex="[" + "".join(self.choices) + "]"
             ),
         )
-        outputs2 = self.llm.generate(prompts_stage2, params2)
+        outputs2 = self.llm.generate(prompts_stage2, params2, lora_request=lora_req)
 
         results = []
         for thinking, o in zip(thinking_outputs, outputs2):
