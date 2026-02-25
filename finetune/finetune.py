@@ -98,7 +98,6 @@ def main():
     model, tokenizer, trainer = train(
         cfg=cfg,
         dataset_meta=dataset_meta,
-        resume_from_checkpoint=resume_from_checkpoint,
     )
 
     print("-" * 50)
