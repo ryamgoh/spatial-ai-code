@@ -105,7 +105,7 @@ class VLLMTwoPass(LM):
         thinking_outputs = [o.outputs[0].text for o in outputs1]
 
         for i, (prompt, thinking) in enumerate(zip(prompts_stage1, thinking_outputs)):
-            extraction_prompt = f"{prompt}\n{thinking}\n\nTherefore, the correct option is (just output the letter):"
+            extraction_prompt = f"{prompt}\n{thinking}\n\nAnswer: "
             prompts_stage2.append(extraction_prompt)
 
         params2 = self.SamplingParams(

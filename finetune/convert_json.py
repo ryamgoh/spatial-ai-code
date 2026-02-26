@@ -14,15 +14,15 @@ def convert_item(item: dict) -> dict:
     coords = item["assistant"]["coordinates"]
     answer = item["assistant"]["answer"]
 
-    structured = json.dumps(
-        {"coordinates": coords, "answer": answer}, ensure_ascii=False
-    )
+    thinking = reasoning + "\nCoordinates\n" + json.dumps(coords, ensure_ascii=False);
+
+    structured = f"<think>{thinking}</think>Answer: {answer}";
 
     return {
         "messages": [
             {"role": "system", "content": item["system"]},
             {"role": "user", "content": item["user"]},
-            {"role": "assistant", "content": f"{reasoning}\n\n{structured}"},
+            {"role": "assistant", "content": structured},
         ]
     }
 
