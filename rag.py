@@ -90,8 +90,8 @@ class RAGRetriever:
     def retrieve(self, query: str, k: int = 3) -> list[str]:
         """Retrieve top-k chunks for a query."""
         if self.index is None:
-            self.build_index()
-
+            # Force rebuild since cache only stores chunks, not the index
+            self.build_index(force_rebuild=True)
         retriever = self.index.as_retriever(similarity_top_k=k)
         nodes = retriever.retrieve(query)
         return [node.text for node in nodes]

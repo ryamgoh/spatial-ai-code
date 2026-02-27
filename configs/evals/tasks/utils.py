@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import re
+from lm_eval.api.task import ConfigurableTask
+from rag import RAGManager
 
 
 def process_docs(dataset, seed=42):
@@ -38,6 +40,48 @@ def process_docs(dataset, seed=42):
 def filter_spatialmap(dataset):
     """Filter dataset to only include rows where id starts with 'spatialmap.'"""
     return dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
+
+
+def process_docs_with_rag(dataset):
+    """Process docs with RAG augmentation."""
+    import re
+    from rag import RAGManager
+
+    # RAG Config
+    context_k = 3
+    context_template = "- {text}"
+    context_separator = "\n"
+    query_field = "text"
+    context_field = "context"
+    corpus_paths = "../spatial_knowledge.docx"
+    chunk_size = 800
+    chunk_overlap = 100
+    embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
+
+    # Filter to spatialmap
+    dataset = dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
+
+    rag_manager = RAGManager()
+    retriever = rag_manager.get_retriever(
+        name="spatial_knowledge",
+        corpus_paths=[corpus_paths],
+        embedding_model=embedding_model,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+    )
+    
+    def add_rag(doc):
+        query = doc.get(query_field, "")
+        context = retriever.get_context(
+            query=query,
+            k=context_k,
+            template=context_template,
+            separator=context_separator,
+        )
+        doc[context_field] = context
+        return doc
+    
+    return dataset.map(add_rag)
 
 
 def macro_f1(items):
@@ -114,7 +158,6 @@ def process_gen_response(items):
 
 def acc_gen(items):
     """Accuracy metric for generative multiple choice.
-    
     items is [gold, filtered_resps] where:
     - gold: str like "A", "B", "C", "D"
     - filtered_resps: list like ["D"] (from filter)
@@ -122,19 +165,15 @@ def acc_gen(items):
     # items is [gold, filtered_resps] - unpack it
     gold = items[0]
     filtered_resps = items[1]
-    
     # filtered_resps is a list like ["D"]
     if isinstance(filtered_resps, list):
         predicted = filtered_resps[0] if filtered_resps else ""
     else:
         predicted = str(filtered_resps)
-    
     # Normalize
     gold = str(gold).upper().strip()
     predicted = str(predicted).upper().strip()
-    
     # Take first character if longer
     if predicted:
         predicted = predicted[0]
-    
     return 1.0 if predicted == gold else 0.0

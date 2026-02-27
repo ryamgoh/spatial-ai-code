@@ -8,7 +8,7 @@ model_args:
   peft_model: null
 include_path: ../configs/evals/tasks
 tasks:
-  - spatial_eval_gen
+  - spatial_eval_gen_rag
 limit: 10
 apply_chat_template: true
 num_fewshot: 0
