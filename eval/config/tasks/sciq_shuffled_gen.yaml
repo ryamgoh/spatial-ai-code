@@ -1,0 +1,35 @@
+task: sciq_shuffled_gen
+dataset_path: allenai/sciq
+test_split: test
+output_type: generate_until
+process_docs: !function utils.process_docs
+doc_to_text: |-
+  {{question}}
+  A. {{choice_a}}
+  B. {{choice_b}}
+  C. {{choice_c}}
+  D. {{choice_d}}
+  
+  Answer:
+doc_to_target: "{{['A', 'B', 'C', 'D'][correct_index]}}"
+# generation_kwargs:
+  # until: ["\n\n", "Question:"]
+  # do_sample: false
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "\\b([A-D])\\b"
+        group_select: -1  # Take last match
+      - function: "take_first"
+metric_list:
+  - metric: !function utils.acc_gen
+    aggregation: mean
+    higher_is_better: true
+  # - metric: mcc
+  #   aggregation: !function utils.mcc
+  #   higher_is_better: true
+
+metadata:
+  version: 1.0
+  note: "Generative version for thinking/reasoning models with structured outputs."

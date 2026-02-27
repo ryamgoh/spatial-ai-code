@@ -1,0 +1,41 @@
+# Task with RAG (Retrieval-Augmented Generation)
+task: task_rag_augmented
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test: ./data/task_rag_augmented.jsonl
+output_type: multiple_choice
+
+choices:
+  - "A"
+  - "B"
+  - "C"
+  - "D"
+
+doc_to_text: |
+  Context: {{context}}
+  
+  Question: {{question}}
+  
+  Answer:
+doc_to_target: "{{answer}}"
+
+# RAG Configuration
+rag:
+  enabled: true
+  context_k: 3
+  context_template: "- {text}"
+  context_separator: "\n"
+  query_field: "question"
+  context_field: "context"
+  corpus:
+    paths:
+      - "./datasets/knowledge_base.txt"
+    chunk_size: 800
+    chunk_overlap: 100
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true

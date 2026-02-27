@@ -1,0 +1,19 @@
+model: vllm_two_pass
+model_args:
+  pretrained: Qwen/Qwen3-7B
+  lora_path: ../finetune/outputs/qwen3-7b-spatial-reasoning
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.8
+  max_model_len: 16384
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen
+limit: 10
+apply_chat_template: true
+num_fewshot: 0
+batch_size: 1
+device: cuda:0
+log_samples: true
+output_path: ./results/qwen3-7b-spatial-reasoning

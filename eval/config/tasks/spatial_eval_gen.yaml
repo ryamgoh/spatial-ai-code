@@ -1,0 +1,38 @@
+# SpatialEval: Spatial reasoning benchmark
+# https://huggingface.co/datasets/MilaWang/SpatialEval
+#
+# Evaluates spatial reasoning on map-based questions
+task: spatial_eval_gen
+dataset_path: MilaWang/SpatialEval
+dataset_name: tqa
+test_split: test
+output_type: generate_until
+
+process_docs: !function utils.filter_spatialmap
+
+doc_to_text: |-
+  {{text}}
+doc_to_target: "{{oracle_option}}"
+
+generation_kwargs:
+  until: []
+
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        # regex_pattern: "\\b([A-D])\\b"
+        # regex_pattern: '"answer"\s*:\s*"([A-D])"'
+        regex_pattern: "Answer: ([A-D])"
+        # group_select: -1
+      - function: "take_first"
+
+metric_list:
+  - metric: !function utils.acc_gen
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 1.1
+  note: "SpatialEval TQA subset filtered to spatialmap.* IDs Generative version"
+  

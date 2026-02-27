@@ -1,0 +1,48 @@
+base_model: Qwen/Qwen3-14B
+load_in_4bit: true
+adapter: qlora
+lora_r: 32
+lora_alpha: 64
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+lora_qkv_kernel: true
+lora_o_kernel: true
+lora_mlp_kernel: true
+embeddings_skip_upcast: true
+xformers_attention: true
+plugins:
+  - axolotl.integrations.cut_cross_entropy.CutCrossEntropyPlugin
+sample_packing: true
+learning_rate: 0.00019
+sequence_len: 4096
+micro_batch_size: 1
+gradient_accumulation_steps: 1
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_steps: 5
+fp16: true
+bf16: false
+max_grad_norm: 0.1
+num_epochs: 1
+saves_per_epoch: 2
+logging_steps: 1
+output_dir: ./outputs/qwen3-14b-finetuned
+chat_template: qwen3
+datasets:
+  - path: winglian/pirate-ultrachat-10k
+    type: chat_template
+    split: train
+    eot_tokens:
+      - "<|im_end|>"
+dataloader_prefetch_factor: 8
+dataloader_num_workers: 2
+dataloader_pin_memory: true

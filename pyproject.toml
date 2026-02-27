@@ -5,9 +5,4 @@ description = "Shared code for spatial-ai project"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pyyaml>=6.0.3",
-    "sentence-transformers>=2.2.0",
-    "numpy>=1.24.0",
-    "llama-index>=0.12.42",
-    "llama-index-embeddings-huggingface>=0.5.5",
 ]

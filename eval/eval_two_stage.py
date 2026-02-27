@@ -5,7 +5,7 @@ Stage 1: Free thinking
 Stage 2: Constrained answer (A/B/C/D)
 
 Usage:
-    cd eval && uv run python eval_two_stage.py --config ../configs/evals/eval_deepseek-r1-distill-qwen-1.5b_two_pass.yaml
+    cd eval && uv run python eval_two_stage.py --config ./config/eval_deepseek-r1-distill-qwen-1.5b_two_pass.yaml
 """
 
 import argparse
@@ -17,7 +17,7 @@ from lm_eval.config.evaluate_config import EvaluatorConfig
 import lm_eval
 from utils import generate_datetime_id
 
-RESULTS_DIR = Path(__file__).parent.parent / "results"
+RESULTS_DIR = Path(__file__).parent / "results"
 
 
 @register_model("vllm_two_pass")
