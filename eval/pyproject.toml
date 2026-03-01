@@ -13,7 +13,6 @@ dependencies = [
     "outlines>=1.2.9",
     "numpy>=1.24.0",
     "docx2txt>=0.9",
-    "transformers>=5.2.0",
 ]
 
 [tool.uv.sources]

@@ -5225,7 +5225,6 @@ dependencies = [
     { name = "outlines" },
     { name = "pyyaml" },
     { name = "sentence-transformers" },
-    { name = "transformers" },
 ]
 
 [package.metadata]
@@ -5238,7 +5237,6 @@ requires-dist = [
     { name = "outlines", specifier = ">=1.2.9" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "sentence-transformers", specifier = ">=2.2.0" },
-    { name = "transformers", specifier = ">=5.2.0" },
 ]
 
 [[package]]
