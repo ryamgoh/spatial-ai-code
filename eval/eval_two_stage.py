@@ -109,20 +109,26 @@ class VLLMTwoPass(LM):
             prompts_stage2.append(extraction_prompt)
 
         params2 = self.SamplingParams(
-            max_tokens=1,
+            max_tokens=16, # Enough for "A, B, C, D" + punctuation
             temperature=0.0,
+            # This regex ensures the model follows your "A, B" format precisely
             structured_outputs=self.StructuredOutputsParams(
-                regex="[" + "".join(self.choices) + "]"
+                regex=f"[{''.join(self.choices)}](, [{''.join(self.choices)}])*"
             ),
         )
+        
+        lora_req = self._get_lora_request()
         outputs2 = self.llm.generate(prompts_stage2, params2, lora_request=lora_req)
 
-        results = []
+        final_results = []
         for thinking, o in zip(thinking_outputs, outputs2):
+            # o.outputs[0].text will now contain strings like "A" or "A, B"
             answer = o.outputs[0].text
-            results.append(f"{thinking}\n\nAnswer: {answer}")
+            # We return the full string; your YAML regex filter will then 
+            # split "A, B" into the list ['A', 'B'] for the metric.
+            final_results.append(f"{thinking}\n\nAnswer: {answer}")
 
-        return results
+        return final_results
 
     def loglikelihood(self, requests):
         raise NotImplementedError("loglikelihood not supported for two-pass evaluation")
