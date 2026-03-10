@@ -21,14 +21,15 @@ filter_list:
   - name: "extract-answer"
     filter:
       - function: "regex"
-        # regex_pattern: "\\b([A-D])\\b"
-        # regex_pattern: '"answer"\s*:\s*"([A-D])"'
-        regex_pattern: "Answer: ([A-D])"
-        # group_select: -1
-      - function: "take_first"
+        # First: Find the specific line starting with "Answer:"
+        regex_pattern: "Answer: [A-D](, [A-D])*"
+        group_select: 0
+      - function: "regex"
+        # Second: Extract all [A-D] letters from THAT line only
+        regex_pattern: "([A-D])"
 
 metric_list:
-  - metric: !function utils.acc_gen
+  - metric: !function utils.partial_acc
     aggregation: mean
     higher_is_better: true
 

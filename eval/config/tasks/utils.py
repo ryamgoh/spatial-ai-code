@@ -174,3 +174,34 @@ def acc_gen(items):
     if predicted:
         predicted = predicted[0]
     return 1.0 if predicted == gold else 0.0
+
+def partial_acc(items):
+    """
+    Partial Accuracy for generative multiple choice.
+    - items[0] (gold): str like "A"
+    - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
+    """
+    gold = str(items[0]).upper().strip()
+    filtered_resps = items[1]
+
+    # Handle cases where the model provides no valid answers
+    if not filtered_resps or not isinstance(filtered_resps, list):
+        return 0.0
+
+    # Clean and normalize all predicted answers
+    # This keeps all X answers the model outputted
+    predictions = [str(p).upper().strip()[0] for p in filtered_resps if str(p).strip()]
+
+    if not predictions:
+        return 0.0
+
+    # Count how many times the gold answer appears in the prediction list
+    # If gold is "A" and predictions are ["A", "B", "C", "D"], correct_count is 1
+    correct_count = predictions.count(gold)
+
+    # Logic: 1 correct out of x = 4 outputs yields 0.25
+    # Logic: 0 correct out of x = 1 output yields 0.0
+    score = correct_count / len(predictions)
+
+    return score
+
