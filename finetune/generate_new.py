@@ -357,4 +357,4 @@ def batch_generate(output_file="spatial_sft_data_uncertainty.jsonl", num_samples
 
 
 if __name__ == "__main__":
-    batch_generate("spatial_sft_data_uncertainty.jsonl", 100)
+    batch_generate("spatial_sft_data_uncertainty.jsonl", 500)
