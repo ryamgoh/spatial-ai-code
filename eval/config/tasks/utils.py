@@ -1,6 +1,46 @@
 import random
 import re
 
+def process_docs_local_train(dataset):
+    """
+    Convert local training data with messages format to lm-eval format.
+    
+    Input format (your data):
+    {
+      "messages": [
+       {"role": "system", "content": "..."},
+        {"role": "user", "content": "Question..."},
+        {"role": "assistant", "content": "Thinking: ...Answer: A"}
+      ]
+    }
+    
+    Output format (lm-eval):
+    {
+      "text": "user content",
+      "oracle_option": "A"
+    }
+    """
+    def convert(doc):
+        user_content = ""
+        oracle_options = []
+        
+        for msg in doc["messages"]:
+            if msg["role"] == "user":
+                user_content = msg["content"]
+            elif msg["role"] == "assistant":
+                match = re.search(r"Answer:\s*([A-D](?:,\s*[A-D])*)", msg["content"])
+                if match:
+                    options_str = match.group(1)
+                    oracle_options = [opt.strip() for opt in options_str.split(",")]
+        
+        return {
+            "text": user_content,
+            # Join with comma (no spaces) for consistent parsing: "A,D"
+            "oracle_option": ",".join(oracle_options) if oracle_options else ""
+        }
+    
+    return dataset.map(convert)
+
 
 def process_docs(dataset, seed=42):
     """
@@ -38,6 +78,11 @@ def filter_spatialmap(dataset):
     """Filter dataset to only include rows where id starts with 'spatialmap.'"""
     return dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
 
+def filter_spatialmap_first_type(dataset):
+    """Filter dataset to only include rows where id matches 'spatialmap.tqa.[number].1'."""
+    return dataset.filter(
+        lambda x: bool(re.match(r"^spatialmap\.tqa\.\d+\.1$", x["id"]))
+    )
 
 def process_docs_with_rag(dataset):
     """Process docs with RAG augmentation."""
@@ -178,30 +223,26 @@ def acc_gen(items):
 def partial_acc(items):
     """
     Partial Accuracy for generative multiple choice.
-    - items[0] (gold): str like "A"
+    - items[0] (gold): str like "A" or "A,B" (multiple valid answers)
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
     gold = str(items[0]).upper().strip()
     filtered_resps = items[1]
-
-    # Handle cases where the model provides no valid answers
+    
     if not filtered_resps or not isinstance(filtered_resps, list):
         return 0.0
-
-    # Clean and normalize all predicted answers
-    # This keeps all X answers the model outputted
+    
     predictions = [str(p).upper().strip()[0] for p in filtered_resps if str(p).strip()]
-
+    
     if not predictions:
         return 0.0
-
-    # Count how many times the gold answer appears in the prediction list
-    # If gold is "A" and predictions are ["A", "B", "C", "D"], correct_count is 1
-    correct_count = predictions.count(gold)
-
-    # Logic: 1 correct out of x = 4 outputs yields 0.25
-    # Logic: 0 correct out of x = 1 output yields 0.0
-    score = correct_count / len(predictions)
-
+    
+    correct_answers = set(gold.split(','))
+    correct_selected = len(set(predictions) & correct_answers)
+    
+    # Divide by number of predictions (penalizes over-guessing)
+    score = correct_selected / len(predictions)
+    
     return score
+
 
