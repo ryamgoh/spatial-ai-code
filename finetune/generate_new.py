@@ -334,25 +334,42 @@ If the relationship on a specific axis (X or Y) cannot be determined from the gi
     }
 
 
-def batch_generate(output_file="spatial_sft_data_uncertainty.jsonl", num_samples=100):
-    """Generate samples in batches and save them in JSONL format"""
-    valid_samples = 0
-    with open(output_file, "w", encoding="utf-8") as f:
-        while valid_samples < num_samples:
+def batch_generate(
+    output_file="spatial_sft_data_uncertainty.jsonl", num_samples=100, test_split=0.2
+):
+    """Generate samples in batches and save them in JSONL format with train/test split"""
+    train_file = output_file.replace(".jsonl", "_train.jsonl")
+    test_file = output_file.replace(".jsonl", "_test.jsonl")
+
+    num_test = int(num_samples * test_split)
+    num_train = num_samples - num_test
+
+    valid_train = 0
+    valid_test = 0
+
+    with (
+        open(train_file, "w", encoding="utf-8") as train_f,
+        open(test_file, "w", encoding="utf-8") as test_f,
+    ):
+        while valid_train < num_train or valid_test < num_test:
             n_ent = random.randint(4, 7)
-            n_sent = random.randint(
-                n_ent, n_ent + 2
-            )  # Slightly reduce the number of sentences to increase the chance of "multiple-answer" cases
+            n_sent = random.randint(n_ent, n_ent + 2)
 
             sample = generate_sample(num_entities=n_ent, num_sentences=n_sent)
             if sample:
-                f.write(json.dumps(sample, ensure_ascii=False) + "\n")
-                valid_samples += 1
-                if valid_samples % 10 == 0:
-                    print(f"Generated {valid_samples}/{num_samples} samples...")
+                if valid_train < num_train:
+                    train_f.write(json.dumps(sample, ensure_ascii=False) + "\n")
+                    valid_train += 1
+                elif valid_test < num_test:
+                    test_f.write(json.dumps(sample, ensure_ascii=False) + "\n")
+                    valid_test += 1
+
+                total = valid_train + valid_test
+                if total % 10 == 0:
+                    print(f"Generated {total}/{num_samples} samples...")
 
     print(
-        f"✅ Done! Successfully saved {num_samples} high-quality SFT samples to '{output_file}'"
+        f"✅ Done! Successfully saved {num_train} train samples to '{train_file}' and {num_test} test samples to '{test_file}'"
     )
 
 
