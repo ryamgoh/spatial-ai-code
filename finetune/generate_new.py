@@ -17,6 +17,11 @@ ENTITIES = [
     "Gas Station",
     "High School",
     "Cinema",
+    "University",
+    "City Hall",
+    "Supermarket",
+    "Zoo",
+    "Shopping Mall"
 ]
 
 
@@ -352,7 +357,7 @@ def batch_generate(
         open(test_file, "w", encoding="utf-8") as test_f,
     ):
         while valid_train < num_train or valid_test < num_test:
-            n_ent = random.randint(4, 7)
+            n_ent = random.randint(8, 13)
             n_sent = random.randint(n_ent, n_ent + 2)
 
             sample = generate_sample(num_entities=n_ent, num_sentences=n_sent)
