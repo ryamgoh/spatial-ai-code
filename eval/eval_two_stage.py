@@ -113,7 +113,7 @@ class VLLMTwoPass(LM):
             temperature=0.0,
             # This regex ensures the model follows your "A, B" format precisely
             structured_outputs=self.StructuredOutputsParams(
-                regex=f"[{''.join(self.choices)}](, [{''.join(self.choices)}])*"
+                regex=f"[{''.join(self.choices)}](,[{''.join(self.choices)}])*"
             ),
         )
         
