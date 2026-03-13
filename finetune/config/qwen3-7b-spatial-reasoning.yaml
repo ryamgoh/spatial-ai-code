@@ -1,4 +1,4 @@
-base_model: Qwen/Qwen3-7B
+base_model: deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
 load_in_4bit: true
 adapter: qlora
 lora_r: 64
@@ -16,11 +16,9 @@ lora_o_kernel: true
 lora_mlp_kernel: true
 embeddings_skip_upcast: true
 xformers_attention: true
-plugins:
-  - axolotl.integrations.cut_cross_entropy.CutCrossEntropyPlugin
 sample_packing: true
 learning_rate: 0.0001
-sequence_len: 8192
+sequence_len: 16384
 micro_batch_size: 1
 gradient_accumulation_steps: 8
 gradient_checkpointing: true
@@ -29,18 +27,33 @@ gradient_checkpointing_kwargs:
 optimizer: paged_adamw_8bit
 lr_scheduler: cosine
 warmup_ratio: 0.05
-fp16: true
-bf16: false
-max_grad_norm: 0.1
-num_epochs: 3
-saves_per_epoch: 2
+fp16: false 
+bf16: true
+max_grad_norm: 0.05
+num_epochs: 10
 logging_steps: 1
 output_dir: ./outputs/qwen3-7b-spatial-reasoning
 chat_template: qwen3
 datasets:
-  - path: ../reason_train_converted.json
+  - path: ../spatial_sft_data_uncertainty_train.jsonl
     type: chat_template
     field_messages: messages
 dataloader_prefetch_factor: 8
 dataloader_num_workers: 2
 dataloader_pin_memory: true
+
+# 1. Split data for validation
+val_set_size: 0.05 
+
+# 2. Configure Evaluation Strategy
+eval_strategy: steps
+eval_steps: 10 # frequency to check loss
+save_steps: 10
+load_best_model_at_end: true # REQUIRED for early stopping
+
+# 3. Early Stopping Parameters
+early_stopping_patience: 1
+early_stopping_threshold: 0.05 # Stop training if eval_loss <= 0.01
+metric_for_best_model: eval_loss
+greater_is_better: false
+
