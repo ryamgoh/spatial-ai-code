@@ -1,22 +1,16 @@
-# SpatialEval: Spatial reasoning benchmark
-# https://huggingface.co/datasets/MilaWang/SpatialEval
-#
-# Evaluates spatial reasoning on map-based questions
-task: spatial_eval_gen
-dataset_path: MilaWang/SpatialEval
-dataset_name: tqa
+task: spatial_eval_gen_finetuning_data_test
+dataset_path: json
+dataset_name: null  # set to null for local files
+dataset_kwargs:
+  data_files: 
+    test: "../spatial_sft_data_uncertainty_test.jsonl" 
 test_split: test
 output_type: generate_until
-
-process_docs: !function utils.filter_spatialmap_zero_type
-
-doc_to_text: |-
-  {{text}}
+process_docs: !function utils.process_docs_local_train
+doc_to_text: "{{text}}"
 doc_to_target: "{{oracle_option}}"
-
 generation_kwargs:
   until: []
-
 filter_list:
   - name: "extract-answer"
     filter:
@@ -28,8 +22,7 @@ metric_list:
   - metric: !function utils.partial_acc
     aggregation: mean
     higher_is_better: true
-
 metadata:
-  version: 1.1
-  note: "SpatialEval TQA subset filtered to spatialmap.* IDs Generative version"
+  version: 1.0
+  note: "This is using the training json"
   

@@ -84,6 +84,12 @@ def filter_spatialmap_first_type(dataset):
         lambda x: bool(re.match(r"^spatialmap\.tqa\.\d+\.1$", x["id"]))
     )
 
+def filter_spatialmap_zero_type(dataset):
+    """Filter dataset to only include rows where id matches 'spatialmap.tqa.[number].0'."""
+    return dataset.filter(
+        lambda x: bool(re.match(r"^spatialmap\.tqa\.\d+\.0$", x["id"]))
+    )
+
 def process_docs_with_rag(dataset):
     """Process docs with RAG augmentation."""
 

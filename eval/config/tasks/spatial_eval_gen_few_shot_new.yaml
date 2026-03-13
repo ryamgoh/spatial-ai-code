@@ -1,0 +1,52 @@
+# SpatialEval: Spatial reasoning benchmark
+# https://huggingface.co/datasets/MilaWang/SpatialEval
+#
+# Evaluates spatial reasoning on map-based questions
+task: spatial_eval_gen_few_shot
+dataset_path: MilaWang/SpatialEval
+dataset_name: tqa
+test_split: test
+output_type: generate_until
+
+process_docs: !function utils.filter_spatialmap
+
+doc_to_text: |-
+  {{text}}
+doc_to_target: "{{oracle_option}}"
+
+generation_kwargs:
+  until: []
+
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        # regex_pattern: "\\b([A-D])\\b"
+        # regex_pattern: '"answer"\s*:\s*"([A-D])"'
+        regex_pattern: "Answer: ([A-D])"
+        # group_select: -1
+      - function: "take_first"
+
+metric_list:
+  - metric: !function utils.acc_gen
+    aggregation: mean
+    higher_is_better: true
+
+fewshot_config:
+  sampler: default
+  samples:
+    - text: "Consider a map with multiple objects:\n\nNarwhal's Novelties is to the East of Planetarium Prints. Oz Oddities is to the Southeast of Planetarium Prints. Oz Oddities is to the Southwest of Narwhal's Novelties. Oz Oddities is to the South of Robot Room. University Unit is to the Northeast of Oz Oddities. Robot Room is to the East of Planetarium Prints. University Unit is to the East of Robot Room. University Unit is to the East of Planetarium Prints. Narwhal's Novelties is to the East of Robot Room.\n\nPlease answer the following multiple-choice question based on the provided information. In which direction is University Unit relative to Planetarium Prints? Available options:\n\nA. East\n\nB. Northwest\n\nC. Southwest\n\nD. Southeast.<think>Step 1: Reference Point\n\n- Entity: \"Planetarium Prints\"\n\n- Assignment: Set as origin (0, 0).\n\nStep 2: Locate \"Robot Room\"\n\n- Relation: East of \"Planetarium Prints\" (0, 0) -> implies x > 0, y = 0.\n\n- Assignment: Set to (10, 0).\n\nStep 3: Locate \"Narwhal's Novelties\"\n\n- Relation 1: East of \"Robot Room\" (10, 0) -> implies x > 10, y = 0.\n\n- Relation 2: East of \"Planetarium Prints\" (0, 0) -> implies x > 0, y = 0.\n\n- Intersection: x > 10, y = 0 AND x > 0, y = 0.\n\n- Assignment: Set to (20, 0).\n\nStep 4: Locate \"Oz Oddities\"\n\n- Relation 1: Southwest of \"Narwhal's Novelties\" (20, 0) -> implies x < 20, y < 0.\n\n- Relation 2: Southeast of \"Planetarium Prints\" (0, 0) -> implies x > 0, y < 0.\n\n- Relation 3: South of \"Robot Room\" (10, 0) -> implies x = 10, y < 0.\n\n- Intersection: x < 20, y < 0 AND x > 0, y < 0 AND x = 10, y < 0.\n\n- Assignment: Set to (10, -10).\n\nStep 5: Locate \"University Unit\"\n\n- Relation 1: Northeast of \"Oz Oddities\" (10, -10) -> implies x > 10, y > -10.\n\n- Relation 2: East of \"Planetarium Prints\" (0, 0) -> implies x > 0, y = 0.\n\n- Relation 3: East of \"Robot Room\" (10, 0) -> implies x > 10, y = 0.\n\n- Intersection: x > 10, y > -10 AND x > 0, y = 0 AND x > 10, y = 0.\n\n- Assignment: Set to (20, 0).\n\nStep 6: Final Check\n\n- Target: Direction of \"University Unit\" (20, 0) from \"Planetarium Prints\" (0, 0).\n\n- Calculation: x increases (0->20), y stays same.\n\n- Result: East.\nCoordinates\n{\"Planetarium Prints\": [0, 0], \"Robot Room\": [10, 0], \"Narwhal's Novelties\": [20, 0], \"Oz Oddities\": [10, -10], \"University Unit\": [20, 0]}</think>"
+      oracle_option: "A"
+    - text: "Consider a map with multiple objects:\n\nSchool Square is to the Southwest of Stadium Stand. School Square is to the South of Flower Fort. Video Village is to the East of Gym Garden. Ice Queen Ice Cream is to the South of Gym Garden. Fruit Factory is to the East of Video Village. Ice Queen Ice Cream is to the Southwest of Fruit Factory. Stadium Stand is to the East of Water World. Water World is to the Southwest of Fruit Factory. School Square is to the Southeast of Gym Garden. Ice Queen Ice Cream is to the Southwest of Flower Fort. Flower Fort is to the West of Fruit Factory. Flower Fort is to the East of Gym Garden. Stadium Stand is to the Southeast of Flower Fort. School Square is to the Southwest of Fruit Factory. Stadium Stand is to the South of Fruit Factory. Water World is to the East of Ice Queen Ice Cream.\n\nPlease answer the following multiple-choice question based on the provided information. In which direction is School Square relative to Gym Garden? Available options:\n\nA. Northeast\n\nB. Northwest\n\nC. Southwest\n\nD. Southeast.<think>Step 1: Reference Point\n\n- Entity: \"Gym Garden\"\n\n- Assignment: Set as origin (0, 0).\n\nStep 2: Locate \"Video Village\"\n\n- Relation: East of \"Gym Garden\" (0, 0) -> implies x > 0, y = 0.\n\n- Assignment: Set to (10, 0).\n\nStep 3: Locate \"Fruit Factory\"\n\n- Relation: East of \"Video Village\" (10, 0) -> implies x > 10, y = 0.\n\n- Assignment: Set to (20, 0).\n\nStep 4: Locate \"Flower Fort\"\n\n- Relation 1: West of \"Fruit Factory\" (20, 0) -> implies x < 20, y = 0.\n\n- Relation 2: East of \"Gym Garden\" (0, 0) -> implies x > 0, y = 0.\n\n- Intersection: x < 20, y = 0 AND x > 0, y = 0.\n\n- Assignment: Set to (10, 0).\n\nStep 5: Locate \"Ice Queen Ice Cream\"\n\n- Relation 1: Southwest of \"Flower Fort\" (10, 0) -> implies x < 10, y < 0.\n\n- Relation 2: Southwest of \"Fruit Factory\" (20, 0) -> implies x < 20, y < 0.\n\n- Relation 3: South of \"Gym Garden\" (0, 0) -> implies x = 0, y < 0.\n\n- Intersection: x < 10, y < 0 AND x < 20, y < 0 AND x = 0, y < 0.\n\n- Assignment: Set to (0, -10).\n\nStep 6: Locate \"Water World\"\n\n- Relation 1: East of \"Ice Queen Ice Cream\" (0, -10) -> implies x > 0, y = -10.\n\n- Relation 2: Southwest of \"Fruit Factory\" (20, 0) -> implies x < 20, y < 0.\n\n- Intersection: x > 0, y = -10 AND x < 20, y < 0.\n\n- Assignment: Set to (10, -10).\n\nStep 7: Locate \"Stadium Stand\"\n\n- Relation 1: East of \"Water World\" (10, -10) -> implies x > 10, y = -10.\n\n- Relation 2: Southeast of \"Flower Fort\" (10, 0) -> implies x > 10, y < 0.\n\n- Relation 3: South of \"Fruit Factory\" (20, 0) -> implies x = 20, y < 0.\n\n- Intersection: x > 10, y = -10 AND x > 10, y < 0 AND x = 20, y < 0.\n\n- Assignment: Set to (20, -10).\n\nStep 8: Locate \"School Square\"\n\n- Relation 1: Southwest of \"Stadium Stand\" (20, -10) -> implies x < 20, y < -10.\n\n- Relation 2: Southeast of \"Gym Garden\" (0, 0) -> implies x > 0, y < 0.\n\n- Relation 3: South of \"Flower Fort\" (10, 0) -> implies x = 10, y < 0.\n\n- Relation 4: Southwest of \"Fruit Factory\" (20, 0) -> implies x < 20, y < 0.\n\n- Intersection: x < 20, y < -10 AND x > 0, y < 0 AND x = 10, y < 0 AND x < 20, y < 0.\n\n- Assignment: Set to (10, -20).\n\nStep 9: Final Check\n\n- Target: Direction of \"School Square\" (10, -20) from \"Gym Garden\" (0, 0).\n\n- Calculation: x increases (0->10), y decreases (0->-20).\n\n- Result: Southeast.\nCoordinates\n{\"Gym Garden\": [0, 0], \"Video Village\": [10, 0], \"Fruit Factory\": [20, 0], \"Flower Fort\": [10, 0], \"Ice Queen Ice Cream\": [0, -10], \"Water World\": [10, -10], \"Stadium Stand\": [20, -10], \"School Square\": [10, -20]}</think>"
+      oracle_option: "D"
+    - text: "Consider a map with multiple objects:\n\nIce Queen Ice Cream is to the West of Library Lane. Arcade Alley is to the Southwest of Ice Queen Ice Cream. Pet Palace is to the South of Ice Queen Ice Cream. Arcade Alley is to the Southwest of Pet Palace. Ice Queen Ice Cream is to the Northwest of Yogurt Yard. Arcade Alley is to the Southwest of Yogurt Yard. Gadget Grove is to the South of Arcade Alley. Yogurt Yard is to the Southwest of Library Lane.\n\nPlease answer the following multiple-choice question based on the provided information. In which direction is Gadget Grove relative to Library Lane? Available options:\n\nA. Northeast\n\nB. Northwest\n\nC. Southwest\n\nD. Southeast.<think>step 1: reference point\n\n- entity: \"library lane\"\n\n- assignment: set as origin (0, 0).\n\nstep 2: locate \"yogurt yard\"\n\n- relation: southwest of \"library lane\" (0, 0) -> implies x < 0, y < 0.\n\n- assignment: set to (-10, -10).\n\nstep 3: locate \"ice queen ice cream\"\n\n- relation 1: northwest of \"yogurt yard\" (-10, -10) -> implies x < -10, y > -10.\n\n- relation 2: west of \"library lane\" (0, 0) -> implies x < 0, y = 0.\n\n- intersection: x < -10, y > -10 and x < 0, y = 0.\n\n- assignment: set to (-20, 0).\n\nstep 4: locate \"pet palace\"\n\n- relation: south of \"ice queen ice cream\" (-20, 0) -> implies x = -20, y < 0.\n\n- assignment: set to (-20, -10).\n\nstep 5: locate \"arcade alley\"\n\n- relation 1: southwest of \"pet palace\" (-20, -10) -> implies x < -20, y < -10.\n\n- relation 2: southwest of \"ice queen ice cream\" (-20, 0) -> implies x < -20, y < 0.\n\n- relation 3: southwest of \"yogurt yard\" (-10, -10) -> implies x < -10, y < -10.\n\n- intersection: x < -20, y < -10 and x < -20, y < 0 and x < -10, y < -10.\n\n- assignment: set to (-30, -20).\n\nstep 6: locate \"gadget grove\"\n\n- relation: south of \"arcade alley\" (-30, -20) -> implies x = -30, y < -20.\n\n- assignment: set to (-30, -30).\n\nstep 7: final check\n\n- target: direction of \"gadget grove\" (-30, -30) from \"library lane\" (0, 0).\n\n- calculation: x decreases (0->-30), y decreases (0->-30).\n\n- result: southwest.\ncoordinates\n{\"library lane\": [0, 0], \"yogurt yard\": [-10, -10], \"ice queen ice cream\": [-20, 0], \"pet palace\": [-20, -10], \"arcade alley\": [-30, -20], \"gadget grove\": [-30, -30]}</think>"
+      oracle_option: "C"
+  doc_to_text: "{{text}}"
+  doc_to_target: "{{oracle_option}}"
+  gen_prefix: "Answer: "
+  fewshot_delimiter: "\n\n"
+
+metadata:
+  version: 1.1
+  note: "SpatialEval TQA subset filtered to spatialmap.* IDs Generative version"
+  
