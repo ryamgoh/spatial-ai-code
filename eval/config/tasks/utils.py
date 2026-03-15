@@ -1,10 +1,11 @@
 import random
 import re
 
+
 def process_docs_local_train(dataset):
     """
     Convert local training data with messages format to lm-eval format.
-    
+
     Input format (your data):
     {
       "messages": [
@@ -13,17 +14,18 @@ def process_docs_local_train(dataset):
         {"role": "assistant", "content": "Thinking: ...Answer: A"}
       ]
     }
-    
+
     Output format (lm-eval):
     {
       "text": "user content",
       "oracle_option": "A"
     }
     """
+
     def convert(doc):
         user_content = ""
         oracle_options = []
-        
+
         for msg in doc["messages"]:
             if msg["role"] == "user":
                 user_content = msg["content"]
@@ -32,13 +34,13 @@ def process_docs_local_train(dataset):
                 if match:
                     options_str = match.group(1)
                     oracle_options = [opt.strip() for opt in options_str.split(",")]
-        
+
         return {
             "text": user_content,
             # Join with comma (no spaces) for consistent parsing: "A,D"
-            "oracle_option": ",".join(oracle_options) if oracle_options else ""
+            "oracle_option": ",".join(oracle_options) if oracle_options else "",
         }
-    
+
     return dataset.map(convert)
 
 
@@ -74,9 +76,20 @@ def process_docs(dataset, seed=42):
     return dataset.map(shuffle_choices)
 
 
+def filter_spatialmap_and_update_oracle_answer_new(dataset):
+    from clean_all import solve
+    dataset = dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
+    def add_oracle(doc):
+        doc["oracle_option"] = solve(doc["text"])
+        return doc
+
+    return dataset.map(add_oracle)
+
+
 def filter_spatialmap(dataset):
     """Filter dataset to only include rows where id starts with 'spatialmap.'"""
     return dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
+
 
 def filter_spatialmap_first_type(dataset):
     """Filter dataset to only include rows where id matches 'spatialmap.tqa.[number].1'."""
@@ -84,11 +97,13 @@ def filter_spatialmap_first_type(dataset):
         lambda x: bool(re.match(r"^spatialmap\.tqa\.\d+\.1$", x["id"]))
     )
 
+
 def filter_spatialmap_zero_type(dataset):
     """Filter dataset to only include rows where id matches 'spatialmap.tqa.[number].0'."""
     return dataset.filter(
         lambda x: bool(re.match(r"^spatialmap\.tqa\.\d+\.0$", x["id"]))
     )
+
 
 def process_docs_with_rag(dataset):
     """Process docs with RAG augmentation."""
@@ -117,7 +132,7 @@ def process_docs_with_rag(dataset):
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
     )
-    
+
     def add_rag(doc):
         query = doc.get(query_field, "")
         context = retriever.get_context(
@@ -128,7 +143,7 @@ def process_docs_with_rag(dataset):
         )
         doc[context_field] = context
         return doc
-    
+
     return dataset.map(add_rag)
 
 
@@ -226,6 +241,7 @@ def acc_gen(items):
         predicted = predicted[0]
     return 1.0 if predicted == gold else 0.0
 
+
 def partial_acc(items):
     """
     Partial Accuracy for generative multiple choice.
@@ -234,21 +250,19 @@ def partial_acc(items):
     """
     gold = str(items[0]).upper().strip()
     filtered_resps = items[1]
-    
+
     if not filtered_resps or not isinstance(filtered_resps, list):
         return 0.0
-    
+
     predictions = [str(p).upper().strip()[0] for p in filtered_resps if str(p).strip()]
-    
+
     if not predictions:
         return 0.0
-    
-    correct_answers = set(gold.split(','))
+
+    correct_answers = set(gold.split(","))
     correct_selected = len(set(predictions) & correct_answers)
-    
+
     # Divide by number of predictions (penalizes over-guessing)
     score = correct_selected / len(predictions)
-    
+
     return score
-
-
