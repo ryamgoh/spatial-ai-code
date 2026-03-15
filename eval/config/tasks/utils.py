@@ -1,6 +1,7 @@
 import random
 import re
-from clean_all import solve
+import os
+import sys
 
 
 def process_docs_local_train(dataset):
@@ -78,6 +79,7 @@ def process_docs(dataset, seed=42):
 
 
 def filter_spatialmap_and_update_oracle_answer_new(dataset):
+    from clean_all import solve
 
     dataset = dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
 

@@ -137,37 +137,37 @@ def solve(text):
     return ""
 
 
-# ========================= Tests =========================
-
-# Type 0 test
-text0 = r"""Consider a map with multiple objects:
-Camelot Antiques is in the map. Andy's Autos is to the Northeast of Camelot Antiques. Oscar's Office Supplies is to the Southeast of Camelot Antiques. Oscar's Office Supplies is to the Southwest of Andy's Autos. Quokka's Quilts is to the Southwest of Andy's Autos. Quokka's Quilts is to the Northwest of Oscar's Office Supplies. Marshland Mart is to the Northeast of Quokka's Quilts. Marshland Mart is to the Northeast of Camelot Antiques. Parrot's Pottery is to the Northwest of Marshland Mart. Parrot's Pottery is to the Northeast of Quokka's Quilts.
-
- Please answer the following multiple-choice question based on the provided information. In which direction is Marshland Mart relative to Parrot's Pottery? Available options:
-A. Northwest
-B. Northeast
-C. Southwest
-D. Southeast."""
-print("Type 0:", solve(text0))
-
-# Type 1 test
-text1 = r"""Consider a map with multiple objects:
-Unicorn's Umbrellas is in the map. Eccentric Electronics is to the Northwest of Unicorn's Umbrellas. Mantis's Maps is to the Southeast of Eccentric Electronics. Mantis's Maps is to the Southeast of Unicorn's Umbrellas. Tremor Toys is to the Northwest of Mantis's Maps. Tremor Toys is to the Southwest of Unicorn's Umbrellas. K University is to the Northeast of Eccentric Electronics. K University is to the Northeast of Mantis's Maps. Wild Water Park is to the Southeast of K University. Wild Water Park is to the Northeast of Tremor Toys.
-
-Please answer the following multiple-choice question based on the provided information. Which object is in the Northeast of Unicorn's Umbrellas? Available options:
-A. K University
-B. Tremor Toys
-C. Mantis's Maps
-D. Eccentric Electronics."""
-print("Type 1:", solve(text1))
-
-# Type 2 test
-text2 = r"""Consider a map with multiple objects:
-Zebra's Zen Zone is in the map. Eagle's Electronics is to the Southeast of Zebra's Zen Zone. Baker Street Bookstore is to the Northwest of Eagle's Electronics. Baker Street Bookstore is to the Northeast of Zebra's Zen Zone. Oz Oddities is to the Southeast of Zebra's Zen Zone. Oz Oddities is to the Southwest of Eagle's Electronics. Waterfall Wonders is to the Northeast of Oz Oddities. Waterfall Wonders is to the Southeast of Zebra's Zen Zone. Gale Gifts is to the Northwest of Oz Oddities. Gale Gifts is to the Southwest of Eagle's Electronics.
-
-Please answer the following multiple-choice question based on the provided information. How many objects are in the Northwest of Zebra's Zen Zone? Available options:
-A. 3
-B. 0
-C. 1
-D. 4."""
-print("Type 2:", solve(text2))
+# # ========================= Tests =========================
+#
+# # Type 0 test
+# text0 = r"""Consider a map with multiple objects:
+# Camelot Antiques is in the map. Andy's Autos is to the Northeast of Camelot Antiques. Oscar's Office Supplies is to the Southeast of Camelot Antiques. Oscar's Office Supplies is to the Southwest of Andy's Autos. Quokka's Quilts is to the Southwest of Andy's Autos. Quokka's Quilts is to the Northwest of Oscar's Office Supplies. Marshland Mart is to the Northeast of Quokka's Quilts. Marshland Mart is to the Northeast of Camelot Antiques. Parrot's Pottery is to the Northwest of Marshland Mart. Parrot's Pottery is to the Northeast of Quokka's Quilts.
+#
+#  Please answer the following multiple-choice question based on the provided information. In which direction is Marshland Mart relative to Parrot's Pottery? Available options:
+# A. Northwest
+# B. Northeast
+# C. Southwest
+# D. Southeast."""
+# print("Type 0:", solve(text0))
+#
+# # Type 1 test
+# text1 = r"""Consider a map with multiple objects:
+# Unicorn's Umbrellas is in the map. Eccentric Electronics is to the Northwest of Unicorn's Umbrellas. Mantis's Maps is to the Southeast of Eccentric Electronics. Mantis's Maps is to the Southeast of Unicorn's Umbrellas. Tremor Toys is to the Northwest of Mantis's Maps. Tremor Toys is to the Southwest of Unicorn's Umbrellas. K University is to the Northeast of Eccentric Electronics. K University is to the Northeast of Mantis's Maps. Wild Water Park is to the Southeast of K University. Wild Water Park is to the Northeast of Tremor Toys.
+#
+# Please answer the following multiple-choice question based on the provided information. Which object is in the Northeast of Unicorn's Umbrellas? Available options:
+# A. K University
+# B. Tremor Toys
+# C. Mantis's Maps
+# D. Eccentric Electronics."""
+# print("Type 1:", solve(text1))
+#
+# # Type 2 test
+# text2 = r"""Consider a map with multiple objects:
+# Zebra's Zen Zone is in the map. Eagle's Electronics is to the Southeast of Zebra's Zen Zone. Baker Street Bookstore is to the Northwest of Eagle's Electronics. Baker Street Bookstore is to the Northeast of Zebra's Zen Zone. Oz Oddities is to the Southeast of Zebra's Zen Zone. Oz Oddities is to the Southwest of Eagle's Electronics. Waterfall Wonders is to the Northeast of Oz Oddities. Waterfall Wonders is to the Southeast of Zebra's Zen Zone. Gale Gifts is to the Northwest of Oz Oddities. Gale Gifts is to the Southwest of Eagle's Electronics.
+#
+# Please answer the following multiple-choice question based on the provided information. How many objects are in the Northwest of Zebra's Zen Zone? Available options:
+# A. 3
+# B. 0
+# C. 1
+# D. 4."""
+# print("Type 2:", solve(text2))
