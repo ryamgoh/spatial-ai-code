@@ -242,27 +242,50 @@ def acc_gen(items):
     return 1.0 if predicted == gold else 0.0
 
 
-def partial_acc(items):
+def strict_acc(items):
     """
-    Partial Accuracy for generative multiple choice.
-    - items[0] (gold): str like "A" or "A,B" (multiple valid answers)
+    Train/test split accuracy for generative multiple choice problems.  
+    - items[0] (target): str like "A" or "A,B" (multiple valid answers)
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
-    gold = str(items[0]).upper().strip()
-    filtered_resps = items[1]
-
-    if not filtered_resps or not isinstance(filtered_resps, list):
+    target = items[0]
+    correct_answers = set(re.split(r'[,;| ]+', target))
+    
+    filtered_resps = items[1][0]
+    if not filtered_resps and not isinstance(filtered_resps, list):
         return 0.0
-
-    predictions = [str(p).upper().strip()[0] for p in filtered_resps if str(p).strip()]
-
+    predictions = set(re.split(r'[,;| ]+', filtered_resps))
     if not predictions:
         return 0.0
 
-    correct_answers = set(gold.split(","))
-    correct_selected = len(set(predictions) & correct_answers)
+    # give 1 point if all correct answer is included in prediction
+    if correct_answers == predictions:
+        score = 1
+    else:
+        score = 0
+    
+    return score
 
-    # Divide by number of predictions (penalizes over-guessing)
-    score = correct_selected / len(predictions)
+def loose_acc(items):
+    """
+    SpatialEval accuracy for generative multiple choice problems.  
+    - items[0] (target): str like "A" or "A,B" (multiple valid answers)
+    - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
+    """
+    target = items[0]
+    correct_answers = set(re.split(r'[,;| ]+', target))
+    
+    filtered_resps = items[1][0]
+    if not filtered_resps and not isinstance(filtered_resps, list):
+        return 0.0
+    predictions = set(re.split(r'[,;| ]+', filtered_resps))
+    if not predictions:
+        return 0.0
 
+    # give 1 point if all correct answer is included in prediction
+    if correct_answers.issubset(predictions):
+        score = 1
+    else:
+        score = 0
+    
     return score

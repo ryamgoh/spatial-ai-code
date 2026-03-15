@@ -8,7 +8,7 @@ dataset_name: tqa
 test_split: test
 output_type: generate_until
 
-process_docs: !function utils.filter_spatialmap_zero_type
+process_docs: !function utils.filter_spatialmap_and_update_oracle_answer_new
 
 doc_to_text: |-
   {{text}}
@@ -25,7 +25,7 @@ filter_list:
         group_select: -1  # Gets the LAST "Answer: ..." line
 
 metric_list:
-  - metric: !function utils.partial_acc
+  - metric: !function utils.loose_acc
     aggregation: mean
     higher_is_better: true
 
