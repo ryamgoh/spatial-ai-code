@@ -844,11 +844,11 @@ if __name__ == "__main__":
     batch_generate(
         "spatial_sft_data_all.jsonl",
         # Type 0 — direction
-        num_type0_1_answer=600,
-        num_type0_2_answer=600,
-        num_type0_4_answer=300,
+        num_type0_1_answer=300,
+        num_type0_2_answer=300,
+        num_type0_4_answer=150,
         # Type 1 — count
-        num_type1=500,
+        num_type1=750,
         # Type 2 — which entity
         num_type2_1_answer=400,
         num_type2_2_answer=200,
