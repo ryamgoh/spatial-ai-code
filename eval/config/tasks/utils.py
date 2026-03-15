@@ -77,8 +77,10 @@ def process_docs(dataset, seed=42):
 
 
 def filter_spatialmap_and_update_oracle_answer_new(dataset):
-    from clean_all import solve
+    from .clean_all import solve
+
     dataset = dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
+
     def add_oracle(doc):
         doc["oracle_option"] = solve(doc["text"])
         return doc
@@ -244,17 +246,17 @@ def acc_gen(items):
 
 def strict_acc(items):
     """
-    Train/test split accuracy for generative multiple choice problems.  
+    Train/test split accuracy for generative multiple choice problems.
     - items[0] (target): str like "A" or "A,B" (multiple valid answers)
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
     target = items[0]
-    correct_answers = set(re.split(r'[,;| ]+', target))
-    
+    correct_answers = set(re.split(r"[,;| ]+", target))
+
     filtered_resps = items[1][0]
     if not filtered_resps and not isinstance(filtered_resps, list):
         return 0.0
-    predictions = set(re.split(r'[,;| ]+', filtered_resps))
+    predictions = set(re.split(r"[,;| ]+", filtered_resps))
     if not predictions:
         return 0.0
 
@@ -263,22 +265,23 @@ def strict_acc(items):
         score = 1
     else:
         score = 0
-    
+
     return score
+
 
 def loose_acc(items):
     """
-    SpatialEval accuracy for generative multiple choice problems.  
+    SpatialEval accuracy for generative multiple choice problems.
     - items[0] (target): str like "A" or "A,B" (multiple valid answers)
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
     target = items[0]
-    correct_answers = set(re.split(r'[,;| ]+', target))
-    
+    correct_answers = set(re.split(r"[,;| ]+", target))
+
     filtered_resps = items[1][0]
     if not filtered_resps and not isinstance(filtered_resps, list):
         return 0.0
-    predictions = set(re.split(r'[,;| ]+', filtered_resps))
+    predictions = set(re.split(r"[,;| ]+", filtered_resps))
     if not predictions:
         return 0.0
 
@@ -287,5 +290,5 @@ def loose_acc(items):
         score = 1
     else:
         score = 0
-    
+
     return score
