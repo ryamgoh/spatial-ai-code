@@ -1,231 +1,320 @@
+"""
+Spatial Reasoning Question Solver
+==================================
+Supports three question types:
+  Type 0: "In which direction is X relative to Y?"
+  Type 1: "Which object is in the [Direction] of X?"
+  Type 2: "How many objects are in the [broad direction] of X?"
+
+Returns comma-separated valid answer option letters, e.g. "A", "A,C", "A,B,C,D".
+
+Algorithm overview
+------------------
+1. Model each object as a point (x, y) in 2-D space:
+       NE(A, B) → x_A > x_B  AND  y_A > y_B
+       SE(A, B) → x_A > x_B  AND  y_A < y_B
+       SW(A, B) → x_A < x_B  AND  y_A < y_B
+       NW(A, B) → x_A < x_B  AND  y_A > y_B
+
+2. Build two directed "greater-than" graphs:
+       x-graph: edge A→B  means  x_A > x_B  (A is east  of B)
+       y-graph: edge A→B  means  y_A > y_B  (A is north of B)
+
+3. Compute the transitive closure of each graph.
+   After closure, A→B reachable  ↔  the ordering is provably true.
+
+4. For each object pair (A, B), derive one of three states per axis:
+       'gt'  — A > B  is provably true
+       'lt'  — A < B  is provably true  (i.e., B > A is provably true)
+       'unknown' — neither can be derived
+
+5. Answer the question:
+   • Type 0 / Type 1 — an option is VALID if the direction is *possible*
+     (not contradicted by any known constraint).
+     Since x and y are independent, both axes are checked independently.
+   • Type 2 — count objects that are *definitely* in the stated broad
+     direction (must hold in every consistent assignment).
+"""
+
 import re
 
 
-def solve(text):
-    text = text.replace('\\n', '\n')
+def _normalize(text: str) -> str:
+    """Normalize curly/smart quotes to ASCII apostrophe so object names
+    parsed from the map description always match those parsed from options."""
+    return (
+        text
+        .replace("\u2018", "'").replace("\u2019", "'")   # '' → '
+        .replace("\u201c", '"').replace("\u201d", '"')   # "" → "
+    )
 
-    # ===== 1. Extract directional relations =====
-    rel_pattern = r"([^.\n]+?) is to the (Northeast|Northwest|Southeast|Southwest) of ([^.\n]+?)\."
-    relations = re.findall(rel_pattern, text)
 
-    # ===== 2. Collect all place names =====
-    all_objects = set()
-    for subj, d, obj in relations:
-        all_objects.add(subj.strip())
-        all_objects.add(obj.strip())
-    map_m = re.search(r"([^.\n]+?) is in the map", text)
-    if map_m:
-        all_objects.add(map_m.group(1).strip())
+# ──────────────────────────────────────────────────────────
+# Parsing
+# ──────────────────────────────────────────────────────────
 
-    # ===== 3. Build directed edges =====
-    # x_edges: (a, b) means b is to the east of a
-    # y_edges: (a, b) means b is to the north of a
-    x_edges, y_edges = set(), set()
-    for subj, d, obj in relations:
-        s, o = subj.strip(), obj.strip()
-        if d == "Northeast":     # s is NE of o -> s is north of o AND s is east of o
-            x_edges.add((o, s));  y_edges.add((o, s))
-        elif d == "Northwest":   # s is NW of o -> s is north of o AND s is west of o
-            x_edges.add((s, o));  y_edges.add((o, s))
-        elif d == "Southeast":   # s is SE of o -> s is south of o AND s is east of o
-            x_edges.add((o, s));  y_edges.add((s, o))
-        elif d == "Southwest":   # s is SW of o -> s is south of o AND s is west of o
-            x_edges.add((s, o));  y_edges.add((s, o))
+def parse_problem(text: str):
+    """
+    Returns (objects: list[str], relations: list[(a, dir, b)], question_part: str).
+    'direction' values are lowercase: 'northeast', 'southeast', 'southwest', 'northwest'.
+    """
+    text = _normalize(text)
+    split_marker = "Please answer"
+    if split_marker in text:
+        idx = text.index(split_marker)
+        map_part = text[:idx]
+        question_part = text[idx:]
+    else:
+        map_part = text
+        question_part = ""
 
-    # ===== 4. Transitive closure =====
-    def transitive_closure(edges):
-        cl = set(edges)
-        changed = True
-        while changed:
-            changed = False
-            new = set()
-            for a, b in list(cl):
-                for c, dd in list(cl):
-                    if b == c and (a, dd) not in cl:
-                        new.add((a, dd))
-            if new:
-                cl |= new
+    objects: set[str] = set()
+
+    # First object declared with "X is in the map."
+    m = re.search(r"([^.]+?) is in the map", map_part)
+    if m:
+        objects.add(m.group(1).strip())
+
+    # All directional relations: "X is to the [Dir] of Y."
+    rel_re = re.compile(
+        r"([^.]+?) is to the (Northeast|Northwest|Southeast|Southwest) of ([^.]+?)\.",
+        re.IGNORECASE,
+    )
+    relations = []
+    for m in rel_re.finditer(map_part):
+        a = m.group(1).strip()
+        d = m.group(2).strip().lower()
+        b = m.group(3).strip()
+        relations.append((a, d, b))
+        objects.add(a)
+        objects.add(b)
+
+    return list(objects), relations, question_part
+
+
+def detect_type(question_part: str) -> int:
+    if "In which direction is" in question_part:
+        return 0
+    if "Which object is in the" in question_part:
+        return 1
+    if "How many objects are in the" in question_part:
+        return 2
+    return -1
+
+
+def parse_options(question_part: str) -> dict[str, str]:
+    """Parse 'A. Value' lines → {'A': 'Value', ...}."""
+    opts = {}
+    for m in re.finditer(r"\b([A-D])\.\s*([^\n]+)", question_part):
+        key = m.group(1)
+        val = m.group(2).strip().rstrip(".")
+        opts[key] = val
+    return opts
+
+
+# ──────────────────────────────────────────────────────────
+# Constraint graphs & transitive closure
+# ──────────────────────────────────────────────────────────
+
+def transitive_closure(objects: list[str], edges: list[tuple]) -> dict[str, set]:
+    """
+    reach[a] = set of b such that a > b is provably derivable.
+    Uses iterative fixed-point expansion.
+    """
+    reach: dict[str, set] = {obj: set() for obj in objects}
+    for (a, b) in edges:
+        if a in reach:
+            reach[a].add(b)
+
+    changed = True
+    while changed:
+        changed = False
+        for a in objects:
+            before = len(reach[a])
+            extras: set = set()
+            for b in reach[a]:
+                extras |= reach.get(b, set())
+            reach[a] |= extras
+            if len(reach[a]) > before:
                 changed = True
-        return cl
+    return reach
 
-    xc = transitive_closure(x_edges)
-    yc = transitive_closure(y_edges)
 
-    # ===== Direction query helpers =====
-    def is_east(o, r):  return (r, o) in xc
-    def is_west(o, r):  return (o, r) in xc
-    def is_north(o, r): return (r, o) in yc
-    def is_south(o, r): return (o, r) in yc
+def build_order_graphs(objects: list[str], relations: list[tuple]):
+    """
+    Returns (x_reach, y_reach).
+      x_reach[a] contains b  →  x_a > x_b  (a is east  of b, provably)
+      y_reach[a] contains b  →  y_a > y_b  (a is north of b, provably)
+    """
+    x_edges, y_edges = [], []
 
-    def definitely_in(o, r, d):
-        """
-        Determine whether o is definitely in direction d of r.
+    for (a, d, b) in relations:
+        if d == "northeast":      # x_a > x_b,  y_a > y_b
+            x_edges.append((a, b))
+            y_edges.append((a, b))
+        elif d == "southeast":    # x_a > x_b,  y_a < y_b  →  y_b > y_a
+            x_edges.append((a, b))
+            y_edges.append((b, a))
+        elif d == "southwest":    # x_a < x_b  →  x_b > x_a,  y_a < y_b  →  y_b > y_a
+            x_edges.append((b, a))
+            y_edges.append((b, a))
+        elif d == "northwest":    # x_a < x_b  →  x_b > x_a,  y_a > y_b
+            x_edges.append((b, a))
+            y_edges.append((a, b))
 
-        Cardinal directions (North/South/East/West): only require the
-        corresponding axis to be provable; the other axis is ignored.
-          e.g. "North of X" = provably north of X (NE, NW, or due north all count)
-        Compound directions (NE/NW/SE/SW): require both axes to be provable.
-        """
-        if d == "Northeast": return is_north(o, r) and is_east(o, r)
-        if d == "Northwest": return is_north(o, r) and is_west(o, r)
-        if d == "Southeast": return is_south(o, r) and is_east(o, r)
-        if d == "Southwest": return is_south(o, r) and is_west(o, r)
-        if d == "North":     return is_north(o, r)
-        if d == "South":     return is_south(o, r)
-        if d == "East":      return is_east(o, r)
-        if d == "West":      return is_west(o, r)
-        return False
+    return (
+        transitive_closure(objects, x_edges),
+        transitive_closure(objects, y_edges),
+    )
 
-    def contradicted_for(o, r, d):
-        """Check whether o is provably NOT in direction d of r (contradicted)."""
-        if d == "Northeast": return is_south(o, r) or is_west(o, r)
-        if d == "Northwest": return is_south(o, r) or is_east(o, r)
-        if d == "Southeast": return is_north(o, r) or is_west(o, r)
-        if d == "Southwest": return is_north(o, r) or is_east(o, r)
-        if d == "North":     return is_south(o, r)
-        if d == "South":     return is_north(o, r)
-        if d == "East":      return is_west(o, r)
-        if d == "West":      return is_east(o, r)
-        return False
 
-    def count_between(cand, ref, direction):
-        """Count the number of objects between cand and ref along each axis required by direction."""
-        total = 0
-        need_north = direction in ("Northeast", "Northwest", "North")
-        need_south = direction in ("Southeast", "Southwest", "South")
-        need_east  = direction in ("Northeast", "Southeast", "East")
-        need_west  = direction in ("Northwest", "Southwest", "West")
-        for o in all_objects:
-            if o == cand or o == ref:
+def get_rel(reach: dict, a: str, b: str) -> str:
+    """
+    Relation of a vs b on one axis.
+      'gt'      → a > b  (proved)
+      'lt'      → a < b  (proved, because b > a)
+      'unknown' → cannot determine
+    """
+    if b in reach.get(a, set()):
+        return "gt"
+    if a in reach.get(b, set()):
+        return "lt"
+    return "unknown"
+
+
+# ──────────────────────────────────────────────────────────
+# Direction checks
+# ──────────────────────────────────────────────────────────
+
+def direction_possible(x_rel: str, y_rel: str, direction: str) -> bool:
+    """
+    Is it POSSIBLE for A to be in `direction` of B,
+    given x_rel / y_rel are A's relation to B?
+    'gt' on x means A is east of B, etc.
+    """
+    d = direction.strip().lower()
+    # Broad single-axis directions
+    if d == "north":
+        return y_rel != "lt"
+    if d == "south":
+        return y_rel != "gt"
+    if d == "east":
+        return x_rel != "lt"
+    if d == "west":
+        return x_rel != "gt"
+    # Diagonal directions
+    needs_east  = d in ("northeast", "southeast")
+    needs_north = d in ("northeast", "northwest")
+    x_ok = (needs_east  and x_rel != "lt") or (not needs_east  and x_rel != "gt")
+    y_ok = (needs_north and y_rel != "lt") or (not needs_north and y_rel != "gt")
+    return x_ok and y_ok
+
+
+def direction_definite(x_rel: str, y_rel: str, direction: str) -> bool:
+    """
+    Is it DEFINITELY TRUE that A is in `direction` of B?
+    Used for Type-2 counting.
+    """
+    d = direction.strip().lower()
+    if d == "north":
+        return y_rel == "gt"
+    if d == "south":
+        return y_rel == "lt"
+    if d == "east":
+        return x_rel == "gt"
+    if d == "west":
+        return x_rel == "lt"
+    if d == "northeast":
+        return x_rel == "gt" and y_rel == "gt"
+    if d == "southeast":
+        return x_rel == "gt" and y_rel == "lt"
+    if d == "southwest":
+        return x_rel == "lt" and y_rel == "lt"
+    if d == "northwest":
+        return x_rel == "lt" and y_rel == "gt"
+    return False
+
+
+# ──────────────────────────────────────────────────────────
+# Main solver
+# ──────────────────────────────────────────────────────────
+
+def solve(text: str) -> str:
+    """
+    Parse and solve one spatial question.
+    Returns comma-separated valid option letters, e.g. "A", "A,C", "A,B,C,D".
+    """
+    objects, relations, question_part = parse_problem(text)
+    if not question_part:
+        return "Error: no question found"
+
+    q_type = detect_type(question_part)
+    options = parse_options(question_part)
+    if not options:
+        return "Error: no options found"
+
+    x_reach, y_reach = build_order_graphs(objects, relations)
+    valid: list[str] = []
+
+    # ── Type 0: "In which direction is X relative to Y?" ──────────────────
+    if q_type == 0:
+        m = re.search(
+            r"In which direction is ([^?]+?) relative to ([^?]+?)\?", question_part
+        )
+        if not m:
+            return "Error: cannot parse type-0 question"
+        obj_x = m.group(1).strip()
+        obj_y = m.group(2).strip()
+        x_rel = get_rel(x_reach, obj_x, obj_y)
+        y_rel = get_rel(y_reach, obj_x, obj_y)
+        for key in sorted(options):
+            if direction_possible(x_rel, y_rel, options[key]):
+                valid.append(key)
+
+    # ── Type 1: "Which object is in the [Dir] of X?" ──────────────────────
+    elif q_type == 1:
+        m = re.search(
+            r"Which object is in the (\w+) of ([^?]+?)\?", question_part
+        )
+        if not m:
+            return "Error: cannot parse type-1 question"
+        direction = m.group(1).strip()
+        obj_ref = m.group(2).strip()
+        for key in sorted(options):
+            candidate = options[key]
+            x_rel = get_rel(x_reach, candidate, obj_ref)
+            y_rel = get_rel(y_reach, candidate, obj_ref)
+            if direction_possible(x_rel, y_rel, direction):
+                valid.append(key)
+
+    # ── Type 2: "How many objects are in the [Dir] of X?" ─────────────────
+    elif q_type == 2:
+        m = re.search(
+            r"How many objects are in the (\w+) of ([^?]+?)\?", question_part
+        )
+        if not m:
+            return "Error: cannot parse type-2 question"
+        direction = m.group(1).strip()
+        obj_ref = m.group(2).strip()
+
+        count = 0
+        for obj in objects:
+            if obj == obj_ref:
                 continue
-            if need_north and is_north(o, ref) and is_south(o, cand):
-                total += 1
-            if need_south and is_south(o, ref) and is_north(o, cand):
-                total += 1
-            if need_east and is_east(o, ref) and is_west(o, cand):
-                total += 1
-            if need_west and is_west(o, ref) and is_east(o, cand):
-                total += 1
-        return total
+            x_rel = get_rel(x_reach, obj, obj_ref)
+            y_rel = get_rel(y_reach, obj, obj_ref)
+            if direction_definite(x_rel, y_rel, direction):
+                count += 1
 
-    # ===== 5. Match question type =====
-    ALL_DIR = "Northeast|Northwest|Southeast|Southwest|North|South|East|West"
-    q_dir   = re.search(r"In which direction is (.+?) relative to (.+?)\?", text)
-    q_which = re.search(r"Which object is in the (" + ALL_DIR + r") of (.+?)\?", text)
-    q_count = re.search(r"How many objects are in the (" + ALL_DIR + r") of (.+?)\?", text)
+        for key in sorted(options):
+            try:
+                if int(options[key]) == count:
+                    valid.append(key)
+            except ValueError:
+                pass
 
-    # ===== 6. Parse answer options =====
-    oi_m = re.search(r"Available options:", text)
-    if not oi_m:
-        return ""
-    od = {}
-    for ln in text[oi_m.start():].strip().split('\n'):
-        m2 = re.match(r'([A-D])\.\s*(.+?)\.?\s*$', ln.strip())
-        if m2:
-            od[m2.group(1)] = m2.group(2).strip()
-    if not od:
-        return ""
+    else:
+        return "Error: unknown question type"
 
-    # ============ Type 0: In which direction ============
-    if q_dir:
-        tgt = q_dir.group(1).strip()
-        ref = q_dir.group(2).strip()
-        x_known = "east" if is_east(tgt, ref) else ("west" if is_west(tgt, ref) else None)
-        y_known = "north" if is_north(tgt, ref) else ("south" if is_south(tgt, ref) else None)
-        possible = set()
-        if y_known and x_known:
-            possible.add(y_known.capitalize() + x_known)
-        if y_known and not x_known:
-            possible.add(y_known.capitalize())
-        if x_known and not y_known:
-            possible.add(x_known.capitalize())
-        res = sorted(l for l, d in od.items() if d in possible)
-        return ",".join(res) if res else ""
+    return ",".join(valid) if valid else "No valid options found"
 
-    # ============ Type 1: Which object ============
-    elif q_which:
-        asked = q_which.group(1).strip()
-        ref   = q_which.group(2).strip()
-
-        # Step 1: strict proof — find all options provably in the asked direction
-        res = sorted(l for l, o in od.items() if definitely_in(o, ref, asked))
-        if len(res) == 1:
-            return res[0]
-        if len(res) > 1:
-            # Multiple matches — break tie by fewest intervening objects (closest)
-            scored = [(count_between(od[l], ref, asked), l) for l in res]
-            scored.sort()
-            return scored[0][1]
-
-        # Step 2: elimination — keep options not contradicted
-        res = sorted(l for l, o in od.items() if not contradicted_for(o, ref, asked))
-        if len(res) == 1:
-            return res[0]
-        if len(res) > 1:
-            scored = [(count_between(od[l], ref, asked), l) for l in res]
-            scored.sort()
-            return scored[0][1]
-        return ""
-
-    # ============ Type 2: How many objects ============
-    elif q_count:
-        asked = q_count.group(1).strip()
-        ref   = q_count.group(2).strip()
-        cnt = sum(1 for o in all_objects
-                  if o != ref and definitely_in(o, ref, asked))
-        res = sorted(l for l, n in od.items() if n == str(cnt))
-        return ",".join(res) if res else ""
-
-    return ""
-
-
-# ========================= Tests =========================
-
-# text0 = r"""Consider a map with multiple objects:
-# Camelot Antiques is in the map. Andy's Autos is to the Northeast of Camelot Antiques. Oscar's Office Supplies is to the Southeast of Camelot Antiques. Oscar's Office Supplies is to the Southwest of Andy's Autos. Quokka's Quilts is to the Southwest of Andy's Autos. Quokka's Quilts is to the Northwest of Oscar's Office Supplies. Marshland Mart is to the Northeast of Quokka's Quilts. Marshland Mart is to the Northeast of Camelot Antiques. Parrot's Pottery is to the Northwest of Marshland Mart. Parrot's Pottery is to the Northeast of Quokka's Quilts.
-#
-#  Please answer the following multiple-choice question based on the provided information. In which direction is Marshland Mart relative to Parrot's Pottery? Available options:
-# A. Northwest
-# B. Northeast
-# C. Southwest
-# D. Southeast."""
-# print("Test 0 (direction):", solve(text0))  # Expected: D (Southeast)
-#
-# text1 = r"""Consider a map with multiple objects:
-# Unicorn's Umbrellas is in the map. Eccentric Electronics is to the Northwest of Unicorn's Umbrellas. Mantis's Maps is to the Southeast of Eccentric Electronics. Mantis's Maps is to the Southeast of Unicorn's Umbrellas. Tremor Toys is to the Northwest of Mantis's Maps. Tremor Toys is to the Southwest of Unicorn's Umbrellas. K University is to the Northeast of Eccentric Electronics. K University is to the Northeast of Mantis's Maps. Wild Water Park is to the Southeast of K University. Wild Water Park is to the Northeast of Tremor Toys.
-#
-# Please answer the following multiple-choice question based on the provided information. Which object is in the Northeast of Unicorn's Umbrellas? Available options:
-# A. K University
-# B. Tremor Toys
-# C. Mantis's Maps
-# D. Eccentric Electronics."""
-# print("Test 1 (which NE):", solve(text1))  # Expected: A
-#
-# text2 = r"""Consider a map with multiple objects:
-# Zebra's Zen Zone is in the map. Eagle's Electronics is to the Southeast of Zebra's Zen Zone. Baker Street Bookstore is to the Northwest of Eagle's Electronics. Baker Street Bookstore is to the Northeast of Zebra's Zen Zone. Oz Oddities is to the Southeast of Zebra's Zen Zone. Oz Oddities is to the Southwest of Eagle's Electronics. Waterfall Wonders is to the Northeast of Oz Oddities. Waterfall Wonders is to the Southeast of Zebra's Zen Zone. Gale Gifts is to the Northwest of Oz Oddities. Gale Gifts is to the Southwest of Eagle's Electronics.
-#
-# Please answer the following multiple-choice question based on the provided information. How many objects are in the Northwest of Zebra's Zen Zone? Available options:
-# A. 3
-# B. 0
-# C. 1
-# D. 4."""
-# print("Test 2 (count NW):", solve(text2))  # Expected: B (0), NW is a compound direction
-#
-# text_new1 = "Consider a map with multiple objects: \\nYeti Yogurt is in the map.  Walrus Watches is to the Southeast of Yeti Yogurt.  Fresh Foods is to the Southeast of Yeti Yogurt. Fresh Foods is to the Southeast of Walrus Watches.  Ursa Uniforms is to the Northwest of Yeti Yogurt. Ursa Uniforms is to the Northwest of Fresh Foods.  Hummingbird Hats is to the Southwest of Ursa Uniforms. Hummingbird Hats is to the Northwest of Walrus Watches.  Umbrella Universe is to the Southeast of Ursa Uniforms. Umbrella Universe is to the Southeast of Yeti Yogurt. \\n\\n Please answer the following multiple-choice question based on the provided information. Which object is in the Southwest of Yeti Yogurt? Available options:\\nA. Hummingbird Hats\\nB. Fresh Foods\\nC. Umbrella Universe\\nD. Walrus Watches."
-# print("New1 (SW of YY):", solve(text_new1))  # Expected: A
-#
-# text_new2 = "Consider a map with multiple objects: \\nPool Hall Provisions is in the map.  Miner's Market is to the Southwest of Pool Hall Provisions.  Safari Supplies is to the Southwest of Pool Hall Provisions. Safari Supplies is to the Northwest of Miner's Market.  Cobra's Cameras is to the Northeast of Safari Supplies. Cobra's Cameras is to the Southwest of Pool Hall Provisions.  Mordor Supplies is to the Southeast of Cobra's Cameras. Mordor Supplies is to the Northeast of Miner's Market.  Brews Brothers Pub is to the Southeast of Miner's Market. Brews Brothers Pub is to the Southeast of Safari Supplies. \\n\\n Please answer the following multiple-choice question based on the provided information. Which object is in the Southwest of Cobra's Cameras? Available options:\\nA. Brews Brothers Pub\\nB. Pool Hall Provisions\\nC. Mordor Supplies\\nD. Miner's Market."
-# print("New2 (SW of CC):", solve(text_new2))  # Expected: D
-#
-# text_new3 = "Consider a map with multiple objects: \\nFactory Finds is in the map.  Fresh Foods is to the Northeast of Factory Finds.  Recycle Center is to the Northwest of Fresh Foods. Recycle Center is to the Northwest of Factory Finds.  Fox's Florist is to the Southeast of Factory Finds. Fox's Florist is to the Southeast of Recycle Center.  Jaguar Juice Bar is to the Southwest of Factory Finds. Jaguar Juice Bar is to the Southeast of Recycle Center.  Lucy's Lingerie is to the Southeast of Fresh Foods. Lucy's Lingerie is to the Southeast of Factory Finds. \\n\\n Please answer the following multiple-choice question based on the provided information. How many objects are in the South of Recycle Center? Available options:\\nA. 5\\nB. 2\\nC. 4\\nD. 0."
-# print("New3 (South of RC):", solve(text_new3))
-# # New interpretation: "South of RC" = provably south of RC (SE, SW, or due south all count)
-# # RC is the northernmost; all other 5 objects are provably south of it -> answer A (5)
-#
-# text_new4 = "Consider a map with multiple objects: \\nAndy's Autos is in the map.  Ursa Uniforms is to the Northeast of Andy's Autos.  Ibex Instruments is to the Northwest of Andy's Autos. Ibex Instruments is to the Northwest of Ursa Uniforms.  Delilah's Deli is to the Northwest of Ursa Uniforms. Delilah's Deli is to the Northeast of Andy's Autos.  Soothing Springs Spa is to the Northeast of Ibex Instruments. Soothing Springs Spa is to the Northwest of Ursa Uniforms.  Buffalo's Books is to the Northeast of Delilah's Deli. Buffalo's Books is to the Northwest of Ursa Uniforms. \\n\\n Please answer the following multiple-choice question based on the provided information. How many objects are in the North of Andy's Autos? Available options:\\nA. 0\\nB. 4\\nC. 1\\nD. 3."
-# print("New4 (North of AA):", solve(text_new4))
-# # New interpretation: "North of AA" = provably north of AA (NE, NW, or due north all count)
-# # AA is the southernmost; all other 5 objects are provably north of it -> should be 5,
-# # but 5 is not among the options, so this test sample's options may be incorrect,
-# # or the source dataset uses a different rule
-#
