@@ -97,7 +97,8 @@ class VLLMTwoPass(LM):
 
         params1 = self.SamplingParams(
             max_tokens=max_tokens,
-            temperature=0.0,
+            temperature=0.6,  # Add some randomness for variety
+            repetition_penalty=1.1,  # But still prevent loops
         )
         lora_req = self._get_lora_request()
         outputs1 = self.llm.generate(prompts_stage1, params1, lora_request=lora_req)
