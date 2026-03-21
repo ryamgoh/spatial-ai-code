@@ -1,0 +1,28 @@
+task: spatial_eval_gen_finetuning_data_train_0
+dataset_path: json
+dataset_name: null  # set to null for local files
+dataset_kwargs:
+  data_files: 
+    test: "../spatial_sft_data_uncertainty_train.jsonl" 
+test_split: test
+output_type: generate_until
+process_docs: !function utils.process_docs_local_train
+doc_to_text: "{{text}}"
+doc_to_target: "{{oracle_option}}"
+generation_kwargs:
+  until: []
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "Answer:\\s*([A-D](?:\\s*,\\s*[A-D])*)"
+        group_select: -1  # Gets the LAST "Answer: ..." line
+
+metric_list:
+  - metric: !function utils.strict_acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
+  note: "This is using the training json"
+  

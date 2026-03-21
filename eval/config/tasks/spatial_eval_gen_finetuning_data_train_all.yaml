@@ -1,9 +1,9 @@
-task: spatial_eval_gen_finetuning_data_train
+task: spatial_eval_gen_finetuning_data_train_all
 dataset_path: json
 dataset_name: null  # set to null for local files
 dataset_kwargs:
   data_files: 
-    test: "../spatial_sft_data_uncertainty_train.jsonl" 
+    test: "../spatial_sft_data_all_train.jsonl" 
 test_split: test
 output_type: generate_until
 process_docs: !function utils.process_docs_local_train

@@ -1,4 +1,4 @@
-task: spatial_eval_gen_finetuning_data_test
+task: spatial_eval_gen_finetuning_data_test_0
 dataset_path: json
 dataset_name: null  # set to null for local files
 dataset_kwargs:
