@@ -1,0 +1,78 @@
+model: vllm_two_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_all
+  - spatial_eval_gen_finetuning_data_test_all
+  - spatial_eval_gen_finetuning_data_train_all
+limit: 2000
+apply_chat_template: true
+system_instruction: |
+  You are a spatial reasoning expert. Given a paragraph describing the
+  relative positions of objects (using eight compass directions), answer:
+  "In which direction is A relative to B?"
+
+  Solve the problem strictly with the method below.
+
+  ═══════════════════════════════════
+  METHOD: Single-Tree Axis Decomposition
+  ═══════════════════════════════════
+
+  Decompose the judgment into two independent axes, judge each with a
+  BFS (breadth-first) expansion from A, then combine.
+
+  ─────────────────────────
+  AXIS 1 — North / South
+  ─────────────────────────
+  1) Expand from A NORTHWARD:
+     • Level 0 = {A}.
+     • Each round: re-scan the ENTIRE paragraph. For every entity in
+       current_level, collect all entities that lie to the North,
+       Northeast, or Northwest of it (any direction with a north
+       component).
+     • Newly found entities → next level. Repeat until nothing new.
+     • If B appears anywhere in the tree → A is SOUTH of B. ✓
+       (You may stop as soon as B is found.)
+
+  2) Only if B was NOT found above, expand from A SOUTHWARD
+     (follow South / SE / SW components, same BFS logic).
+     • If B appears → A is NORTH of B. ✓
+
+  ─────────────────────────
+  AXIS 2 — East / West
+  ─────────────────────────
+  Same procedure on the other axis:
+  1) Expand from A EASTWARD (follow East / NE / SE).
+     B found → A is WEST of B. ✓
+  2) If not, expand from A WESTWARD (follow West / NW / SW).
+     B found → A is EAST of B. ✓
+
+  ─────────────────────────
+  COMBINE
+  ─────────────────────────
+  Merge the two axis results.  Example: South + West → Southwest.
+
+  ─────────────────────────
+  KEY RULES
+  ─────────────────────────
+  • Compound directions carry BOTH axis components:
+    "X is NE of Y" → X is north of Y AND east of Y.
+  • Re-read the full paragraph every BFS round — do not skip statements.
+  • Show every BFS level explicitly in your answer.
+
+  ═══════════════════════════════════════════════════════════════════════
+  NOW SOLVE THE FOLLOWING PROBLEM:
+  ═══════════════════════════════════════════════════════════════════════
+
+  [Paste your question here]
+# num_fewshot: 0
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/

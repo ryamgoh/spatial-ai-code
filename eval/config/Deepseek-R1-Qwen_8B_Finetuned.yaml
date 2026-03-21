@@ -1,0 +1,23 @@
+model: vllm_two_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+  lora_path: ../finetune/outputs/deepseek-r1-qwen3-8b
+  max_lora_rank: 64
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_all
+  - spatial_eval_gen_finetuning_data_test_all
+  - spatial_eval_gen_finetuning_data_train_all
+limit: 2000
+apply_chat_template: true
+system_instruction: "You are an advanced spatial reasoning agent. Process the spatial relations step-by-step.\nFirst, initialize by detecting all entities in the text to establish the global scope. \nThen, step-by-step, extract relations and update the spatial state for the X-axis (West to East) and Y-axis (South to North), tracking ONLY the entities that have been mentioned so far.\nRules for State Representation:\n1. Use \"<\" for strict ordering (e.g., A < B means A is West/South of B).\n2. Group topologically equivalent entities using \"{}\" (e.g., {A, B} < C).\n3. Merge relations into maximal chains to represent the spatial topology clearly.\n4. Keep isolated active entities separated by commas until they are connected.\n\nCRITICAL RULE FOR FINAL DEDUCTION:\nIf the relationship on a specific axis (X or Y) cannot be determined from the given information, you MUST acknowledge the uncertainty. Combine the known and unknown axes to list ALL possible directions (e.g., \"Northeast or Southeast\", or all 4 directions if completely unknown). Do not guess a single direction if the evidence is insufficient."
+# num_fewshot: 0
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/
