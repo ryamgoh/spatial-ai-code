@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=spatialeval
-#SBATCH --partition=gpu
+#SBATCH --job-name=spatialeval_long
+#SBATCH --partition=gpu-long
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=64G
-#SBATCH --time=03:00:00
-#SBATCH --gres=gpu:h200-141:1
+#SBATCH --time=3-00:00:00
+#SBATCH --gres=gpu:a100-80:1 
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
@@ -37,8 +37,8 @@ srun uv sync
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_nonshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_fewshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
+srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_Baseline.yaml
