@@ -1,0 +1,113 @@
+model: vllm_two_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_all
+  - spatial_eval_gen_finetuning_data_test_all
+limit: 1500
+apply_chat_template: true
+system_instruction: |
+  ---
+  
+  **INSTRUCTIONS: Spatial Map Reasoning**
+  
+  You are given a passage describing the positions of named objects on a 2D map using directional relations, followed by a multiple-choice question. Solve it by strictly following the procedure below.
+  
+  ---
+  
+  **STEP 1 — Extract All Atomic Relations**
+  
+  Every positional statement implies two independent 1D facts. Decompose every statement in the passage using this table, and record all atoms explicitly:
+  
+  | Direction stated | Atoms derived |
+  |---|---|
+  | A is Northeast of B | A north-of B · A east-of B · B south-of A · B west-of A |
+  | A is Northwest of B | A north-of B · A west-of B · B south-of A · B east-of A |
+  | A is Southeast of B | A south-of B · A east-of B · B north-of A · B west-of A |
+  | A is Southwest of B | A south-of B · A west-of B · B north-of A · B east-of A |
+  
+  This atom list is your complete relation database. Do not infer anything beyond what is explicitly listed here.
+  
+  ---
+  
+  **STEP 2 — Identify the Reference Entity and Question Type**
+  
+  From the question, identify:
+  
+  - The **reference entity** (the spatial anchor):
+    - *"In which direction is A relative to **B**?"* → reference entity = **B**, target = **A**
+    - *"Which object is in the [direction] of **X**?"* → reference entity = **X**
+    - *"How many objects are in the [direction] of **X**?"* → reference entity = **X**
+  
+  - The **question type**: Type 0 (direction query), Type 1 (identification query), or Type 2 (count query).
+  
+  ---
+  
+  **STEP 3 — Build Four Directional Sets via Transitive Closure**
+  
+  For the reference entity, build four sets: `NorthSet`, `SouthSet`, `EastSet`, `WestSet`.
+  
+  Each set collects every object that lies in that direction from the reference entity, including those reachable through chains of relations.
+  
+  **Algorithm (apply identically to all four directions):**
+  
+  Start with the reference entity as the sole seed. Then repeatedly scan the atom database: whenever an atom says "Y north-of Z" and Z is already in `NorthSet`, add Y to `NorthSet`. Continue scanning and adding until a complete pass over all atoms produces no new additions. Finally, remove the reference entity itself from the set.
+  
+  The key insight driving transitivity: if Y is north of Z, and Z is already known to be north of the reference entity, then Y is necessarily north of the reference entity as well.
+  
+  > **NOTE:** After convergence, remove the reference entity from all four sets before proceeding.
+  
+  Show each pass explicitly, listing newly added entities per pass, so the reasoning is auditable.
+  
+  ---
+  
+  **STEP 4 — Answer Based on Question Type**
+  
+  ---
+  
+  **Type 0 — Direction** (*"In which direction is A relative to B?"*)
+  
+  Check which sets the **target entity A** belongs to:
+  
+  | A found in … | Direction of A from B |
+  |---|---|
+  | NorthSet ∩ EastSet | Northeast |
+  | NorthSet ∩ WestSet | Northwest |
+  | SouthSet ∩ EastSet | Southeast |
+  | SouthSet ∩ WestSet | Southwest |
+  | NorthSet only (not in EastSet or WestSet) | South axis confirmed; East/West undetermined |
+  | SouthSet only (not in EastSet or WestSet) | North axis confirmed; East/West undetermined |
+  | EastSet only (not in NorthSet or SouthSet) | East/West axis confirmed; North/South undetermined |
+  | WestSet only (not in NorthSet or SouthSet) | East/West axis confirmed; North/South undetermined |
+  
+  If only one axis is confirmed, inspect the answer options and select the option whose confirmed axis matches. The undetermined axis cannot eliminate that choice.
+  
+  ---
+  
+  **Type 1 — Identification** (*"Which object is in the [direction] of X?"*)
+  
+  Decompose the queried direction into its required sets (e.g., Southwest → SouthSet and WestSet).
+  
+  For each answer option O: O is correct if and only if O appears in **every** required set simultaneously. Evaluate all options and select the one that satisfies this membership condition.
+  
+  ---
+  
+  **Type 2 — Count** (*"How many objects are in the [direction] of X?"*)
+  
+  Decompose the queried direction into its required sets:
+  
+  - Single cardinal (e.g., North) → count entities in `NorthSet`
+  - Diagonal (e.g., Northwest) → count entities in `NorthSet ∩ WestSet`
+  
+  Count the members of the resulting set and match to the available answer options.
+# num_fewshot: 0
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/

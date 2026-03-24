@@ -1,0 +1,554 @@
+model: vllm_two_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_all
+  - spatial_eval_gen_finetuning_data_test_all
+limit: 1500
+apply_chat_template: true
+system_instruction: |
+  You are solving a spatial reasoning problem about objects on a 2D map.
+  You MUST follow every step below in order, writing out all intermediate
+  results explicitly. Do not skip, abbreviate, or combine any step.
+  
+  ══════════════════════════════════════════════════════════════════════
+  DIRECTION DECOMPOSITION & INVERSION RULES  (reference — use throughout)
+  ══════════════════════════════════════════════════════════════════════
+  
+  Decomposition into axis components:
+    Northeast = North + East          Northwest = North + West
+    Southeast = South + East          Southwest = South + West
+    North = North (only)              South = South (only)
+    East  = East  (only)              West  = West  (only)
+  
+  Inversion (swap both axes):
+    North ↔ South      East ↔ West
+    Northeast ↔ Southwest             Northwest ↔ Southeast
+  
+  From "X is to the Northeast of Y":
+    → X is-North-of Y  and  X is-East-of Y
+    → (inverse) Y is-South-of X  and  Y is-West-of X
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  STEP 0 — ASSIGN SHORT IDS AND EXTRACT ALL ATOMIC DIRECTIONAL FACTS
+  ══════════════════════════════════════════════════════════════════════
+  
+  0-A.  List every distinct entity mentioned in the passage.
+        Assign each one a short ID: E1, E2, E3, …
+        Print the mapping table, e.g.:
+          E1 = Wonderland Gifts
+          E2 = Umbrella Universe
+          …
+  
+  0-B.  For EVERY directional statement in the passage, decompose it into
+        atomic axis-aligned facts and record the inverse facts as well.
+  
+        Example: "Umbrella Universe is to the Southwest of Wonderland Gifts"
+          Forward decomposition (Southwest = South + West):
+            E2 is-South-of E1
+            E2 is-West-of E1
+          Inverse:
+            E1 is-North-of E2
+            E1 is-East-of E2
+  
+        Process every statement this way. Then compile FOUR master lists —
+        one per axis direction — collecting all facts of each type:
+  
+          North-facts:  all pairs (A, B) such that A is-North-of B
+          South-facts:  all pairs (A, B) such that A is-South-of B
+          East-facts:   all pairs (A, B) such that A is-East-of B
+          West-facts:   all pairs (A, B) such that A is-West-of B
+  
+        Print all four lists completely before moving on.
+  
+        Self-check: A diagonal direction (NE, NW, SE, SW) produces 2 forward
+        + 2 inverse = 4 atomic facts. A cardinal direction (N, S, E, W)
+        produces 1 forward + 1 inverse = 2 atomic facts. Verify your total
+        matches the expected sum across all statements.
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  STEP 1 — IDENTIFY THE REFERENCE ENTITY R AND REQUIRED AXIS SETS
+  ══════════════════════════════════════════════════════════════════════
+  
+  Read the question and match one of the three patterns below:
+  
+    Pattern A — "In which direction is [A] relative to [B]?"
+      R = B.  (You are standing at B, looking for where A is.)
+      You need to build ALL FOUR reachability sets for R:
+        R_North, R_South, R_East, R_West.
+  
+    Pattern B — "Which object is in the [DIR] of [A]?"
+      R = A.  Decompose [DIR] into axis components.
+      Build only the reachability sets corresponding to those components.
+      (e.g., DIR = Southwest → build R_South and R_West.)
+  
+    Pattern C — "How many objects are in the [DIR] of [A]?"
+      R = A.  Same as Pattern B.
+  
+  Now state explicitly:
+    "R = E__ ( ___ ).  I need to build: ___."
+  before proceeding to Step 2.
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  STEP 2 — BUILD EACH DIRECTIONAL REACHABILITY SET (TRANSITIVE CLOSURE)
+  ══════════════════════════════════════════════════════════════════════
+  
+  For each axis direction D you need, execute the following procedure to
+  compute R_D — the set of all entities reachable from R in direction D
+  (directly or through a chain of intermediate entities).
+  
+    Round 0:
+      Let D-set = ∅  (empty).
+      Let newly_found = { R }    — these are the entities to expand next.
+  
+    Round 1:
+      For each entity E in newly_found:
+        Scan the D-facts list from Step 0.
+        Collect every entity F where "F is-D-of E" appears in that list
+        AND F is not already in D-set and F ≠ R.
+      Add all collected F to D-set.
+      Set newly_found = the set of all F just added.
+      Print: "Round 1 — expanding: {…}, discovered: {…}, D-set is now: {…}"
+  
+    Round 2, 3, …:
+      Repeat the same process: for each entity E in newly_found, find new
+      neighbours in direction D that are not yet in D-set.
+      Print each round's expansion and discoveries.
+  
+    Stop when a round discovers no new entities.
+      Print: "D-set final = {…}"
+  
+  Repeat this for every axis direction D you need.
+  
+  Important reminders:
+    • Only look at the D-facts list (from Step 0) for direction D. Do NOT
+      re-read the original passage — use only the pre-extracted atomic facts.
+    • R itself is never included in R_D.
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  STEP 3 — DERIVE THE ANSWER
+  ══════════════════════════════════════════════════════════════════════
+  
+  ——— Pattern A: "In which direction is A relative to B?"  (R = B) ———
+  
+    Check which of R's four reachability sets contain A:
+  
+      A ∈ R_North?  →  North component present
+      A ∈ R_South?  →  South component present
+      A ∈ R_East?   →  East  component present
+      A ∈ R_West?   →  West  component present
+  
+    Use this lookup table to compose the direction of A as seen from R:
+  
+      North + East  →  A is to the Northeast of R
+      North + West  →  A is to the Northwest of R
+      South + East  →  A is to the Southeast of R
+      South + West  →  A is to the Southwest of R
+      North only (neither East nor West)  →  could be Northeast or Northwest
+      South only (neither East nor West)  →  could be Southeast or Southwest
+      East  only (neither North nor South) → could be Northeast or Southeast
+      West  only (neither North nor South) → could be Northwest or Southwest
+  
+    If the result is uniquely determined (two components found), select the
+    matching option.
+    If only one axis is determined, select every available option whose
+    direction is compatible.
+  
+  ——— Pattern B: "Which object is in the [DIR] of A?"  (R = A) ———
+  
+    Decompose [DIR] into axis components.
+    An answer option O is correct if and only if O appears in EVERY
+    corresponding reachability set.
+  
+      DIR = North      →  O ∈ R_North
+      DIR = South      →  O ∈ R_South
+      DIR = East       →  O ∈ R_East
+      DIR = West       →  O ∈ R_West
+      DIR = Northeast  →  O ∈ R_North  AND  O ∈ R_East
+      DIR = Northwest  →  O ∈ R_North  AND  O ∈ R_West
+      DIR = Southeast  →  O ∈ R_South  AND  O ∈ R_East
+      DIR = Southwest  →  O ∈ R_South  AND  O ∈ R_West
+  
+    Check each answer option against the required sets and select the one(s)
+    that satisfy all constraints.
+  
+  ——— Pattern C: "How many objects are in the [DIR] of A?"  (R = A) ———
+  
+    Same decomposition as Pattern B.
+    Count the distinct entities that appear in the INTERSECTION of all
+    required reachability sets.
+  
+      DIR = North      →  count = |R_North|
+      DIR = Northwest  →  count = |R_North ∩ R_West|
+      (and so on for other directions)
+  
+    Select the option matching this count.
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  STEP 4 — VERIFY
+  ══════════════════════════════════════════════════════════════════════
+  
+  Before committing to your answer, for each target entity T that your
+  answer depends on, trace a concrete chain of atomic facts from Step 0
+  that connects R to T along each required axis.
+  
+    Example: "T is North of R"  →  R →(N)→ X →(N)→ T    ✓  chain found
+  
+  If you cannot trace such a chain for any required axis, go back to
+  Step 2 and re-examine your BFS for that direction.
+  
+  Also confirm that entities you EXCLUDED from a set truly have no chain
+  connecting them to R in that direction.
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  OUTPUT FORMAT
+  ══════════════════════════════════════════════════════════════════════
+  
+  After completing all steps above, end your response with a single line:
+  
+  ANSWER: XYZ
+  
+  where XYZ is the set of correct option letters in alphabetical order
+  (for example, A, BD, or ACD). Do not include spaces, commas, or any
+  other text.
+  
+  
+  ██████████████████████████████████████████████████████████████████████
+  ██  WORKED EXAMPLE 1 — Pattern A                                   ██
+  ██████████████████████████████████████████████████████████████████████
+  
+  PASSAGE:
+  "The Museum is to the Northeast of the Library. The Hospital is to the
+  Northeast of the Museum. The Park is to the Southwest of the Library."
+  
+  QUESTION: In which direction is the Hospital relative to the Park?
+    (A) Southwest   (B) Northeast   (C) Northwest   (D) Southeast
+  
+  ─── STEP 0 ───
+  
+  0-A. Entity mapping:
+    E1 = Library
+    E2 = Museum
+    E3 = Hospital
+    E4 = Park
+  
+  0-B. Decompose each statement:
+  
+    Statement 1 — "The Museum is to the Northeast of the Library"
+      Forward (NE = N + E):
+        E2 is-North-of E1
+        E2 is-East-of E1
+      Inverse (NE ↔ SW):
+        E1 is-South-of E2
+        E1 is-West-of E2
+  
+    Statement 2 — "The Hospital is to the Northeast of the Museum"
+      Forward:
+        E3 is-North-of E2
+        E3 is-East-of E2
+      Inverse:
+        E2 is-South-of E3
+        E2 is-West-of E3
+  
+    Statement 3 — "The Park is to the Southwest of the Library"
+      Forward (SW = S + W):
+        E4 is-South-of E1
+        E4 is-West-of E1
+      Inverse:
+        E1 is-North-of E4
+        E1 is-East-of E4
+  
+    Master lists:
+      North-facts: (E2, E1), (E3, E2), (E1, E4)
+      South-facts: (E1, E2), (E2, E3), (E4, E1)
+      East-facts:  (E2, E1), (E3, E2), (E1, E4)
+      West-facts:  (E1, E2), (E2, E3), (E4, E1)
+  
+    Self-check: 3 diagonal statements × 4 = 12 atomic facts.
+    Counted: 3 + 3 + 3 + 3 = 12. ✓
+  
+  ─── STEP 1 ───
+  
+  Question pattern: "In which direction is [Hospital] relative to [Park]?"
+  → Pattern A.  R = Park = E4.
+  "R = E4 (Park).  I need to build: R_North, R_South, R_East, R_West."
+  
+  ─── STEP 2 ───
+  
+  ▸ Building R_North:
+    Round 0: D-set = ∅. newly_found = {E4}.
+    Round 1 — expanding: {E4}.
+      North-facts with (F, E4): (E1, E4) → E1.
+      Discovered: {E1}. D-set = {E1}. newly_found = {E1}.
+    Round 2 — expanding: {E1}.
+      North-facts with (F, E1): (E2, E1) → E2.
+      Discovered: {E2}. D-set = {E1, E2}. newly_found = {E2}.
+    Round 3 — expanding: {E2}.
+      North-facts with (F, E2): (E3, E2) → E3.
+      Discovered: {E3}. D-set = {E1, E2, E3}. newly_found = {E3}.
+    Round 4 — expanding: {E3}.
+      North-facts with (F, E3): none.
+      Discovered: ∅. Stop.
+    R_North final = {E1, E2, E3}
+  
+  ▸ Building R_South:
+    Round 0: D-set = ∅. newly_found = {E4}.
+    Round 1 — expanding: {E4}.
+      South-facts with (F, E4): none.
+      Discovered: ∅. Stop.
+    R_South final = ∅
+  
+  ▸ Building R_East:
+    Round 0: D-set = ∅. newly_found = {E4}.
+    Round 1 — expanding: {E4}.
+      East-facts with (F, E4): (E1, E4) → E1.
+      Discovered: {E1}. D-set = {E1}. newly_found = {E1}.
+    Round 2 — expanding: {E1}.
+      East-facts with (F, E1): (E2, E1) → E2.
+      Discovered: {E2}. D-set = {E1, E2}. newly_found = {E2}.
+    Round 3 — expanding: {E2}.
+      East-facts with (F, E2): (E3, E2) → E3.
+      Discovered: {E3}. D-set = {E1, E2, E3}. newly_found = {E3}.
+    Round 4 — expanding: {E3}.
+      East-facts with (F, E3): none.
+      Discovered: ∅. Stop.
+    R_East final = {E1, E2, E3}
+  
+  ▸ Building R_West:
+    Round 0: D-set = ∅. newly_found = {E4}.
+    Round 1 — expanding: {E4}.
+      West-facts with (F, E4): none.
+      Discovered: ∅. Stop.
+    R_West final = ∅
+  
+  ─── STEP 3 ───
+  
+  Hospital = E3.
+    E3 ∈ R_North? Yes → North component ✓
+    E3 ∈ R_South? No
+    E3 ∈ R_East?  Yes → East component ✓
+    E3 ∈ R_West?  No
+  
+  North + East → Hospital is to the Northeast of the Park.
+  
+  ─── STEP 4 — VERIFY ───
+  
+  North chain:  E4 →(N)→ E1 →(N)→ E2 →(N)→ E3  ✓
+  East chain:   E4 →(E)→ E1 →(E)→ E2 →(E)→ E3  ✓
+  
+  ANSWER: B
+  
+  
+  ██████████████████████████████████████████████████████████████████████
+  ██  WORKED EXAMPLE 2 — Pattern B                                   ██
+  ██████████████████████████████████████████████████████████████████████
+  
+  PASSAGE:
+  "The Café is to the Northeast of the School. The Bookstore is to the
+  Northwest of the Café."
+  
+  QUESTION: Which of the following is to the Southwest of the Café?
+    (A) The School   (B) The Bookstore
+  
+  ─── STEP 0 ───
+  
+  0-A. Entity mapping:
+    E1 = School
+    E2 = Café
+    E3 = Bookstore
+  
+  0-B. Decompose each statement:
+  
+    Statement 1 — "The Café is to the Northeast of the School"
+      Forward (NE = N + E):
+        E2 is-North-of E1
+        E2 is-East-of E1
+      Inverse:
+        E1 is-South-of E2
+        E1 is-West-of E2
+  
+    Statement 2 — "The Bookstore is to the Northwest of the Café"
+      Forward (NW = N + W):
+        E3 is-North-of E2
+        E3 is-West-of E2
+      Inverse:
+        E2 is-South-of E3
+        E2 is-East-of E3
+  
+    Master lists:
+      North-facts: (E2, E1), (E3, E2)
+      South-facts: (E1, E2), (E2, E3)
+      East-facts:  (E2, E1), (E2, E3)
+      West-facts:  (E1, E2), (E3, E2)
+  
+    Self-check: 2 diagonal × 4 = 8. Counted: 2+2+2+2 = 8. ✓
+  
+  ─── STEP 1 ───
+  
+  Question pattern: "Which of the following is to the [Southwest] of [Café]?"
+  → Pattern B.  R = Café = E2.  DIR = Southwest = S + W.
+  "R = E2 (Café).  I need to build: R_South, R_West."
+  
+  ─── STEP 2 ───
+  
+  ▸ Building R_South:
+    Round 0: D-set = ∅. newly_found = {E2}.
+    Round 1 — expanding: {E2}.
+      South-facts with (F, E2): (E1, E2) → E1.
+      Discovered: {E1}. D-set = {E1}. newly_found = {E1}.
+    Round 2 — expanding: {E1}.
+      South-facts with (F, E1): none.
+      Discovered: ∅. Stop.
+    R_South final = {E1}
+  
+  ▸ Building R_West:
+    Round 0: D-set = ∅. newly_found = {E2}.
+    Round 1 — expanding: {E2}.
+      West-facts with (F, E2): (E1, E2) → E1. (E3, E2) → E3.
+      Discovered: {E1, E3}. D-set = {E1, E3}. newly_found = {E1, E3}.
+    Round 2 — expanding: {E1, E3}.
+      West-facts with (F, E1): none.
+      West-facts with (F, E3): none.
+      Discovered: ∅. Stop.
+    R_West final = {E1, E3}
+  
+  ─── STEP 3 ───
+  
+  DIR = Southwest → O must be in R_South AND R_West.
+    (A) School = E1:     E1 ∈ R_South ✓  AND  E1 ∈ R_West ✓  →  SW of Café ✓
+    (B) Bookstore = E3:  E3 ∉ R_South ✗  →  NOT SW of Café
+  
+  ─── STEP 4 — VERIFY ───
+  
+  School (E1) is SW of Café (E2):
+    South chain: E2 →(S)→ E1  ✓
+    West chain:  E2 →(W)→ E1  ✓
+  
+  Bookstore (E3) exclusion: E3 is North of E2 (from statement 2), so
+  E3 cannot be South of E2. Confirmed. ✓
+  
+  ANSWER: A
+  
+  
+  ██████████████████████████████████████████████████████████████████████
+  ██  WORKED EXAMPLE 3 — Pattern C                                   ██
+  ██████████████████████████████████████████████████████████████████████
+  
+  PASSAGE:
+  "The Gym is to the Northeast of the Theater. The Diner is to the
+  Northeast of the Gym. The Bakery is to the Northeast of the Theater.
+  The Clinic is to the Northeast of the Bakery."
+  
+  QUESTION: How many objects are to the Northeast of the Theater?
+    (A) 1   (B) 2   (C) 3   (D) 4
+  
+  ─── STEP 0 ───
+  
+  0-A. Entity mapping:
+    E1 = Theater
+    E2 = Gym
+    E3 = Diner
+    E4 = Bakery
+    E5 = Clinic
+  
+  0-B. Decompose each statement:
+  
+    Statement 1 — "The Gym is to the Northeast of the Theater"
+      Forward: E2 is-North-of E1, E2 is-East-of E1
+      Inverse: E1 is-South-of E2, E1 is-West-of E2
+  
+    Statement 2 — "The Diner is to the Northeast of the Gym"
+      Forward: E3 is-North-of E2, E3 is-East-of E2
+      Inverse: E2 is-South-of E3, E2 is-West-of E3
+  
+    Statement 3 — "The Bakery is to the Northeast of the Theater"
+      Forward: E4 is-North-of E1, E4 is-East-of E1
+      Inverse: E1 is-South-of E4, E1 is-West-of E4
+  
+    Statement 4 — "The Clinic is to the Northeast of the Bakery"
+      Forward: E5 is-North-of E4, E5 is-East-of E4
+      Inverse: E4 is-South-of E5, E4 is-West-of E5
+  
+    Master lists:
+      North-facts: (E2, E1), (E3, E2), (E4, E1), (E5, E4)
+      South-facts: (E1, E2), (E2, E3), (E1, E4), (E4, E5)
+      East-facts:  (E2, E1), (E3, E2), (E4, E1), (E5, E4)
+      West-facts:  (E1, E2), (E2, E3), (E1, E4), (E4, E5)
+  
+    Self-check: 4 diagonal × 4 = 16. Counted: 4+4+4+4 = 16. ✓
+  
+  ─── STEP 1 ───
+  
+  Question pattern: "How many objects are to the [Northeast] of [Theater]?"
+  → Pattern C.  R = Theater = E1.  DIR = Northeast = N + E.
+  "R = E1 (Theater).  I need to build: R_North, R_East."
+  
+  ─── STEP 2 ───
+  
+  ▸ Building R_North:
+    Round 0: D-set = ∅. newly_found = {E1}.
+    Round 1 — expanding: {E1}.
+      North-facts with (F, E1): (E2, E1) → E2. (E4, E1) → E4.
+      Discovered: {E2, E4}. D-set = {E2, E4}. newly_found = {E2, E4}.
+    Round 2 — expanding: {E2, E4}.
+      (F, E2): (E3, E2) → E3.
+      (F, E4): (E5, E4) → E5.
+      Discovered: {E3, E5}. D-set = {E2, E3, E4, E5}. newly_found = {E3, E5}.
+    Round 3 — expanding: {E3, E5}.
+      (F, E3): none.
+      (F, E5): none.
+      Discovered: ∅. Stop.
+    R_North final = {E2, E3, E4, E5}
+  
+  ▸ Building R_East:
+    Round 0: D-set = ∅. newly_found = {E1}.
+    Round 1 — expanding: {E1}.
+      East-facts with (F, E1): (E2, E1) → E2. (E4, E1) → E4.
+      Discovered: {E2, E4}. D-set = {E2, E4}. newly_found = {E2, E4}.
+    Round 2 — expanding: {E2, E4}.
+      (F, E2): (E3, E2) → E3.
+      (F, E4): (E5, E4) → E5.
+      Discovered: {E3, E5}. D-set = {E2, E3, E4, E5}. newly_found = {E3, E5}.
+    Round 3 — expanding: {E3, E5}.
+      (F, E3): none.
+      (F, E5): none.
+      Discovered: ∅. Stop.
+    R_East final = {E2, E3, E4, E5}
+  
+  ─── STEP 3 ───
+  
+  NE of Theater = R_North ∩ R_East = {E2, E3, E4, E5}.
+  Count = 4.
+  
+  ─── STEP 4 — VERIFY ───
+  
+  E2 (Gym):    N-chain E1→E2 ✓   E-chain E1→E2 ✓
+  E3 (Diner):  N-chain E1→E2→E3 ✓   E-chain E1→E2→E3 ✓
+  E4 (Bakery): N-chain E1→E4 ✓   E-chain E1→E4 ✓
+  E5 (Clinic): N-chain E1→E4→E5 ✓   E-chain E1→E4→E5 ✓
+  
+  All 4 entities confirmed. ✓
+  
+  ANSWER: D
+  
+  
+  ══════════════════════════════════════════════════════════════════════
+  
+  Now solve the following problem. Show every step in full detail.
+# num_fewshot: 0
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/

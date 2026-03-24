@@ -1,0 +1,128 @@
+model: vllm_two_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_all
+  - spatial_eval_gen_finetuning_data_test_all
+limit: 1500
+apply_chat_template: true
+system_instruction: |
+  ---
+  
+  **INSTRUCTIONS: Spatial Map Reasoning**
+  
+  You are given a passage describing the positions of named objects on a 2D map using directional relations, followed by a multiple-choice question. Follow every step below in order, writing out all intermediate results explicitly.
+  
+  ---
+  
+  **DIRECTION RULES (reference throughout)**
+  
+  Each diagonal direction decomposes into exactly two independent axis facts, plus their inverses:
+  
+  | Statement | Forward atoms | Inverse atoms |
+  |---|---|---|
+  | A is Northeast of B | A north-of B · A east-of B | B south-of A · B west-of A |
+  | A is Northwest of B | A north-of B · A west-of B | B south-of A · B east-of A |
+  | A is Southeast of B | A south-of B · A east-of B | B north-of A · B west-of A |
+  | A is Southwest of B | A south-of B · A west-of B | B north-of A · B east-of A |
+  
+  ---
+  
+  **STEP 0 — Assign Short IDs and Extract All Atomic Facts**
+  
+  **0-A.** List every distinct entity in the passage and assign a short ID:
+  ```
+  E1 = ...
+  E2 = ...
+  ```
+  
+  **0-B.** Process every directional statement into atoms using the table above. Then compile four master lists from all atoms (use the short IDs throughout):
+  
+  - `North-facts`: all (A, B) where A north-of B
+  - `South-facts`: all (A, B) where A south-of B
+  - `East-facts`: all (A, B) where A east-of B
+  - `West-facts`: all (A, B) where A west-of B
+  
+  Print all four lists completely.
+  
+  > **Self-check:** Each original statement produces exactly 4 atoms (2 forward + 2 inverse). Verify that total atoms = number of statements × 4. If not, find and fix the discrepancy before proceeding.
+  
+  ---
+  
+  **STEP 1 — Identify the Reference Entity and Required Sets**
+  
+  Match the question to one of three patterns:
+  
+  - **Pattern A** — *"In which direction is A relative to B?"* → Reference entity R = B, target = A. Build all four sets: `R_North`, `R_South`, `R_East`, `R_West`.
+  - **Pattern B** — *"Which object is in the [DIR] of X?"* → R = X. Decompose [DIR] and build only the required sets (e.g., Southwest → `R_South` and `R_West` only).
+  - **Pattern C** — *"How many objects are in the [DIR] of X?"* → R = X. Same as Pattern B.
+  
+  State explicitly: *"R = E__ (name). Pattern: __. Sets to build: __."*
+  
+  ---
+  
+  **STEP 2 — Build Each Required Directional Set**
+  
+  For each required direction D, compute `R_D` — every entity reachable from R in direction D through any chain of intermediate entities.
+  
+  **Procedure:** The key insight is transitivity: if F is D-of E, and E is already known to be D-of R, then F is also D-of R.
+  
+  - Start with a frontier = { R } and an empty result set `R_D`.
+  - Each round: scan the D-facts list. For every fact "F is-D-of E" where E is in the current frontier and F is not already in `R_D` and F ≠ R, collect F as newly found.
+  - Add all newly found entities to `R_D`. The new frontier becomes the set of newly found entities.
+  - Print each round: *"Expanding: {…} → discovered: {…} → R_D now: {…}"*
+  - Stop when a round discovers nothing new.
+  
+  > **Important:** Only consult the pre-extracted atom lists from Step 0. Do not re-read the original passage.
+  
+  ---
+  
+  **STEP 3 — Derive the Answer**
+  
+  **Pattern A** — Check which sets contain the target entity A:
+  
+  | Membership | Direction of A from R |
+  |---|---|
+  | R_North ∩ R_East | Northeast |
+  | R_North ∩ R_West | Northwest |
+  | R_South ∩ R_East | Southeast |
+  | R_South ∩ R_West | Southwest |
+  | R_North only | North axis confirmed; East/West undetermined |
+  | R_South only | South axis confirmed; East/West undetermined |
+  | R_East only | East axis confirmed; North/South undetermined |
+  | R_West only | West axis confirmed; North/South undetermined |
+  
+  If only one axis is confirmed, select the answer option whose confirmed axis matches.
+  
+  **Pattern B** — For each answer option O, check whether O appears in every required set simultaneously. The correct answer is the option satisfying all membership conditions.
+  
+  **Pattern C** — Count distinct entities in the intersection of all required sets (e.g., Northwest → `|R_North ∩ R_West|`). Select the matching count.
+  
+  ---
+  
+  **STEP 4 — Verify**
+  
+  For each entity your answer depends on, trace a concrete chain of atomic facts from Step 0 connecting R to that entity along each required axis:
+  
+  > Example: R →(north-of)→ E3 →(north-of)→ E5 ✓
+  
+  If no such chain exists for a required axis, return to Step 2 and re-examine the BFS for that direction. Also confirm that any entity you excluded genuinely has no connecting chain.
+  
+  ---
+  
+  After completing all steps above, end your response with a single line:
+  
+  ANSWER: XYZ
+  
+  where XYZ is the set of correct option letters in alphabetical order (for example, A, BD, or ACD).
+# num_fewshot: 0
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/
