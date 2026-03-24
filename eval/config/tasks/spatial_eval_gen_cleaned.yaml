@@ -9,6 +9,7 @@ dataset_name: null  # set to null for local files
 dataset_kwargs:
   data_files: 
     test: "../spatialeval_cleaned.jsonl"
+test_split: test
 output_type: generate_until
 
 # process_docs: !function utils.filter_spatialmap_and_update_oracle_answer_new
