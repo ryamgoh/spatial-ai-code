@@ -8,7 +8,7 @@ model_args:
   peft_model: null
 include_path: ./config/tasks
 tasks:
-  - spatial_eval_gen_all
+  - spatial_eval_gen_cleaned
   - spatial_eval_gen_finetuning_data_test_all
 limit: 1500
 apply_chat_template: true
