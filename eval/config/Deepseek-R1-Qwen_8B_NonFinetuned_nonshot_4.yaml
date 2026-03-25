@@ -1,3 +1,7 @@
+metadata:
+  version: "1.0.0"
+  model_type: "distilled-r1-qwen3-8b"
+  notes: "non-finetuned - nonshot_4"
 model: vllm_two_pass
 model_args:
   pretrained: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
