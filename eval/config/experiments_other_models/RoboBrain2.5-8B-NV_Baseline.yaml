@@ -1,0 +1,22 @@
+metadata:
+  version: "1.0.0"
+  model_type: "BAAI/RoboBrain2.5-8B-NV"
+  notes: "baseline model"
+model: vllm_two_pass
+model_args:
+  pretrained: BAAI/RoboBrain2.5-8B-NV
+  max_thinking_tokens: 16384
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  peft_model: null
+include_path: ./config/tasks
+tasks:
+  - spatial_eval_gen_cleaned
+  - spatial_eval_gen_finetuning_data_test_all
+limit: 1500
+apply_chat_template: true
+batch_size: 32
+device: cuda:0
+log_samples: true
+output_path: ./results/deepseek-r1-distill-qwen-1.5b-two-pass/
