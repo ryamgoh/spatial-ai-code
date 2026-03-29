@@ -29,20 +29,28 @@ mkdir -p logs
 # EVAL
 cd eval
 srun uv sync
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ../configs/evals/eval_qwen3-7b-spatial-reasoning.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_14B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_all_type_question_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
 # srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_Finetuned.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Gemma_12B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ../configs/evals/eval_deepseek-r1-distill-qwen-1.5b_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_3.5_27B_thinking_two_pass.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot_1.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot_1_mul.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot_3.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot_4.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_oneshot_3.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_threeshot_3.yaml
+
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Cosmos-Reason2_8B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Cosmos-Reason2_8B_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Falcon-H1R-7B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Falcon-H1R-7B_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/RoboBrain2.5-8B-NV_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/RoboBrain2.5-8B-NV_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceQwen3-VL-2B-Thinking_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceQwen3-VL-2B-Thinking_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceR_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceR_NonFinetuned_nonshot_2.yaml
+
+# Run visuals
+srun --cpu-bind=cores uv run create_visual.py ./results/experiment_1_qwen3_8B/*/results.json --output-dir ./charts/experiment_1
+srun --cpu-bind=cores uv run create_visual.py ./results/experiment_2_other_spatial_models/baseline/*/results.json --output-dir ./charts/experiment_2/baseline
+srun --cpu-bind=cores uv run create_visual.py ./results/experiment_2_other_spatial_models/nonshot_2/*/results.json --output-dir ./charts/experiment_2/nonshot_2
+srun --cpu-bind=cores uv run create_visual.py ./results/experiment_3_other_models/*/results.json --output-dir ./charts/experiment_3

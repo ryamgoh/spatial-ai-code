@@ -80,15 +80,15 @@ def extract_label(data: dict) -> str:
     for task_name, task_config in configs.items():
         metadata = task_config.get("metadata", {})
         model = metadata.get("model_type") or metadata.get("pretrained", "")
-        note = metadata.get("notes", "")
+        notes = metadata.get("notes", "")
         if model:
             # Shorten long model paths
             model = model.split("/")[-1]
-            if note:
+            if notes:
                 return f"{model} ({notes})"
             return model
-        if note:
-            return note
+        if notes:
+            return notes
     return "unknown"
 
 
