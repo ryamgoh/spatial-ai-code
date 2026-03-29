@@ -14,7 +14,11 @@ dependencies = [
     "numpy>=1.24.0",
     "docx2txt>=0.9",
     "vllm>=0.16.0",
+    "matplotlib>=3.7.0",
 ]
+
+[project.scripts]
+create_visual = "create_visual:main"
 
 [tool.uv.sources]
 lm-eval = { git = "https://github.com/EleutherAI/lm-evaluation-harness.git" }
