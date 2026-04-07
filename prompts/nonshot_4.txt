@@ -1,0 +1,195 @@
+You are solving a spatial reasoning problem about objects on a 2D map.
+You MUST follow every step below in order, writing out all intermediate
+results explicitly. Do not skip, abbreviate, or combine any step.
+
+══════════════════════════════════════════════════════════════════════
+DIRECTION DECOMPOSITION & INVERSION RULES  (reference — use throughout)
+══════════════════════════════════════════════════════════════════════
+
+Decomposition into axis components:
+  Northeast = North + East          Northwest = North + West
+  Southeast = South + East          Southwest = South + West
+  North = North (only)              South = South (only)
+  East  = East  (only)              West  = West  (only)
+
+Inversion (swap both axes):
+  North ↔ South      East ↔ West
+  Northeast ↔ Southwest             Northwest ↔ Southeast
+
+From "X is to the Northeast of Y":
+  → X is-North-of Y  and  X is-East-of Y
+  → (inverse) Y is-South-of X  and  Y is-West-of X
+
+
+══════════════════════════════════════════════════════════════════════
+STEP 0 — ASSIGN SHORT IDS AND EXTRACT ALL ATOMIC DIRECTIONAL FACTS
+══════════════════════════════════════════════════════════════════════
+
+0-A.  List every distinct entity mentioned in the passage.
+      Assign each one a short ID: E1, E2, E3, …
+      Print the mapping table, e.g.:
+        E1 = Wonderland Gifts
+        E2 = Umbrella Universe
+        …
+
+0-B.  For EVERY directional statement in the passage, decompose it into
+      atomic axis-aligned facts and record the inverse facts as well.
+
+      Example: "Umbrella Universe is to the Southwest of Wonderland Gifts"
+        Forward decomposition (Southwest = South + West):
+          E2 is-South-of E1
+          E2 is-West-of E1
+        Inverse:
+          E1 is-North-of E2
+          E1 is-East-of E2
+
+      Process every statement this way. Then compile FOUR master lists —
+      one per axis direction — collecting all facts of each type:
+
+        North-facts:  all pairs (A, B) such that A is-North-of B
+        South-facts:  all pairs (A, B) such that A is-South-of B
+        East-facts:   all pairs (A, B) such that A is-East-of B
+        West-facts:   all pairs (A, B) such that A is-West-of B
+
+      Print all four lists completely before moving on.
+
+      Self-check: Every original statement should produce exactly 2 forward
+      atomic facts and 2 inverse atomic facts (4 total). Verify that your
+      total number of atomic facts = (number of original statements) × 4.
+
+
+══════════════════════════════════════════════════════════════════════
+STEP 1 — IDENTIFY THE REFERENCE ENTITY R AND REQUIRED AXIS SETS
+══════════════════════════════════════════════════════════════════════
+
+Read the question and match one of the three patterns below:
+
+  Pattern A — "In which direction is [A] relative to [B]?"
+    R = B.  (You are standing at B, looking for where A is.)
+    You need to build ALL FOUR reachability sets for R:
+      R_North, R_South, R_East, R_West.
+
+  Pattern B — "Which object is in the [DIR] of [A]?"
+    R = A.  Decompose [DIR] into axis components.
+    Build only the reachability sets corresponding to those components.
+    (e.g., DIR = Southwest → build R_South and R_West.)
+
+  Pattern C — "How many objects are in the [DIR] of [A]?"
+    R = A.  Same as Pattern B.
+
+Now state explicitly:
+  "R = E__ ( ___ ).  I need to build: ___."
+before proceeding to Step 2.
+
+
+══════════════════════════════════════════════════════════════════════
+STEP 2 — BUILD EACH DIRECTIONAL REACHABILITY SET (TRANSITIVE CLOSURE)
+══════════════════════════════════════════════════════════════════════
+
+For each axis direction D you need, execute the following procedure to
+compute R_D — the set of all entities reachable from R in direction D
+(directly or through a chain of intermediate entities).
+
+  Round 0:
+    Let D-set = ∅  (empty).
+    Let newly_found = { R }    — these are the entities to expand next.
+
+  Round 1:
+    For each entity E in newly_found:
+      Scan the D-facts list from Step 0.
+      Collect every entity F where "F is-D-of E" appears in that list
+      AND F is not already in D-set and F ≠ R.
+    Add all collected F to D-set.
+    Set newly_found = the set of all F just added.
+    Print: "Round 1 — expanding: {…}, discovered: {…}, D-set is now: {…}"
+
+  Round 2, 3, …:
+    Repeat the same process: for each entity E in newly_found, find new
+    neighbours in direction D that are not yet in D-set.
+    Print each round's expansion and discoveries.
+
+  Stop when a round discovers no new entities.
+    Print: "D-set final = {…}"
+
+Repeat this for every axis direction D you need.
+
+Important reminders:
+  • Only look at the D-facts list (from Step 0) for direction D. Do NOT
+    re-read the original passage — use only the pre-extracted atomic facts.
+  • R itself is never included in R_D.
+
+
+══════════════════════════════════════════════════════════════════════
+STEP 3 — DERIVE THE ANSWER
+══════════════════════════════════════════════════════════════════════
+
+——— Pattern A: "In which direction is A relative to B?"  (R = B) ———
+
+  Check which of R's four reachability sets contain A:
+
+    A ∈ R_North?  →  North component present
+    A ∈ R_South?  →  South component present
+    A ∈ R_East?   →  East  component present
+    A ∈ R_West?   →  West  component present
+
+  Use this lookup table to compose the direction of A as seen from R:
+
+    North + East  →  A is to the Northeast of R
+    North + West  →  A is to the Northwest of R
+    South + East  →  A is to the Southeast of R
+    South + West  →  A is to the Southwest of R
+    North only (neither East nor West)  →  could be Northeast or Northwest
+    South only (neither East nor West)  →  could be Southeast or Southwest
+    East  only (neither North nor South) → could be Northeast or Southeast
+    West  only (neither North nor South) → could be Northwest or Southwest
+
+  Then the question asks for the direction of A relative to R, so the
+  answer is one of the above directions.
+  If the result is uniquely determined (two components found), select the
+  matching option.
+  If only one axis is determined, select every available option whose
+  direction is compatible.
+
+——— Pattern B: "Which object is in the [DIR] of A?"  (R = A) ———
+
+  Decompose [DIR] into axis components.
+  An answer option O is correct if and only if O appears in EVERY
+  corresponding reachability set.
+
+    DIR = North      →  O ∈ R_North
+    DIR = South      →  O ∈ R_South
+    DIR = East       →  O ∈ R_East
+    DIR = West       →  O ∈ R_West
+    DIR = Northeast  →  O ∈ R_North  AND  O ∈ R_East
+    DIR = Northwest  →  O ∈ R_North  AND  O ∈ R_West
+    DIR = Southeast  →  O ∈ R_South  AND  O ∈ R_East
+    DIR = Southwest  →  O ∈ R_South  AND  O ∈ R_West
+
+  Check each answer option against the required sets and select the one
+  that satisfies all constraints.
+
+——— Pattern C: "How many objects are in the [DIR] of A?"  (R = A) ———
+
+  Same decomposition as Pattern B.
+  Count the distinct entities that appear in the INTERSECTION of all
+  required reachability sets.
+
+    DIR = North      →  count = |R_North|
+    DIR = Northwest  →  count = |R_North ∩ R_West|
+    (and so on for other directions)
+
+  Select the option matching this count.
+
+══════════════════════════════════════════════════════════════════════
+OUTPUT FORMAT
+══════════════════════════════════════════════════════════════════════
+
+After completing all steps above, end your response with a single line:
+
+ANSWER: XYZ
+
+where XYZ is the set of correct option letters in alphabetical order (for example, A, BD, or ACD). Do not include spaces, commas, or any other text.
+
+══════════════════════════════════════════════════════════════════════
+
+Now solve the following problem. Show every step in full detail.
