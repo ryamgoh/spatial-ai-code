@@ -16,7 +16,10 @@ mkdir -p logs
 
 export OMP_NUM_THREADS=16
 export MKL_NUM_THREADS=16
-export PYTORCH_ALLOC_CONF=expandable_segments:True
+# vLLM colocate sleep/memory pool asserts if expandable_segments is on.
+# https://github.com/pytorch/pytorch/issues/147851
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:False
+export PYTORCH_ALLOC_CONF=expandable_segments:False
 export AXOLOTL_NO_TELEMETRY=1
 export AXOLOTL_DO_NOT_TRACK=1
 
