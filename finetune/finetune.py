@@ -145,6 +145,7 @@ def main():
     if cfg.rl and cfg.trl and cfg.trl.use_vllm:
         _patch_grpo_vllm_max_model_length()
         _patch_vllm_bnb_weight_reload()
+        _patch_vllm_generation_fsdp_flag()
 
     use_vllm = bool(cfg.trl and cfg.trl.use_vllm)
     # vLLM colocate sleep/memory pool cannot use expandable_segments.
