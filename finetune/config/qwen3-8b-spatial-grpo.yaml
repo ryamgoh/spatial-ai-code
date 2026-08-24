@@ -61,9 +61,7 @@ trl:
   num_generations: 4
   max_completion_length: 1024
   temperature: 0.7
-  use_vllm: true
-  vllm_mode: colocate
-  vllm_enable_sleep_mode: true
+  use_vllm: false
   log_completions: true
   num_completions_to_print: 2
   mask_truncated_completions: true
@@ -72,9 +70,3 @@ trl:
     - rewards.format_reward
     - rewards.length_penalty
   reward_weights: [1.0, 0.1, 0.1]
-
-vllm:
-  tensor_parallel_size: 1
-  gpu_memory_utilization: 0.25
-  # Native R1/Qwen context is 131072; that KV cache will not fit on 47GB.
-  max_model_len: 2048
