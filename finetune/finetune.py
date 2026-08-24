@@ -82,7 +82,18 @@ def main():
     config = load_yaml_config(config_path)
     cfg = load_cfg(config)
 
-    set_pytorch_cuda_alloc_conf()
+    use_vllm = bool(cfg.trl and cfg.trl.use_vllm)
+    # vLLM colocate sleep/memory pool cannot use expandable_segments.
+    if not (cfg.rl and use_vllm):
+        set_pytorch_cuda_alloc_conf()
+
+    if args.resume:
+        checkpoint = find_latest_checkpoint(Path(cfg.output_dir))
+        if checkpoint:
+            cfg.resume_from_checkpoint = str(checkpoint)
+            print(f"Resuming from checkpoint: {checkpoint}")
+        else:
+            print("No checkpoint found, starting from lora_model_dir / base")
 
     print("Loading datasets...")
     if cfg.rl:
@@ -91,20 +102,10 @@ def main():
     else:
         dataset_meta = load_datasets(cfg=cfg)
 
-    resume_from_checkpoint = None
-    if args.resume:
-        output_dir = Path(cfg.output_dir)
-        checkpoint = find_latest_checkpoint(output_dir)
-        if checkpoint:
-            resume_from_checkpoint = str(checkpoint)
-            print(f"Resuming from checkpoint: {checkpoint}")
-        else:
-            print("No checkpoint found, starting fresh training")
-
     print(f"Starting training: {args.config_name}")
     print(f"Output directory: {cfg.output_dir}")
-    if resume_from_checkpoint:
-        print(f"Resuming from: {resume_from_checkpoint}")
+    if cfg.resume_from_checkpoint:
+        print(f"Resuming from: {cfg.resume_from_checkpoint}")
     print("-" * 50)
 
     model, tokenizer, trainer = train(

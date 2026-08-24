@@ -53,7 +53,9 @@ bf16: true
 max_grad_norm: 1.0
 num_epochs: 1
 logging_steps: 1
-save_steps: 50
+save_steps: 10
+save_total_limit: 3
+auto_resume_from_checkpoints: true
 evals_per_epoch: 0
 eval_strategy: "no"
 

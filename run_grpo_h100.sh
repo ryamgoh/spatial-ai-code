@@ -25,5 +25,9 @@ export AXOLOTL_DO_NOT_TRACK=1
 
 cd finetune
 srun uv sync --extra vllm
-srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
-srun --cpu-bind=cores uv run python finetune.py qwen3-8b-spatial-grpo
+if [[ ! -s ../spatial_grpo_data.jsonl ]]; then
+  srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+else
+  echo "Using existing ../spatial_grpo_data.jsonl"
+fi
+srun --cpu-bind=cores uv run python finetune.py qwen3-8b-spatial-grpo --resume
