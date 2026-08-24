@@ -21,9 +21,10 @@ lora_target_modules:
   - gate_proj
   - down_proj
   - up_proj
-lora_qkv_kernel: true
-lora_o_kernel: true
-lora_mlp_kernel: true
+# Axolotl rejects fused LoRA kernels when rl: is set.
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
 embeddings_skip_upcast: true
 xformers_attention: true
 
