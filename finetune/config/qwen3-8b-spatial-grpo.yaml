@@ -1,15 +1,6 @@
-# GRPO continuation of the SpatialMap SFT QLoRA, 1x ~40–47GB GPU
-# (A100-40 or H100-47). Generation is smaller than the 80GB recipe
-# (G=4, 1024 completion tokens) so QLoRA + colocated vLLM can coexist.
-# If you OOM, set use_vllm: false.
-#
-# Policy = DeepSeek-R1-0528-Qwen3-8B + SFT adapter (lora_model_dir).
-# Prompts only; gold letters live in `oracle_option` for the outcome reward.
-# vLLM is colocated on the same GPU (sleep mode) — no second card.
-#
-# KL (`trl.beta`): with PEFT autounwrap the frozen ref is adapter-off = base R1,
-# not a second copy of the SFT adapter (that would OOM on 1x80GB). Small beta
-# keeps GRPO from drifting too far from R1/SFT style.
+# GRPO on the SFT QLoRA, one ~47GB GPU (h100-47).
+# Prompts only; oracle_option is for rewards, not the model.
+# If OOM: use_vllm: false.
 base_model: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
 load_in_4bit: true
 adapter: qlora
@@ -24,17 +15,15 @@ lora_target_modules:
   - gate_proj
   - down_proj
   - up_proj
-# Axolotl rejects fused LoRA kernels when rl: is set.
+# Required: Axolotl rejects fused LoRA kernels when rl: is set.
 lora_qkv_kernel: false
 lora_o_kernel: false
 lora_mlp_kernel: false
 embeddings_skip_upcast: true
-xformers_attention: true
 
 rl: grpo
 chat_template: qwen3
 sample_packing: false
-pad_to_sequence_len: false
 remove_unused_columns: false
 skip_prepare_dataset: true
 
@@ -49,7 +38,6 @@ learning_rate: 0.00001
 optimizer: paged_adamw_8bit
 lr_scheduler: cosine
 warmup_ratio: 0.05
-fp16: false
 bf16: true
 max_grad_norm: 1.0
 num_epochs: 1
@@ -57,7 +45,6 @@ logging_steps: 1
 save_steps: 10
 save_total_limit: 3
 auto_resume_from_checkpoints: true
-evals_per_epoch: 0
 eval_strategy: "no"
 
 output_dir: ./outputs/deepseek-r1-qwen3-8b-grpo
@@ -79,7 +66,6 @@ trl:
   log_completions: true
   num_completions_to_print: 2
   mask_truncated_completions: true
-  scale_rewards: true
   reward_funcs:
     - rewards.outcome_reward
     - rewards.format_reward
@@ -89,6 +75,5 @@ trl:
 vllm:
   tensor_parallel_size: 1
   gpu_memory_utilization: 0.25
-  dtype: auto
   # Native R1/Qwen context is 131072; that KV cache will not fit on 47GB.
   max_model_len: 2048

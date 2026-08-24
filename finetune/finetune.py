@@ -17,7 +17,6 @@ os.environ.setdefault("AXOLOTL_DO_NOT_TRACK", "1")
 os.environ.setdefault("AXOLOTL_NO_TELEMETRY", "1")
 
 import argparse
-import signal
 import sys
 from pathlib import Path
 
