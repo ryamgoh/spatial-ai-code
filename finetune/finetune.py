@@ -69,25 +69,34 @@ def _patch_vllm_bnb_weight_reload() -> None:
     bnb_loader.set_weight_attrs = set_weight_attrs
 
 
-def _patch_vllm_generation_fsdp_flag() -> None:
-    """Axolotl 0.18 wraps VLLMGeneration.sync_weights using Trainer.is_fsdp_enabled.
+def _ensure_fsdp_flag(sync_fn):
+    def sync_weights(self, *args, **kwargs):
+        if not hasattr(self, "is_fsdp_enabled"):
+            self.is_fsdp_enabled = False
+        return sync_fn(self, *args, **kwargs)
 
-    VLLMGeneration is not a Trainer, so the wrap crashes before falling back to
-    TRL's PEFT path. Single-GPU QLoRA is not FSDP.
+    return sync_weights
+
+
+def _patch_vllm_generation_fsdp_flag() -> None:
+    """Axolotl 0.18 wrap reads Trainer.is_fsdp_enabled on VLLMGeneration.
+
+    Trainer init re-applies that wrap after any earlier patch, so we hook the
+    factory and the current method.
     """
     try:
+        import axolotl.monkeypatch.trainer.trl_vllm as trl_vllm
         from trl.generation.vllm_generation import VLLMGeneration
     except ImportError:
         return
 
-    orig = VLLMGeneration.sync_weights
+    orig_make = trl_vllm._make_batched_sync_weights
 
-    def sync_weights(self, *args, **kwargs):
-        if not hasattr(self, "is_fsdp_enabled"):
-            self.is_fsdp_enabled = False
-        return orig(self, *args, **kwargs)
+    def make_batched_sync_weights(original_sync_weights):
+        return _ensure_fsdp_flag(orig_make(original_sync_weights))
 
-    VLLMGeneration.sync_weights = sync_weights
+    trl_vllm._make_batched_sync_weights = make_batched_sync_weights
+    VLLMGeneration.sync_weights = _ensure_fsdp_flag(VLLMGeneration.sync_weights)
 
 
 CONFIGS_DIR = Path(__file__).parent / "config"
