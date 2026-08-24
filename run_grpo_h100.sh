@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=spatialgrpo
+#SBATCH --partition=gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
+#SBATCH --time=1-00:00:00
+#SBATCH --gres=gpu:h100-80:1
+#SBATCH --output=logs/%x-%j.out
+#SBATCH --error=logs/%x-%j.err
+
+set -euo pipefail
+cd "$SLURM_SUBMIT_DIR"
+mkdir -p logs
+
+export OMP_NUM_THREADS=16
+export MKL_NUM_THREADS=16
+export PYTORCH_ALLOC_CONF=expandable_segments:True
+export AXOLOTL_NO_TELEMETRY=1
+export AXOLOTL_DO_NOT_TRACK=1
+
+cd finetune
+srun uv sync --extra vllm
+srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+srun --cpu-bind=cores uv run python finetune.py qwen3-8b-spatial-grpo

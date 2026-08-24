@@ -9,6 +9,13 @@ Example:
     cd finetune && uv run python finetune.py qwen3-7b-lora --resume
 """
 
+import os
+
+# Axolotl 0.13.2 ships without telemetry/whitelist.yaml. If tracking is left
+# at the default (on), import crashes on that missing file after a 10s sleep.
+os.environ.setdefault("AXOLOTL_DO_NOT_TRACK", "1")
+os.environ.setdefault("AXOLOTL_NO_TELEMETRY", "1")
+
 import argparse
 import signal
 import sys
@@ -16,10 +23,11 @@ from pathlib import Path
 
 import yaml
 from axolotl.cli.config import load_cfg
-from axolotl.common.datasets import load_datasets
+from axolotl.common.datasets import load_datasets, load_preference_datasets
 from axolotl.train import setup_signal_handler, train
 from axolotl.utils.dict import DictDefault
 from axolotl.utils import set_pytorch_cuda_alloc_conf
+
 
 CONFIGS_DIR = Path(__file__).parent / "config"
 
@@ -77,7 +85,11 @@ def main():
     set_pytorch_cuda_alloc_conf()
 
     print("Loading datasets...")
-    dataset_meta = load_datasets(cfg=cfg)
+    if cfg.rl:
+        dataset_meta = load_preference_datasets(cfg=cfg)
+        print(f"RL dataset path ({cfg.rl}): preference/prompt loader")
+    else:
+        dataset_meta = load_datasets(cfg=cfg)
 
     resume_from_checkpoint = None
     if args.resume:

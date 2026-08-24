@@ -1,0 +1,86 @@
+# GRPO continuation of the SpatialMap SFT QLoRA, 1x H100 80GB.
+#
+# Policy = DeepSeek-R1-0528-Qwen3-8B + SFT adapter (lora_model_dir).
+# Prompts only; gold letters live in `oracle_option` for the outcome reward.
+# vLLM is colocated on the same GPU (sleep mode) — no second card.
+#
+# KL (`trl.beta`): with PEFT autounwrap the frozen ref is adapter-off = base R1,
+# not a second copy of the SFT adapter (that would OOM on 1x80GB). Small beta
+# keeps GRPO from drifting too far from R1/SFT style.
+base_model: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+load_in_4bit: true
+adapter: qlora
+lora_model_dir: ./outputs/deepseek-r1-qwen3-8b
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+lora_qkv_kernel: true
+lora_o_kernel: true
+lora_mlp_kernel: true
+embeddings_skip_upcast: true
+xformers_attention: true
+
+rl: grpo
+chat_template: qwen3
+sample_packing: false
+pad_to_sequence_len: false
+remove_unused_columns: false
+skip_prepare_dataset: true
+
+sequence_len: 2048
+micro_batch_size: 8
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+
+learning_rate: 0.00001
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_ratio: 0.05
+fp16: false
+bf16: true
+max_grad_norm: 1.0
+num_epochs: 1
+logging_steps: 1
+save_steps: 50
+evals_per_epoch: 0
+eval_strategy: "no"
+
+output_dir: ./outputs/deepseek-r1-qwen3-8b-grpo
+
+datasets:
+  - path: ../spatial_grpo_data.jsonl
+    ds_type: json
+    type:
+
+trl:
+  beta: 0.04
+  epsilon: 0.2
+  num_generations: 8
+  max_completion_length: 1536
+  temperature: 0.7
+  use_vllm: true
+  vllm_mode: colocate
+  vllm_enable_sleep_mode: true
+  log_completions: true
+  num_completions_to_print: 2
+  mask_truncated_completions: true
+  scale_rewards: true
+  reward_funcs:
+    - rewards.outcome_reward
+    - rewards.format_reward
+    - rewards.length_penalty
+  reward_weights: [1.0, 0.1, 0.1]
+
+vllm:
+  gpu_memory_utilization: 0.35
+  dtype: auto
+  max_model_len: 4096
