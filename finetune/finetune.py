@@ -69,6 +69,27 @@ def _patch_vllm_bnb_weight_reload() -> None:
     bnb_loader.set_weight_attrs = set_weight_attrs
 
 
+def _patch_vllm_generation_fsdp_flag() -> None:
+    """Axolotl 0.18 wraps VLLMGeneration.sync_weights using Trainer.is_fsdp_enabled.
+
+    VLLMGeneration is not a Trainer, so the wrap crashes before falling back to
+    TRL's PEFT path. Single-GPU QLoRA is not FSDP.
+    """
+    try:
+        from trl.generation.vllm_generation import VLLMGeneration
+    except ImportError:
+        return
+
+    orig = VLLMGeneration.sync_weights
+
+    def sync_weights(self, *args, **kwargs):
+        if not hasattr(self, "is_fsdp_enabled"):
+            self.is_fsdp_enabled = False
+        return orig(self, *args, **kwargs)
+
+    VLLMGeneration.sync_weights = sync_weights
+
+
 CONFIGS_DIR = Path(__file__).parent / "config"
 
 
