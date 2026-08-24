@@ -82,6 +82,7 @@ trl:
   reward_weights: [1.0, 0.1, 0.1]
 
 vllm:
+  tensor_parallel_size: 1
   gpu_memory_utilization: 0.35
   dtype: auto
   max_model_len: 4096
