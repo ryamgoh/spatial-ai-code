@@ -51,6 +51,24 @@ def _patch_grpo_vllm_max_model_length() -> None:
     GRPOStrategy.set_training_args_kwargs = patched
 
 
+def _patch_vllm_bnb_weight_reload() -> None:
+    """vLLM 0.11.0 bitsandbytes reload_weights asserts on existing bnb_quant_state.
+
+    TRL colocate QLoRA loads the engine once, then collective_rpc("reload_weights")
+    on the first generate. Allow attribute overwrite so LoRA sync can proceed.
+    """
+    try:
+        import vllm.model_executor.model_loader.bitsandbytes_loader as bnb_loader
+    except ImportError:
+        return
+
+    def set_weight_attrs(weight, attrs):
+        for key, val in attrs.items():
+            setattr(weight, key, val)
+
+    bnb_loader.set_weight_attrs = set_weight_attrs
+
+
 CONFIGS_DIR = Path(__file__).parent / "config"
 
 
