@@ -1,6 +1,7 @@
-# GRPO continuation of the SpatialMap SFT QLoRA, 1x A100-40GB.
-# Generation is smaller than the 80GB recipe (G=4, 1024 completion tokens)
-# so QLoRA + colocated vLLM can coexist. If you OOM, set use_vllm: false.
+# GRPO continuation of the SpatialMap SFT QLoRA, 1x ~40–47GB GPU
+# (A100-40 or H100-47). Generation is smaller than the 80GB recipe
+# (G=4, 1024 completion tokens) so QLoRA + colocated vLLM can coexist.
+# If you OOM, set use_vllm: false.
 #
 # Policy = DeepSeek-R1-0528-Qwen3-8B + SFT adapter (lora_model_dir).
 # Prompts only; gold letters live in `oracle_option` for the outcome reward.
