@@ -24,9 +24,31 @@ from pathlib import Path
 import yaml
 from axolotl.cli.config import load_cfg
 from axolotl.common.datasets import load_datasets, load_preference_datasets
+from axolotl.core.trainers.grpo import GRPOStrategy
 from axolotl.train import setup_signal_handler, train
 from axolotl.utils.dict import DictDefault
 from axolotl.utils import set_pytorch_cuda_alloc_conf
+
+
+def _patch_grpo_vllm_max_model_length() -> None:
+    """Axolotl 0.13.2 never forwards vllm.max_model_len to TRL colocate.
+
+    TRL then infers the native R1/Qwen context (131072) and vLLM demands ~18GiB
+    of KV cache. Pass yaml `vllm.max_model_len` through as vllm_max_model_length.
+    """
+    original = GRPOStrategy.set_training_args_kwargs
+
+    @classmethod
+    def patched(cls, cfg):
+        kwargs = original.__func__(cls, cfg)
+        max_len = None
+        if cfg.vllm is not None:
+            max_len = getattr(cfg.vllm, "max_model_len", None)
+        if max_len:
+            kwargs["vllm_max_model_length"] = int(max_len)
+        return kwargs
+
+    GRPOStrategy.set_training_args_kwargs = patched
 
 
 CONFIGS_DIR = Path(__file__).parent / "config"
@@ -81,6 +103,8 @@ def main():
 
     config = load_yaml_config(config_path)
     cfg = load_cfg(config)
+    if cfg.rl and cfg.trl and cfg.trl.use_vllm:
+        _patch_grpo_vllm_max_model_length()
 
     use_vllm = bool(cfg.trl and cfg.trl.use_vllm)
     # vLLM colocate sleep/memory pool cannot use expandable_segments.
