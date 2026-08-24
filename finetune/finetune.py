@@ -24,18 +24,23 @@ from pathlib import Path
 import yaml
 from axolotl.cli.config import load_cfg
 from axolotl.common.datasets import load_datasets, load_preference_datasets
-from axolotl.core.trainers.grpo import GRPOStrategy
-from axolotl.train import setup_signal_handler, train
+from axolotl.train import train
 from axolotl.utils.dict import DictDefault
-from axolotl.utils import set_pytorch_cuda_alloc_conf
+
+try:
+    from axolotl.utils import set_pytorch_cuda_alloc_conf
+except ImportError:
+
+    def set_pytorch_cuda_alloc_conf():
+        return
 
 
 def _patch_grpo_vllm_max_model_length() -> None:
-    """Axolotl 0.13.2 never forwards vllm.max_model_len to TRL colocate.
-
-    TRL then infers the native R1/Qwen context (131072) and vLLM demands ~18GiB
-    of KV cache. Pass yaml `vllm.max_model_len` through as vllm_max_model_length.
-    """
+    """Forward yaml vllm.max_model_len to TRL if this Axolotl build omits it."""
+    try:
+        from axolotl.core.trainers.grpo import GRPOStrategy
+    except ImportError:
+        return
     original = GRPOStrategy.set_training_args_kwargs
 
     @classmethod
@@ -44,7 +49,7 @@ def _patch_grpo_vllm_max_model_length() -> None:
         max_len = None
         if cfg.vllm is not None:
             max_len = getattr(cfg.vllm, "max_model_len", None)
-        if max_len:
+        if max_len and "vllm_max_model_length" not in kwargs:
             kwargs["vllm_max_model_length"] = int(max_len)
         return kwargs
 
@@ -52,11 +57,7 @@ def _patch_grpo_vllm_max_model_length() -> None:
 
 
 def _patch_vllm_bnb_weight_reload() -> None:
-    """vLLM 0.11.0 bitsandbytes reload_weights asserts on existing bnb_quant_state.
-
-    TRL colocate QLoRA loads the engine once, then collective_rpc("reload_weights")
-    on the first generate. Allow attribute overwrite so LoRA sync can proceed.
-    """
+    """Older vLLM bitsandbytes reload_weights asserts on existing bnb_quant_state."""
     try:
         import vllm.model_executor.model_loader.bitsandbytes_loader as bnb_loader
     except ImportError:
@@ -123,6 +124,7 @@ def main():
     cfg = load_cfg(config)
     if cfg.rl and cfg.trl and cfg.trl.use_vllm:
         _patch_grpo_vllm_max_model_length()
+        _patch_vllm_bnb_weight_reload()
 
     use_vllm = bool(cfg.trl and cfg.trl.use_vllm)
     # vLLM colocate sleep/memory pool cannot use expandable_segments.

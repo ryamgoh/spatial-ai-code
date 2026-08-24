@@ -90,6 +90,5 @@ vllm:
   tensor_parallel_size: 1
   gpu_memory_utilization: 0.25
   dtype: auto
-  # Must be forwarded as TRL vllm_max_model_length (see finetune.py patch).
-  # Native R1/Qwen context is 131072; that KV cache will not fit on 40GB.
+  # Native R1/Qwen context is 131072; that KV cache will not fit on 47GB.
   max_model_len: 2048

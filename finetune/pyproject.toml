@@ -4,12 +4,12 @@ version = "0.1.0"
 description = "Model finetuning with Axolotl"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    "axolotl<0.14.0",
+    "axolotl>=0.18.0,<0.19.0",
     "pyyaml>=6.0.3",
     "torchvision>=0.23.0",
 ]
 
 [project.optional-dependencies]
 vllm = [
-    "axolotl[vllm]<0.14.0",
+    "axolotl[vllm]>=0.18.0,<0.19.0",
 ]

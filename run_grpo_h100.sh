@@ -24,6 +24,7 @@ export AXOLOTL_NO_TELEMETRY=1
 export AXOLOTL_DO_NOT_TRACK=1
 
 cd finetune
+srun uv lock
 srun uv sync --extra vllm
 if [[ ! -s ../spatial_grpo_data.jsonl ]]; then
   srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
