@@ -14,11 +14,7 @@ set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
 
-# vLLM sleep mode cannot use expandable CUDA segments.
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:False
-export PYTORCH_ALLOC_CONF=expandable_segments:False
-
 cd finetune
-srun uv sync --extra vllm
+srun uv sync
 [[ -s ../spatial_grpo_data.jsonl ]] || srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 srun uv run python finetune.py qwen3-8b-spatial-grpo --resume

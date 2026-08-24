@@ -1,6 +1,7 @@
-# GRPO on the SFT QLoRA, one ~47GB GPU (h100-47).
+# GRPO on the SFT QLoRA, one h100-47.
+# HF generate (no vLLM): QLoRA weight shapes cannot be load_weights()'d
+# into a colocated vLLM Qwen3 engine.
 # Prompts only; oracle_option is for rewards, not the model.
-# If OOM: use_vllm: false.
 base_model: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
 load_in_4bit: true
 adapter: qlora
