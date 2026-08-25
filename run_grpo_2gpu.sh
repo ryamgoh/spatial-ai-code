@@ -1,7 +1,8 @@
 #!/bin/bash
-# Same-node 2-device GRPO: device0 vLLM serve, device1 train.
+# Same-node 2-device GRPO: cuda:0 vLLM serve, cuda:1 train.
 # h100-47 is MIG 3g.47gb: two slices often share one physical H100 NVL.
-# nvidia-smi --query-gpu=uuid then reports 1 GPU; pin by MIG UUID instead.
+# SLURM already isolates those slices. vLLM ModelConfig does int() on
+# CUDA_VISIBLE_DEVICES, so pin with 0/1, not MIG- UUIDs.
 #SBATCH --job-name=spatialgrpo-2gpu
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
@@ -41,23 +42,24 @@ fi
 
 CFG=./config/qwen3-8b-spatial-grpo-vllm.yaml
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-# Prefer MIG instance UUIDs (h100-47). Fall back to physical GPU UUIDs.
-# Numeric CUDA_VISIBLE_DEVICES=1 makes Torch dynamo index GPU 1 with a
-# length-1 property list. Pin by UUID so each process only has cuda:0.
-mapfile -t GPU_UUIDS < <(nvidia-smi -L | sed -n 's/.*UUID: \(MIG-[^)]*\).*/\1/p')
-if [[ ${#GPU_UUIDS[@]} -lt 2 ]]; then
-  mapfile -t GPU_UUIDS < <(nvidia-smi --query-gpu=uuid --format=csv,noheader)
-fi
-if [[ ${#GPU_UUIDS[@]} -lt 2 ]]; then
-  echo "Need 2 GPUs or MIG slices in this job, nvidia-smi saw ${#GPU_UUIDS[@]}"
-  nvidia-smi -L
+echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
+nvidia-smi -L
+n_mig=$(nvidia-smi -L | grep -c 'MIG-' || true)
+n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+if [[ "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then
+  echo "Need 2 GPUs or MIG slices, saw MIG=${n_mig} GPU=${n_gpu}"
   exit 1
 fi
-echo "vLLM  GPU ${GPU_UUIDS[0]}"
-echo "train GPU ${GPU_UUIDS[1]}"
-nvidia-smi -L
+# SLURM may export MIG-UUIDs; vLLM then does int(CUDA_VISIBLE_DEVICES).
+# Cgroup already has the two slices. 0/1 are the CUDA indices inside the job.
+if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
+  echo "Remapping CUDA_VISIBLE_DEVICES to 0,1 (vLLM cannot parse MIG UUIDs)"
+  export CUDA_VISIBLE_DEVICES=0,1
+fi
+echo "vLLM  CUDA_VISIBLE_DEVICES=0"
+echo "train CUDA_VISIBLE_DEVICES=1"
 
-CUDA_VISIBLE_DEVICES="${GPU_UUIDS[0]}" \
+CUDA_VISIBLE_DEVICES=0 \
   VLLM_WORKER_MULTIPROC_METHOD=spawn \
   uv run axolotl vllm-serve "$CFG" &
 VLLM_PID=$!
@@ -78,6 +80,6 @@ if [[ "$ok" -ne 1 ]]; then
 fi
 
 unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
-CUDA_VISIBLE_DEVICES="${GPU_UUIDS[1]}" \
+CUDA_VISIBLE_DEVICES=1 \
   CUDA_DEVICE_ORDER=PCI_BUS_ID \
   uv run python finetune.py qwen3-8b-spatial-grpo-vllm
