@@ -1,5 +1,5 @@
-# GRPO on two full H100 96GB (not MIG 47). GPU0 vLLM, GPU1 train.
-# KV must stay capped: never drop max_model_len (native Qwen3 is 131072).
+# GRPO on two full GPUs (H200 141GB preferred; H100 96GB same yaml).
+# GPU0 vLLM, GPU1 train. Never raise max_model_len (native Qwen3 is 131072).
 # ~2000 prompts, 8 unique / step, ~250 steps. New LoRA dir (keep SFT adapter).
 base_model: ./outputs/deepseek-r1-qwen3-8b-merged
 load_in_4bit: false

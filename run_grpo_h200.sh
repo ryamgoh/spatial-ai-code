@@ -1,14 +1,14 @@
 #!/bin/bash
-# Two full H100 96GB. Prefer run_grpo_h200.sh when h200-141:2 is free.
-# Same yaml / output dir. KV capped at max_model_len 3072.
-#SBATCH --job-name=spatialgrpo-h100
+# Two full H200 141GB on one node (xgpk*): cuda:0 vLLM, cuda:1 train.
+# Same 2000-prompt recipe as run_grpo_h100_96.sh. Do not raise max_model_len.
+#SBATCH --job-name=spatialgrpo-h200
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
-#SBATCH --gres=gpu:h100-96:2
+#SBATCH --gres=gpu:h200-141:2
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
