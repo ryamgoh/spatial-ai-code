@@ -48,7 +48,7 @@ save_total_limit: 3
 auto_resume_from_checkpoints: true
 eval_strategy: "no"
 
-output_dir: ./outputs/deepseek-r1-qwen3-8b-grpo
+output_dir: ./outputs/deepseek-r1-qwen3-8b-grpo-v2
 
 datasets:
   - path: ../spatial_grpo_data.jsonl
@@ -59,7 +59,7 @@ trl:
   beta: 0.04
   epsilon: 0.2
   num_generations: 4
-  max_completion_length: 1024
+  max_completion_length: 1536
   temperature: 0.7
   use_vllm: false
   log_completions: true

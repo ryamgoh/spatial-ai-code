@@ -16,5 +16,9 @@ mkdir -p logs
 
 cd finetune
 srun uv sync
-[[ -s ../spatial_grpo_data.jsonl ]] || srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
-srun uv run python finetune.py qwen3-8b-spatial-grpo --resume
+if [[ -s ../spatial_grpo_data.jsonl ]]; then
+  srun uv run python generate_grpo.py --annotate --out ../spatial_grpo_data.jsonl
+else
+  srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+fi
+srun uv run python finetune.py qwen3-8b-spatial-grpo

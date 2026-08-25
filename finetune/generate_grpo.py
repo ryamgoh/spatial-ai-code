@@ -43,6 +43,23 @@ def oracle_from_assistant(content: str) -> str | None:
     return ",".join(letters)
 
 
+# SFT gold always ends with: </think>\nAnswer: A   (or "A, B")
+ANSWER_LINE = (
+    "\n\nAfter your reasoning, close with </think> and a final line "
+    "exactly like the examples: `Answer: A` or `Answer: A, C`."
+)
+
+
+def attach_answer_line(prompt: list[dict]) -> list[dict]:
+    out = []
+    for msg in prompt:
+        msg = dict(msg)
+        if msg.get("role") == "user" and ANSWER_LINE not in (msg.get("content") or ""):
+            msg["content"] = (msg.get("content") or "") + ANSWER_LINE
+        out.append(msg)
+    return out
+
+
 def to_grpo_row(sample: dict) -> dict | None:
     messages = sample.get("messages") or []
     prompt = [m for m in messages if m.get("role") in {"system", "user"}]
@@ -52,7 +69,7 @@ def to_grpo_row(sample: dict) -> dict | None:
     oracle = oracle_from_assistant(assistant.get("content") or "")
     if not oracle:
         return None
-    return {"prompt": prompt, "oracle_option": oracle}
+    return {"prompt": attach_answer_line(prompt), "oracle_option": oracle}
 
 
 def generate_rows(plan: list[tuple], seed: int) -> list[dict]:
@@ -106,7 +123,28 @@ def parse_args() -> argparse.Namespace:
         default=4000,
         help="If set, scale DEFAULT_PLAN to this many rows (default 4000)",
     )
+    parser.add_argument(
+        "--annotate",
+        action="store_true",
+        help="Patch an existing JSONL in place with the Answer-line instruction",
+    )
     return parser.parse_args()
+
+
+def annotate_jsonl(path: Path) -> int:
+    rows = []
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            row["prompt"] = attach_answer_line(row["prompt"])
+            rows.append(row)
+    with path.open("w", encoding="utf-8") as f:
+        for row in rows:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return len(rows)
 
 
 def scaled_plan(n: int) -> list[tuple]:
@@ -125,10 +163,14 @@ def scaled_plan(n: int) -> list[tuple]:
 
 def main() -> None:
     args = parse_args()
+    out_path = Path(args.out)
+    if args.annotate:
+        n = annotate_jsonl(out_path)
+        print(f"annotated {n} rows in {out_path.resolve()}")
+        return
     plan = scaled_plan(args.n)
     print("plan:", [(p[3], p[2]) for p in plan], file=sys.stderr)
     rows = generate_rows(plan, seed=args.seed)
-    out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for row in rows:
