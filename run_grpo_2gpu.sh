@@ -1,7 +1,7 @@
 #!/bin/bash
-# Same-node 2-GPU GRPO: GPU0 vLLM serve, GPU1 train.
-# Cluster: a100-80 is 1 GPU/node. Dual named cards are h100-47:4 (xgpi*)
-# or idle gpu:nv:2 (unknown VRAM). Request 2x h100-47 on one node.
+# Same-node 2-device GRPO: device0 vLLM serve, device1 train.
+# h100-47 is MIG 3g.47gb: two slices often share one physical H100 NVL.
+# nvidia-smi --query-gpu=uuid then reports 1 GPU; pin by MIG UUID instead.
 #SBATCH --job-name=spatialgrpo-2gpu
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
@@ -41,11 +41,15 @@ fi
 
 CFG=./config/qwen3-8b-spatial-grpo-vllm.yaml
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
+# Prefer MIG instance UUIDs (h100-47). Fall back to physical GPU UUIDs.
 # Numeric CUDA_VISIBLE_DEVICES=1 makes Torch dynamo index GPU 1 with a
 # length-1 property list. Pin by UUID so each process only has cuda:0.
-mapfile -t GPU_UUIDS < <(nvidia-smi --query-gpu=uuid --format=csv,noheader)
+mapfile -t GPU_UUIDS < <(nvidia-smi -L | sed -n 's/.*UUID: \(MIG-[^)]*\).*/\1/p')
 if [[ ${#GPU_UUIDS[@]} -lt 2 ]]; then
-  echo "Need 2 GPUs in this job, nvidia-smi saw ${#GPU_UUIDS[@]}"
+  mapfile -t GPU_UUIDS < <(nvidia-smi --query-gpu=uuid --format=csv,noheader)
+fi
+if [[ ${#GPU_UUIDS[@]} -lt 2 ]]; then
+  echo "Need 2 GPUs or MIG slices in this job, nvidia-smi saw ${#GPU_UUIDS[@]}"
   nvidia-smi -L
   exit 1
 fi
