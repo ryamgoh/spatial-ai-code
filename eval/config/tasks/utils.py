@@ -368,6 +368,13 @@ def filter_spatialmap_and_update_oracle_answer_new(dataset):
     return dataset.map(add_oracle)
 
 
+def filter_nonempty_oracle(dataset):
+    """Drop rows whose gold letter set is empty (171 of 1500 cleaned SpatialMap)."""
+    return dataset.filter(
+        lambda doc: bool(str(doc.get("oracle_option") or "").strip())
+    )
+
+
 def filter_spatialmap(dataset):
     """Filter dataset to only include rows where id starts with 'spatialmap.'"""
     return dataset.filter(lambda x: bool(re.match(r"^spatialmap\.", x["id"])))
