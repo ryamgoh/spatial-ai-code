@@ -16,6 +16,45 @@ import os
 os.environ.setdefault("AXOLOTL_DO_NOT_TRACK", "1")
 os.environ.setdefault("AXOLOTL_NO_TELEMETRY", "1")
 
+
+def _patch_torch_single_gpu_index() -> None:
+    """CUDA_VISIBLE_DEVICES=N (N!=0) remaps to one GPU, but Torch dynamo
+    still indexes properties[N]. That IndexError is raised from has_triton
+    during `import transformers` / torchao, before training starts.
+    """
+    import torch
+    from torch._dynamo import device_interface
+    from torch.utils import _triton
+
+    orig_has_triton = _triton.has_triton
+
+    def has_triton():
+        try:
+            return orig_has_triton()
+        except IndexError:
+            if not torch.cuda.is_available():
+                return False
+            return torch.cuda.get_device_capability(0)[0] >= 7
+
+    _triton.has_triton = has_triton
+
+    worker = device_interface.CudaInterface.Worker
+    orig_props = worker.get_device_properties
+
+    def get_device_properties(device=None):
+        try:
+            return orig_props(device)
+        except IndexError:
+            props = device_interface.caching_worker_device_properties.get("cuda") or []
+            if not props:
+                return torch.cuda.get_device_properties(0)
+            return props[0]
+
+    worker.get_device_properties = get_device_properties
+
+
+_patch_torch_single_gpu_index()
+
 import argparse
 import sys
 from pathlib import Path

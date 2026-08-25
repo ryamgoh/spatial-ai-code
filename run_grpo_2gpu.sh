@@ -41,8 +41,19 @@ fi
 
 CFG=./config/qwen3-8b-spatial-grpo-vllm.yaml
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-# vLLM EngineCore must not see GPU 1. Spawn + pin to logical cuda:0.
-CUDA_VISIBLE_DEVICES=0 \
+# Numeric CUDA_VISIBLE_DEVICES=1 makes Torch dynamo index GPU 1 with a
+# length-1 property list. Pin by UUID so each process only has cuda:0.
+mapfile -t GPU_UUIDS < <(nvidia-smi --query-gpu=uuid --format=csv,noheader)
+if [[ ${#GPU_UUIDS[@]} -lt 2 ]]; then
+  echo "Need 2 GPUs in this job, nvidia-smi saw ${#GPU_UUIDS[@]}"
+  nvidia-smi -L
+  exit 1
+fi
+echo "vLLM  GPU ${GPU_UUIDS[0]}"
+echo "train GPU ${GPU_UUIDS[1]}"
+nvidia-smi -L
+
+CUDA_VISIBLE_DEVICES="${GPU_UUIDS[0]}" \
   VLLM_WORKER_MULTIPROC_METHOD=spawn \
   uv run axolotl vllm-serve "$CFG" &
 VLLM_PID=$!
@@ -62,8 +73,7 @@ if [[ "$ok" -ne 1 ]]; then
   exit 1
 fi
 
-# Train must only see GPU 1, remapped to cuda:0. Drop vLLM dist env.
 unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
-CUDA_VISIBLE_DEVICES=1 \
+CUDA_VISIBLE_DEVICES="${GPU_UUIDS[1]}" \
   CUDA_DEVICE_ORDER=PCI_BUS_ID \
   uv run python finetune.py qwen3-8b-spatial-grpo-vllm
