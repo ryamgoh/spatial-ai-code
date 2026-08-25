@@ -40,14 +40,18 @@ if [[ ! -f "$SFT_ADAPTER/adapter_config.json" ]]; then
 fi
 
 CFG=./config/qwen3-8b-spatial-grpo-vllm.yaml
-CUDA_VISIBLE_DEVICES=0 uv run axolotl vllm-serve "$CFG" &
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+# vLLM EngineCore must not see GPU 1. Spawn + pin to logical cuda:0.
+CUDA_VISIBLE_DEVICES=0 \
+  VLLM_WORKER_MULTIPROC_METHOD=spawn \
+  uv run axolotl vllm-serve "$CFG" &
 VLLM_PID=$!
 trap 'kill "$VLLM_PID" 2>/dev/null || true' EXIT
 
 ok=0
 for _ in $(seq 1 90); do
-  if curl -sf "http://127.0.0.1:8000/health" >/dev/null 2>&1 \
-    || curl -sf "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1; then
+  if curl -sfL "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1 \
+    || curl -sfL "http://127.0.0.1:8000/health" >/dev/null 2>&1; then
     ok=1
     break
   fi
@@ -58,4 +62,8 @@ if [[ "$ok" -ne 1 ]]; then
   exit 1
 fi
 
-CUDA_VISIBLE_DEVICES=1 uv run python finetune.py qwen3-8b-spatial-grpo-vllm
+# Train must only see GPU 1, remapped to cuda:0. Drop vLLM dist env.
+unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
+CUDA_VISIBLE_DEVICES=1 \
+  CUDA_DEVICE_ORDER=PCI_BUS_ID \
+  uv run python finetune.py qwen3-8b-spatial-grpo-vllm
