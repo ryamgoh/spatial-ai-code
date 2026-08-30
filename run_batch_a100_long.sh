@@ -23,26 +23,16 @@ mkdir -p logs
 # export AXOLOTL_DO_NOT_TRACK=1
 # cd finetune
 # srun uv sync
-# srun --cpu-bind=cores uv run python finetune.py qwen3-8b-spatial-reasoning
+# srun --cpu-bind=cores uv run python finetune.py ../experiments/03-sft-vs-baseline/train-sft-8b.yaml
 # cd ../eval
 
 # EVAL
 cd eval
 srun uv sync
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ../configs/evals/eval_qwen3-7b-spatial-reasoning.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_14B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_all_type_question_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_Finetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_7B_NonFinetuned_nonshot.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_fewshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_NonFinetuned_nonshot.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Deepseek-R1-Qwen_8B_Finetuned.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Gemma_12B_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ../configs/evals/eval_deepseek-r1-distill-qwen-1.5b_two_pass.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/Qwen_3.5_27B_thinking_two_pass.yaml
+# configs now live in ../experiments/<experiment>/ (paths below are from this dir)
+srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/01-few-shot-prompting/fewshot.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/00-baseline-model/eval-baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/03-sft-vs-baseline/eval-sft-finetuned.yaml
+# (removed from repo) Qwen_7B_*/Gemma_12B two-pass configs -> ../experiments/archive/legacy-two-pass/
+# (removed from repo) Deepseek nonshot/oneshot/threeshot variants -> ../experiments/01-few-shot-prompting/
+# (removed from repo) Qwen_3.5_27B_thinking_two_pass, ../configs/evals/* — never present in this repo

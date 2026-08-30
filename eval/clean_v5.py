@@ -6,7 +6,6 @@ finetune/generate_all.py):
   Type 0: "In which direction is X relative to Y?"
   Type 1: "Which object is in the [Direction] of X?"
   Type 2: "How many objects are in the [broad direction] of X?"
-
 Returns comma-separated valid answer option letters, e.g. "A", "A,C", "A,B,C,D".
 
 Algorithm overview
@@ -38,6 +37,8 @@ Algorithm overview
 """
 
 import re
+
+import typer
 
 
 def _normalize(text: str) -> str:
@@ -468,19 +469,47 @@ def clean_jsonl(input_path: str, output_path: str) -> None:
     print(f"Done. Cleaned file written to: {output_path}")
 
 
+# ---------------------------------------------------------------------------
+# CLI (typer)
+# ---------------------------------------------------------------------------
+# Usage examples:
+#   cd eval && uv run python clean_v5.py              # demo: solve one example per type
+#   cd eval && uv run python clean_v5.py batch        # clean org -> cleaned (defaults)
+#   cd eval && uv run python clean_v5.py batch --input other.jsonl --out cleaned.jsonl
+
+app = typer.Typer(help="Spatial solver: clean SpatialEval oracles or demo each question type.")
+
+
+def demo() -> None:
+    """Solve one example of each question type."""
+    print(f"Type 0 answer: {solve(TYPE0)}")
+    print(f"Type 1 answer: {solve(TYPE1)}")
+    print(f"Type 2 answer: {solve(TYPE2)}")
+
+
+@app.command()
+def batch(
+    input_file: str = typer.Option(
+        "../data/spatialeval_org.jsonl", "--input", "-i",
+        help="Raw JSONL to clean.",
+    ),
+    output_file: str = typer.Option(
+        "../data/spatialeval_cleaned.jsonl", "--out", "-o",
+        help="Where to write the cleaned JSONL.",
+    ),
+) -> None:
+    """Re-solve every entry's oracle and write the cleaned JSONL."""
+    print(f"Cleaning {input_file} → {output_file}")
+    clean_jsonl(input_file, output_file)
+
+
+@app.callback(invoke_without_command=True)
+def _cli(ctx: typer.Context) -> None:
+    if ctx.invoked_subcommand is None:
+        demo()
+
+
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) >= 2 and sys.argv[1] == "batch":
-        input_file  = sys.argv[2] if len(sys.argv) > 2 else "spatialeval_org.jsonl"
-        output_file = sys.argv[3] if len(sys.argv) > 3 else "spatialeval_cleaned.jsonl"
-        print(f"Cleaning {input_file} → {output_file}")
-        clean_jsonl(input_file, output_file)
-    else:
-        print(f"Type 0 answer: {solve(TYPE0)}")
-        print(f"Type 1 answer: {solve(TYPE1)}")
-        print(f"Type 2 answer: {solve(TYPE2)}")
-        print()
-        print("Tip: run with argument 'batch' to clean the JSONL file.")
-        print("  python clean_v3.py batch [input.jsonl] [output.jsonl]")
+    app()
  
 

@@ -21,4 +21,4 @@ if [[ -s ../spatial_grpo_data.jsonl ]]; then
 else
   srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 fi
-srun uv run python finetune.py qwen3-8b-spatial-grpo
+srun uv run python finetune.py ../experiments/05-grpo/train-grpo-8b.yaml

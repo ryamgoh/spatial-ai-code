@@ -2,6 +2,7 @@ import random
 import json
 import itertools
 from collections import defaultdict
+from pathlib import Path
 
 import typer
 
@@ -747,7 +748,7 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
 
 
 def batch_generate(
-    output_file="spatial_sft_data_uncertainty.jsonl",
+    output_file=None,
     # Type 0 — original direction question
     num_type0_1_answer=200,
     num_type0_2_answer=200,
@@ -776,6 +777,9 @@ def batch_generate(
         seed: Optional RNG seed. When set, the full dataset (and its
             train/test split) is reproducible across runs and processes.
     """
+    if output_file is None:
+        output_file = str(Path(__file__).parent.parent / "data" / "spatial_sft_data_uncertainty.jsonl")
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     if seed is not None:
         random.seed(seed)
     train_file = output_file.replace(".jsonl", "_train.jsonl")
@@ -867,9 +871,10 @@ app = typer.Typer(help="Generate synthetic SFT data for spatial reasoning.")
 @app.command()
 def main(
     out: str = typer.Option(
-        "spatial_sft_data_all.jsonl",
+        None,
         "--out",
-        help="Output JSONL base filename (writes <out>_train.jsonl / _test.jsonl).",
+        help="Output JSONL base filename (writes <out>_train.jsonl / _test.jsonl). "
+             "Default: <repo>/data/spatial_sft_data_all.jsonl (CWD-independent).",
     ),
     test_split: float = typer.Option(
         0.2, "--test-split", min=0.0, max=1.0,
@@ -889,6 +894,9 @@ def main(
     num_type2: int = typer.Option(750, min=0, help="Type 2 (count) samples"),
 ) -> None:
     """Generate the dataset. Defaults reproduce the 2100-sample training mix."""
+    if out is None:
+        out = str(Path(__file__).parent.parent / "data" / "spatial_sft_data_all.jsonl")
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
     batch_generate(
         out,
         num_type0_1_answer=num_type0_1_answer,

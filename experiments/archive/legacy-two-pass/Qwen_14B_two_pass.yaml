@@ -1,0 +1,18 @@
+model: vllm_staged_pass
+model_args:
+  pretrained: deepseek-ai/DeepSeek-R1-Distill-Qwen-14B
+  max_thinking_tokens: 8192
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 16384
+  peft_model: null
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_gen_rag
+  - spatial_eval_gen
+limit: 1500
+apply_chat_template: true
+num_fewshot: 0
+batch_size: 4
+device: cuda:0
+log_samples: true

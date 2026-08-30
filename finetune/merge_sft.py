@@ -3,15 +3,15 @@
 Usage:
     cd finetune && uv run python merge_sft.py
     cd finetune && uv run python merge_sft.py \\
-        --adapter ./outputs/deepseek-r1-qwen3-8b \\
-        --out ./outputs/deepseek-r1-qwen3-8b-merged
+        --adapter ../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b \\
+        --out ../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
 """
 
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
+import typer
 import torch
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -19,18 +19,18 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 BASE = "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"
 
 
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Merge SFT LoRA into a new folder")
-    p.add_argument("--base", default=BASE)
-    p.add_argument("--adapter", default="./outputs/deepseek-r1-qwen3-8b")
-    p.add_argument("--out", default="./outputs/deepseek-r1-qwen3-8b-merged")
-    return p.parse_args()
+app = typer.Typer(add_completion=False)
 
 
-def main() -> None:
-    args = parse_args()
-    adapter = Path(args.adapter).resolve()
-    out = Path(args.out).resolve()
+@app.command()
+def main(
+    base: str = typer.Option(BASE, "--base"),
+    adapter: str = typer.Option("../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b", "--adapter"),
+    out: str = typer.Option("../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged", "--out"),
+) -> None:
+    """Merge SFT LoRA into a new folder."""
+    adapter = Path(adapter).resolve()
+    out = Path(out).resolve()
     if adapter == out or out.is_relative_to(adapter):
         raise SystemExit(
             f"Refusing to write merge into the adapter tree:\n  adapter={adapter}\n  out={out}"
@@ -41,14 +41,14 @@ def main() -> None:
         print(f"already merged: {out}")
         return
 
-    print(f"base     {args.base}")
+    print(f"base     {base}")
     print(f"adapter  {adapter}  (read-only)")
     print(f"out      {out}")
     out.mkdir(parents=True, exist_ok=True)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.base, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(base, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
-        args.base,
+        base,
         torch_dtype=torch.bfloat16,
         device_map="cpu",
         trust_remote_code=True,
@@ -62,4 +62,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    app()

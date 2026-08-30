@@ -27,8 +27,8 @@ else
   srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 fi
 
-SFT_ADAPTER=./outputs/deepseek-r1-qwen3-8b
-MERGED=./outputs/deepseek-r1-qwen3-8b-merged
+SFT_ADAPTER=../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b
+MERGED=../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
 if [[ ! -f "$MERGED/config.json" ]]; then
   echo "Merging SFT QLoRA into bf16 at $MERGED (adapter left untouched)"
   CUDA_VISIBLE_DEVICES="" srun uv run python merge_sft.py \
@@ -40,7 +40,7 @@ if [[ ! -f "$SFT_ADAPTER/adapter_config.json" ]]; then
   exit 1
 fi
 
-CFG=./config/qwen3-8b-spatial-grpo-vllm.yaml
+CFG=../experiments/05-grpo/train-grpo-8b-vllm.yaml
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
 nvidia-smi -L
@@ -82,4 +82,4 @@ fi
 unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
 CUDA_VISIBLE_DEVICES=1 \
   CUDA_DEVICE_ORDER=PCI_BUS_ID \
-  uv run python finetune.py qwen3-8b-spatial-grpo-vllm
+  uv run python finetune.py ../experiments/05-grpo/train-grpo-8b-vllm.yaml

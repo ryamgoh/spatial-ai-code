@@ -2,11 +2,14 @@
 Finetune a model using Axolotl API.
 
 Usage:
-    cd finetune && uv run python finetune.py <config_name> [--resume]
+    cd finetune && uv run python finetune.py <config> [--resume]
+
+Config may be a path to a yaml or a bare name searched recursively under
+experiments/.
 
 Example:
-    cd finetune && uv run python finetune.py qwen3-7b-lora
-    cd finetune && uv run python finetune.py qwen3-7b-lora --resume
+    cd finetune && uv run python finetune.py ../experiments/03-sft-vs-baseline/train-sft-8b.yaml
+    cd finetune && uv run python finetune.py train-grpo-8b-vllm-h100 --resume
 """
 
 import os
@@ -55,10 +58,10 @@ def _patch_torch_single_gpu_index() -> None:
 
 _patch_torch_single_gpu_index()
 
-import argparse
 import sys
 from pathlib import Path
 
+import typer
 import yaml
 from axolotl.cli.config import load_cfg
 from axolotl.common.datasets import load_datasets, load_preference_datasets
@@ -138,20 +141,7 @@ def _patch_vllm_generation_fsdp_flag() -> None:
     VLLMGeneration.sync_weights = _ensure_fsdp_flag(VLLMGeneration.sync_weights)
 
 
-CONFIGS_DIR = Path(__file__).parent / "config"
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="Finetune a model using Axolotl")
-    parser.add_argument(
-        "config_name",
-        type=str,
-        help="Name of the config file (without .yaml extension)",
-    )
-    parser.add_argument(
-        "--resume", action="store_true", help="Resume from the latest checkpoint"
-    )
-    return parser.parse_args()
+EXPERIMENTS_DIR = Path(__file__).parent.parent / "experiments"
 
 
 def load_yaml_config(config_path: Path) -> DictDefault:
@@ -174,17 +164,54 @@ def find_latest_checkpoint(output_dir: Path) -> Path | None:
     return checkpoints[-1]
 
 
-def main():
-    args = parse_args()
+def resolve_config(arg: str) -> Path:
+    """Resolve a config arg to an existing yaml.
 
-    config_path = CONFIGS_DIR / f"{args.config_name}.yaml"
+    Accepts a path (with or without .yaml) or a bare config name, which is
+    searched recursively under the top-level experiments/ directory.
+    """
+    p = Path(arg)
+    if p.suffix == ".yaml" or p.suffix == ".yml":
+        if p.exists():
+            return p
+        raise FileNotFoundError(f"Config not found: {p}")
+    if "/" in arg or "\\" in arg:
+        # Path-like without extension: try as-is, then with .yaml.
+        for cand in (p, p.with_suffix(".yaml")):
+            if cand.exists():
+                return cand
+        raise FileNotFoundError(f"Config not found: {p} or {p.with_suffix('.yaml')}")
 
-    if not config_path.exists():
-        print(f"Error: Config not found: {config_path}")
-        print(f"Available configs in {CONFIGS_DIR}:")
-        for f in CONFIGS_DIR.glob("*.yaml"):
-            print(f"  - {f.stem}")
+    candidates = sorted(EXPERIMENTS_DIR.rglob(f"{arg}.yaml"))
+    if len(candidates) == 1:
+        return candidates[0]
+    if not candidates:
+        print(f"Error: Config not found: {arg!r}")
+        print(f"Available configs under {EXPERIMENTS_DIR}:")
+        for f in sorted(EXPERIMENTS_DIR.rglob("*.yaml")):
+            print(f"  - {f.relative_to(EXPERIMENTS_DIR.parent)}")
         sys.exit(1)
+    print(f"Error: {arg!r} is ambiguous; use a path:")
+    for f in candidates:
+        print(f"  - {f}")
+    sys.exit(1)
+
+
+app = typer.Typer(add_completion=False)
+
+
+@app.command()
+def main(
+    config_name: str = typer.Argument(
+        help=(
+            "Path to a config yaml (with or without .yaml) or a bare config "
+            f"name searched recursively under {EXPERIMENTS_DIR}"
+        ),
+    ),
+    resume: bool = typer.Option(False, "--resume", help="Resume from the latest checkpoint"),
+) -> None:
+    """Finetune a model using Axolotl."""
+    config_path = resolve_config(config_name)
 
     print(f"Loading config: {config_path}")
 
@@ -200,7 +227,7 @@ def main():
     if not (cfg.rl and use_vllm):
         set_pytorch_cuda_alloc_conf()
 
-    if args.resume:
+    if resume:
         checkpoint = find_latest_checkpoint(Path(cfg.output_dir))
         if checkpoint:
             cfg.resume_from_checkpoint = str(checkpoint)
@@ -215,7 +242,7 @@ def main():
     else:
         dataset_meta = load_datasets(cfg=cfg)
 
-    print(f"Starting training: {args.config_name}")
+    print(f"Starting training: {config_name}")
     print(f"Output directory: {cfg.output_dir}")
     if cfg.resume_from_checkpoint:
         print(f"Resuming from: {cfg.resume_from_checkpoint}")
@@ -231,4 +258,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app()

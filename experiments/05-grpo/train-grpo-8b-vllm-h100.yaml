@@ -1,0 +1,86 @@
+# GRPO on two full GPUs (H200 141GB preferred; H100 96GB same yaml).
+# GPU0 vLLM, GPU1 train. Never raise max_model_len (native Qwen3 is 131072).
+# ~2000 prompts, 8 unique / step, ~250 steps. New LoRA dir (keep SFT adapter).
+base_model: ../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
+load_in_4bit: false
+adapter: lora
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
+
+rl: grpo
+chat_template: qwen3
+sample_packing: false
+remove_unused_columns: false
+skip_prepare_dataset: true
+
+sequence_len: 1024
+# 16 = 4 prompts x G=4. Two micro-batches / step => 8 prompts, one epoch ~250 steps.
+micro_batch_size: 16
+gradient_accumulation_steps: 2
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+
+learning_rate: 0.00001
+optimizer: adamw_torch
+lr_scheduler: cosine
+warmup_steps: 10
+bf16: true
+max_grad_norm: 1.0
+num_epochs: 1
+max_steps: 250
+logging_steps: 1
+save_steps: 10
+save_total_limit: 4
+auto_resume_from_checkpoints: false
+eval_strategy: "no"
+val_set_size: 0.0
+load_best_model_at_end: false
+
+output_dir: ../experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-h100
+
+datasets:
+  - path: ../spatial_grpo_data_2k.jsonl
+    ds_type: json
+    type:
+
+trl:
+  beta: 0.04
+  epsilon: 0.2
+  num_generations: 4
+  max_completion_length: 1536
+  temperature: 0.7
+  use_vllm: true
+  vllm_mode: server
+  vllm_lora_sync: true
+  vllm_server_host: 127.0.0.1
+  vllm_server_port: 8000
+  vllm_server_timeout: 600
+  log_completions: true
+  num_completions_to_print: 2
+  mask_truncated_completions: true
+  reward_funcs:
+    - rewards.outcome_reward
+    - rewards.format_reward
+    - rewards.length_penalty
+  reward_weights: [1.0, 0.1, 0.1]
+
+vllm:
+  host: 0.0.0.0
+  port: 8000
+  tensor_parallel_size: 1
+  # 0.70 * 96GB leaves headroom for CUDA graphs. max_model_len 3072 is the KV cap.
+  gpu_memory_utilization: 0.70
+  dtype: auto
+  max_model_len: 3072

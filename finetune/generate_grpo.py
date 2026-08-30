@@ -9,12 +9,13 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
 import json
 import random
 import re
 import sys
 from pathlib import Path
+
+import typer
 
 from generate_all import generate_sample
 
@@ -108,29 +109,6 @@ def generate_rows(plan: list[tuple], seed: int) -> list[dict]:
     return rows
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate GRPO prompt-only JSONL")
-    parser.add_argument(
-        "--out",
-        type=str,
-        default="../spatial_grpo_data.jsonl",
-        help="Output JSONL path (relative to cwd)",
-    )
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument(
-        "--n",
-        type=int,
-        default=4000,
-        help="If set, scale DEFAULT_PLAN to this many rows (default 4000)",
-    )
-    parser.add_argument(
-        "--annotate",
-        action="store_true",
-        help="Patch an existing JSONL in place with the Answer-line instruction",
-    )
-    return parser.parse_args()
-
-
 def annotate_jsonl(path: Path) -> int:
     rows = []
     with path.open(encoding="utf-8") as f:
@@ -161,16 +139,30 @@ def scaled_plan(n: int) -> list[tuple]:
     return plan
 
 
-def main() -> None:
-    args = parse_args()
-    out_path = Path(args.out)
-    if args.annotate:
-        n = annotate_jsonl(out_path)
-        print(f"annotated {n} rows in {out_path.resolve()}")
+app = typer.Typer(add_completion=False)
+
+
+@app.command()
+def main(
+    out: str = typer.Option(
+        "../spatial_grpo_data.jsonl", "--out", help="Output JSONL path (relative to cwd)",
+    ),
+    seed: int = typer.Option(42, "--seed"),
+    n: int = typer.Option(4000, "--n", help="If set, scale DEFAULT_PLAN to this many rows (default 4000)"),
+    annotate: bool = typer.Option(
+        False, "--annotate",
+        help="Patch an existing JSONL in place with the Answer-line instruction",
+    ),
+) -> None:
+    """Generate GRPO prompt-only JSONL."""
+    out_path = Path(out)
+    if annotate:
+        n_rows = annotate_jsonl(out_path)
+        print(f"annotated {n_rows} rows in {out_path.resolve()}")
         return
-    plan = scaled_plan(args.n)
+    plan = scaled_plan(n)
     print("plan:", [(p[3], p[2]) for p in plan], file=sys.stderr)
-    rows = generate_rows(plan, seed=args.seed)
+    rows = generate_rows(plan, seed=seed)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for row in rows:
@@ -179,4 +171,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    app()

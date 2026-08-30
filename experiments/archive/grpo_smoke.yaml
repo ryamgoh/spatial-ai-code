@@ -1,0 +1,59 @@
+# Tiny GRPO smoke test. Not the 8B SFT run.
+# ~0.5B, 16 prompts, G=2, 2 optimizer steps, HF generate (no vLLM).
+base_model: Qwen/Qwen2.5-0.5B-Instruct
+load_in_4bit: false
+adapter: lora
+lora_r: 8
+lora_alpha: 16
+lora_target_modules:
+  - q_proj
+  - v_proj
+
+rl: grpo
+chat_template: qwen_25
+sample_packing: false
+pad_to_sequence_len: false
+remove_unused_columns: false
+skip_prepare_dataset: true
+
+sequence_len: 1024
+micro_batch_size: 2
+gradient_accumulation_steps: 1
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+
+learning_rate: 0.00001
+optimizer: adamw_torch
+lr_scheduler: cosine
+warmup_steps: 0
+fp16: false
+bf16: true
+num_epochs: 1
+max_steps: 2
+logging_steps: 1
+save_steps: 2
+eval_strategy: "no"
+output_dir: ../experiments/archive/models/grpo_smoke
+
+datasets:
+  - path: ../spatial_grpo_data_smoke.jsonl
+    ds_type: json
+    type:
+
+trl:
+  beta: 0.04
+  epsilon: 0.2
+  num_generations: 2
+  max_completion_length: 128
+  temperature: 0.7
+  use_vllm: false
+  log_completions: true
+  num_completions_to_print: 1
+  mask_truncated_completions: true
+  scale_rewards: true
+  reward_funcs:
+    - rewards.outcome_reward
+    - rewards.format_reward
+    - rewards.length_penalty
+  reward_weights: [1.0, 0.1, 0.1]

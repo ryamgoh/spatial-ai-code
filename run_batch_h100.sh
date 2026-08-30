@@ -23,25 +23,26 @@ mkdir -p logs
 # export AXOLOTL_DO_NOT_TRACK=1
 # cd finetune
 # srun uv sync
-# srun --cpu-bind=cores uv run python finetune.py qwen3-8b-spatial-reasoning
+# srun --cpu-bind=cores uv run python finetune.py ../experiments/03-sft-vs-baseline/train-sft-8b.yaml
 # cd ../eval
 
 # EVAL
 cd eval
 srun uv sync
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Cosmos-Reason2_8B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Cosmos-Reason2_8B_NonFinetuned_nonshot_2.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Falcon-H1R-7B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/Falcon-H1R-7B_NonFinetuned_nonshot_2.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/RoboBrain2.5-8B-NV_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/RoboBrain2.5-8B-NV_NonFinetuned_nonshot_2.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceQwen3-VL-2B-Thinking_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceQwen3-VL-2B-Thinking_nonshot_2.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceR_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_other_models/SpaceR_NonFinetuned_nonshot_2.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/Ministral-3-8B-Instruct-2512-BF16_Baseline.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/gemma-3-12b-it_Baseline.yaml
-srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/Mistral-NeMo-12B-Instruct_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/cogito-v1-preview-llama-8B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/DeepSeek-R1-Distill-Llama-8B_Baseline.yaml
-# srun --cpu-bind=cores uv run python eval_two_stage.py --config ./config/experiments_two/NVIDIA-Nemotron-3-Nano-4B-BF16_Baseline.yaml
+# configs now live in ../experiments/<experiment>/ (paths below are from this dir)
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/Cosmos-Reason2_8B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/Cosmos-Reason2_8B_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/Falcon-H1R-7B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/Falcon-H1R-7B_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/RoboBrain2.5-8B-NV_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/RoboBrain2.5-8B-NV_NonFinetuned_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceQwen3-VL-2B-Thinking_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceQwen3-VL-2B-Thinking_nonshot_2.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceR_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceR_NonFinetuned_nonshot_2.yaml
+srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/Ministral-3-8B-Instruct-2512-BF16_Baseline.yaml
+srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/gemma-3-12b-it_Baseline.yaml
+srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/Mistral-NeMo-12B-Instruct_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/cogito-v1-preview-llama-8B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/DeepSeek-R1-Distill-Llama-8B_Baseline.yaml
+# srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/experiments_two/NVIDIA-Nemotron-3-Nano-4B-BF16_Baseline.yaml

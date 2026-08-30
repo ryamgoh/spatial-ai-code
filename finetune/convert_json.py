@@ -28,8 +28,8 @@ def convert_item(item: dict) -> dict:
 
 
 def main():
-    input_path = Path(__file__).parent.parent / "reason_train.json"
-    output_path = Path(__file__).parent.parent / "reason_train_converted.json"
+    input_path = Path(__file__).parent.parent / "data" / "reason_train.json"
+    output_path = Path(__file__).parent.parent / "data" / "reason_train_converted.json"
 
     print(f"Loading: {input_path}")
     with open(input_path) as f:

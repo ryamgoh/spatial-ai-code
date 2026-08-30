@@ -2,7 +2,7 @@
 # Separate from GRPO train. 1329 cleaned SpatialMap two-pass eval.
 # Default: merged SFT + GRPO LoRA from the H100-96 2000-prompt run.
 # Override adapter:
-#   sbatch --export=ALL,ADAPTER=./finetune/outputs/deepseek-r1-qwen3-8b-grpo-vllm run_eval_grpo_1329.sh
+#   sbatch --export=ALL,ADAPTER=experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-vllm run_eval_grpo_1329.sh
 #SBATCH --job-name=spatialeval-grpo-1329
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
@@ -18,8 +18,8 @@ set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
 
-MERGED=./finetune/outputs/deepseek-r1-qwen3-8b-merged
-ADAPTER="${ADAPTER:-./finetune/outputs/deepseek-r1-qwen3-8b-grpo-h100}"
+MERGED=experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
+ADAPTER="${ADAPTER:-experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-h100}"
 
 if [[ ! -f "$MERGED/config.json" ]]; then
   echo "Merged SFT weights missing at $MERGED"
@@ -44,13 +44,13 @@ echo "eval task=spatial_eval_gen_cleaned_1329"
 cd eval
 srun uv sync
 
-CFG=./config/Deepseek-R1-Qwen_8B_GRPO.yaml
+CFG=../experiments/05-grpo/eval-grpo-1329.yaml
 RUN_CFG="$CFG"
 # Yaml lora_path is relative to eval/. Rewrite if we resolved a checkpoint.
-if [[ "$ADAPTER" != "./finetune/outputs/deepseek-r1-qwen3-8b-grpo-h100" ]]; then
-  RUN_CFG=$(mktemp ./config/Deepseek-R1-Qwen_8B_GRPO.XXXX.yaml)
+if [[ "$ADAPTER" != "experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-h100" ]]; then
+  RUN_CFG=$(mktemp ../experiments/05-grpo/eval-grpo-1329.XXXX.yaml)
   sed "s|lora_path:.*|lora_path: ../${ADAPTER#./}|" "$CFG" > "$RUN_CFG"
   trap 'rm -f "$RUN_CFG"' EXIT
 fi
 
-srun --cpu-bind=cores uv run python eval_two_stage.py --config "$RUN_CFG"
+srun --cpu-bind=cores uv run python eval_new.py --config "$RUN_CFG"

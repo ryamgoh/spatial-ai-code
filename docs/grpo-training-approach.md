@@ -302,15 +302,15 @@ A longer run where format/outcome stay ~0.2, `frac_reward_zero_std` stays high, 
 
 | Piece | Path |
 |---|---|
-| SFT adapter (do not delete) | `finetune/outputs/deepseek-r1-qwen3-8b` |
-| Merged SFT (vLLM / GRPO base) | `finetune/outputs/deepseek-r1-qwen3-8b-merged` |
-| 20-step GRPO LoRA | `finetune/outputs/deepseek-r1-qwen3-8b-grpo-vllm` |
-| 2000-prompt GRPO LoRA | `finetune/outputs/deepseek-r1-qwen3-8b-grpo-h100` |
+| SFT adapter (do not delete) | `experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b` |
+| Merged SFT (vLLM / GRPO base) | `experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged` |
+| 20-step GRPO LoRA | `experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-vllm` |
+| 2000-prompt GRPO LoRA | `experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-h100` |
 | Rewards | `finetune/rewards.py` |
 | Prompt-only data gen | `finetune/generate_grpo.py` |
-| Probe yaml | `finetune/config/qwen3-8b-spatial-grpo-vllm.yaml` |
-| 2000-prompt yaml (H200 or H100) | `finetune/config/qwen3-8b-spatial-grpo-vllm-h100.yaml` |
+| Probe yaml | `experiments/05-grpo/train-grpo-8b-vllm.yaml` |
+| 2000-prompt yaml (H200 or H100) | `experiments/05-grpo/train-grpo-8b-vllm-h100.yaml` |
 | Train **2× H200 141GB** (preferred) | `run_grpo_h200.sh` |
 | Train 2× H100 96GB (fallback) | `run_grpo_h100_96.sh` |
-| 1329 eval | `run_eval_grpo_1329.sh`, `eval/config/Deepseek-R1-Qwen_8B_GRPO.yaml` |
-| Eval entrypoint | `eval/eval_two_stage.py` (`vllm_two_pass`) |
+| 1329 eval | `run_eval_grpo_1329.sh`, `experiments/05-grpo/eval-grpo-1329.yaml` |
+| Eval entrypoint | `eval/eval_new.py` (`vllm_staged_pass`, `--stages 1\|2`) |

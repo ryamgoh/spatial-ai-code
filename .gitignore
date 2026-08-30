@@ -210,3 +210,7 @@ __marimo__/
 # datasets/
 # models/
 results/
+
+# finetune model outputs (moved to experiments/<exp>/models/)
+finetune/outputs/
+experiments/**/models/

@@ -1,0 +1,17 @@
+# Minimal end-to-end smoke run: smallest model (0.5B), 2 questions.
+# Verifies the eval_new.py pipeline on a GPU in seconds-to-minutes.
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen2.5-0.5B-Instruct
+  max_thinking_tokens: 256
+  dtype: bfloat16
+  gpu_memory_utilization: 0.7  # desktop box: leave headroom for the UI
+  max_model_len: 8192
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_gen_cleaned_1329
+limit: 2
+apply_chat_template: true
+batch_size: 2
+device: cuda:0
+log_samples: true
