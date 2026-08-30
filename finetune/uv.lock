@@ -4487,6 +4487,7 @@ dependencies = [
     { name = "axolotl" },
     { name = "pyyaml" },
     { name = "torchvision" },
+    { name = "typer" },
 ]
 
 [package.optional-dependencies]
@@ -4500,6 +4501,7 @@ requires-dist = [
     { name = "axolotl", extras = ["vllm"], marker = "extra == 'vllm'", specifier = ">=0.18.0,<0.19.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "torchvision", specifier = ">=0.23.0" },
+    { name = "typer", specifier = ">=0.12" },
 ]
 provides-extras = ["vllm"]
 

@@ -3,6 +3,8 @@ import json
 import itertools
 from collections import defaultdict
 
+import typer
+
 # Preset entity name library — no duplicates allowed
 ENTITIES = [
     "Police Station",
@@ -276,13 +278,14 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
         num_sentences: Number of relation sentences to generate.
         target_num_answers: Desired number of correct answers.
             Type 0 — 1, 2, or 4 (direction ambiguity).
-            Type 1 — ignored (always exactly 1 correct count).
-            Type 2 — number of correct entity options among A-D (1, 2, or 3).
+            Type 1 — number of correct entity options among A-D (1, 2, or 3).
+            Type 2 — ignored (count question, always exactly 1 correct count).
             If None, any number of answers is accepted.
         question_type:
             0 — original direction question
-            1 — count question  ("How many objects …")
-            2 — which-entity question ("Which object …")
+            1 — which-entity question ("Which object …")
+            2 — count question  ("How many objects …")
+            Numbering matches eval/clean_v5.py.
 
     Returns:
         A sample dict, or None if no suitable question can be formed.
@@ -531,10 +534,10 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
         )
 
     # ------------------------------------------------------------------
-    # TYPE 1 — Count question
+    # TYPE 2 — Count question
     # ------------------------------------------------------------------
-    elif question_type == 1:
-        ref_candidates = list(all_mentioned_entities)
+    elif question_type == 2:
+        ref_candidates = sorted(all_mentioned_entities)
         random.shuffle(ref_candidates)
 
         found = False
@@ -627,12 +630,12 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
         )
 
     # ------------------------------------------------------------------
-    # TYPE 2 — Which-entity question
+    # TYPE 1 — Which-entity question
     # ------------------------------------------------------------------
-    elif question_type == 2:
+    elif question_type == 1:
         min_correct = target_num_answers if target_num_answers is not None else 1
 
-        ref_candidates = list(all_mentioned_entities)
+        ref_candidates = sorted(all_mentioned_entities)
         random.shuffle(ref_candidates)
 
         found = False
@@ -648,7 +651,7 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                     _ref, _dir, x_closure, y_closure, all_mentioned_entities
                 )
                 _not_ents = [
-                    e for e in all_mentioned_entities
+                    e for e in sorted(all_mentioned_entities)
                     if e != _ref and e not in _ents
                 ]
                 if (len(_ents) >= min_correct
@@ -749,12 +752,13 @@ def batch_generate(
     num_type0_1_answer=200,
     num_type0_2_answer=200,
     num_type0_4_answer=100,
-    # Type 1 — count question (always 1 correct option)
-    num_type1=200,
-    # Type 2 — which-entity question
-    num_type2_1_answer=200,
-    num_type2_2_answer=100,
+    # Type 1 — which-entity question
+    num_type1_1_answer=200,
+    num_type1_2_answer=100,
+    # Type 2 — count question (always 1 correct option)
+    num_type2=200,
     test_split=0.2,
+    seed=None,
 ):
     """Generate samples in batches covering all three question types.
 
@@ -765,11 +769,15 @@ def batch_generate(
         num_type0_1_answer: Type 0 samples with exactly 1 correct answer.
         num_type0_2_answer: Type 0 samples with exactly 2 correct answers.
         num_type0_4_answer: Type 0 samples with exactly 4 correct answers.
-        num_type1: Type 1 (count) samples.
-        num_type2_1_answer: Type 2 samples with 1 correct entity option.
-        num_type2_2_answer: Type 2 samples with 2 correct entity options.
+        num_type1_1_answer: Type 1 samples with 1 correct entity option.
+        num_type1_2_answer: Type 1 samples with 2 correct entity options.
+        num_type2: Type 2 (count) samples.
         test_split: Fraction of samples reserved for the test set.
+        seed: Optional RNG seed. When set, the full dataset (and its
+            train/test split) is reproducible across runs and processes.
     """
+    if seed is not None:
+        random.seed(seed)
     train_file = output_file.replace(".jsonl", "_train.jsonl")
     test_file = output_file.replace(".jsonl", "_test.jsonl")
 
@@ -780,9 +788,9 @@ def batch_generate(
         (0, 1, num_type0_1_answer, "Type0-1ans"),
         (0, 2, num_type0_2_answer, "Type0-2ans"),
         (0, 4, num_type0_4_answer, "Type0-4ans"),
-        (1, None, num_type1, "Type1-count"),
-        (2, 1, num_type2_1_answer, "Type2-1ans"),
-        (2, 2, num_type2_2_answer, "Type2-2ans"),
+        (1, 1, num_type1_1_answer, "Type1-1ans"),
+        (1, 2, num_type1_2_answer, "Type1-2ans"),
+        (2, None, num_type2, "Type2-count"),
     ]
 
     for q_type, tgt_ans, target_count, label in generation_plan:
@@ -835,21 +843,64 @@ def batch_generate(
     print(
         f"   Type0: {num_type0_1_answer}×1-ans + {num_type0_2_answer}×2-ans "
         f"+ {num_type0_4_answer}×4-ans  |  "
-        f"Type1: {num_type1}  |  "
-        f"Type2: {num_type2_1_answer}×1-ans + {num_type2_2_answer}×2-ans"
+        f"Type1: {num_type1_1_answer}×1-ans + {num_type1_2_answer}×2-ans  |  "
+        f"Type2: {num_type2}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# CLI (typer)
+# ---------------------------------------------------------------------------
+# Usage examples:
+#   python generate_all.py                                   # default 2100-sample mix
+#   python generate_all.py --num-type1-1-answer 20000 \
+#       --num-type0-1-answer 0 --num-type0-2-answer 0 --num-type0-4-answer 0 \
+#       --num-type1-2-answer 0 --num-type2 0 --test-split 0 --seed 42
+#   python generate_all.py --out my_set.jsonl --seed 7
+#
+# Question types (numbering matches eval/clean_v5.py):
+#   0 — direction, 1 — which-entity, 2 — count
+
+app = typer.Typer(help="Generate synthetic SFT data for spatial reasoning.")
+
+
+@app.command()
+def main(
+    out: str = typer.Option(
+        "spatial_sft_data_all.jsonl",
+        "--out",
+        help="Output JSONL base filename (writes <out>_train.jsonl / _test.jsonl).",
+    ),
+    test_split: float = typer.Option(
+        0.2, "--test-split", min=0.0, max=1.0,
+        help="Fraction of samples reserved for the test set (0 = no split).",
+    ),
+    seed: int | None = typer.Option(
+        None, "--seed", help="RNG seed for a reproducible dataset.",
+    ),
+    # Type 0 — direction
+    num_type0_1_answer: int = typer.Option(300, min=0, help="Type 0, 1 correct answer"),
+    num_type0_2_answer: int = typer.Option(300, min=0, help="Type 0, 2 correct answers"),
+    num_type0_4_answer: int = typer.Option(150, min=0, help="Type 0, 4 correct answers"),
+    # Type 1 — which-entity
+    num_type1_1_answer: int = typer.Option(400, min=0, help="Type 1, 1 correct entity option"),
+    num_type1_2_answer: int = typer.Option(200, min=0, help="Type 1, 2 correct entity options"),
+    # Type 2 — count
+    num_type2: int = typer.Option(750, min=0, help="Type 2 (count) samples"),
+) -> None:
+    """Generate the dataset. Defaults reproduce the 2100-sample training mix."""
+    batch_generate(
+        out,
+        num_type0_1_answer=num_type0_1_answer,
+        num_type0_2_answer=num_type0_2_answer,
+        num_type0_4_answer=num_type0_4_answer,
+        num_type1_1_answer=num_type1_1_answer,
+        num_type1_2_answer=num_type1_2_answer,
+        num_type2=num_type2,
+        test_split=test_split,
+        seed=seed,
     )
 
 
 if __name__ == "__main__":
-    batch_generate(
-        "spatial_sft_data_all.jsonl",
-        # Type 0 — direction
-        num_type0_1_answer=300,
-        num_type0_2_answer=300,
-        num_type0_4_answer=150,
-        # Type 1 — count
-        num_type1=750,
-        # Type 2 — which entity
-        num_type2_1_answer=400,
-        num_type2_2_answer=200,
-    )
+    app()

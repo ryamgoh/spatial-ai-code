@@ -26,9 +26,9 @@ DEFAULT_PLAN = [
     # (question_type, target_num_answers, count, label)
     (0, 1, 1050, "Type0-1ans"),
     (0, 2, 280, "Type0-2ans"),
-    (1, None, 1210, "Type1-count"),
-    (2, 1, 1100, "Type2-1ans"),
-    (2, 2, 360, "Type2-2ans"),
+    (1, 1, 1100, "Type1-1ans"),
+    (1, 2, 360, "Type1-2ans"),
+    (2, None, 1210, "Type2-count"),
 ]
 
 
