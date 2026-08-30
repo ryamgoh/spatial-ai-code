@@ -1,8 +1,0 @@
-[project]
-name = "spatial-ai-code"
-version = "0.1.0"
-description = "Shared code for spatial-ai project"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-]
