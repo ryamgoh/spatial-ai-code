@@ -1,12 +1,21 @@
 """
-Convert reason_train.json to Axolotl-compatible messages format.
+Convert a 'reason'-format spatial training set to Axolotl chat 'messages' format.
+
+Each input item is {system, user, assistant:{reasoning, coordinates, answer}}.
+The assistant turn is folded into a single string:
+    <thinking>{reasoning}\nCoordinates\n{coords JSON}</thinking>
+    Answer: {answer}
 
 Usage:
-    cd finetune && uv run python convert_json.py
+    cd finetune && uv run python convert_json.py \\
+        --input ../data/reason_train.json \\
+        --out ../data/reason_train_converted.json
 """
 
 import json
 from pathlib import Path
+
+import typer
 
 
 def convert_item(item: dict) -> dict:
@@ -27,9 +36,17 @@ def convert_item(item: dict) -> dict:
     }
 
 
-def main():
-    input_path = Path(__file__).parent.parent / "data" / "reason_train.json"
-    output_path = Path(__file__).parent.parent / "data" / "reason_train_converted.json"
+app = typer.Typer(add_completion=False)
+
+
+@app.command()
+def main(
+    input_path: str = typer.Option(..., "--input", "-i", help="Source 'reason'-format JSON to convert (required)."),
+    output_path: str = typer.Option(..., "--out", "-o", help="Where to write the Axolotl 'messages' JSON (required)."),
+) -> None:
+    """Convert a 'reason'-format spatial training set into Axolotl chat 'messages' format."""
+    input_path = Path(input_path)
+    output_path = Path(output_path)
 
     print(f"Loading: {input_path}")
     with open(input_path) as f:
@@ -47,4 +64,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    app()

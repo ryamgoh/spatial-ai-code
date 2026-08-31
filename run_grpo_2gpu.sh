@@ -32,6 +32,7 @@ MERGED=../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
 if [[ ! -f "$MERGED/config.json" ]]; then
   echo "Merging SFT QLoRA into bf16 at $MERGED (adapter left untouched)"
   CUDA_VISIBLE_DEVICES="" srun uv run python merge_sft.py \
+    --base deepseek-ai/DeepSeek-R1-0528-Qwen3-8B \
     --adapter "$SFT_ADAPTER" \
     --out "$MERGED"
 fi

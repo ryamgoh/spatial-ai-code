@@ -1,8 +1,11 @@
 """Merge SFT QLoRA into a new bf16 directory. Never writes into the adapter dir.
 
+--base is required: there is no default model, and merging a LoRA into the
+wrong base silently produces a broken model.
+
 Usage:
-    cd finetune && uv run python merge_sft.py
     cd finetune && uv run python merge_sft.py \\
+        --base deepseek-ai/DeepSeek-R1-0528-Qwen3-8B \\
         --adapter ../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b \\
         --out ../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged
 """
@@ -16,17 +19,14 @@ import torch
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-BASE = "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"
-
-
 app = typer.Typer(add_completion=False)
 
 
 @app.command()
 def main(
-    base: str = typer.Option(BASE, "--base"),
-    adapter: str = typer.Option("../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b", "--adapter"),
-    out: str = typer.Option("../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged", "--out"),
+    base: str = typer.Option(..., "--base", help="HF base model id to merge the LoRA into (required)"),
+    adapter: str = typer.Option(..., "--adapter", help="Path to the SFT LoRA adapter dir to merge (required)"),
+    out: str = typer.Option(..., "--out", help="Where to write the merged bf16 model (required)"),
 ) -> None:
     """Merge SFT LoRA into a new folder."""
     adapter = Path(adapter).resolve()
