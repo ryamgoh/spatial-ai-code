@@ -1,0 +1,40 @@
+# Experiment 4a smoke benchmark: 16 stratified SpatialMap-TQA-CORR rows.
+# Covers every question-type / answer-count case that exists in the cleaned
+# 1329 set (dir 1/2-ans, which 1/4-ans, count 1-ans).
+# Data: data/spatialeval_4a_smoke16.jsonl (via scripts/make_smoke16.py).
+task: spatial_eval_4a_smoke16
+dataset_path: json
+dataset_name: null
+dataset_kwargs:
+  data_files:
+    test: "../data/spatialeval_4a_smoke16.jsonl"
+test_split: test
+output_type: generate_until
+
+process_docs: !function utils.filter_nonempty_oracle
+
+doc_to_text: |-
+  {{text}}
+doc_to_target: "{{oracle_option}}"
+
+generation_kwargs:
+  until: []
+
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "Answer:\\s*([A-D](?:\\s*,\\s*[A-D])*)"
+        group_select: -1
+
+metric_list:
+  - metric: !function utils.strict_acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: !function utils.loose_acc
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 1.0
+  note: "Exp 4a smoke — 16 stratified TQA-CORR rows, all SFT/GRPO cases"

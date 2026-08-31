@@ -1,0 +1,16 @@
+# Exp 4a smoke — un-tuned Qwen3.5-4B baseline on the 16-row TQA-CORR set.
+# No system instruction (true baseline, matches Exp 0 convention).
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.9
+  max_model_len: 16384
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_4a_smoke16
+apply_chat_template: true
+batch_size: 16
+device: cuda:0
+log_samples: true

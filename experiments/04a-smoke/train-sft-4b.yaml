@@ -1,0 +1,57 @@
+# Exp 4a smoke — SFT QLoRA on Qwen3.5-4B (AxisDecomposition CoT traces).
+# Same recipe as experiments/03-sft-vs-baseline/train-sft-8b.yaml, scaled to
+# the 4B base. Runs in ~1h on 1x H100-96. Adapter lands at
+# experiments/04a-smoke/models/qwen3.5-4b-sft.
+base_model: Qwen/Qwen3.5-4B
+load_in_4bit: true
+adapter: qlora
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+lora_qkv_kernel: true
+lora_o_kernel: true
+lora_mlp_kernel: true
+embeddings_skip_upcast: true
+xformers_attention: true
+sample_packing: true
+learning_rate: 0.0001
+sequence_len: 16384
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_ratio: 0.05
+fp16: false
+bf16: true
+max_grad_norm: 0.05
+num_epochs: 2
+logging_steps: 1
+output_dir: ../experiments/04a-smoke/models/qwen3.5-4b-sft
+datasets:
+  - path: ../data/spatial_sft_data_all_train.jsonl
+    type: chat_template
+    field_messages: messages
+dataloader_prefetch_factor: 8
+dataloader_num_workers: 2
+dataloader_pin_memory: true
+
+# Validation split + early stopping (same strategy as the 8B SFT run)
+val_set_size: 0.05
+eval_strategy: steps
+eval_steps: 10
+save_steps: 10
+load_best_model_at_end: true
+early_stopping_patience: 1
+early_stopping_threshold: 0.05
+metric_for_best_model: eval_loss
+greater_is_better: false
