@@ -25,7 +25,9 @@ lora_o_kernel: false
 lora_mlp_kernel: false
 
 rl: grpo
-chat_template: qwen3
+# qwen3_5 to match what SFT infers for Qwen3.5 (renders identically for text,
+# but keeps train/eval prompt formatting consistent).
+chat_template: qwen3_5
 sample_packing: false
 remove_unused_columns: false
 skip_prepare_dataset: true
