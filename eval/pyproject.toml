@@ -14,7 +14,10 @@ dependencies = [
     "typer>=0.12",
     "numpy>=1.24.0",
     "docx2txt>=0.9",
-    "vllm>=0.16.0",
+    # vLLM ==0.27.1 matches the finetune venv and is required for text-only
+    # Qwen3.5 (qwen3_5_text) checkpoints (vllm PR #50210); 0.17.0 only knew
+    # the multimodal class and crashed on the merged text config.
+    "vllm==0.27.1",
     "matplotlib>=3.7.0",
 ]
 
@@ -23,3 +26,12 @@ create_visual = "create_visual:main"
 
 [tool.uv.sources]
 lm-eval = { git = "https://github.com/EleutherAI/lm-evaluation-harness.git" }
+
+[tool.uv]
+override-dependencies = [
+    "torch==2.13.0",
+    "torchvision==0.28.0",
+    # Match the finetune venv (axolotl 0.18 pins transformers==5.14.1) so the
+    # eval and train stacks stay coherent.
+    "transformers==5.14.1",
+]
