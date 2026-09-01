@@ -23,7 +23,11 @@ lora_qkv_kernel: true
 lora_o_kernel: true
 lora_mlp_kernel: true
 embeddings_skip_upcast: true
-xformers_attention: true
+# sdpa (not the deprecated xformers_attention flag): axolotl's xformers
+# attention patch calls transformers' _upad_input() without the new
+# `unpad_input_func` arg required in transformers 5.14.1 -> TypeError.
+# sdpa is torch-native, fast on H100, and works with QLoRA/packed layouts.
+attn_implementation: sdpa
 # Packing OFF: axolotl 0.18's Qwen3.5 packing patch (installed only when
 # sample_packing is on) reads decoder-layer attribute `layer_type`, but
 # transformers 5.14.1 names it `block_type` -> AttributeError at step 0.

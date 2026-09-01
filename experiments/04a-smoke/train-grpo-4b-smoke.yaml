@@ -25,6 +25,9 @@ lora_o_kernel: false
 lora_mlp_kernel: false
 
 rl: grpo
+# sdpa: same as the SFT config — avoids axolotl's xformers patch, which is
+# incompatible with transformers 5.14.1's _upad_input signature.
+attn_implementation: sdpa
 # qwen3_5 to match what SFT infers for Qwen3.5 (renders identically for text,
 # but keeps train/eval prompt formatting consistent).
 chat_template: qwen3_5
