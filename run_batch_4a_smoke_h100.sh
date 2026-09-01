@@ -44,6 +44,14 @@ A_GRPO_ADAPTER=$SLURM_SUBMIT_DIR/$GRPO_ADAPTER
 A_GRPO_DATA=$SLURM_SUBMIT_DIR/$GRPO_DATA
 A_SMOKE_OUT=$SLURM_SUBMIT_DIR/$SMOKE_OUT
 
+# An adapter dir is only "complete" when it has both the config AND the
+# weights: axolotl pre-saves adapter_config.json/tokenizer at the START of
+# training, so its presence alone does not mean training finished.
+has_adapter() {
+  [[ -f "$1/adapter_config.json" ]] &&
+    { [[ -f "$1/adapter_model.safetensors" ]] || [[ -f "$1/adapter_model.bin" ]]; }
+}
+
 # ── GPU sanity (mirrors run_grpo_h100_96.sh) ─────────────────────────────
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 n_mig=$(nvidia-smi -L | grep -c 'MIG-' || true)
@@ -62,25 +70,38 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
   srun uv sync --extra vllm
 
-  if [[ ! -f "$A_SFT_ADAPTER/adapter_config.json" ]]; then
-    echo "=== [1/5] SFT QLoRA on Qwen3.5-4B ==="
-    srun --cpu-bind=cores uv run python finetune.py ../experiments/04a-smoke/train-sft-4b.yaml
+  if has_adapter "$A_SFT_ADAPTER"; then
+    echo "=== [1/5] SFT adapter already complete, skipping ==="
   else
-    echo "=== [1/5] SFT adapter already present, skipping ==="
+    if [[ -f "$A_SFT_ADAPTER/adapter_config.json" ]]; then
+      echo "Found an incomplete SFT adapter (config, no weights) at $A_SFT_ADAPTER; retraining"
+    fi
+    echo "=== [1/5] SFT QLoRA on Qwen3.5-4B ==="
+    srun --cpu-bind=cores uv run python finetune.py ../experiments/04a-smoke/train-sft-4b.yaml || {
+      echo "SFT training FAILED — aborting. Check the log for the traceback."
+      exit 1
+    }
   fi
-  if [[ ! -f "$A_SFT_ADAPTER/adapter_config.json" ]]; then
-    echo "SFT adapter missing after training; aborting"
+  if ! has_adapter "$A_SFT_ADAPTER"; then
+    echo "SFT did not produce a complete adapter (no adapter_model.* at $A_SFT_ADAPTER); aborting"
     exit 1
   fi
 
-  if [[ ! -f "$A_MERGED/config.json" ]]; then
+  if [[ -f "$A_MERGED/config.json" ]]; then
+    echo "=== [2/5] Merged SFT weights already present, skipping ==="
+  else
+    if [[ -d "$A_MERGED" ]]; then
+      echo "Removing partial merge output at $A_MERGED from a failed earlier run"
+      find "$A_MERGED" -depth -delete 2>/dev/null || true
+    fi
     echo "=== [2/5] Merge SFT LoRA into bf16 (adapter left untouched) ==="
     CUDA_VISIBLE_DEVICES="" srun uv run python merge_sft.py \
       --base Qwen/Qwen3.5-4B \
       --adapter "$A_SFT_ADAPTER" \
-      --out "$A_MERGED"
-  else
-    echo "=== [2/5] Merged SFT weights already present, skipping ==="
+      --out "$A_MERGED" || {
+      echo "Merge FAILED — aborting. Delete $A_MERGED before re-running."
+      exit 1
+    }
   fi
 
   echo "=== [3/5] Generate GRPO prompt data (~300 rows, seeded) ==="
@@ -106,6 +127,11 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
       ok=1
       break
     fi
+    # Fail fast if the server process already died (e.g. bad base_model).
+    if ! kill -0 "$VLLM_PID" 2>/dev/null; then
+      echo "vllm-serve exited during startup — check the log, aborting"
+      exit 1
+    fi
     sleep 10
   done
   if [[ "$ok" -ne 1 ]]; then
@@ -122,7 +148,10 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
   CUDA_VISIBLE_DEVICES=1 \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
-    uv run python finetune.py ../experiments/04a-smoke/train-grpo-4b-smoke.yaml "${RESUME[@]}"
+    uv run python finetune.py ../experiments/04a-smoke/train-grpo-4b-smoke.yaml "${RESUME[@]}" || {
+    echo "GRPO training FAILED — aborting."
+    exit 1
+  }
   kill "$VLLM_PID" 2>/dev/null || true
   cd ..
 else
@@ -136,13 +165,13 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
 
   # Resolve GRPO adapter: final dir, else newest checkpoint. (absolute)
   grpo_lora=$A_GRPO_ADAPTER
-  if [[ ! -f "$grpo_lora/adapter_config.json" ]]; then
+  if ! has_adapter "$grpo_lora"; then
     latest=$(ls -d "$grpo_lora"/checkpoint-* 2>/dev/null | sort -t- -k2 -n | tail -1 || true)
-    if [[ -n "${latest:-}" && -f "$latest/adapter_config.json" ]]; then
+    if [[ -n "${latest:-}" ]] && has_adapter "$latest"; then
       echo "Final GRPO adapter missing; using $latest"
       grpo_lora=$latest
     else
-      echo "WARN: no GRPO adapter at $grpo_lora — grpo eval skipped, continuing with base+sft"
+      echo "WARN: no complete GRPO adapter at $grpo_lora — grpo eval skipped, continuing with base+sft"
       grpo_lora=""
     fi
   fi
