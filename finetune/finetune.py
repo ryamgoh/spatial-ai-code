@@ -76,41 +76,6 @@ except ImportError:
         return
 
 
-def _patch_grpo_vllm_max_model_length() -> None:
-    """Forward yaml vllm.max_model_len to TRL if this Axolotl build omits it."""
-    try:
-        from axolotl.core.trainers.grpo import GRPOStrategy
-    except ImportError:
-        return
-    original = GRPOStrategy.set_training_args_kwargs
-
-    @classmethod
-    def patched(cls, cfg):
-        kwargs = original.__func__(cls, cfg)
-        max_len = None
-        if cfg.vllm is not None:
-            max_len = getattr(cfg.vllm, "max_model_len", None)
-        if max_len and "vllm_max_model_length" not in kwargs:
-            kwargs["vllm_max_model_length"] = int(max_len)
-        return kwargs
-
-    GRPOStrategy.set_training_args_kwargs = patched
-
-
-def _patch_vllm_bnb_weight_reload() -> None:
-    """Older vLLM bitsandbytes reload_weights asserts on existing bnb_quant_state."""
-    try:
-        import vllm.model_executor.model_loader.bitsandbytes_loader as bnb_loader
-    except ImportError:
-        return
-
-    def set_weight_attrs(weight, attrs):
-        for key, val in attrs.items():
-            setattr(weight, key, val)
-
-    bnb_loader.set_weight_attrs = set_weight_attrs
-
-
 def _ensure_fsdp_flag(sync_fn):
     def sync_weights(self, *args, **kwargs):
         if not hasattr(self, "is_fsdp_enabled"):
@@ -218,8 +183,6 @@ def main(
     config = load_yaml_config(config_path)
     cfg = load_cfg(config)
     if cfg.rl and cfg.trl and cfg.trl.use_vllm:
-        _patch_grpo_vllm_max_model_length()
-        _patch_vllm_bnb_weight_reload()
         _patch_vllm_generation_fsdp_flag()
 
     use_vllm = bool(cfg.trl and cfg.trl.use_vllm)

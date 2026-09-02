@@ -1,0 +1,15 @@
+# Exp 4b — un-tuned Qwen3.5-4B baseline on the same 16-row TQA-CORR slice as 4a.
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 8192
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_4a_smoke16
+apply_chat_template: true
+batch_size: 4
+device: cuda:0
+log_samples: true

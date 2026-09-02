@@ -4,7 +4,8 @@ Every experiment lives in its own directory: its train/eval config yamls, its
 launcher notes, and a README recording the research question, setup, and result.
 
 Numbering follows the dissertation (H036660, Ch. 4): Experiments **0–3**.
-Experiment **5** (GRPO) is a post-thesis follow-up and is not part of the report.
+Experiments **4a/4b** (Qwen3.5-4B pipeline smoke) and **5** (GRPO) are
+post-thesis follow-ups and are not part of the report.
 
 `eval/` and `finetune/` contain only code and their uv environments — no
 configs. New experiments get a new numbered directory here.
@@ -17,6 +18,8 @@ experiments/
 ├── 01-few-shot-prompting/        Exp 1: prompt-strategy sweep (77.6% Non-shot-2)
 ├── 02-spatial-baseline-models/   Exp 2: specialised spatial models on TQA-CORR
 ├── 03-sft-vs-baseline/           Exp 3: baseline vs SFT (73.7% → 87.9%)
+├── 04a-smoke/                    Exp 4a: Qwen3.5-4B pipeline smoke (finetune.py)
+├── 04b-cli/                      Exp 4b: same smoke via axolotl CLI (no finetune.py)
 ├── 05-grpo/                      post-thesis GRPO (inconclusive — not in report)
 ├── archive/                      unrunnable / abandoned configs
 ├── tasks/                        lm-eval task definitions (shared; via include_path)
