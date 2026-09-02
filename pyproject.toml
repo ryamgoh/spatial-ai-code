@@ -1,12 +1,14 @@
 [project]
-name = "spatial-ai-finetune"
+name = "spatial-ai-code"
 version = "0.1.0"
-description = "Model finetuning with Axolotl"
+description = "SFT + GRPO finetuning (Axolotl) and lm-eval evaluation for spatial reasoning"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "axolotl>=0.18.0,<0.19.0",
+    "lm-eval[vllm]==0.4.12",
     "pyyaml>=6.0.3",
     "typer>=0.12",
+    "outlines>=1.2.9",
     "torch>=2.13.0",
     "torchvision>=0.28.0",
     # ==0.28.0 required: 0.27.x loads qwen3_5_text configs but lacks the
@@ -24,15 +26,14 @@ vllm = [
 override-dependencies = [
     "torch==2.13.0",
     "torchvision==0.28.0",
+    # Match axolotl 0.18's pin so train/eval stacks stay coherent.
+    "transformers==5.14.1",
     "mistral-common==1.11.5",
     "starlette>=1.0.1",         # Forces Gradio to look past its <1.0 constraint
     # vllm 0.28.0 needs huggingface-hub>=1.27.0; axolotl 0.18.0 pins 1.17.0.
-    # Match the eval venv (resolves 1.29.0). hf-xet follows (axolotl pins 1.4.3).
     "huggingface-hub==1.29.0",
     "hf-xet==1.6.0",
-    # torch 2.13 pulls nvidia-cudnn-cu13==9.20.0.48, which omits
-    # libcudnn_engines_tensor_ir.so; Hopper SDPA then mixes with another
-    # 9.x on the loader path → CUDNN_STATUS_SUBLIBRARY_VERSION_MISMATCH.
-    # 9.23.2.1 ships that lib (pytorch/pytorch#187824).
-    "nvidia-cudnn-cu13==9.23.2.1",
+    # axolotl 0.18 pins lm_eval==0.4.11 but never imports it; eval uses
+    # 0.4.12 (task machinery + structured outputs). Override, like hf-hub.
+    "lm-eval==0.4.12",
 ]
