@@ -1,5 +1,6 @@
 #!/bin/bash
-# Exp 4a — Qwen3.5-4B full-pipeline smoke on 2x H100-47 (MIG 3g.47gb).
+# Exp 4a — Qwen3.5-4B full-pipeline smoke.
+# xgpi* : 4x h100-47 = two H100 NVL. :2 is one card; :4 is two CUDA devices.
 #
 # Pipeline (all artifacts land under experiments/04a-smoke/):
 #   1. SFT QLoRA on Qwen3.5-4B          -> models/qwen3.5-4b-sft
@@ -21,7 +22,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --time=08:00:00
-#SBATCH --gres=gpu:h100-47:2
+#SBATCH --gres=gpu:h100-47:4
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
@@ -100,8 +101,8 @@ uuid0="${_probe[1]:-}"
 uuid1="${_probe[2]:-}"
 echo "torch.cuda.device_count=${n_cuda} uuid0=${uuid0} uuid1=${uuid1}"
 if [[ "${n_cuda}" -lt 2 || -z "$uuid1" || "$uuid0" == "$uuid1" ]]; then
-  echo "Need 2 distinct CUDA devices for vLLM+trainer NCCL. This job sees ${n_cuda}."
-  echo "h100-47 is two MIG slices; CUDA_VISIBLE_DEVICES=0.1 is still the same UUID."
+  echo "Need 2 distinct CUDA devices for vLLM+trainer. This job sees ${n_cuda}."
+  echo "xgpi h100-47:2 is both 47GB shares of ONE NVL. Use h100-47:4 for two cards."
   echo "Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
   exit 1
 fi
