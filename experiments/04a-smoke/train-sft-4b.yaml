@@ -1,6 +1,6 @@
 # Exp 4a smoke — SFT QLoRA on Qwen3.5-4B (AxisDecomposition CoT traces).
 # Same recipe as experiments/03-sft-vs-baseline/train-sft-8b.yaml, scaled to
-# the 4B base. Runs in ~1h on 1x H100-96. Adapter lands at
+# the 4B base. Sized for 1x H100-47 (MIG 3g.47gb). Adapter lands at
 # experiments/04a-smoke/models/qwen3.5-4b-sft.
 base_model: Qwen/Qwen3.5-4B
 load_in_4bit: true
@@ -34,8 +34,10 @@ attn_implementation: sdpa
 # Without packing the standard forward runs unpatched. Cost: ~1.5-2x slower
 # (samples are small: median ~1.9K, max ~3.7K tokens).
 sample_packing: false
+# Cap at the data, not 16k: padding/activation at 16384 OOMs a 47GB slice.
+pad_to_sequence_len: false
 learning_rate: 0.0001
-sequence_len: 16384
+sequence_len: 4096
 micro_batch_size: 1
 gradient_accumulation_steps: 8
 gradient_checkpointing: true

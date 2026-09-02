@@ -1,5 +1,5 @@
 #!/bin/bash
-# Exp 4a — Qwen3.5-4B full-pipeline smoke on H100 (2x H100-96).
+# Exp 4a — Qwen3.5-4B full-pipeline smoke on 2x H100-47 (MIG 3g.47gb).
 #
 # Pipeline (all artifacts land under experiments/04a-smoke/):
 #   1. SFT QLoRA on Qwen3.5-4B          -> models/qwen3.5-4b-sft
@@ -18,10 +18,10 @@
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=256G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
 #SBATCH --time=08:00:00
-#SBATCH --gres=gpu:h100-96:2
+#SBATCH --gres=gpu:h100-47:2
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
@@ -52,8 +52,9 @@ has_adapter() {
     { [[ -f "$1/adapter_model.safetensors" ]] || [[ -f "$1/adapter_model.bin" ]]; }
 }
 
-# ── GPU sanity (mirrors run_grpo_h100_96.sh) ─────────────────────────────
+# ── GPU sanity (h100-47 is MIG 3g.47gb; pin 0/1 not MIG-UUIDs) ──────────
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
+export PYTORCH_ALLOC_CONF=expandable_segments:True
 n_mig=$(nvidia-smi -L | grep -c 'MIG-' || true)
 n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 if [[ "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then

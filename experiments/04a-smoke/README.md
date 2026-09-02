@@ -2,7 +2,8 @@
 
 **Source.** Dissertation H036660. Smoke test of the full
 SFT → merge → GRPO → eval pipeline on a smaller base model
-(Qwen3.5-4B instead of DeepSeek-R1-Qwen3-8B), run on 2×H100.
+(Qwen3.5-4B instead of DeepSeek-R1-Qwen3-8B), run on 2×H100-47
+(MIG 3g.47gb).
 
 **Question.** Does the full pipeline (QLoRA SFT, LoRA merge, short GRPO
 run, two-stage vLLM eval) run end-to-end on Qwen3.5-4B, and does the
@@ -44,17 +45,19 @@ TQA-CORR; empty-oracle rows are filtered by the task.)
 | Per-config eval results | `results/smoke16/{base,sft,grpo}/` |
 | Summary table | `results/smoke16/SUMMARY.md` |
 
-## Run (H100)
+## Run (2× H100-47)
 
 ```bash
 sbatch run_batch_4a_smoke_h100.sh
 ```
 
-One submission runs the whole pipeline: SFT (2 epochs, 16k context,
+One submission runs the whole pipeline: SFT (2 epochs, 4k context,
 QLoRA r=64) → merge → ~300 GRPO prompts → 20-step GRPO (GPU0 vLLM
 serve + GPU1 train) → three evals → `SUMMARY.md`. Every stage is
 idempotent: re-submit to resume/continue (SFT/merge skipped when the
 artifacts exist; GRPO resumes from the newest checkpoint).
+VRAM knobs (GRPO `micro_batch_size` 8, eval `max_model_len` 8192)
+are sized for 47GB MIG slices, not full 96GB cards.
 
 Overrides:
 

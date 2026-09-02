@@ -5,12 +5,12 @@ model_args:
   pretrained: Qwen/Qwen3.5-4B
   max_thinking_tokens: 4096
   dtype: bfloat16
-  gpu_memory_utilization: 0.9
-  max_model_len: 16384
+  gpu_memory_utilization: 0.85
+  max_model_len: 8192
 include_path: ../experiments/tasks
 tasks:
   - spatial_eval_4a_smoke16
 apply_chat_template: true
-batch_size: 16
+batch_size: 4
 device: cuda:0
 log_samples: true

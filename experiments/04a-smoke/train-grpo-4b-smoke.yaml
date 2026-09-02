@@ -1,6 +1,6 @@
 # Exp 4a smoke — GRPO (20 steps) on the merged Qwen3.5-4B SFT weights.
-# Mirrors experiments/05-grpo/train-grpo-8b-vllm-h100.yaml (2-GPU vLLM
-# server + trainer) but at smoke scale: ~300 prompts, 20 steps.
+# 2-GPU vLLM server + trainer, sized for 2x H100-47 (MIG 3g.47gb).
+# Smoke scale: ~300 prompts, 20 steps.
 # Requires: models/qwen3.5-4b-sft-merged (created by merge_sft.py in the
 # batch launcher) and ../spatial_grpo_data_smoke4a.jsonl (generated in-job).
 base_model: ../experiments/04a-smoke/models/qwen3.5-4b-sft-merged
@@ -36,8 +36,9 @@ remove_unused_columns: false
 skip_prepare_dataset: true
 
 sequence_len: 1024
-# 16 = 4 prompts x G=4. One micro-batch / step => 4 prompts, 20 steps ~ 80 prompts.
-micro_batch_size: 16
+# Must be divisible by num_generations. 8 = 2 prompts x G=4 (16 is the
+# 96GB setting; 8B-on-47 used 4).
+micro_batch_size: 8
 gradient_accumulation_steps: 1
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
@@ -91,7 +92,8 @@ vllm:
   host: 0.0.0.0
   port: 8000
   tensor_parallel_size: 1
-  # 4B model: 0.70 * 96GB leaves headroom for CUDA graphs; 3072 is the KV cap.
-  gpu_memory_utilization: 0.70
+  # 0.80 * 47GB ≈ 38GB for 4B bf16 + LoRA + 3072-token KV. Do not raise
+  # max_model_len (native context is 262144 and the KV would OOM).
+  gpu_memory_utilization: 0.80
   dtype: auto
   max_model_len: 3072
