@@ -85,6 +85,9 @@ echo "GRPO train     CUDA_VISIBLE_DEVICES=$DEV1"
 
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
+  # axolotl is a console script (sys.path[0] = .venv/bin), not finetune.py.
+  # reward_funcs: rewards.* must be importable; rewards.py lives here.
+  export PYTHONPATH="$SLURM_SUBMIT_DIR/finetune${PYTHONPATH:+:$PYTHONPATH}"
   srun uv sync --extra vllm
 
   CFG_SFT=../experiments/04b-cli/train-sft-4b.yaml
