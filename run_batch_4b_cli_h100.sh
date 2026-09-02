@@ -46,6 +46,9 @@ has_adapter() {
 
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
+# torch 2.13 was built against cuDNN 9.2; uv resolved nvidia-cudnn-cu13 9.20.
+# SDPA would pick CUDNN_ATTENTION on Hopper and crash. FLASH/mem-efficient stay on.
+export TORCH_CUDNN_SDPA_ENABLED=0
 export AXOLOTL_DO_NOT_TRACK=1
 export AXOLOTL_NO_TELEMETRY=1
 
