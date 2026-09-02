@@ -65,16 +65,22 @@ fi
 n_mig=$(nvidia-smi -L 2>/dev/null | grep -c 'MIG-' || true)
 n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | wc -l)
 echo "device count: CUDA_VISIBLE_DEVICES=${n_vis} MIG=${n_mig} GPU=${n_gpu}"
-# nvidia-smi -L often lists only the parent GPU (GPU=1, MIG=0) even when
-# SLURM gave two MIG UUIDs in CUDA_VISIBLE_DEVICES.
 if [[ "${n_vis}" -lt 2 && "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then
   echo "Need 2 GPUs or MIG slices. Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
   exit 1
 fi
-if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
-  echo "Remapping CUDA_VISIBLE_DEVICES to 0,1 (vLLM cannot parse UUIDs)"
-  export CUDA_VISIBLE_DEVICES=0,1
+# Keep SLURM's ids (often MIG-UUIDs). Rewriting them to 0,1 makes
+# CUDA_VISIBLE_DEVICES=1 mean "physical GPU 1", which does not exist on a
+# 1-GPU MIG node → torch sees no CUDA → bf16/gpu ValueError.
+if [[ "${n_vis}" -ge 2 ]]; then
+  DEV0="${_devs[0]// /}"
+  DEV1="${_devs[1]// /}"
+else
+  DEV0=0
+  DEV1=1
 fi
+echo "serve/SFT/eval CUDA_VISIBLE_DEVICES=$DEV0"
+echo "GRPO train     CUDA_VISIBLE_DEVICES=$DEV1"
 
 # ── 1-2-3-4: TRAIN (SFT -> merge -> GRPO data -> GRPO) ───────────────────
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
@@ -88,7 +94,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
       echo "Found an incomplete SFT adapter (config, no weights) at $A_SFT_ADAPTER; retraining"
     fi
     echo "=== [1/5] SFT QLoRA on Qwen3.5-4B ==="
-    srun --cpu-bind=cores uv run python finetune.py ../experiments/04a-smoke/train-sft-4b.yaml || {
+    CUDA_VISIBLE_DEVICES="$DEV0" srun --cpu-bind=cores uv run python finetune.py ../experiments/04a-smoke/train-sft-4b.yaml || {
       echo "SFT training FAILED — aborting. Check the log for the traceback."
       exit 1
     }
@@ -125,7 +131,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
 
   echo "=== [4/5] GRPO 20 steps (GPU0 vLLM serve, GPU1 train) ==="
   CFG=../experiments/04a-smoke/train-grpo-4b-smoke.yaml
-  CUDA_VISIBLE_DEVICES=0 \
+  CUDA_VISIBLE_DEVICES="$DEV0" \
     VLLM_WORKER_MULTIPROC_METHOD=spawn \
     uv run axolotl vllm-serve "$CFG" &
   VLLM_PID=$!
@@ -157,7 +163,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   fi
 
   unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
-  CUDA_VISIBLE_DEVICES=1 \
+  CUDA_VISIBLE_DEVICES="$DEV1" \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     uv run python finetune.py ../experiments/04a-smoke/train-grpo-4b-smoke.yaml "${RESUME[@]}" || {
     echo "GRPO training FAILED — aborting."
@@ -199,7 +205,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     fi
     echo "=== [5/5] Eval $tag ($cfg_to_use) ==="
     local status=0
-    CUDA_VISIBLE_DEVICES=0 srun --cpu-bind=cores uv run python eval_new.py --config "$cfg_to_use" || status=$?
+    CUDA_VISIBLE_DEVICES="$DEV0" srun --cpu-bind=cores uv run python eval_new.py --config "$cfg_to_use" || status=$?
     # Move the newest timestamped results dir into smoke16/<tag>/.
     # eval_new.py writes to <config dir>/results/<timestamp>/
     local latest
