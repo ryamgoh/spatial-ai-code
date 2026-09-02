@@ -55,10 +55,20 @@ has_adapter() {
 # ── GPU sanity (h100-47 is MIG 3g.47gb; pin 0/1 not MIG-UUIDs) ──────────
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
-n_mig=$(nvidia-smi -L | grep -c 'MIG-' || true)
-n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
-if [[ "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then
-  echo "Need 2 GPUs, saw MIG=${n_mig} GPU=${n_gpu}"
+echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
+nvidia-smi -L || true
+n_vis=0
+if [[ -n "${CUDA_VISIBLE_DEVICES-}" ]]; then
+  IFS=',' read -ra _devs <<< "$CUDA_VISIBLE_DEVICES"
+  n_vis=${#_devs[@]}
+fi
+n_mig=$(nvidia-smi -L 2>/dev/null | grep -c 'MIG-' || true)
+n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | wc -l)
+echo "device count: CUDA_VISIBLE_DEVICES=${n_vis} MIG=${n_mig} GPU=${n_gpu}"
+# nvidia-smi -L often lists only the parent GPU (GPU=1, MIG=0) even when
+# SLURM gave two MIG UUIDs in CUDA_VISIBLE_DEVICES.
+if [[ "${n_vis}" -lt 2 && "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then
+  echo "Need 2 GPUs or MIG slices. Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
   exit 1
 fi
 if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
