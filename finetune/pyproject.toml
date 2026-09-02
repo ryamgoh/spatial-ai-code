@@ -9,7 +9,10 @@ dependencies = [
     "typer>=0.12",
     "torch>=2.13.0",
     "torchvision>=0.28.0",
-    "vllm>=0.27.0",
+    # ==0.28.0 required: 0.27.x loads qwen3_5_text configs but lacks the
+    # "model.language_model." -> "model." weight-prefix mapper (vllm PR #50355),
+    # which merged SFT checkpoints carry.
+    "vllm==0.28.0",
 ]
 
 [project.optional-dependencies]
@@ -22,5 +25,9 @@ override-dependencies = [
     "torch==2.13.0",
     "torchvision==0.28.0",
     "mistral-common==1.11.5",
-    "starlette>=1.0.1"          # Forces Gradio to look past its <1.0 constraint
+    "starlette>=1.0.1",         # Forces Gradio to look past its <1.0 constraint
+    # vllm 0.28.0 needs huggingface-hub>=1.27.0; axolotl 0.18.0 pins 1.17.0.
+    # Match the eval venv (resolves 1.29.0). hf-xet follows (axolotl pins 1.4.3).
+    "huggingface-hub==1.29.0",
+    "hf-xet==1.6.0",
 ]

@@ -14,10 +14,11 @@ dependencies = [
     "typer>=0.12",
     "numpy>=1.24.0",
     "docx2txt>=0.9",
-    # vLLM ==0.27.1 matches the finetune venv and is required for text-only
-    # Qwen3.5 (qwen3_5_text) checkpoints (vllm PR #50210); 0.17.0 only knew
-    # the multimodal class and crashed on the merged text config.
-    "vllm==0.27.1",
+    # vLLM ==0.28.0 matches the finetune venv and is required for text-only
+    # Qwen3.5 (qwen3_5_text) checkpoints: PR #50210 (config routing, 0.27.0)
+    # plus PR #50355 (weight-prefix mapper for "model.language_model." keys,
+    # 0.28.0). 0.17.0 only knew the multimodal class.
+    "vllm==0.28.0",
     "matplotlib>=3.7.0",
 ]
 
