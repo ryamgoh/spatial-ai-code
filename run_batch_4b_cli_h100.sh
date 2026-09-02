@@ -50,38 +50,64 @@ export AXOLOTL_DO_NOT_TRACK=1
 export AXOLOTL_NO_TELEMETRY=1
 
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
+echo "SLURM NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES-unset}"
 nvidia-smi -L || true
-n_vis=0
+
+# Distinct CUDA devices as torch sees them (NCCL compares UUID). 0.1 on a
+# 1-parent MIG node is the same card as 0 and TRL init_communicator aborts.
+_CUDA_LIST_PY='
+import os, torch
+def uid(i):
+    p = torch.cuda.get_device_properties(i)
+    u = getattr(p, "uuid", None)
+    if u is None:
+        return str(i)
+    if isinstance(u, (bytes, bytearray)):
+        return bytes(u).hex()
+    return str(u)
+n = torch.cuda.device_count()
+print(n)
+for i in range(n):
+    print(uid(i))
+print(os.environ.get("CUDA_VISIBLE_DEVICES", ""))
+'
+_cuda_list() {
+  if [[ "${1:-}" == "--unset" ]]; then
+    env -u CUDA_VISIBLE_DEVICES uv run python -c "$_CUDA_LIST_PY"
+  else
+    CUDA_VISIBLE_DEVICES="$1" uv run python -c "$_CUDA_LIST_PY"
+  fi
+}
+
 if [[ -n "${CUDA_VISIBLE_DEVICES-}" ]]; then
-  IFS=',' read -ra _devs <<< "$CUDA_VISIBLE_DEVICES"
-  n_vis=${#_devs[@]}
+  mapfile -t _probe < <(_cuda_list "$CUDA_VISIBLE_DEVICES" || true)
+else
+  mapfile -t _probe < <(_cuda_list --unset || true)
 fi
-n_mig=$(nvidia-smi -L 2>/dev/null | grep -c 'MIG-' || true)
-n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | wc -l)
-mapfile -t MIG_UUIDS < <(nvidia-smi -L 2>/dev/null | grep -oE 'MIG-[0-9a-fA-F-]+' || true)
-echo "device count: CUDA_VISIBLE_DEVICES=${n_vis} MIG=${n_mig} GPU=${n_gpu} mig_uuids=${#MIG_UUIDS[@]}"
-if [[ "${n_vis}" -lt 2 && "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 && "${#MIG_UUIDS[@]}" -lt 2 ]]; then
-  echo "Need 2 GPUs or MIG slices. Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
+if [[ "${#_probe[@]}" -lt 2 || "${_probe[0]:-0}" -lt 2 ]]; then
+  echo "retry probe with CUDA_VISIBLE_DEVICES unset (cgroup-local devices)"
+  mapfile -t _probe < <(_cuda_list --unset || true)
+  unset CUDA_VISIBLE_DEVICES || true
+fi
+n_cuda="${_probe[0]:-0}"
+uuid0="${_probe[1]:-}"
+uuid1="${_probe[2]:-}"
+echo "torch.cuda.device_count=${n_cuda} uuid0=${uuid0} uuid1=${uuid1}"
+if [[ "${n_cuda}" -lt 2 || -z "$uuid1" || "$uuid0" == "$uuid1" ]]; then
+  echo "Need 2 distinct CUDA devices for vLLM+trainer NCCL. This job sees ${n_cuda}."
+  echo "h100-47 is two MIG slices; CUDA_VISIBLE_DEVICES=0.1 is still the same UUID."
+  echo "Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
   exit 1
 fi
-# Two 47GB slices live on ONE parent H100. CUDA_VISIBLE_DEVICES=1 is
-# physical GPU 1 and does not exist → torch CPU → bf16/gpu ValueError.
-# Address slices by MIG UUID, or 0 / 0.1 on a single parent.
-if [[ ${#MIG_UUIDS[@]} -ge 2 ]]; then
-  DEV0="${MIG_UUIDS[0]}"
-  DEV1="${MIG_UUIDS[1]}"
-elif [[ "${n_vis}" -ge 2 && "${CUDA_VISIBLE_DEVICES-}" == *MIG-* ]]; then
-  DEV0="${_devs[0]// /}"
-  DEV1="${_devs[1]// /}"
-elif [[ "${n_gpu}" -ge 2 ]]; then
-  DEV0=0
-  DEV1=1
-else
-  DEV0=0
-  DEV1=0.1
-fi
-echo "serve/SFT/eval CUDA_VISIBLE_DEVICES=$DEV0"
-echo "GRPO train     CUDA_VISIBLE_DEVICES=$DEV1"
+# Indices inside the (possibly cgroup-filtered) CUDA view.
+DEV0=0
+DEV1=1
+# Axolotl/TRL: trainer on the first N GPUs, vLLM on the last N
+# (https://docs.axolotl.ai/docs/vllm_serving.html).
+TRAIN_DEV=$DEV0
+VLLM_DEV=$DEV1
+echo "SFT/eval/GRPO-train CUDA_VISIBLE_DEVICES=$TRAIN_DEV"
+echo "vLLM serve          CUDA_VISIBLE_DEVICES=$VLLM_DEV"
 
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
@@ -97,7 +123,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [1/5] SFT adapter already complete, skipping ==="
   else
     echo "=== [1/5] SFT QLoRA on Qwen3.5-4B (axolotl train) ==="
-    CUDA_VISIBLE_DEVICES="$DEV0" srun --cpu-bind=cores \
+    CUDA_VISIBLE_DEVICES="$TRAIN_DEV" srun --cpu-bind=cores \
       uv run axolotl train "$CFG_SFT" --launcher python || {
       echo "SFT training FAILED — aborting."
       exit 1
@@ -130,8 +156,8 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   fi
   srun uv run python generate_grpo.py --annotate --out "../$GRPO_DATA"
 
-  echo "=== [4/5] GRPO 20 steps (GPU0 vllm-serve, GPU1 axolotl train) ==="
-  CUDA_VISIBLE_DEVICES="$DEV0" \
+  echo "=== [4/5] GRPO 20 steps (vLLM last GPU, trainer first GPU) ==="
+  CUDA_VISIBLE_DEVICES="$VLLM_DEV" \
     VLLM_WORKER_MULTIPROC_METHOD=spawn \
     uv run axolotl vllm-serve "$CFG_GRPO" &
   VLLM_PID=$!
@@ -139,8 +165,10 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
 
   ok=0
   for _ in $(seq 1 90); do
-    if curl -sfL "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1 \
-      || curl -sfL "http://127.0.0.1:8000/health" >/dev/null 2>&1; then
+    # LoRA serve script requires the trailing slash on /health/
+    if curl -sfL "http://127.0.0.1:8000/health/" >/dev/null 2>&1 \
+      || curl -sfL "http://127.0.0.1:8000/health" >/dev/null 2>&1 \
+      || curl -sfL "http://127.0.0.1:8000/v1/models" >/dev/null 2>&1; then
       ok=1
       break
     fi
@@ -163,12 +191,8 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   fi
 
   unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
-  echo "preflight trainer CUDA_VISIBLE_DEVICES=$DEV1"
-  CUDA_VISIBLE_DEVICES="$DEV1" uv run python -c "import torch,sys; print('cuda', torch.cuda.is_available(), 'n', torch.cuda.device_count()); sys.exit(0 if torch.cuda.is_available() else 1)" || {
-    echo "Trainer has no CUDA with CUDA_VISIBLE_DEVICES=$DEV1"
-    exit 1
-  }
-  CUDA_VISIBLE_DEVICES="$DEV1" \
+  echo "GRPO train CUDA_VISIBLE_DEVICES=$TRAIN_DEV"
+  CUDA_VISIBLE_DEVICES="$TRAIN_DEV" \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     uv run axolotl train "$CFG_GRPO" --launcher python "${RESUME[@]}" || {
     echo "GRPO training FAILED — aborting."
@@ -206,7 +230,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     fi
     echo "=== [5/5] Eval $tag ($cfg_to_use) ==="
     local status=0
-    CUDA_VISIBLE_DEVICES="$DEV0" srun --cpu-bind=cores uv run python eval_new.py --config "$cfg_to_use" || status=$?
+    CUDA_VISIBLE_DEVICES="$TRAIN_DEV" srun --cpu-bind=cores uv run python eval_new.py --config "$cfg_to_use" || status=$?
     local latest
     latest=$(ls -dt "$SLURM_SUBMIT_DIR/$EXP"/results/2*/ 2>/dev/null | head -1 || true)
     mkdir -p "$A_SMOKE_OUT/$tag"

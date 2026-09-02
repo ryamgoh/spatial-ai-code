@@ -86,3 +86,5 @@ vllm:
   gpu_memory_utilization: 0.80
   dtype: auto
   max_model_len: 3072
+  # Qwen3.5 hybrid GDN: CUDA graphs are unsupported (axolotl vLLM serving docs).
+  enforce_eager: true
