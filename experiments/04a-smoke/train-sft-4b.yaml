@@ -19,9 +19,10 @@ lora_target_modules:
   - linear_attn.in_proj_qkv
   - linear_attn.in_proj_z
   - linear_attn.out_proj
-lora_qkv_kernel: true
-lora_o_kernel: true
-lora_mlp_kernel: true
+# Fused LoRA Triton kernels IMA on torch 2.13 / triton 3.7 (swiglu_fwd).
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
 embeddings_skip_upcast: true
 # sdpa (not the deprecated xformers_attention flag): axolotl's xformers
 # attention patch calls transformers' _upad_input() without the new

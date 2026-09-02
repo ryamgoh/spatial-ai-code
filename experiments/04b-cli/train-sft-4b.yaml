@@ -17,9 +17,11 @@ lora_target_modules:
   - linear_attn.in_proj_qkv
   - linear_attn.in_proj_z
   - linear_attn.out_proj
-lora_qkv_kernel: true
-lora_o_kernel: true
-lora_mlp_kernel: true
+# Fused LoRA Triton kernels IMA on torch 2.13 / triton 3.7 (swiglu_fwd).
+# 4a SFT never re-ran after that upgrade; GRPO already had these off.
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
 embeddings_skip_upcast: true
 attn_implementation: sdpa
 sample_packing: false
