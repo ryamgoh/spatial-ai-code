@@ -58,20 +58,27 @@ if [[ -n "${CUDA_VISIBLE_DEVICES-}" ]]; then
 fi
 n_mig=$(nvidia-smi -L 2>/dev/null | grep -c 'MIG-' || true)
 n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | wc -l)
-echo "device count: CUDA_VISIBLE_DEVICES=${n_vis} MIG=${n_mig} GPU=${n_gpu}"
-if [[ "${n_vis}" -lt 2 && "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then
+mapfile -t MIG_UUIDS < <(nvidia-smi -L 2>/dev/null | grep -oE 'MIG-[0-9a-fA-F-]+' || true)
+echo "device count: CUDA_VISIBLE_DEVICES=${n_vis} MIG=${n_mig} GPU=${n_gpu} mig_uuids=${#MIG_UUIDS[@]}"
+if [[ "${n_vis}" -lt 2 && "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 && "${#MIG_UUIDS[@]}" -lt 2 ]]; then
   echo "Need 2 GPUs or MIG slices. Check: scontrol show job ${SLURM_JOB_ID-} | grep -E 'GRES|TRES'"
   exit 1
 fi
-# Keep SLURM's ids (often MIG-UUIDs). Rewriting them to 0,1 makes
-# CUDA_VISIBLE_DEVICES=1 mean "physical GPU 1", which does not exist on a
-# 1-GPU MIG node → torch sees no CUDA → bf16/gpu ValueError.
-if [[ "${n_vis}" -ge 2 ]]; then
+# Two 47GB slices live on ONE parent H100. CUDA_VISIBLE_DEVICES=1 is
+# physical GPU 1 and does not exist → torch CPU → bf16/gpu ValueError.
+# Address slices by MIG UUID, or 0 / 0.1 on a single parent.
+if [[ ${#MIG_UUIDS[@]} -ge 2 ]]; then
+  DEV0="${MIG_UUIDS[0]}"
+  DEV1="${MIG_UUIDS[1]}"
+elif [[ "${n_vis}" -ge 2 && "${CUDA_VISIBLE_DEVICES-}" == *MIG-* ]]; then
   DEV0="${_devs[0]// /}"
   DEV1="${_devs[1]// /}"
-else
+elif [[ "${n_gpu}" -ge 2 ]]; then
   DEV0=0
   DEV1=1
+else
+  DEV0=0
+  DEV1=0.1
 fi
 echo "serve/SFT/eval CUDA_VISIBLE_DEVICES=$DEV0"
 echo "GRPO train     CUDA_VISIBLE_DEVICES=$DEV1"
@@ -153,6 +160,11 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   fi
 
   unset RANK LOCAL_RANK WORLD_SIZE MASTER_ADDR MASTER_PORT GROUP_RANK || true
+  echo "preflight trainer CUDA_VISIBLE_DEVICES=$DEV1"
+  CUDA_VISIBLE_DEVICES="$DEV1" uv run python -c "import torch,sys; print('cuda', torch.cuda.is_available(), 'n', torch.cuda.device_count()); sys.exit(0 if torch.cuda.is_available() else 1)" || {
+    echo "Trainer has no CUDA with CUDA_VISIBLE_DEVICES=$DEV1"
+    exit 1
+  }
   CUDA_VISIBLE_DEVICES="$DEV1" \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     uv run axolotl train "$CFG_GRPO" --launcher python "${RESUME[@]}" || {
