@@ -115,7 +115,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   # axolotl is a console script (sys.path[0] = .venv/bin), not finetune.py.
   # reward_funcs: rewards.* must be importable; rewards.py lives here.
   export PYTHONPATH="$SLURM_SUBMIT_DIR/finetune${PYTHONPATH:+:$PYTHONPATH}"
-  srun uv sync --extra vllm
+  srun uv sync
 
   CFG_SFT=../experiments/04b-cli/train-sft-4b.yaml
   CFG_GRPO=../experiments/04b-cli/train-grpo-4b-smoke.yaml

@@ -4,36 +4,38 @@ version = "0.1.0"
 description = "SFT + GRPO finetuning (Axolotl) and lm-eval evaluation for spatial reasoning"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    "axolotl>=0.18.0,<0.19.0",
+    "axolotl[vllm]",
+    "vllm==0.28.0",
+    "torch==2.13.0",
+    "torchvision==0.28.0",
     "lm-eval[vllm]==0.4.12",
     "pyyaml>=6.0.3",
     "typer>=0.12",
     "outlines>=1.2.9",
-    "torch>=2.13.0",
-    "torchvision>=0.28.0",
-    # ==0.28.0 required: 0.27.x loads qwen3_5_text configs but lacks the
-    # "model.language_model." -> "model." weight-prefix mapper (vllm PR #50355),
-    # which merged SFT checkpoints carry.
-    "vllm==0.28.0",
 ]
 
-[project.optional-dependencies]
-vllm = [
-    "axolotl[vllm]>=0.18.0,<0.19.0",
-]
+# Last PyPI axolotl is 0.18.0 (2026-07-17): torch<=2.12.1, trl==1.8.0,
+# transformers==5.14.1. That stack cannot load Qwen3.5 text checkpoints in
+# vLLM (needs 0.28 → torch 2.13) and its trl_vllm wrap still reads
+# VLLMGeneration.is_fsdp_enabled (gone in TRL 1.8+).
+# main @ 7d77580: torch<=2.13, trl==1.9.0, transformers==5.16.1, uses
+# self._dist.is_fsdp instead.
+[tool.uv.sources]
+axolotl = { git = "https://github.com/axolotl-ai-cloud/axolotl", rev = "7d775808d0ff71f21f553bd7d761631d7fb089e6" }
 
 [tool.uv]
 override-dependencies = [
     "torch==2.13.0",
     "torchvision==0.28.0",
-    # Match axolotl 0.18's pin so train/eval stacks stay coherent.
-    "transformers==5.14.1",
-    "mistral-common==1.11.5",
-    "starlette>=1.0.1",         # Forces Gradio to look past its <1.0 constraint
-    # vllm 0.28.0 needs huggingface-hub>=1.27.0; axolotl 0.18.0 pins 1.17.0.
+    # axolotl still pins huggingface_hub==1.17.0 / hf-xet==1.4.3;
+    # vllm 0.28 needs huggingface-hub>=1.27.
     "huggingface-hub==1.29.0",
     "hf-xet==1.6.0",
-    # axolotl 0.18 pins lm_eval==0.4.11 but never imports it; eval uses
-    # 0.4.12 (task machinery + structured outputs). Override, like hf-hub.
+    # axolotl pins lm_eval==0.4.11; eval needs 0.4.12.
     "lm-eval==0.4.12",
+    # torch 2.13 ships nvidia-cudnn-cu13==9.20.0.48 (incomplete wheel;
+    # pytorch#187824). 9.23.2.1 includes tensor_ir.
+    "nvidia-cudnn-cu13==9.23.2.1",
+    "mistral-common==1.11.5",
+    "starlette>=1.0.1",
 ]

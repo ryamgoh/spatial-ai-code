@@ -33,10 +33,9 @@ These are ours, not Axolotl:
 - `eval/eval_new.py` — two-pass SpatialMap eval
 - this SLURM script — GPU pin, skip/resume, vLLM health, result layout
 
-`finetune.py` after the recent cuts is only: dynamo `CUDA_VISIBLE_DEVICES=1`
-workaround, and axolotl 0.18's `VLLMGeneration.is_fsdp_enabled` AttributeError
-on first LoRA sync. **4b does not apply those patches.** If GRPO dies on
-either, that is the result: keep a tiny shim, do not keep a train wrapper.
+Axolotl is pinned to git `7d77580` (0.19.dev), which uses
+`self._dist.is_fsdp` instead of `VLLMGeneration.is_fsdp_enabled`.
+GRPO train is CLI again.
 
 ## Artifacts
 

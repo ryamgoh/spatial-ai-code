@@ -118,7 +118,7 @@ echo "vLLM serve          CUDA_VISIBLE_DEVICES=$VLLM_DEV"
 # ── 1-2-3-4: TRAIN (SFT -> merge -> GRPO data -> GRPO) ───────────────────
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
-  srun uv sync --extra vllm
+  srun uv sync
 
   if has_adapter "$A_SFT_ADAPTER"; then
     echo "=== [1/5] SFT adapter already complete, skipping ==="
