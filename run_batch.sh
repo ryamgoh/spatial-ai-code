@@ -48,9 +48,3 @@ srun uv sync
 # srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceQwen3-VL-2B-Thinking_nonshot_2.yaml
 # srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceR_Baseline.yaml
 # srun --cpu-bind=cores uv run python eval_new.py --config ../experiments/02-spatial-baseline-models/other_models/SpaceR_NonFinetuned_nonshot_2.yaml
-
-# Run visuals
-srun --cpu-bind=cores uv run create_visual.py ./results/experiment_1_qwen3_8B/*/results.json --output-dir ./charts/experiment_1
-srun --cpu-bind=cores uv run create_visual.py ./results/experiment_2_other_spatial_models/baseline/*/results.json --output-dir ./charts/experiment_2/baseline
-srun --cpu-bind=cores uv run create_visual.py ./results/experiment_2_other_spatial_models/nonshot_2/*/results.json --output-dir ./charts/experiment_2/nonshot_2
-srun --cpu-bind=cores uv run create_visual.py ./results/experiment_3_other_models/*/results.json --output-dir ./charts/experiment_3
