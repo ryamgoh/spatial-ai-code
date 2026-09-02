@@ -55,9 +55,6 @@ has_adapter() {
 # ── GPU sanity (h100-47 is MIG 3g.47gb; pin 0/1 not MIG-UUIDs) ──────────
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
-# torch 2.13 was built against cuDNN 9.2; uv resolved nvidia-cudnn-cu13 9.20.
-# SDPA would pick CUDNN_ATTENTION on Hopper and crash. FLASH/mem-efficient stay on.
-export TORCH_CUDNN_SDPA_ENABLED=0
 n_mig=$(nvidia-smi -L | grep -c 'MIG-' || true)
 n_gpu=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 if [[ "${n_mig}" -lt 2 && "${n_gpu}" -lt 2 ]]; then

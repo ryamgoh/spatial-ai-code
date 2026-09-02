@@ -30,4 +30,9 @@ override-dependencies = [
     # Match the eval venv (resolves 1.29.0). hf-xet follows (axolotl pins 1.4.3).
     "huggingface-hub==1.29.0",
     "hf-xet==1.6.0",
+    # torch 2.13 pulls nvidia-cudnn-cu13==9.20.0.48, which omits
+    # libcudnn_engines_tensor_ir.so; Hopper SDPA then mixes with another
+    # 9.x on the loader path → CUDNN_STATUS_SUBLIBRARY_VERSION_MISMATCH.
+    # 9.23.2.1 ships that lib (pytorch/pytorch#187824).
+    "nvidia-cudnn-cu13==9.23.2.1",
 ]

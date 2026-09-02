@@ -35,4 +35,7 @@ override-dependencies = [
     # Match the finetune venv (axolotl 0.18 pins transformers==5.14.1) so the
     # eval and train stacks stay coherent.
     "transformers==5.14.1",
+    # Same as finetune: torch 2.13's 9.20.0.48 cuDNN wheel is incomplete
+    # (pytorch/pytorch#187824). 9.23.2.1 ships tensor_ir.
+    "nvidia-cudnn-cu13==9.23.2.1",
 ]
