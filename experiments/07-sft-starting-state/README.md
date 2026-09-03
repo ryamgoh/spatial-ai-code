@@ -49,7 +49,7 @@ Hyperparameters copied from `../04b-cli/train-sft-4b.yaml` (QLoRA r=64,
 lr 1e-4, 2 epochs, seq 4096, microbatch 1, grad acc 8, early stopping on
 `eval_loss`). Only `base_model` and `output_dir` differ.
 
-## Run (1× H100-96)
+## Run (1× H100-47)
 
 ```bash
 sbatch run_batch_07_sft_start_h100.sh
