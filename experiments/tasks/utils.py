@@ -368,11 +368,40 @@ def filter_spatialmap_and_update_oracle_answer_new(dataset):
     return dataset.map(add_oracle)
 
 
+# Census of data/spatialeval_cleaned.jsonl (1500 SpatialMap TQA rows):
+#   empty oracle                          171
+#   SpatialMap-TQA-Corr (nonempty)       1329
+#     Single (exactly one A–D letter)    1038
+#       count 1-ans  404
+#       dir   1-ans  332
+#       which 1-ans  302
+#     Multi (2+ letters)                  291
+#       dir   2-ans   93
+#       which 4-ans  198
+# dir-4-ans / which-2-ans / count-multi do not occur in TQA-Corr.
+
+
 def filter_nonempty_oracle(dataset):
     """Drop rows whose gold letter set is empty (171 of 1500 cleaned SpatialMap)."""
     return dataset.filter(
         lambda doc: bool(str(doc.get("oracle_option") or "").strip())
     )
+
+
+def _oracle_letters(doc) -> list[str]:
+    raw = str(doc.get("oracle_option") or "").strip().upper()
+    if not raw:
+        return []
+    return [p for p in re.split(r"[,;| ]+", raw) if p]
+
+
+def filter_single_letter_oracle(dataset):
+    """SpatialMap-TQA-Corr-Single: gold is exactly one A–D letter (1038 of 1329)."""
+    def keep(doc):
+        ls = _oracle_letters(doc)
+        return len(ls) == 1 and ls[0] in "ABCD"
+
+    return dataset.filter(keep)
 
 
 def filter_spatialmap(dataset):
