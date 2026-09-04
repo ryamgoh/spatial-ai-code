@@ -1,0 +1,57 @@
+# Exp 8 / 2.1 — Qwen3.5-4B Instruct SFT on nested 5,000 single-answer traces.
+# Exp 7 QLoRA recipe minus early stop (2 full epochs).
+base_model: Qwen/Qwen3.5-4B
+load_in_4bit: true
+adapter: qlora
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+  - linear_attn.in_proj_qkv
+  - linear_attn.in_proj_z
+  - linear_attn.out_proj
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
+embeddings_skip_upcast: true
+attn_implementation: sdpa
+sample_packing: false
+pad_to_sequence_len: false
+learning_rate: 0.0001
+sequence_len: 4096
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_ratio: 0.05
+fp16: false
+bf16: true
+max_grad_norm: 0.05
+num_epochs: 2
+logging_steps: 1
+output_dir: ../experiments/08-dual-scaling/models/qwen3.5-4b-sft-5000
+datasets:
+  - path: ../data/spatial_sft_single_scale_5000_train.jsonl
+    type: chat_template
+    field_messages: messages
+dataloader_prefetch_factor: 8
+dataloader_num_workers: 2
+dataloader_pin_memory: true
+
+val_set_size: 0.05
+eval_strategy: steps
+eval_steps: 150
+save_steps: 150
+save_total_limit: 3
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
