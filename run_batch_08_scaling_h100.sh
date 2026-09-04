@@ -8,7 +8,10 @@
 #   2. eval_new.py      all five on TQA-Corr-Single
 #   3. summarize.py
 #
-# Submit:  sbatch run_batch_08_scaling_h100.sh
+# Two-GPU split (preferred):
+#   sbatch run_batch_08_scaling_h100_96.sh   # 4B × {1.5k, 5k, 20k}
+#   sbatch run_batch_08_scaling_h100_47.sh   # 0.8B-20k + 2B-20k
+# Sequential fallback (this file): all five cells on one h100-47.
 # Overrides: SKIP_TRAIN=1 SKIP_EVAL=1 SKIP_2_1=1 SKIP_2_2=1 ONLY=4b-5k,2b-20k
 #SBATCH --job-name=spatial8-scale
 #SBATCH --partition=gpu-long
@@ -97,6 +100,11 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   export PYTHONPATH="$SLURM_SUBMIT_DIR/finetune${PYTHONPATH:+:$PYTHONPATH}"
   srun uv sync
 
+  # flock: 96 and 47 jobs may both hit this. Winner generates; loser waits
+  # and reuses. Nested 1.5k/5k slices are deterministic from the 20k pool.
+  mkdir -p "$SLURM_SUBMIT_DIR/data"
+  exec 9>"$SLURM_SUBMIT_DIR/data/.spatial_sft_single_scale.lock"
+  flock 9
   if [[ -s "$A_POOL" ]]; then
     echo "=== [0] 20k pool already at $POOL ==="
   else
@@ -125,6 +133,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "make_scale_data.py FAILED — aborting."
     exit 1
   }
+  flock -u 9
 
   train_one() {
     local tag=$1 cfg=$2 dest=$3
@@ -169,21 +178,16 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
       return 0
     fi
     echo "=== eval $tag ($cfg) ==="
-    local status=0
-    srun --cpu-bind=cores uv run python eval_new.py --config "$cfg" || status=$?
-    local latest
-    latest=$(ls -dt "$SLURM_SUBMIT_DIR/$EXP"/results/2*/ 2>/dev/null | head -1 || true)
     mkdir -p "$A_EVAL_OUT/$tag"
-    if [[ -n "${latest:-}" && -f "${latest}results.json" ]]; then
-      mv "${latest}"* "$A_EVAL_OUT/$tag/"
-      rmdir "${latest}" 2>/dev/null || true
-      echo "  -> $A_EVAL_OUT/$tag/"
-    fi
+    local status=0
+    srun --cpu-bind=cores uv run python eval_new.py \
+      --config "$cfg" \
+      --output-dir "$A_EVAL_OUT/$tag" || status=$?
     if [[ $status -ne 0 ]]; then
       echo "  eval $tag FAILED (status $status)"
       return "$status"
     fi
-    echo "  eval $tag OK"
+    echo "  eval $tag OK -> $A_EVAL_OUT/$tag/"
   }
 
   for row in "${selected[@]}"; do
@@ -192,9 +196,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     tag=$1 cfg=$2 adapter=$3 ev=$4
     run_eval "$tag" "../experiments/08-dual-scaling/$ev" "$SLURM_SUBMIT_DIR/$EXP/$adapter"
   done
-
-  srun uv run --no-project python ../experiments/08-dual-scaling/scripts/summarize.py \
-    || echo "summarize failed — check $EVAL_OUT manually"
 fi
 
-echo "=== Exp 8 dual-scaling done. Summary: $A_EVAL_OUT/SUMMARY.md ==="
+echo "=== Exp 8 cells done. After both GPU jobs finish:"
+echo "    cd eval && uv run --no-project python ../experiments/08-dual-scaling/scripts/summarize.py"

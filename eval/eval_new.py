@@ -154,11 +154,19 @@ class VLLMStagedPass(LM):
         )
 
 
-def run_evaluation(config_path: Path, stages: int = 2) -> dict:
+def run_evaluation(
+    config_path: Path,
+    stages: int = 2,
+    output_dir: Path | None = None,
+) -> dict:
     # Results live under the experiment dir that owns the config
-    # (e.g. experiments/05-grpo/results/<timestamp>/).
+    # (e.g. experiments/05-grpo/results/<timestamp>/), unless --output-dir
+    # is set (parallel jobs write straight to results/<tag>/).
     config_path = Path(config_path)
-    output_dir = config_path.parent / "results" / generate_datetime_id()
+    if output_dir is None:
+        output_dir = config_path.parent / "results" / generate_datetime_id()
+    else:
+        output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Newer lm-eval requires output_path whenever log_samples is set; we
@@ -230,10 +238,15 @@ app = typer.Typer(add_completion=False)
 def main(
     config: str = typer.Option(..., "--config", help="Path to the evaluation configuration YAML file"),
     stages: int = typer.Option(2, "--stages", min=1, max=2, help="1 = single pass; 2 (default) = thinking + constrained A/B/C/D re-ask"),
+    output_dir: Path | None = typer.Option(
+        None,
+        "--output-dir",
+        help="Write results.json here instead of experiments/<exp>/results/<timestamp>/",
+    ),
 ) -> None:
     """Evaluate a model with one or two vLLM passes."""
     print(f"Running with {stages} stage(s)")
-    run_evaluation(Path(config), stages=stages)
+    run_evaluation(Path(config), stages=stages, output_dir=output_dir)
     print(f"\nDone! Config: {config}")
 
 

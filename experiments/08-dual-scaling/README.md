@@ -88,7 +88,29 @@ Stage 2 still does **not** load the LoRA (existing harness). That was
 harmless for 4B-Instruct in Exp 7 (0% over-select); 0.8B/2B get the
 same protocol so the IV is the checkpoint, not a new decoder.
 
-## Run (1× H100-47)
+## Run (1× H100-96 + 1× H100-47)
+
+Same QLoRA recipe on both cards (microbatch 1, grad acc 8). 96GB is
+only more VRAM / less paging, not a different training condition.
+
+```bash
+sbatch run_batch_08_scaling_h100_96.sh   # 4B × {1.5k, 5k, 20k}
+sbatch run_batch_08_scaling_h100_47.sh   # 0.8B-20k + 2B-20k
+```
+
+| job | GRES | cells |
+|---|---|---|
+| `spatial8-96` | `h100-96:1` | `4b-1.5k`, `4b-5k`, `4b-20k` |
+| `spatial8-47` | `h100-47:1` | `0.8b-20k`, `2b-20k` |
+
+Submit both at once. Data gen is `flock`'d: whichever job starts first
+writes the 20k pool + nested 1.5k/5k; the other waits and reuses.
+Evals write to `results/scaling/<tag>/` (no shared timestamp dir).
+
+If `h100-96` is only on partition `gpu`, resubmit the 96 job with
+`-p gpu` (keep the 2-day limit if the partition allows it).
+
+Sequential fallback (all five cells on one 47GB slice):
 
 ```bash
 sbatch run_batch_08_scaling_h100.sh
@@ -98,16 +120,19 @@ Idempotent: existing 20k jsonl / nested slices / adapter / `results.json`
 are skipped. Overrides:
 
 - `SKIP_TRAIN=1` / `SKIP_EVAL=1`
-- `SKIP_2_1=1` — skip `4b-1.5k` and `4b-5k` (still trains `4b-20k`)
+- `SKIP_2_1=1` — skip `4b-1.5k` and `4b-5k` (still trains `4b-20k` if selected)
 - `SKIP_2_2=1` — skip `2b-20k` and `0.8b-20k`
 - `ONLY=4b-5k,2b-20k` — run that subset (comma-separated tags)
 
-Evals land in `results/scaling/<tag>/`.
-`scripts/summarize.py` writes `SUMMARY.md` (2.1 curve, 2.2 curve,
-format flags, loss).
+Do **not** wait for a job to write `SUMMARY.md`. After **both** GPU jobs
+have `results.json` under `results/scaling/<tag>/`:
 
-Wall-clock: 20k generation is CPU; five QLoRA runs + five 1,038-row
-evals. Budget **2 days** on `gpu-long`. 4B-20k is the long pole.
+```bash
+cd eval && uv run --no-project python ../experiments/08-dual-scaling/scripts/summarize.py
+```
+
+Wall-clock ≈ max(4B 1.5k+5k+20k on 96, 0.8B-20k+2B-20k on 47). 4B-20k
+is still the long pole. Budget **2 days** `gpu-long` on each.
 
 ## Artifacts
 
