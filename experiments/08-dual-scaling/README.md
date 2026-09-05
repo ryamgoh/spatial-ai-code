@@ -94,14 +94,19 @@ Same QLoRA recipe on both cards (microbatch 1, grad acc 8). 96GB is
 only more VRAM / less paging, not a different training condition.
 
 ```bash
-sbatch run_batch_08_scaling_h100_96.sh   # 4B × {1.5k, 5k, 20k}
-sbatch run_batch_08_scaling_h100_47.sh   # 0.8B-20k + 2B-20k
+sbatch run_batch_08_scaling_h100_96.sh     # 4B × {1.5k, 5k, 20k}
+sbatch run_batch_08_scaling_h100_47.sh     # 0.8B-20k (+ 2B-20k if not split off)
+sbatch run_batch_08_scaling_h100_96_b.sh   # 2B-20k on a second 96, other folders
 ```
 
-| job | GRES | cells |
-|---|---|---|
-| `spatial8-96` | `h100-96:1` | `4b-1.5k`, `4b-5k`, `4b-20k` |
-| `spatial8-47` | `h100-47:1` | `0.8b-20k`, `2b-20k` |
+| job | GRES | cells | adapter dir |
+|---|---|---|---|
+| `spatial8-96` | `h100-96:1` | `4b-1.5k`, `4b-5k`, `4b-20k` | `models/qwen3.5-4b-sft-*` |
+| `spatial8-47` | `h100-47:1` | `0.8b-20k`, `2b-20k` | `…-0.8b-sft-20000`, `…-2b-sft-20000` |
+| `spatial8-96b` | `h100-96:1` | `2b-20k-96b` | `models/qwen3.5-2b-sft-20000-96b` |
+
+`96b` does **not** share a folder with 47. If 47 later starts 2B, `scancel` it;
+junk in `qwen3.5-2b-sft-20000/` is unused. Summarize prefers `2b-20k-96b`.
 
 Submit both at once. Data gen is `flock`'d: whichever job starts first
 writes the 20k pool + nested 1.5k/5k; the other waits and reuses.

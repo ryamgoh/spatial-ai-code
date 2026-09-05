@@ -33,6 +33,7 @@ CELLS = {
     "4b-5k": (5000, 4.0, ROOT / "models" / "qwen3.5-4b-sft-5000"),
     "4b-20k": (20000, 4.0, ROOT / "models" / "qwen3.5-4b-sft-20000"),
     "2b-20k": (20000, 2.0, ROOT / "models" / "qwen3.5-2b-sft-20000"),
+    "2b-20k-96b": (20000, 2.0, ROOT / "models" / "qwen3.5-2b-sft-20000-96b"),
     "0.8b-20k": (20000, 0.8, ROOT / "models" / "qwen3.5-0.8b-sft-20000"),
 }
 DATA_TAGS = ("4b-1.5k", "4b-5k", "4b-20k")
@@ -282,7 +283,14 @@ def main() -> None:
         "| config | params | n eval | strict | loose | error (1−strict) |",
         "|---|---|---|---|---|---|",
     ]
+    param_tags = []
     for tag in PARAM_TAGS:
+        if tag == "2b-20k" and "2b-20k-96b" in eval_rows:
+            param_tags.append("2b-20k-96b")
+        else:
+            param_tags.append(tag)
+
+    for tag in param_tags:
         _, params, _ = CELLS[tag]
         r = eval_rows.get(tag)
         if r is None:
@@ -293,7 +301,7 @@ def main() -> None:
             f"{fmt_acc(r['strict'])} | {fmt_acc(r['loose'])} | {fmt_err(r['strict'])} |"
         )
 
-    present_22 = [t for t in PARAM_TAGS if t in eval_rows and eval_rows[t]["strict"] is not None]
+    present_22 = [t for t in param_tags if t in eval_rows and eval_rows[t]["strict"] is not None]
     if len(present_22) >= 2:
         small, big = present_22[0], present_22[-1]
         d = eval_rows[big]["strict"] - eval_rows[small]["strict"]
@@ -309,7 +317,12 @@ def main() -> None:
         "| config | n | any | " + " | ".join(FLAG_NAMES) + " |",
         "|" + "---|" * (3 + len(FLAG_NAMES)),
     ]
-    for tag in list(DATA_TAGS) + [t for t in PARAM_TAGS if t not in DATA_TAGS]:
+    flag_tags = list(DATA_TAGS) + [
+        t for t in param_tags if t not in DATA_TAGS
+    ]
+    if "2b-20k-96b" in eval_rows and "2b-20k-96b" not in flag_tags:
+        flag_tags.append("2b-20k-96b")
+    for tag in flag_tags:
         r = eval_rows.get(tag)
         if r is None:
             continue

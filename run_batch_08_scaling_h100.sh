@@ -42,6 +42,7 @@ CELLS=(
   "4b-20k   train-sft-4b-20000.yaml  models/qwen3.5-4b-sft-20000   eval-sft-4b-20000.yaml  20000"
   "0.8b-20k train-sft-0.8b-20000.yaml models/qwen3.5-0.8b-sft-20000 eval-sft-0.8b-20000.yaml 20000"
   "2b-20k   train-sft-2b-20000.yaml  models/qwen3.5-2b-sft-20000   eval-sft-2b-20000.yaml  20000"
+  "2b-20k-96b train-sft-2b-20000-96b.yaml models/qwen3.5-2b-sft-20000-96b eval-sft-2b-20000-96b.yaml 20000"
 )
 
 has_adapter() {
@@ -65,6 +66,10 @@ want_tag() {
       ;;
     0.8b-20k|2b-20k)
       [[ "${SKIP_2_2:-0}" == "1" ]] && return 1
+      ;;
+    2b-20k-96b)
+      # Extra-96 cell: only when ONLY=2b-20k-96b (see run_batch_08_scaling_h100_96_b.sh).
+      return 1
       ;;
   esac
   return 0
