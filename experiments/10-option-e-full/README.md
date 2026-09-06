@@ -59,6 +59,8 @@ recipe as Exp 8 4B (2 epochs, no early stop, acc 8 on 1 GPU). `eval_steps` /
 | `4b-1.5k` | 1,500 | `models/qwen3.5-4b-sft-full1500/` |
 | `4b-5k` | 5,000 | `models/qwen3.5-4b-sft-full5000/` |
 | `4b-20k` | 20,000 | `models/qwen3.5-4b-sft-full20000/` |
+| `2b-20k` | 20,000 | `models/qwen3.5-2b-sft-full20000/` |
+| `0.8b-20k` | 20,000 | `models/qwen3.5-0.8b-sft-full20000/` |
 
 **Hypothesis.** Strict on Full rises with n (or saturates like Exp 8
 Single at 1.5k–5k). Gold-E recall high on dir/count/which-E; Single and
@@ -82,9 +84,19 @@ sbatch run_batch_10_sft_h100_47.sh        # 4b-1.5k + 4b-5k
 sbatch run_batch_10_sft_h100_47_20k.sh    # 4b-20k
 ```
 
-Do not submit 96 and 47 for the same tag (same adapter dirs). Data gen
-is `flock`'d. Each job trains then evals (`results/full/<tag>/`). Eval
-on the 47 path uses slice 0 only. If DDP dies, use the 96 scripts.
+0.8B / 2B × 20k on one MIG each (`h100-47:1`, `--launcher python`, acc 8).
+Same Full 20k pool. Not DDP. `run_batch_10_sft_h100_47_param.sh` is the
+body — do not sbatch it.
+
+```bash
+sbatch run_batch_10_sft_h100_47_0.8b.sh   # 0.8b-20k
+sbatch run_batch_10_sft_h100_47_2b.sh     # 2b-20k
+```
+
+Do not submit 4B-96 and 4B-47 DDP for the same tag (same adapter dirs).
+Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
+Eval on the 4B-47 DDP path uses slice 0 only. If 4B DDP dies, use the 96
+scripts.
 
 `SKIP_EVAL=1` to train only. Optional later eval on H200:
 
@@ -103,8 +115,8 @@ cd eval && uv run --no-project python ../experiments/10-option-e-full/scripts/su
 | Eval jsonl | `data/spatialeval_corr_full.jsonl` |
 | 20k SFT pool | `data/spatial_sft_full_scale_20000_train.jsonl` |
 | Nested slices | `data/spatial_sft_full_scale_{1500,5000}_train.jsonl` |
-| Adapters | `models/qwen3.5-4b-sft-full{1500,5000,20000}/` |
-| Eval | `results/full/{4b-1.5k,4b-5k,4b-20k}/` |
+| Adapters | `models/qwen3.5-{0.8b,2b,4b}-sft-full{1500,5000,20000}/` |
+| Eval | `results/full/{4b-1.5k,4b-5k,4b-20k,2b-20k,0.8b-20k}/` |
 | Summary | `results/full/SUMMARY.md` |
 
 ## Run log
