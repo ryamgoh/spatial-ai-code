@@ -56,15 +56,17 @@ recipe as Exp 8 4B (2 epochs, no early stop, acc 8 on 1 GPU). `eval_steps` /
 
 | tag | n | adapter |
 |---|---|---|
-| `4b-1.5k` | 1,500 | `models/qwen3.5-4b-sft-full1500/` |
-| `4b-5k` | 5,000 | `models/qwen3.5-4b-sft-full5000/` |
-| `4b-20k` | 20,000 | `models/qwen3.5-4b-sft-full20000/` |
-| `2b-20k` | 20,000 | `models/qwen3.5-2b-sft-full20000/` |
-| `0.8b-20k` | 20,000 | `models/qwen3.5-0.8b-sft-full20000/` |
+| `{0.8b,2b,4b}-1.5k` | 1,500 | `models/qwen3.5-{0.8,2,4}b-sft-full1500/` |
+| `{0.8b,2b,4b}-5k` | 5,000 | `models/qwen3.5-{0.8,2,4}b-sft-full5000/` |
+| `{0.8b,2b,4b}-20k` | 20,000 | `models/qwen3.5-{0.8,2,4}b-sft-full20000/` |
+
+**3×3.** Instruct size ∈ {0.8B, 2B, 4B} × n ∈ {1.5k, 5k, 20k}, same nested
+Full mix, same QLoRA (r=64, 2 epochs, acc 8, 1 GPU). Exp 8 was 4B×n plus
+only 20k for 0.8B/2B.
 
 **Hypothesis.** Strict on Full rises with n (or saturates like Exp 8
-Single at 1.5k–5k). Gold-E recall high on dir/count/which-E; Single and
-dir-2 A–D do not collapse to E.
+Single at 1.5k–5k). Size still separates the three. Gold-E recall high on
+dir/count/which-E; Single and dir-2 A–D do not collapse to E.
 
 ## Run
 
@@ -80,13 +82,14 @@ sbatch run_batch_10_sft_h100_47_4b_small.sh    # 4b-1.5k + 4b-5k on one 47 MIG
 `run_batch_10_sft_h100_47_20k.sh` (DDP; failed on sibling MIGs).
 Do not submit 96 and 47-small for the same 4B tag (same adapter dirs).
 
-0.8B / 2B × 20k on one MIG each (`h100-47:1`, `--launcher python`, acc 8).
-Same Full 20k pool. Not DDP. `run_batch_10_sft_h100_47_param.sh` is the
-body — do not sbatch it.
+0.8B / 2B on one MIG each (`h100-47:1`, `--launcher python`, acc 8).
+`run_batch_10_sft_h100_47_param.sh` is the body — do not sbatch it.
 
 ```bash
-sbatch run_batch_10_sft_h100_47_0.8b.sh   # 0.8b-20k
-sbatch run_batch_10_sft_h100_47_2b.sh     # 2b-20k
+sbatch run_batch_10_sft_h100_47_0.8b_small.sh  # 0.8b-1.5k + 0.8b-5k
+sbatch run_batch_10_sft_h100_47_2b_small.sh    # 2b-1.5k + 2b-5k
+sbatch run_batch_10_sft_h100_47_0.8b.sh        # 0.8b-20k
+sbatch run_batch_10_sft_h100_47_2b.sh          # 2b-20k
 ```
 
 Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
@@ -109,7 +112,7 @@ cd eval && uv run --no-project python ../experiments/10-option-e-full/scripts/su
 | 20k SFT pool | `data/spatial_sft_full_scale_20000_train.jsonl` |
 | Nested slices | `data/spatial_sft_full_scale_{1500,5000}_train.jsonl` |
 | Adapters | `models/qwen3.5-{0.8b,2b,4b}-sft-full{1500,5000,20000}/` |
-| Eval | `results/full/{4b-1.5k,4b-5k,4b-20k,2b-20k,0.8b-20k}/` |
+| Eval | `results/full/{0.8b,2b,4b}-{1.5k,5k,20k}/` |
 | Summary | `results/full/SUMMARY.md` |
 
 ## Run log

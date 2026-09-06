@@ -1,9 +1,8 @@
 #!/bin/bash
-# Exp 10 — 0.8B / 2B × 20k Full-mix body (1 GPU, --launcher python).
-# Sourced by run_batch_10_sft_h100_47_0.8b.sh and run_batch_10_sft_h100_47_2b.sh.
-# Not DDP. Do not sbatch this file.
+# Exp 10 — 0.8B / 2B Full-mix body (1 GPU, --launcher python).
+# Sourced by the 0.8B/2B 47 wrappers. Not DDP. Do not sbatch this file.
 #
-# Overrides: SKIP_TRAIN=1 SKIP_EVAL=1 ONLY=0.8b-20k
+# Overrides: SKIP_TRAIN=1 SKIP_EVAL=1 ONLY=0.8b-1.5k,0.8b-5k
 set -uo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
@@ -18,8 +17,12 @@ A_EVAL_OUT=$SLURM_SUBMIT_DIR/$EVAL_OUT
 mkdir -p "$A_EVAL_OUT"
 
 CELLS=(
-  "0.8b-20k  train-sft-0.8b-20000.yaml  models/qwen3.5-0.8b-sft-full20000  eval-sft-0.8b-20000.yaml  20000"
-  "2b-20k    train-sft-2b-20000.yaml    models/qwen3.5-2b-sft-full20000    eval-sft-2b-20000.yaml    20000"
+  "0.8b-1.5k  train-sft-0.8b-1500.yaml   models/qwen3.5-0.8b-sft-full1500   eval-sft-0.8b-1500.yaml   1500"
+  "0.8b-5k    train-sft-0.8b-5000.yaml   models/qwen3.5-0.8b-sft-full5000   eval-sft-0.8b-5000.yaml   5000"
+  "0.8b-20k   train-sft-0.8b-20000.yaml  models/qwen3.5-0.8b-sft-full20000  eval-sft-0.8b-20000.yaml  20000"
+  "2b-1.5k    train-sft-2b-1500.yaml     models/qwen3.5-2b-sft-full1500     eval-sft-2b-1500.yaml     1500"
+  "2b-5k      train-sft-2b-5000.yaml     models/qwen3.5-2b-sft-full5000     eval-sft-2b-5000.yaml     5000"
+  "2b-20k     train-sft-2b-20000.yaml    models/qwen3.5-2b-sft-full20000    eval-sft-2b-20000.yaml    20000"
 )
 
 has_adapter() {

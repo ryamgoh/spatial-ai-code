@@ -24,11 +24,15 @@ FULL=$SLURM_SUBMIT_DIR/data/spatialeval_corr_full.jsonl
 EVAL_OUT=$SLURM_SUBMIT_DIR/$EXP/results/full
 
 CELLS=(
-  "4b-1.5k   models/qwen3.5-4b-sft-full1500     eval-sft-4b-1500.yaml"
-  "4b-5k     models/qwen3.5-4b-sft-full5000     eval-sft-4b-5000.yaml"
-  "4b-20k    models/qwen3.5-4b-sft-full20000    eval-sft-4b-20000.yaml"
-  "0.8b-20k  models/qwen3.5-0.8b-sft-full20000  eval-sft-0.8b-20000.yaml"
-  "2b-20k    models/qwen3.5-2b-sft-full20000    eval-sft-2b-20000.yaml"
+  "4b-1.5k    models/qwen3.5-4b-sft-full1500      eval-sft-4b-1500.yaml"
+  "4b-5k      models/qwen3.5-4b-sft-full5000      eval-sft-4b-5000.yaml"
+  "4b-20k     models/qwen3.5-4b-sft-full20000     eval-sft-4b-20000.yaml"
+  "2b-1.5k    models/qwen3.5-2b-sft-full1500      eval-sft-2b-1500.yaml"
+  "2b-5k      models/qwen3.5-2b-sft-full5000      eval-sft-2b-5000.yaml"
+  "2b-20k     models/qwen3.5-2b-sft-full20000     eval-sft-2b-20000.yaml"
+  "0.8b-1.5k  models/qwen3.5-0.8b-sft-full1500    eval-sft-0.8b-1500.yaml"
+  "0.8b-5k    models/qwen3.5-0.8b-sft-full5000    eval-sft-0.8b-5000.yaml"
+  "0.8b-20k   models/qwen3.5-0.8b-sft-full20000   eval-sft-0.8b-20000.yaml"
 )
 
 has_adapter() {
