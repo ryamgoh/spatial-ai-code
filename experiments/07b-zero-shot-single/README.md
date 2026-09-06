@@ -35,12 +35,27 @@ Writes `results/zero-shot-single/{instruct,base}/`. After both finish:
 cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize.py
 ```
 
+## Corr 1,329 (Single + Multi slices)
+
+Same SFT prompt, no LoRA. One 1,329 run per checkpoint; summarize slices
+multi (291) the way Exp 6 did.
+
+```bash
+sbatch --export=ALL,TAGS=instruct-corr run_batch_07b_eval_single_h200.sh
+sbatch --export=ALL,TAGS=base-corr     run_batch_07b_eval_single_h200.sh
+```
+
+```bash
+cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize_corr.py
+```
+
 ## Artifacts
 
 | artifact | location |
 |---|---|
-| Eval | `results/zero-shot-single/{instruct,base}/` |
-| Summary | `results/zero-shot-single/SUMMARY.md` |
+| Single eval | `results/zero-shot-single/{instruct,base}/` |
+| Corr eval | `results/zero-shot-corr/{instruct,base}/` |
+| Summaries | `results/zero-shot-single/SUMMARY.md`, `results/zero-shot-corr/SUMMARY.md` |
 
 ## Run log
 

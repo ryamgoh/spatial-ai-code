@@ -6,7 +6,11 @@
 #   TAGS=instruct sbatch run_batch_07b_eval_single_h200.sh
 #   TAGS=base     sbatch run_batch_07b_eval_single_h200.sh
 #
-# TAGS=instruct,base (default) runs both in one job; likely hits the 3h cap.
+# Corr 1329 (Single + Multi slices), same SFT prompt:
+#   sbatch --export=ALL,TAGS=instruct-corr run_batch_07b_eval_single_h200.sh
+#   sbatch --export=ALL,TAGS=base-corr     run_batch_07b_eval_single_h200.sh
+#
+# TAGS=instruct,base (default) is Single only; two tags in one 3h job is tight.
 #SBATCH --job-name=spatial7b-zs
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
@@ -29,6 +33,14 @@ TAGS="${TAGS:-instruct,base}"
 declare -A CFG=(
   [instruct]=eval-instruct-single.yaml
   [base]=eval-base-single.yaml
+  [instruct-corr]=eval-instruct-corr.yaml
+  [base-corr]=eval-base-corr.yaml
+)
+declare -A OUT_REL=(
+  [instruct]=results/zero-shot-single/instruct
+  [base]=results/zero-shot-single/base
+  [instruct-corr]=results/zero-shot-corr/instruct
+  [base-corr]=results/zero-shot-corr/base
 )
 
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
@@ -46,11 +58,11 @@ for tag in $TAGS; do
   tag=${tag// /}
   cfg=${CFG[$tag]:-}
   if [[ -z "$cfg" ]]; then
-    echo "Unknown tag $tag (want instruct or base)"
+    echo "Unknown tag $tag (want instruct, base, instruct-corr, base-corr)"
     status=1
     continue
   fi
-  out=$A_EXP/results/zero-shot-single/$tag
+  out=$A_EXP/${OUT_REL[$tag]}
   if [[ -f "$out/results.json" ]]; then
     echo "=== skip $tag (already have results.json) ==="
     continue
@@ -67,5 +79,7 @@ for tag in $TAGS; do
   echo "  7b $tag OK -> $out/"
 done
 
-echo "=== 7b done. Summarize: cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize.py ==="
+echo "=== 7b done."
+echo "    Single:  cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize.py"
+echo "    Corr:    cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize_corr.py"
 exit "$status"
