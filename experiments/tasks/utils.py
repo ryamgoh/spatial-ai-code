@@ -97,9 +97,9 @@ def process_docs(dataset, seed=42):
 # dir-4-ans / which-2-ans / count-multi do not occur in TQA-Corr.
 #
 # SpatialMap-TQA-Corr-Full (data/spatialeval_corr_full.jsonl, 1500):
-#   same 1500 rows + option "E. None of the Options" on every item.
-#   empty oracle (171) → gold E  (dir 75 + count 96)
-#   which-4 (198) → gold A,B,C,D; E is a distractor
+#   same 1500 rows + option "E. None of these is proven" on every item.
+#   gold E (369): empty oracle dir 75 + count 96, plus which-4 fallback 198
+#     (type-1 first pass proves 0 of A–D; A,B,C,D was not a spatial gold)
 #   remaining 1131 → original A–D gold; E is a distractor
 
 

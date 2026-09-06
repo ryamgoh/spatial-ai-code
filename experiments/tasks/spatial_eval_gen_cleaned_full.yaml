@@ -1,0 +1,38 @@
+# SpatialMap-TQA-Corr-Full: 1500 rows. Option E = None of these is proven.
+# Gold E = 369: empty oracles (dir 75 + count 96) + which-4 fallback (198).
+task: spatial_eval_gen_cleaned_full
+dataset_path: json
+dataset_name: null
+dataset_kwargs:
+  data_files:
+    test: "../data/spatialeval_corr_full.jsonl"
+test_split: test
+output_type: generate_until
+
+process_docs: !function utils.filter_corr_full
+
+doc_to_text: |-
+  {{text}}
+doc_to_target: "{{oracle_option}}"
+
+generation_kwargs:
+  until: []
+
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "Answer:\\s*([A-E](?:\\s*,\\s*[A-E])*)"
+        group_select: -1
+
+metric_list:
+  - metric: !function utils.strict_acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: !function utils.loose_acc
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 1.0
+  note: "SpatialMap-TQA-Corr-Full — 1500 rows, option E None of these is proven"

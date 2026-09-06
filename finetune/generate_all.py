@@ -37,6 +37,14 @@ ALL_DIRECTIONS = [
     "North", "South", "East", "West",
     "Northeast", "Northwest", "Southeast", "Southwest",
 ]
+NONE_LABEL = "None of these is proven"
+
+
+def _format_options(options: list, letters: list[str], include_e: bool) -> str:
+    parts = [f"{letters[i]}. {options[i]}" for i in range(len(options))]
+    if include_e:
+        parts.append(f"E. {NONE_LABEL}")
+    return ", ".join(parts)
 
 
 class AxisGraph:
@@ -271,7 +279,7 @@ def _build_direction_reasoning(ref, direction, entities_in_dir,
 # ---------------------------------------------------------------------------
 
 def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
-                    question_type=0):
+                    question_type=0, include_option_e=False, none_of_above=False):
     """Generate a single SFT training sample.
 
     Args:
@@ -480,17 +488,27 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
             "North", "South", "East", "West",
             "Northeast", "Northwest", "Southeast", "Southwest",
         ]
-        options = list(possible_dirs)
-        while len(options) < 4:
-            d = random.choice(all_dir_options)
-            if d not in options:
-                options.append(d)
-        random.shuffle(options)
-        correct_letters = [
-            option_letters[i] for i in range(len(options))
-            if options[i] in possible_dirs
-        ]
-        answer_str = ", ".join(correct_letters)
+        if none_of_above:
+            wrong = [d for d in all_dir_options if d not in possible_dirs]
+            if len(wrong) < 4:
+                return None
+            options = random.sample(wrong, 4)
+            random.shuffle(options)
+            correct_letters = []
+            answer_str = "E"
+            include_option_e = True
+        else:
+            options = list(possible_dirs)
+            while len(options) < 4:
+                d = random.choice(all_dir_options)
+                if d not in options:
+                    options.append(d)
+            random.shuffle(options)
+            correct_letters = [
+                option_letters[i] for i in range(len(options))
+                if options[i] in possible_dirs
+            ]
+            answer_str = ", ".join(correct_letters)
 
         if len(possible_dirs) == 1:
             target_dir_str = possible_dirs[0]
@@ -509,6 +527,11 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                 f"The spatial relationship is completely undetermined. The "
                 f"{target} could be to the {target_dir_str} of the {ref}."
             )
+        if none_of_above:
+            conclusion = (
+                f"None of options A–D is a proven direction "
+                f"(possible: {', '.join(possible_dirs)}). The answer is E."
+            )
 
         thinking_content = f"{steps_text[0]}\n\n"
         for step in steps_text[1:]:
@@ -524,9 +547,7 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
             f"<think>\n{thinking_content}\n</think>\nAnswer: {answer_str}"
         )
 
-        options_text = ", ".join(
-            [f"{option_letters[i]}. {options[i]}" for i in range(len(options))]
-        )
+        options_text = _format_options(options, option_letters, include_option_e)
         user_prompt = "Consider a map with multiple locations:\n\n"
         user_prompt += " ".join([s["text"] for s in sentences])
         user_prompt += (
@@ -610,18 +631,34 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
             extra += 1
         random.shuffle(option_values)
 
-        correct_letters = [
-            option_letters[i] for i in range(4)
-            if option_values[i] == correct_count
-        ]
-        answer_str = ", ".join(correct_letters)
+        if none_of_above:
+            option_values = [i for i in range(0, max_count + 2) if i != correct_count][:4]
+            if len(option_values) < 4:
+                return None
+            random.shuffle(option_values)
+            answer_str = "E"
+            include_option_e = True
+            reasoning_lines.append(
+                f"**Conclusion**: The count {correct_count} is not among "
+                f"options A–D, so none of them is proven. The answer is E."
+            )
+            thinking_content = f"{steps_text[0]}\n\n"
+            for step in steps_text[1:]:
+                thinking_content += f"{step}\n\n"
+            thinking_content += "### Final Deduction\n"
+            thinking_content += "\n".join(reasoning_lines) + "\n"
+        else:
+            answer_str = ", ".join(
+                option_letters[i] for i in range(4)
+                if option_values[i] == correct_count
+            )
 
         final_deduction = (
             f"<think>\n{thinking_content}\n</think>\nAnswer: {answer_str}"
         )
 
-        options_text = ", ".join(
-            [f"{option_letters[i]}. {option_values[i]}" for i in range(4)]
+        options_text = _format_options(
+            [str(v) for v in option_values], option_letters, include_option_e
         )
         user_prompt = "Consider a map with multiple locations:\n\n"
         user_prompt += " ".join([s["text"] for s in sentences])
@@ -655,8 +692,9 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                     e for e in sorted(all_mentioned_entities)
                     if e != _ref and e not in _ents
                 ]
+                need_wrong = 4 if none_of_above else (4 - min_correct)
                 if (len(_ents) >= min_correct
-                        and len(_not_ents) >= (4 - min_correct)):
+                        and len(_not_ents) >= need_wrong):
                     ref = _ref
                     direction = _dir
                     entities_in_dir = _ents
@@ -669,25 +707,35 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
         if not found:
             return None
 
-        # Select exactly the requested number of correct entities for options
-        if target_num_answers is not None:
-            correct_options = random.sample(entities_in_dir, target_num_answers)
+        if none_of_above:
+            if len(entities_not_in_dir) < 4:
+                return None
+            options = random.sample(entities_not_in_dir, 4)
+            random.shuffle(options)
+            correct_options = []
+            correct_letters = []
+            answer_str = "E"
+            include_option_e = True
         else:
-            max_c = min(len(entities_in_dir), 3)
-            n_correct = random.randint(1, max_c)
-            correct_options = random.sample(entities_in_dir, n_correct)
+            # Select exactly the requested number of correct entities for options
+            if target_num_answers is not None:
+                correct_options = random.sample(entities_in_dir, target_num_answers)
+            else:
+                max_c = min(len(entities_in_dir), 3)
+                n_correct = random.randint(1, max_c)
+                correct_options = random.sample(entities_in_dir, n_correct)
 
-        num_wrong = 4 - len(correct_options)
-        wrong_options = random.sample(entities_not_in_dir, num_wrong)
+            num_wrong = 4 - len(correct_options)
+            wrong_options = random.sample(entities_not_in_dir, num_wrong)
 
-        options = correct_options + wrong_options
-        random.shuffle(options)
+            options = correct_options + wrong_options
+            random.shuffle(options)
 
-        correct_set = set(correct_options)
-        correct_letters = [
-            option_letters[i] for i in range(4) if options[i] in correct_set
-        ]
-        answer_str = ", ".join(correct_letters)
+            correct_set = set(correct_options)
+            correct_letters = [
+                option_letters[i] for i in range(4) if options[i] in correct_set
+            ]
+            answer_str = ", ".join(correct_letters)
 
         # ---- Reasoning ----
         reasoning_lines = _build_direction_reasoning(
@@ -714,6 +762,11 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                 f"**Conclusion**: Among the given options, {ent_str} are in "
                 f"the {direction} of the {ref}."
             )
+        if none_of_above:
+            reasoning_lines.append(
+                f"**Conclusion**: None of options A–D is proven to lie in "
+                f"the {direction} of the {ref}. The answer is E."
+            )
 
         thinking_content = f"{steps_text[0]}\n\n"
         for step in steps_text[1:]:
@@ -725,9 +778,7 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
             f"<think>\n{thinking_content}\n</think>\nAnswer: {answer_str}"
         )
 
-        options_text = ", ".join(
-            [f"{option_letters[i]}. {options[i]}" for i in range(4)]
-        )
+        options_text = _format_options(options, option_letters, include_option_e)
         user_prompt = "Consider a map with multiple locations:\n\n"
         user_prompt += " ".join([s["text"] for s in sentences])
         user_prompt += (
@@ -756,8 +807,13 @@ def batch_generate(
     # Type 1 — which-entity question
     num_type1_1_answer=200,
     num_type1_2_answer=100,
+    num_type1_4_answer=0,
     # Type 2 — count question (always 1 correct option)
     num_type2=200,
+    include_option_e=False,
+    num_none_dir=0,
+    num_none_which=0,
+    num_none_count=0,
     test_split=0.2,
     seed=None,
 ):
@@ -772,7 +828,13 @@ def batch_generate(
         num_type0_4_answer: Type 0 samples with exactly 4 correct answers.
         num_type1_1_answer: Type 1 samples with 1 correct entity option.
         num_type1_2_answer: Type 1 samples with 2 correct entity options.
+        num_type1_4_answer: Type 1 samples with 4 correct entity options
+            (all four A–D gold; matches TQA-Corr which-4-ans).
         num_type2: Type 2 (count) samples.
+        include_option_e: Append ``E. None of these is proven`` to every item.
+        num_none_dir: Type 0 items whose A–D dirs are all wrong (gold E).
+        num_none_which: Type 1 items whose A–D entities are all wrong (gold E).
+        num_none_count: Type 2 items whose A–D counts are all wrong (gold E).
         test_split: Fraction of samples reserved for the test set.
         seed: Optional RNG seed. When set, the full dataset (and its
             train/test split) is reproducible across runs and processes.
@@ -794,6 +856,7 @@ def batch_generate(
         (0, 4, num_type0_4_answer, "Type0-4ans"),
         (1, 1, num_type1_1_answer, "Type1-1ans"),
         (1, 2, num_type1_2_answer, "Type1-2ans"),
+        (1, 4, num_type1_4_answer, "Type1-4ans"),
         (2, None, num_type2, "Type2-count"),
     ]
 
@@ -810,6 +873,7 @@ def batch_generate(
                 num_sentences=n_sent,
                 target_num_answers=tgt_ans,
                 question_type=q_type,
+                include_option_e=include_option_e,
             )
             attempts += 1
             if sample:
@@ -820,6 +884,43 @@ def batch_generate(
                         f"[{label}] Generated {generated}/{target_count} "
                         f"(attempts so far: {attempts})"
                     )
+        print(
+            f"✅ Completed {target_count} samples for {label} "
+            f"(total attempts: {attempts})"
+        )
+
+    none_plan = [
+        (0, num_none_dir, "None-dir"),
+        (1, num_none_which, "None-which"),
+        (2, num_none_count, "None-count"),
+    ]
+    for q_type, target_count, label in none_plan:
+        if target_count <= 0:
+            continue
+        generated = 0
+        attempts = 0
+        while generated < target_count:
+            n_ent = random.randint(5, 10)
+            n_sent = random.randint(n_ent, n_ent + 5)
+            sample = generate_sample(
+                num_entities=n_ent,
+                num_sentences=n_sent,
+                target_num_answers=1 if q_type != 2 else None,
+                question_type=q_type,
+                include_option_e=True,
+                none_of_above=True,
+            )
+            attempts += 1
+            if sample:
+                all_samples.append(sample)
+                generated += 1
+                if generated % 10 == 0:
+                    print(
+                        f"[{label}] Generated {generated}/{target_count} "
+                        f"(attempts so far: {attempts})"
+                    )
+            if attempts > max(5000, target_count * 200) and generated == 0:
+                raise RuntimeError(f"{label}: no samples after {attempts} attempts")
         print(
             f"✅ Completed {target_count} samples for {label} "
             f"(total attempts: {attempts})"
@@ -890,8 +991,15 @@ def main(
     # Type 1 — which-entity
     num_type1_1_answer: int = typer.Option(400, min=0, help="Type 1, 1 correct entity option"),
     num_type1_2_answer: int = typer.Option(200, min=0, help="Type 1, 2 correct entity options"),
+    num_type1_4_answer: int = typer.Option(0, min=0, help="Type 1, 4 correct entity options"),
     # Type 2 — count
     num_type2: int = typer.Option(750, min=0, help="Type 2 (count) samples"),
+    include_option_e: bool = typer.Option(
+        False, "--include-option-e", help="Append E. None of these is proven."
+    ),
+    num_none_dir: int = typer.Option(0, min=0, help="Type 0 gold-E (wrong A–D dirs)"),
+    num_none_which: int = typer.Option(0, min=0, help="Type 1 gold-E (wrong A–D entities)"),
+    num_none_count: int = typer.Option(0, min=0, help="Type 2 gold-E (wrong A–D counts)"),
 ) -> None:
     """Generate the dataset. Defaults reproduce the 2100-sample training mix."""
     if out is None:
@@ -904,7 +1012,12 @@ def main(
         num_type0_4_answer=num_type0_4_answer,
         num_type1_1_answer=num_type1_1_answer,
         num_type1_2_answer=num_type1_2_answer,
+        num_type1_4_answer=num_type1_4_answer,
         num_type2=num_type2,
+        include_option_e=include_option_e,
+        num_none_dir=num_none_dir,
+        num_none_which=num_none_which,
+        num_none_count=num_none_count,
         test_split=test_split,
         seed=seed,
     )
