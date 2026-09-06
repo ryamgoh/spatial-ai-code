@@ -743,7 +743,8 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
             x_closure, y_closure, all_mentioned_entities,
         )
 
-        # Conclusion mentioning which option entities are correct
+        # Conclusion mentioning which option entities are correct.
+        # Gold-E (none_of_above) has an empty correct_options list.
         if len(correct_options) == 1:
             reasoning_lines.append(
                 f"**Conclusion**: Among the given options, the "
@@ -755,7 +756,7 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                 f"{correct_options[0]} and the {correct_options[1]} are in "
                 f"the {direction} of the {ref}."
             )
-        else:
+        elif len(correct_options) >= 3:
             parts = [f"the {e}" for e in correct_options]
             ent_str = ", ".join(parts[:-1]) + f", and {parts[-1]}"
             reasoning_lines.append(
