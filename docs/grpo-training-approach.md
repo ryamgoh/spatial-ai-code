@@ -20,7 +20,7 @@ Lab-meeting note. Headline result is still **SpatialMap-TQA** (static, extrinsic
 
 **Not the headline:** `results.json` (~28% strict / ~75% loose on 1500 *generated* SpatialMap) is a different protocol. Do not mix it with 71/87.
 
-**Cleaned gold.** Offline SpatialMap JSONL is 1500 rows. Graph-closure oracle leaves **171 empty** (undetermined). We **drop** those and score **1329**. Mix is roughly Type0 direction / Type1 which-object / Type2 count; golds are 1-, 2-, or 4-letter sets.
+**Cleaned gold.** Offline SpatialMap JSONL is 1500 rows. Graph-closure oracle leaves **171 empty** (`oracle_option` wiped: dir 75, count 96, which 0 — which-4 is the type-1 fallback, not empty). We **drop** those and score **1329**. Mix is roughly Type0 direction / Type1 which-object / Type2 count; golds are 1-, 2-, or 4-letter sets. Census: `experiments/tasks/utils.py`.
 
 **SFT, in one line.** QLoRA on DeepSeek-R1-0528-Qwen3-8B; synthetic traces that build X/Y axis graphs and end `</think>\nAnswer: A` (or `A, C`). Mean completion ~708 tokens. Train mix was 1500 synthetic (1-answer 600, 2-answer 600, 4-answer 300). Original adapter: `finetune/outputs/deepseek-r1-qwen3-8b` — **keep it**; SFT eval depends on it.
 

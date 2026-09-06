@@ -30,7 +30,7 @@ Counts live next to the filters in `../tasks/utils.py`.
 | set | n | gold |
 |---|---|---|
 | cleaned file | 1,500 | includes empty-oracle rows |
-| empty oracle | 171 | dropped by `filter_nonempty_oracle` |
+| empty oracle | 171 | `oracle_option` wiped: **dir 75** + **count 96** + **which 0** (see `../tasks/utils.py`) |
 | SpatialMap-TQA-Corr | 1,329 | nonempty oracle |
 | **SpatialMap-TQA-Corr-Single** | **1,038** | exactly one A–D letter |
 | TQA-Corr multi (slice) | 291 | 2+ letters |

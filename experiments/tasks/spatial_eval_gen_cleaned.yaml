@@ -12,7 +12,7 @@ dataset_kwargs:
 test_split: test
 output_type: generate_until
 
-# process_docs: !function utils.filter_spatialmap_and_update_oracle_answer_new
+process_docs: !function utils.filter_nonempty_oracle
 
 doc_to_text: |-
   {{text}}
