@@ -45,6 +45,23 @@ sbatch --export=ALL,TAGS=instruct-corr run_batch_07b_eval_single_h200.sh
 sbatch --export=ALL,TAGS=base-corr     run_batch_07b_eval_single_h200.sh
 ```
 
+## Stages 1 vs 2 (does the constrained re-ask matter?)
+
+Default eval is `--stages 2`. GRPO scores a single `Answer:` in the
+completion. Re-run Single (or Corr) with `--stages 1` into `*-s1/` dirs
+(does not overwrite the tables above):
+
+```bash
+sbatch --export=ALL,TAGS=instruct,STAGES=1 run_batch_07b_eval_single_h200.sh
+sbatch --export=ALL,TAGS=base,STAGES=1     run_batch_07b_eval_single_h200.sh
+```
+
+The SFT check that actually matters for GRPO is 4B-5k, not 7b zs:
+
+```bash
+sbatch run_batch_08_eval_4b5k_s1_h200.sh
+```
+
 ```bash
 cd eval && uv run --no-project python ../experiments/07b-zero-shot-single/scripts/summarize_corr.py
 ```
