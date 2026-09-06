@@ -17,7 +17,10 @@ untuned Δ for those SFT numbers.
 | Checkpoint | Base + Instruct | Base + Instruct | Instruct + 5k SFT |
 | Prompt | Non-shot-2 | SFT system prompt | SFT system prompt |
 | Eval | 1329, Single **slice** | Single **task** (1,038) | Single 1,038 |
-| Strict Single | 20.4% / 46.5% | **this run** | 98.5% |
+| Strict Single | 20.4% / 46.5% | **76.9% / 78.2% (s2)** | 98.5% |
+
+**Results.** SFT prompt zs is ~78% Single at stages 2; Instruct **stages 1
+is ~4%**. Two-pass is a zs crutch. Write-up: [`RESULTS.md`](RESULTS.md).
 
 ## Run (H200, `gpu`, 3h)
 
