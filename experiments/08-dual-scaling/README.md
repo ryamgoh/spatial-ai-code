@@ -129,6 +129,18 @@ are skipped. Overrides:
 - `SKIP_2_2=1` — skip `2b-20k` and `0.8b-20k`
 - `ONLY=4b-5k,2b-20k` — run that subset (comma-separated tags)
 
+0.8B train finished, eval not run (prefer H200, 3h `gpu` cap):
+
+```bash
+sbatch run_batch_08_eval_0.8b_h200.sh
+```
+
+One `h200-141`, not `:4`. Writes `results/scaling/0.8b-20k/`. Fallback MIG:
+
+```bash
+sbatch run_batch_08_eval_0.8b_h100_47.sh
+```
+
 Do **not** wait for a job to write `SUMMARY.md`. After **both** GPU jobs
 have `results.json` under `results/scaling/<tag>/`:
 
