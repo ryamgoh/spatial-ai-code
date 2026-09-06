@@ -68,21 +68,17 @@ dir-2 A–D do not collapse to E.
 
 ## Run
 
-Known-working path (1 GPU, `h100-96:1`, `--launcher python`):
+Known-working 4B (1 GPU, `--launcher python`, acc 8):
 
 ```bash
-sbatch run_batch_10_sft_h100_96.sh        # 4b-1.5k + 4b-5k
-sbatch run_batch_10_sft_h100_96_20k.sh    # 4b-20k
+sbatch run_batch_10_sft_h100_96.sh             # 4b-1.5k + 4b-5k on h100-96
+sbatch run_batch_10_sft_h100_96_20k.sh         # 4b-20k on h100-96
+sbatch run_batch_10_sft_h100_47_4b_small.sh    # 4b-1.5k + 4b-5k on one 47 MIG
 ```
 
-Experimental DDP when 96s are full (`h100-47:2` = both MIGs on one NVL,
-not fused 96GB). Own scripts; train yamls stay acc 8. CLI overrides
-`--gradient-accumulation-steps 4` so global batch stays 8.
-
-```bash
-sbatch run_batch_10_sft_h100_47.sh        # 4b-1.5k + 4b-5k
-sbatch run_batch_10_sft_h100_47_20k.sh    # 4b-20k
-```
+4B-20k stays on 96. Do not sbatch `run_batch_10_sft_h100_47.sh` /
+`run_batch_10_sft_h100_47_20k.sh` (DDP; failed on sibling MIGs).
+Do not submit 96 and 47-small for the same 4B tag (same adapter dirs).
 
 0.8B / 2B × 20k on one MIG each (`h100-47:1`, `--launcher python`, acc 8).
 Same Full 20k pool. Not DDP. `run_batch_10_sft_h100_47_param.sh` is the
@@ -93,10 +89,7 @@ sbatch run_batch_10_sft_h100_47_0.8b.sh   # 0.8b-20k
 sbatch run_batch_10_sft_h100_47_2b.sh     # 2b-20k
 ```
 
-Do not submit 4B-96 and 4B-47 DDP for the same tag (same adapter dirs).
 Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
-Eval on the 4B-47 DDP path uses slice 0 only. If 4B DDP dies, use the 96
-scripts.
 
 `SKIP_EVAL=1` to train only. Optional later eval on H200:
 
