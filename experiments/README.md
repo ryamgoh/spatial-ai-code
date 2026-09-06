@@ -5,9 +5,10 @@ launcher notes, and a README recording the research question, setup, and result.
 
 Numbering follows the dissertation (H036660, Ch. 4): Experiments **0–3**.
 Experiments **4a/4b** (Qwen3.5-4B pipeline smoke), **5** (GRPO), **6**
-(baseline task feasibility), **7** (SFT starting state), and **8**
-(dual scaling: data × params) are post-thesis follow-ups and are not
-part of the report.
+(baseline task feasibility), **7** (SFT starting state), **7b** (untuned
+4B Instruct on Single, SFT prompt), **8** (dual scaling), and **8b**
+(4B-5k Single-SFT transferred to Corr 1,329) are post-thesis follow-ups
+and are not part of the report.
 
 `eval/` and `finetune/` contain only code and their uv environments — no
 configs. New experiments get a new numbered directory here.
@@ -25,7 +26,9 @@ experiments/
 ├── 05-grpo/                      post-thesis GRPO (inconclusive — not in report)
 ├── 06-baseline-task-feasibility/ Exp 6: zero-shot Single vs Multi TQA-Corr
 ├── 07-sft-starting-state/        Exp 7: SFT Base vs Instruct on TQA-Corr-Single
+├── 07b-zero-shot-single/         Exp 7b: untuned 4B Instruct on Single (SFT prompt)
 ├── 08-dual-scaling/              Exp 8: SFT data × param scaling on TQA-Corr-Single
+├── 08b-sft-transfer-corr/        Exp 8b: 4B-5k Single-SFT eval on TQA-Corr 1329
 ├── archive/                      unrunnable / abandoned configs
 ├── tasks/                        lm-eval task definitions (shared; via include_path)
 └── prompts/                      standalone copies of Exp 1 system prompts

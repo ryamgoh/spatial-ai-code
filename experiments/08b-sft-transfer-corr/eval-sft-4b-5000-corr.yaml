@@ -1,0 +1,19 @@
+# Exp 8b — 4B-5k Single-SFT adapter on SpatialMap-TQA-Corr (1,329).
+# No new training. SFT system prompt (not Non-shot-2). H200 batch 16.
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  lora_path: ../experiments/08-dual-scaling/models/qwen3.5-4b-sft-5000
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.90
+  max_model_len: 8192
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_gen_cleaned_1329
+apply_chat_template: true
+system_instruction: "You are an advanced spatial reasoning agent. Process the spatial relations step-by-step.\nFirst, initialize by detecting all entities in the text to establish the global scope. \nThen, step-by-step, extract relations and update the spatial state for the X-axis (West to East) and Y-axis (South to North), tracking ONLY the entities that have been mentioned so far.\nRules for State Representation:\n1. Use \"<\" for strict ordering (e.g., A < B means A is West/South of B).\n2. Group topologically equivalent entities using \"{}\" (e.g., {A, B} < C).\n3. Merge relations into maximal chains to represent the spatial topology clearly.\n4. Keep isolated active entities separated by commas until they are connected.\n\nCRITICAL RULE FOR FINAL DEDUCTION:\nIf the relationship on a specific axis (X or Y) cannot be determined from the given information, you MUST acknowledge the uncertainty. Combine the known and unknown axes to list ALL possible directions (e.g., \"Northeast or Southeast\", or all 4 directions if completely unknown). Do not guess a single direction if the evidence is insufficient."
+batch_size: 16
+device: cuda:0
+log_samples: true
