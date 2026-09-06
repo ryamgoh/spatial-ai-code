@@ -10,6 +10,10 @@ jointly affect SpatialMap-TQA-Corr-Single accuracy?
 
 Two sub-experiments share the 4B × 20k cell.
 
+**Results.** 2.1 rejected (4B saturates at 1.5k–5k; 20k is not best).
+2.2: 4B ≫ 0.8B > 2B at 20k; not monotone in size. Full write-up:
+[`RESULTS.md`](RESULTS.md).
+
 ## What Exp 6/7 change here
 
 | finding | consequence |
@@ -165,4 +169,4 @@ is still the long pole. Budget **2 days** `gpu-long` on each.
 
 | date | results dir | notes |
 |---|---|---|
-| | | |
+| 2026-09-05 | `results/scaling/` | All five cells. 2B is `2b-20k-96b` (4,750 steps). 0.8B eval on H200. See `RESULTS.md`. |

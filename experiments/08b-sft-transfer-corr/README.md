@@ -13,6 +13,9 @@ on that checkpoint on Single is a null. The remaining hole, if any, is
 the 291 multi rows SFT never saw. This eval is the gate for a 4B GRPO
 chapter.
 
+**Results.** Single 98.5% (paired with Exp 8). Multi **0.0%** (291/291).
+Corr 76.9% is only the Single mass. Write-up: [`RESULTS.md`](RESULTS.md).
+
 **Not SFT on Corr.** The adapter is unchanged. This is transfer.
 
 | | |
@@ -52,4 +55,4 @@ cd eval && uv run --no-project python ../experiments/08b-sft-transfer-corr/scrip
 
 | date | results dir | notes |
 |---|---|---|
-| | | |
+| 2026-09 | `results/transfer/4b-5k-corr/` | 76.9% / 98.5% / 0.0% all/single/multi. See `RESULTS.md`. |
