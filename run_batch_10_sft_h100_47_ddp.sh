@@ -1,14 +1,15 @@
 #!/bin/bash
-# Exp 10 — 4B Full-mix scaling body (sourced by the two H100-96 launchers).
+# Exp 10 — 4B Full-mix DDP body (sourced by the two H100-47:2 launchers).
+# Experimental. Does not replace run_batch_10_sft_h100.sh (1-GPU python / 96GB).
 #
-#   0. make_corr_full.py + generate_all.py 20k Full mix
-#      make_full_scale_data.py nested 5k/1.5k
-#   1. axolotl train --launcher python (1 GPU)
-#   2. eval_new.py on TQA-Corr-Full (same GPU, after that job's trains)
+#   0. same 20k pool + nested 1.5k/5k as the 96 jobs (flock)
+#   1. axolotl train --launcher torchrun --nproc_per_node=2
+#      CLI override: --gradient-accumulation-steps 4 (yaml stays acc 8)
+#   2. eval_new.py on slice 0
 #
 # Submit:
-#   sbatch run_batch_10_sft_h100_96.sh       # 4b-1.5k + 4b-5k
-#   sbatch run_batch_10_sft_h100_96_20k.sh   # 4b-20k
+#   sbatch run_batch_10_sft_h100_47.sh        # 4b-1.5k + 4b-5k
+#   sbatch run_batch_10_sft_h100_47_20k.sh    # 4b-20k
 # Overrides: SKIP_TRAIN=1 SKIP_EVAL=1 ONLY=4b-5k
 set -uo pipefail
 cd "$SLURM_SUBMIT_DIR"
@@ -23,7 +24,7 @@ EVAL_OUT=$EXP/results/full
 A_EVAL_OUT=$SLURM_SUBMIT_DIR/$EVAL_OUT
 mkdir -p "$A_EVAL_OUT"
 
-# tag  train_yaml  adapter_rel  eval_yaml  n_train
+# Same cells/adapters as the 96 path. Do not submit 96 and 47 for the same tag.
 CELLS=(
   "4b-1.5k  train-sft-4b-1500.yaml   models/qwen3.5-4b-sft-full1500   eval-sft-4b-1500.yaml   1500"
   "4b-5k    train-sft-4b-5000.yaml   models/qwen3.5-4b-sft-full5000   eval-sft-4b-5000.yaml   5000"
@@ -62,16 +63,25 @@ if [[ ${#selected[@]} -eq 0 ]]; then
   echo "No cells selected (ONLY=${ONLY-})"
   exit 1
 fi
-echo "Selected cells:"
+echo "Selected cells (H100-47:2 DDP):"
 printf '  %s\n' "${selected[@]}"
 
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 export AXOLOTL_DO_NOT_TRACK=1
 export AXOLOTL_NO_TELEMETRY=1
+# Sibling MIGs on one NVL: no P2P. Socket/shm NCCL or DDP hangs.
+export NCCL_P2P_DISABLE=1
+export NCCL_IB_DISABLE=1
+export NCCL_NVLS_DISABLE=1
 
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
 nvidia-smi -L || true
+if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
+  echo "Remapping CUDA_VISIBLE_DEVICES to 0,1 (two 47GB slices)"
+  export CUDA_VISIBLE_DEVICES=0,1
+fi
+echo "train CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
 
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
@@ -130,9 +140,13 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
       echo "=== skip SFT $tag (adapter complete) ==="
       return 0
     fi
-    echo "=== SFT QLoRA $tag ==="
-    srun --cpu-bind=cores uv run axolotl train "$cfg" --launcher python || {
-      echo "SFT $tag FAILED — aborting."
+    echo "=== SFT QLoRA $tag (torchrun nproc=2, acc 4) ==="
+    srun uv run axolotl train "$cfg" \
+      --gradient-accumulation-steps 4 \
+      --launcher torchrun -- \
+      --nproc_per_node=2 --nnodes=1 || {
+      echo "SFT $tag FAILED (2-GPU DDP). Sibling-MIG NCCL is the usual cause."
+      echo "Known-working path: sbatch run_batch_10_sft_h100_96.sh / _96_20k.sh"
       exit 1
     }
     if ! has_adapter "$dest"; then
@@ -170,10 +184,10 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
       echo "=== skip eval $tag (already have results.json) ==="
       return 0
     fi
-    echo "=== eval $tag ($cfg) ==="
+    echo "=== eval $tag ($cfg) on slice 0 ==="
     mkdir -p "$A_EVAL_OUT/$tag"
     local status=0
-    srun --cpu-bind=cores uv run python eval_new.py \
+    CUDA_VISIBLE_DEVICES=0 srun --cpu-bind=cores uv run python eval_new.py \
       --config "$cfg" \
       --output-dir "$A_EVAL_OUT/$tag" || status=$?
     if [[ $status -ne 0 ]]; then
@@ -191,5 +205,5 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
   done
 fi
 
-echo "=== Exp 10 cells done. After both 96 jobs finish:"
+echo "=== Exp 10 47-DDP cells done. After both 47 jobs finish:"
 echo "    cd eval && uv run --no-project python ../experiments/10-option-e-full/scripts/summarize.py"

@@ -51,7 +51,7 @@ and 1.5k (1.5k ⊂ 5k ⊂ 20k), stratified to Full proportions
 
 Gold-E traces: A–D are all *wrong* (wrong dirs / entities / counts);
 answer `E`. No synthetic which-4: eval has no which-4 gold. Same QLoRA
-recipe as Exp 8 4B (2 epochs, no early stop). `eval_steps` /
+recipe as Exp 8 4B (2 epochs, no early stop, acc 8 on 1 GPU). `eval_steps` /
 `save_steps` scale with n (45 / 150 / 600).
 
 | tag | n | adapter |
@@ -64,17 +64,27 @@ recipe as Exp 8 4B (2 epochs, no early stop). `eval_steps` /
 Single at 1.5k–5k). Gold-E recall high on dir/count/which-E; Single and
 dir-2 A–D do not collapse to E.
 
-## Run (2× H100-96, `gpu-long`)
+## Run
 
-Submit together. Data gen is `flock`'d: whichever job starts first
-writes the 20k pool + nested 1.5k/5k; the other waits and reuses.
-Each job trains its cells, then evals them on the same 96
-(`results/full/<tag>/`).
+Known-working path (1 GPU, `h100-96:1`, `--launcher python`):
 
 ```bash
 sbatch run_batch_10_sft_h100_96.sh        # 4b-1.5k + 4b-5k
 sbatch run_batch_10_sft_h100_96_20k.sh    # 4b-20k
 ```
+
+Experimental DDP when 96s are full (`h100-47:2` = both MIGs on one NVL,
+not fused 96GB). Own scripts; train yamls stay acc 8. CLI overrides
+`--gradient-accumulation-steps 4` so global batch stays 8.
+
+```bash
+sbatch run_batch_10_sft_h100_47.sh        # 4b-1.5k + 4b-5k
+sbatch run_batch_10_sft_h100_47_20k.sh    # 4b-20k
+```
+
+Do not submit 96 and 47 for the same tag (same adapter dirs). Data gen
+is `flock`'d. Each job trains then evals (`results/full/<tag>/`). Eval
+on the 47 path uses slice 0 only. If DDP dies, use the 96 scripts.
 
 `SKIP_EVAL=1` to train only. Optional later eval on H200:
 
