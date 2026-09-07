@@ -80,7 +80,7 @@ nvidia-smi -L || true
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
   export PYTHONPATH="$SLURM_SUBMIT_DIR/finetune${PYTHONPATH:+:$PYTHONPATH}"
-  srun uv sync || exit 1
+  uv sync || exit 1
 
   mkdir -p "$SLURM_SUBMIT_DIR/data"
   exec 9>"$SLURM_SUBMIT_DIR/data/.spatial_sft_full_scale.lock"
@@ -90,14 +90,14 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== Full jsonl already at $FULL ==="
   else
     echo "=== Build SpatialMap-TQA-Corr-Full ==="
-    srun uv run python ../experiments/10-option-e-full/scripts/make_corr_full.py || exit 1
+    uv run python ../experiments/10-option-e-full/scripts/make_corr_full.py || exit 1
   fi
 
   if [[ -s "$A_POOL" ]]; then
     echo "=== [0] 20k Full-mix pool already at $POOL ==="
   else
     echo "=== [0] Generate 20000 Full-mix traces (seed 42) ==="
-    srun uv run python generate_all.py \
+    uv run python generate_all.py \
       --out ../data/spatial_sft_full_scale_20000.jsonl \
       --test-split 0 \
       --seed 42 \
@@ -122,7 +122,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   fi
 
   echo "=== [0] Nested 1.5k / 5k slices ==="
-  srun uv run python ../experiments/10-option-e-full/scripts/make_full_scale_data.py || {
+  uv run python ../experiments/10-option-e-full/scripts/make_full_scale_data.py || {
     echo "make_full_scale_data.py FAILED — aborting."
     exit 1
   }
@@ -135,7 +135,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
       return 0
     fi
     echo "=== SFT QLoRA $tag ==="
-    srun --cpu-bind=cores uv run axolotl train "$cfg" --launcher python || {
+    uv run axolotl train "$cfg" --launcher python || {
       echo "SFT $tag FAILED — aborting."
       exit 1
     }
@@ -162,7 +162,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     exit 1
   fi
   cd eval
-  srun uv sync || exit 1
+  uv sync || exit 1
 
   run_eval() {
     local tag=$1 cfg=$2 adapter=$3
@@ -177,7 +177,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     echo "=== eval $tag ($cfg) ==="
     mkdir -p "$A_EVAL_OUT/$tag"
     local status=0
-    srun --cpu-bind=cores uv run python eval_new.py \
+    uv run python eval_new.py \
       --config "$cfg" \
       --output-dir "$A_EVAL_OUT/$tag" || status=$?
     if [[ $status -ne 0 ]]; then
