@@ -69,6 +69,10 @@ export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 export AXOLOTL_DO_NOT_TRACK=1
 export AXOLOTL_NO_TELEMETRY=1
+# Slurm 23+: srun fatal if SLURM_CPUS_PER_TASK (often 2× threads) != TRES cpu=.
+export SLURM_CPUS_PER_TASK=16
+export SRUN_CPUS_PER_TASK=16
+unset SLURM_TRES_PER_TASK || true
 
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
 nvidia-smi -L || true
@@ -76,7 +80,7 @@ nvidia-smi -L || true
 if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   cd finetune
   export PYTHONPATH="$SLURM_SUBMIT_DIR/finetune${PYTHONPATH:+:$PYTHONPATH}"
-  srun uv sync
+  srun uv sync || exit 1
 
   mkdir -p "$SLURM_SUBMIT_DIR/data"
   exec 9>"$SLURM_SUBMIT_DIR/data/.spatial_sft_full_scale.lock"
@@ -158,7 +162,7 @@ if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
     exit 1
   fi
   cd eval
-  srun uv sync
+  srun uv sync || exit 1
 
   run_eval() {
     local tag=$1 cfg=$2 adapter=$3
