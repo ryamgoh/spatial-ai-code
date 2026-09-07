@@ -70,27 +70,18 @@ dir/count/which-E; Single and dir-2 A–D do not collapse to E.
 
 ## Run
 
-Known-working 4B (1 GPU, `--launcher python`, acc 8):
+Preferred: **three jobs**, one `h100-47:1` each, 1.5k → 5k → 20k sequential
+(`--launcher python`, acc 8). 3 MIGs, under the ~4 GRES cap.
 
 ```bash
-sbatch run_batch_10_sft_h100_96.sh             # 4b-1.5k + 4b-5k on h100-96
-sbatch run_batch_10_sft_h100_96_20k.sh         # 4b-20k on h100-96
-sbatch run_batch_10_sft_h100_47_4b_small.sh    # 4b-1.5k + 4b-5k on one 47 MIG
+sbatch run_batch_10_sft_h100_47_0.8b.sh        # 0.8B 1.5k + 5k + 20k
+sbatch run_batch_10_sft_h100_47_2b.sh          # 2B  1.5k + 5k + 20k
+sbatch run_batch_10_sft_h100_47_4b_small.sh    # 4B  1.5k + 5k + 20k
 ```
 
-4B-20k stays on 96. Do not sbatch `run_batch_10_sft_h100_47.sh` /
-`run_batch_10_sft_h100_47_20k.sh` (DDP; failed on sibling MIGs).
-Do not submit 96 and 47-small for the same 4B tag (same adapter dirs).
-
-0.8B / 2B on one MIG each (`h100-47:1`, `--launcher python`, acc 8).
-`run_batch_10_sft_h100_47_param.sh` is the body — do not sbatch it.
-
-```bash
-sbatch run_batch_10_sft_h100_47_0.8b_small.sh  # 0.8b-1.5k + 0.8b-5k
-sbatch run_batch_10_sft_h100_47_2b_small.sh    # 2b-1.5k + 2b-5k
-sbatch run_batch_10_sft_h100_47_0.8b.sh        # 0.8b-20k
-sbatch run_batch_10_sft_h100_47_2b.sh          # 2b-20k
-```
+Do not sbatch the DDP `run_batch_10_sft_h100_47.sh` / `*_47_20k.sh`.
+Do not also submit the 96 4B jobs (same adapter dirs). 96 launchers remain
+the 1-GPU fallback if a full 96 is free.
 
 Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
 
