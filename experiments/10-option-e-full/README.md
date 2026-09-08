@@ -85,10 +85,22 @@ the 1-GPU fallback if a full 96 is free.
 
 Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
 
-`SKIP_EVAL=1` to train only. Optional later eval on H200:
+`SKIP_EVAL=1` to train only. Eval-only on H200 (default **skips 4b-20k**
+while that job is still training; the 4B train job evals 1.5k/5k/20k only
+after 20k finishes, so eval 1.5k+5k here if you want them sooner):
 
 ```bash
-sbatch run_batch_10_eval_full_h200.sh
+sbatch run_batch_10_eval_full_h200.sh                 # 8 ready cells
+ONLY=4b-20k sbatch run_batch_10_eval_full_h200.sh     # after 4B-20k adapter exists
+SKIP_TAGS= sbatch run_batch_10_eval_full_h200.sh      # all 9
+FORCE=1 sbatch run_batch_10_eval_full_h200.sh         # redo existing results.json
+```
+
+H100-47 MIG instead of H200:
+
+```bash
+sbatch --partition=gpu-long --time=1-00:00:00 --gres=gpu:h100-47:1 \
+  run_batch_10_eval_full_h200.sh
 ```
 
 ```bash

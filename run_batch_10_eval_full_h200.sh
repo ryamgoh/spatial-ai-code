@@ -1,9 +1,17 @@
 #!/bin/bash
-# Exp 10 — optional H200 eval if the 96 jobs skipped eval (SKIP_EVAL=1).
-# Default path: eval runs on the train GPU after SFT.
+# Exp 10 — eval-only on TQA-Corr-Full (adapters already trained).
+#
+# Default skips 4b-20k (still training). Same script evals it later.
 #
 #   sbatch run_batch_10_eval_full_h200.sh
-#   ONLY=4b-5k sbatch run_batch_10_eval_full_h200.sh
+#   ONLY=4b-20k sbatch run_batch_10_eval_full_h200.sh          # after 4B-20k finishes
+#   SKIP_TAGS= sbatch run_batch_10_eval_full_h200.sh           # all 9 cells
+#   ONLY=4b-1.5k,4b-5k sbatch run_batch_10_eval_full_h200.sh
+#   FORCE=1 sbatch run_batch_10_eval_full_h200.sh              # redo even if results.json exists
+#
+# H100-47 MIG instead of H200:
+#   sbatch --partition=gpu-long --time=1-00:00:00 --gres=gpu:h100-47:1 \
+#     run_batch_10_eval_full_h200.sh
 #SBATCH --job-name=spatial10-eval
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
@@ -23,16 +31,20 @@ EXP=experiments/10-option-e-full
 FULL=$SLURM_SUBMIT_DIR/data/spatialeval_corr_full.jsonl
 EVAL_OUT=$SLURM_SUBMIT_DIR/$EXP/results/full
 
+# Default: skip the cell that is still training. ONLY= overrides this.
+# Unset SKIP_TAGS (SKIP_TAGS=) to include 4b-20k in a full sweep.
+SKIP_TAGS="${SKIP_TAGS-4b-20k}"
+
 CELLS=(
-  "4b-1.5k    models/qwen3.5-4b-sft-full1500      eval-sft-4b-1500.yaml"
-  "4b-5k      models/qwen3.5-4b-sft-full5000      eval-sft-4b-5000.yaml"
-  "4b-20k     models/qwen3.5-4b-sft-full20000     eval-sft-4b-20000.yaml"
-  "2b-1.5k    models/qwen3.5-2b-sft-full1500      eval-sft-2b-1500.yaml"
-  "2b-5k      models/qwen3.5-2b-sft-full5000      eval-sft-2b-5000.yaml"
-  "2b-20k     models/qwen3.5-2b-sft-full20000     eval-sft-2b-20000.yaml"
   "0.8b-1.5k  models/qwen3.5-0.8b-sft-full1500    eval-sft-0.8b-1500.yaml"
   "0.8b-5k    models/qwen3.5-0.8b-sft-full5000    eval-sft-0.8b-5000.yaml"
   "0.8b-20k   models/qwen3.5-0.8b-sft-full20000   eval-sft-0.8b-20000.yaml"
+  "2b-1.5k    models/qwen3.5-2b-sft-full1500      eval-sft-2b-1500.yaml"
+  "2b-5k      models/qwen3.5-2b-sft-full5000      eval-sft-2b-5000.yaml"
+  "2b-20k     models/qwen3.5-2b-sft-full20000     eval-sft-2b-20000.yaml"
+  "4b-1.5k    models/qwen3.5-4b-sft-full1500      eval-sft-4b-1500.yaml"
+  "4b-5k      models/qwen3.5-4b-sft-full5000      eval-sft-4b-5000.yaml"
+  "4b-20k     models/qwen3.5-4b-sft-full20000     eval-sft-4b-20000.yaml"
 )
 
 has_adapter() {
@@ -40,17 +52,27 @@ has_adapter() {
     { [[ -f "$1/adapter_model.safetensors" ]] || [[ -f "$1/adapter_model.bin" ]]; }
 }
 
-want_tag() {
-  local tag=$1
-  if [[ -z "${ONLY:-}" ]]; then
-    return 0
-  fi
+in_csv() {
+  local needle=$1
+  local csv=$2
   local IFS=,
   local t
-  for t in $ONLY; do
-    [[ "$t" == "$tag" ]] && return 0
+  for t in $csv; do
+    [[ "$t" == "$needle" ]] && return 0
   done
   return 1
+}
+
+want_tag() {
+  local tag=$1
+  if [[ -n "${ONLY:-}" ]]; then
+    in_csv "$tag" "$ONLY"
+    return $?
+  fi
+  if [[ -n "${SKIP_TAGS:-}" ]] && in_csv "$tag" "$SKIP_TAGS"; then
+    return 1
+  fi
+  return 0
 }
 
 if [[ ! -s "$FULL" ]]; then
@@ -60,7 +82,16 @@ fi
 
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
+# vLLM/axolotl do int(CUDA_VISIBLE_DEVICES); SLURM may pass a MIG UUID.
+if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
+  echo "Remapping CUDA_VISIBLE_DEVICES to 0"
+  export CUDA_VISIBLE_DEVICES=0
+fi
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
+echo "ONLY=${ONLY-} SKIP_TAGS=${SKIP_TAGS-} FORCE=${FORCE-0}"
+if [[ -z "${ONLY:-}" && -n "${SKIP_TAGS:-}" ]]; then
+  echo "Default skip: $SKIP_TAGS  (ONLY=4b-20k later, or SKIP_TAGS= for all 9)"
+fi
 nvidia-smi -L || true
 
 cd eval
@@ -78,7 +109,7 @@ for row in "${CELLS[@]}"; do
     echo "WARN: no adapter at $dest — skip eval $tag"
     continue
   fi
-  if [[ -f "$out/results.json" ]]; then
+  if [[ "${FORCE:-0}" != "1" && -f "$out/results.json" ]]; then
     echo "=== skip eval $tag (already have results.json) ==="
     continue
   fi
@@ -95,6 +126,10 @@ for row in "${CELLS[@]}"; do
 done
 
 if [[ "$ran" -eq 0 ]]; then
-  echo "Nothing to eval (missing adapters or results already present)."
+  echo "Nothing to eval (filtered out, missing adapters, or results already present)."
+fi
+if [[ -z "${ONLY:-}" ]] && in_csv "4b-20k" "${SKIP_TAGS:-}"; then
+  echo "4b-20k skipped. After that adapter is written:"
+  echo "    ONLY=4b-20k sbatch run_batch_10_eval_full_h200.sh"
 fi
 echo "    cd eval && uv run --no-project python ../experiments/10-option-e-full/scripts/summarize.py"
