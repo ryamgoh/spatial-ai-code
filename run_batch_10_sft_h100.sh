@@ -13,6 +13,9 @@
 set -uo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
+# #SBATCH --cpus-per-task and SLURM_CPUS_PER_TASK must never differ (Slurm 23+).
+# shellcheck disable=SC1091
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm_pin_srun_cpus.sh"
 
 EXP=experiments/10-option-e-full
 POOL=data/spatial_sft_full_scale_20000_train.jsonl
@@ -69,10 +72,6 @@ export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 export AXOLOTL_DO_NOT_TRACK=1
 export AXOLOTL_NO_TELEMETRY=1
-# Slurm 23+: srun fatal if SLURM_CPUS_PER_TASK (often 2× threads) != TRES cpu=.
-export SLURM_CPUS_PER_TASK=16
-export SRUN_CPUS_PER_TASK=16
-unset SLURM_TRES_PER_TASK || true
 
 echo "SLURM CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES-unset}"
 nvidia-smi -L || true

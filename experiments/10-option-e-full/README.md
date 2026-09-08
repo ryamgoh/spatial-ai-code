@@ -87,19 +87,29 @@ Data gen is `flock`'d. Each job trains then evals (`results/full/<tag>/`).
 
 `SKIP_EVAL=1` to train only. Eval-only on H200 (default **skips 4b-20k**
 while that job is still training; the 4B train job evals 1.5k/5k/20k only
-after 20k finishes, so eval 1.5k+5k here if you want them sooner):
+after 20k finishes, so eval 1.5k+5k here if you want them sooner).
+
+**Queue limits:** `gpu` max **3 hours** (H200); `gpu-long` max **3 days**
+(H100-47). The H200 script requests `gpu` / 3h. Eight cells will likely
+not finish in 3h — resubmit; it skips tags that already have
+`results.json`. For a single sweep, submit on `gpu-long`.
+
+`#SBATCH --cpus-per-task` and `SLURM_CPUS_PER_TASK` must never differ
+(Slurm 23+ fatal; job 830266). Launchers source `slurm_pin_srun_cpus.sh`
+so leftover login `SLURM_CPUS_PER_TASK=16` cannot override this job's 8.
+See `experiments/README.md` → "srun cpus-per-task".
 
 ```bash
-sbatch run_batch_10_eval_full_h200.sh                 # 8 ready cells
+sbatch run_batch_10_eval_full_h200.sh                 # 8 ready cells (gpu, 3h)
 ONLY=4b-20k sbatch run_batch_10_eval_full_h200.sh     # after 4B-20k adapter exists
 SKIP_TAGS= sbatch run_batch_10_eval_full_h200.sh      # all 9
 FORCE=1 sbatch run_batch_10_eval_full_h200.sh         # redo existing results.json
 ```
 
-H100-47 MIG instead of H200:
+H100-47 MIG on `gpu-long` (3 days) instead of H200 / `gpu` (3h):
 
 ```bash
-sbatch --partition=gpu-long --time=1-00:00:00 --gres=gpu:h100-47:1 \
+sbatch --partition=gpu-long --time=3-00:00:00 --gres=gpu:h100-47:1 \
   run_batch_10_eval_full_h200.sh
 ```
 

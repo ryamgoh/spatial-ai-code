@@ -18,6 +18,9 @@
 set -uo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
+# #SBATCH --cpus-per-task and SLURM_CPUS_PER_TASK must never differ (Slurm 23+).
+# shellcheck disable=SC1091
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm_pin_srun_cpus.sh"
 
 EXP=experiments/08-dual-scaling
 ADAPTER=$SLURM_SUBMIT_DIR/$EXP/models/qwen3.5-0.8b-sft-20000

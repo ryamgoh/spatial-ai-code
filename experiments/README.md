@@ -53,6 +53,29 @@ checkpoint is not — update the config in the same commit.
 
 ## Running
 
+### srun cpus-per-task (these two must NEVER differ)
+
+`#SBATCH --cpus-per-task=N` and env `SLURM_CPUS_PER_TASK` are the same
+knob. Slurm 23+ **fatals** if they disagree:
+
+```
+srun: fatal: cpus-per-task set by two different environment variables
+SLURM_CPUS_PER_TASK=16 != SLURM_TRES_PER_TASK=cpu=8
+```
+
+`#SBATCH --cpus-per-task=N` is this job's TRES `cpu=N`. `sbatch --export=ALL`
+copies leftover `SLURM_CPUS_PER_TASK` from the login shell (train jobs
+use 16; eval jobs often use 8). Job 830266 died on that mismatch.
+
+**Do not hardcode a second N** next to `--cpus-per-task`. Every launcher
+that calls `srun` must source `slurm_pin_srun_cpus.sh` (repo root) after
+`cd "$SLURM_SUBMIT_DIR"` / `mkdir -p logs` and **before any `srun`**.
+That script copies `cpu=` from this job's TRES onto `SLURM_CPUS_PER_TASK`
+and unsets `SLURM_TRES_PER_TASK`. Changing `--cpus-per-task` is then
+enough; do not add a matching `export`.
+
+Partitions: **`gpu` max 3 hours**; **`gpu-long` max 3 days**.
+
 Eval (from repo root, or submit to SLURM):
 
 ```bash

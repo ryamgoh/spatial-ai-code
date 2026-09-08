@@ -1,6 +1,12 @@
 #!/bin/bash
 # Exp 10 — eval-only on TQA-Corr-Full (adapters already trained).
 #
+# Partitions (wall-clock max):
+#   gpu       — 3 hours  (H200 lives here; this script's default)
+#   gpu-long  — 3 days   (H100-47 / anything that needs more than 3h)
+# Eight cells will likely not finish in 3h. Resubmit the same job: it skips
+# any tag that already has results.json. For one shot, use gpu-long below.
+#
 # Default skips 4b-20k (still training). Same script evals it later.
 #
 #   sbatch run_batch_10_eval_full_h200.sh
@@ -9,8 +15,8 @@
 #   ONLY=4b-1.5k,4b-5k sbatch run_batch_10_eval_full_h200.sh
 #   FORCE=1 sbatch run_batch_10_eval_full_h200.sh              # redo even if results.json exists
 #
-# H100-47 MIG instead of H200:
-#   sbatch --partition=gpu-long --time=1-00:00:00 --gres=gpu:h100-47:1 \
+# H100-47 MIG on gpu-long (max 3 days) instead of H200 / gpu (max 3h):
+#   sbatch --partition=gpu-long --time=3-00:00:00 --gres=gpu:h100-47:1 \
 #     run_batch_10_eval_full_h200.sh
 #SBATCH --job-name=spatial10-eval
 #SBATCH --partition=gpu
@@ -18,7 +24,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=03:00:00
 #SBATCH --gres=gpu:h200-141:1
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
@@ -26,6 +32,9 @@
 set -uo pipefail
 cd "$SLURM_SUBMIT_DIR"
 mkdir -p logs
+# #SBATCH --cpus-per-task and SLURM_CPUS_PER_TASK must never differ (Slurm 23+).
+# shellcheck disable=SC1091
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm_pin_srun_cpus.sh"
 
 EXP=experiments/10-option-e-full
 FULL=$SLURM_SUBMIT_DIR/data/spatialeval_corr_full.jsonl
