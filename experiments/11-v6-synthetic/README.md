@@ -68,3 +68,4 @@ cd eval && uv run --no-project python ../experiments/11-v6-synthetic/scripts/sum
 | Adapters | `experiments/11-v6-synthetic/models/` |
 | Eval | `experiments/11-v6-synthetic/results/{tag}/` |
 | Summary | `experiments/11-v6-synthetic/results/SUMMARY.md` |
+| 4B-1.5k error analysis | `experiments/11-v6-synthetic/RESULTS.md` |
