@@ -123,7 +123,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
       --seed 42 \
       --num-type0-1-answer 6397 \
       --num-type0-2-answer 0 \
-      --num-type0-4-answer 0 \
+      --num-type0-undetermined 0 \
       --num-type1-1-answer 5819 \
       --num-type1-2-answer 0 \
       --num-type2 7784 || {

@@ -7,9 +7,10 @@ Numbering follows the dissertation (H036660, Ch. 4): Experiments **0–3**.
 Experiments **4a/4b** (Qwen3.5-4B pipeline smoke), **5** (GRPO), **6**
 (baseline task feasibility), **7** (SFT starting state), **7b** (untuned
 4B Instruct on Single, SFT prompt), **8** (dual scaling), **8b** (4B-5k Single-SFT transferred to Corr
-1,329), and **10** (option E / TQA-Corr-Full) are post-thesis follow-ups and
-are not part of the report. Exp **9** (mixed-cardinality SFT) was
-scrapped unused; see `archive/09-multi-sft/`.
+1,329), **10** (option E / TQA-Corr-Full), and **11** (v6 synthetic SFT, 2B/4B ×
+1.5k/6k/20k) are post-thesis follow-ups and are not part of the report.
+Exp **9** (mixed-cardinality SFT) was scrapped unused; see
+`archive/09-multi-sft/`.
 
 `eval/` and `finetune/` contain only code and their uv environments — no
 configs. New experiments get a new numbered directory here.
@@ -31,6 +32,7 @@ experiments/
 ├── 08-dual-scaling/              Exp 8: SFT data × param scaling on TQA-Corr-Single
 ├── 08b-sft-transfer-corr/        Exp 8b: 4B-5k Single-SFT eval on TQA-Corr 1329
 ├── 10-option-e-full/             Exp 10: option E (None of these is proven), TQA-Corr-Full
+├── 11-v6-synthetic/              Exp 11: v6 generator SFT, synth 20% + SpatialMap v6
 ├── archive/                      unrunnable / abandoned configs (incl. Exp 9)
 ├── tasks/                        lm-eval task definitions (shared; via include_path)
 └── prompts/                      standalone copies of Exp 1 system prompts

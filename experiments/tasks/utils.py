@@ -112,6 +112,37 @@ def filter_corr_full(dataset):
     return dataset.filter(keep)
 
 
+def process_docs_v6_sft(dataset):
+    """SFT chat jsonl → lm-eval docs. Gold letters A–E from Answer: line."""
+    def convert(doc):
+        user_content = ""
+        oracle = ""
+        for msg in doc.get("messages") or []:
+            if msg.get("role") == "user":
+                user_content = msg.get("content") or ""
+            elif msg.get("role") == "assistant":
+                match = re.search(
+                    r"Answer:\s*([A-E](?:\s*,\s*[A-E])*)",
+                    msg.get("content") or "",
+                )
+                if match:
+                    oracle = ",".join(
+                        p.strip() for p in match.group(1).split(",") if p.strip()
+                    )
+        return {"text": user_content, "oracle_option": oracle}
+
+    return dataset.map(convert)
+
+
+def filter_v6_spatialmap(dataset):
+    """SpatialMap with v6 fifth option; keep nonempty A–E gold."""
+    def keep(doc):
+        ls = _oracle_letters(doc)
+        return bool(ls) and all(x in "ABCDE" for x in ls)
+
+    return dataset.filter(keep)
+
+
 def filter_nonempty_oracle(dataset):
     """Drop rows whose gold letter set is empty (171 of 1500 cleaned SpatialMap)."""
     return dataset.filter(

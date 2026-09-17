@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "results" / "zero-shot-corr"
 TASK = "spatial_eval_gen_cleaned_1329"
-ANSWER_RE = re.compile(r"Answer:\s*([A-D](?:\s*,\s*[A-D])*)", re.I)
+ANSWER_RE = re.compile(r"Answer:\s*([A-E](?:\s*,\s*[A-E])*)", re.I)
 LOOP_RE = re.compile(r"(.{20,80}?)\1{4,}", re.DOTALL)
 FLAG_NAMES = [
     "format_fail",
@@ -38,7 +38,7 @@ def letters(raw: object) -> list[str]:
     s = str(raw or "").strip().upper()
     if not s:
         return []
-    return [p for p in re.split(r"[,;| ]+", s) if p and p in "ABCD"]
+    return [p for p in re.split(r"[,;| ]+", s) if p and p in "ABCDE"]
 
 
 def pred_from_sample(sample: dict) -> str:
