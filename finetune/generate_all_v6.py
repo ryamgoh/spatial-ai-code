@@ -522,10 +522,33 @@ def _build_direction_reasoning(ref, direction, entities_in_dir,
 # Main generation function
 # ---------------------------------------------------------------------------
 
+DEFAULT_SYSTEM_PROMPT = (
+    "You are an advanced spatial reasoning agent. Process the spatial "
+    "relations step-by-step.\nFirst, initialize by detecting all entities "
+    "in the text to establish the global scope. \nThen, step-by-step, "
+    "extract relations and update the spatial state for the X-axis "
+    "(West to East) and Y-axis (South to North), tracking ONLY the "
+    "entities that have been mentioned so far.\nRules for State "
+    "Representation:\n1. Use \"<\" for strict ordering (e.g., A < B means "
+    "A is West/South of B).\n2. Group topologically equivalent entities "
+    "using \"{}\" (e.g., {A, B} < C).\n3. Merge relations into maximal "
+    "chains to represent the spatial topology clearly.\n4. Keep isolated "
+    "active entities separated by commas until they are connected.\n\n"
+    "CRITICAL RULE FOR FINAL DEDUCTION:\nRead the final X-State and "
+    "Y-State. For the queried pair, derive each axis from whether "
+    "A < B is in that state. A two-axis direction is proven only if "
+    "both components are derived. If exactly one axis is derived, the "
+    "remaining compounds that match it are the only possible answers. "
+    "If neither axis is derived, select \"Cannot be determined\". Then "
+    "accept or reject each option from those facts."
+)
+
+
 def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
                     question_type=0, inject_conflict=None,
                     incomplete_pair=False, omit_live=False,
-                    shuffle_special=False, shuffle_none_phrase=False):
+                    shuffle_special=False, shuffle_none_phrase=False,
+                    system_prompt=None):
     """Generate a single SFT training sample.
 
     Args:
@@ -664,27 +687,8 @@ def generate_sample(num_entities=5, num_sentences=6, target_num_answers=None,
         if a in all_mentioned_entities and b in all_mentioned_entities and a != b
     ]
 
-    # Shared system prompt
-    system_prompt = (
-        "You are an advanced spatial reasoning agent. Process the spatial "
-        "relations step-by-step.\nFirst, initialize by detecting all entities "
-        "in the text to establish the global scope. \nThen, step-by-step, "
-        "extract relations and update the spatial state for the X-axis "
-        "(West to East) and Y-axis (South to North), tracking ONLY the "
-        "entities that have been mentioned so far.\nRules for State "
-        "Representation:\n1. Use \"<\" for strict ordering (e.g., A < B means "
-        "A is West/South of B).\n2. Group topologically equivalent entities "
-        "using \"{}\" (e.g., {A, B} < C).\n3. Merge relations into maximal "
-        "chains to represent the spatial topology clearly.\n4. Keep isolated "
-        "active entities separated by commas until they are connected.\n\n"
-        "CRITICAL RULE FOR FINAL DEDUCTION:\nRead the final X-State and "
-        "Y-State. For the queried pair, derive each axis from whether "
-        "A < B is in that state. A two-axis direction is proven only if "
-        "both components are derived. If exactly one axis is derived, the "
-        "remaining compounds that match it are the only possible answers. "
-        "If neither axis is derived, select \"Cannot be determined\". Then "
-        "accept or reject each option from those facts."
-    )
+    if not system_prompt:
+        system_prompt = DEFAULT_SYSTEM_PROMPT
 
     option_letters = ["A", "B", "C", "D"]
 
@@ -1063,6 +1067,7 @@ def batch_generate(
     num_type2_none=0,
     test_split=0.2,
     seed=None,
+    system_prompt=None,
 ):
     """Generate samples in batches covering all three question types.
 
@@ -1133,6 +1138,7 @@ def batch_generate(
                 question_type=q_type,
                 shuffle_special=shuffle_special,
                 shuffle_none_phrase=shuffle_none_phrase,
+                system_prompt=system_prompt,
                 **extra,
             )
             attempts += 1
@@ -1258,6 +1264,12 @@ def main(
         0, min=0,
         help="Type 2, true count omitted (gold: None of the Options)",
     ),
+    system_prompt_file: str | None = typer.Option(
+        None,
+        "--system-prompt-file",
+        help="Replace the default SFT system prompt with this file. "
+             "Default (omit) is the built-in v6 prompt.",
+    ),
 ) -> None:
     """Generate the dataset. Defaults reproduce the 2100-sample training mix."""
     if out is None:
@@ -1282,6 +1294,11 @@ def main(
         num_type2_none=num_type2_none,
         test_split=test_split,
         seed=seed,
+        system_prompt=(
+            Path(system_prompt_file).read_text(encoding="utf-8").strip()
+            if system_prompt_file
+            else None
+        ),
     )
 
 

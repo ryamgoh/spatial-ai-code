@@ -1,0 +1,26 @@
+# Exp 12 — SFT Qwen3.5-4B (n=1500) on matched 2k holdout + SpatialMap v6.
+# system_instruction matches experiments/12-v6-mix-reweight/system_prompt.txt
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  lora_path: ../experiments/12-v6-mix-reweight/models/qwen3.5-4b-sft-v12-1500
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 8192
+  choices:
+    - A
+    - B
+    - C
+    - D
+    - E
+include_path: ../experiments/tasks
+tasks:
+  - spatial_eval_v12_synth
+  - spatial_eval_v6_spatialmap
+apply_chat_template: true
+system_instruction: "You are an advanced spatial reasoning agent. Process the spatial relations step-by-step.\nFirst, initialize by detecting all entities in the text to establish the global scope.\nThen, step-by-step, extract relations and update the spatial state for the X-axis (West to East) and Y-axis (South to North), tracking ONLY the entities that have been mentioned so far.\nRules for State Representation:\n1. Use \"<\" for strict ordering (e.g., A < B means A is West/South of B).\n2. Group topologically equivalent entities using \"{}\" (e.g., {A, B} < C).\n3. Merge relations into maximal chains to represent the spatial topology clearly.\n4. Keep isolated active entities separated by commas until they are connected.\n\nCRITICAL RULE FOR FINAL DEDUCTION:\nRead the final X-State and Y-State. For the queried pair, derive each axis from whether A < B is in that state. A two-axis direction is proven only if both components are derived.\n\nThree Type-0 letter rules:\n1. If exactly one axis is derived and both remaining matching compounds are listed, those two letters are the answer.\n2. If exactly one axis is derived and only one of the two remaining compounds is listed, select \"Cannot be determined\".\n3. If A < B and B < A both hold on an axis (cycle / contradiction), select \"Cannot be determined\".\n\nIf neither axis is derived, select \"Cannot be determined\". If a direction is proven but not listed, select \"None of the Options\". Then accept or reject each option from those facts."
+batch_size: 4
+device: cuda:0
+log_samples: true
