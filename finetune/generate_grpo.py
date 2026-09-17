@@ -17,9 +17,9 @@ from pathlib import Path
 
 import typer
 
-from generate_all import generate_sample
+from generate_all_v6 import generate_sample
 
-ANSWER_RE = re.compile(r"Answer:\s*([A-D](?:\s*,\s*[A-D])*)", re.IGNORECASE)
+ANSWER_RE = re.compile(r"Answer:\s*([A-F](?:\s*,\s*[A-F])*)", re.IGNORECASE)
 
 # Match cleaned SpatialMap mix (~32% direction, ~38% which-object, ~30% count)
 # rather than the SFT 40/40/20 uncertainty-heavy mix.
@@ -38,7 +38,7 @@ def oracle_from_assistant(content: str) -> str | None:
     if not matches:
         return None
     letters = [tok.strip().upper() for tok in matches[-1].split(",")]
-    letters = [tok for tok in letters if tok in {"A", "B", "C", "D"}]
+    letters = [tok for tok in letters if tok in {"A", "B", "C", "D", "E", "F"}]
     if not letters:
         return None
     return ",".join(letters)
@@ -47,7 +47,7 @@ def oracle_from_assistant(content: str) -> str | None:
 # SFT gold always ends with: </think>\nAnswer: A   (or "A, B")
 ANSWER_LINE = (
     "\n\nAfter your reasoning, close with </think> and a final line "
-    "exactly like the examples: `Answer: A` or `Answer: A, C`."
+    "exactly like the examples: `Answer: A`, `Answer: A, C`, or `Answer: E`."
 )
 
 

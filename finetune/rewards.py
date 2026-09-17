@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-ANSWER_RE = re.compile(r"Answer:\s*([A-D](?:\s*,\s*[A-D])*)", re.IGNORECASE)
+ANSWER_RE = re.compile(r"Answer:\s*([A-F](?:\s*,\s*[A-F])*)", re.IGNORECASE)
 
 # SFT traces average ~708 completion tokens. Penalize above this budget.
 LENGTH_SOFT_CAP = 1024
@@ -39,13 +39,13 @@ def _parse_answer_letters(text: str) -> list[str] | None:
     if not matches:
         return None
     letters = [tok.strip().upper() for tok in matches[-1].split(",")]
-    letters = [tok for tok in letters if tok in {"A", "B", "C", "D"}]
+    letters = [tok for tok in letters if tok in {"A", "B", "C", "D", "E", "F"}]
     return letters or None
 
 
 def _gold_letters(oracle_option: object) -> set[str]:
     raw = str(oracle_option or "").upper()
-    return {tok for tok in re.split(r"[,;| ]+", raw) if tok in {"A", "B", "C", "D"}}
+    return {tok for tok in re.split(r"[,;| ]+", raw) if tok in {"A", "B", "C", "D", "E", "F"}}
 
 
 def outcome_reward(
