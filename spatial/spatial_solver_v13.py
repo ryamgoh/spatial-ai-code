@@ -23,6 +23,17 @@ RELATION_RE = re.compile(
     re.IGNORECASE,
 )
 
+_DIRECTION_REQUIREMENTS = {
+    "North": (("y", "gt"),),
+    "South": (("y", "lt"),),
+    "East": (("x", "gt"),),
+    "West": (("x", "lt"),),
+    "Northeast": (("x", "gt"), ("y", "gt")),
+    "Northwest": (("x", "lt"), ("y", "gt")),
+    "Southeast": (("x", "gt"), ("y", "lt")),
+    "Southwest": (("x", "lt"), ("y", "lt")),
+}
+
 
 def _normalize_text(text: str) -> str:
     return (
@@ -46,6 +57,9 @@ class SolvedProblem:
 
     grade: Grade
     structure: dict[str, Any]
+    objects: tuple[str, ...]
+    relations: tuple[tuple[str, str, str], ...]
+    question_part: str
 
 
 def _axis_edges(a: str, direction: str, b: str) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
@@ -164,7 +178,9 @@ class SpatialSolverV13(SpatialSolver):
                 "relation": "lt",
                 "conflict": False,
                 "depth": len(reverse_path) - 1,
-                "path": reverse_path,
+                # Edges point greater -> lesser; render every proof in the
+                # state notation's lower -> higher order.
+                "path": list(reversed(reverse_path)),
                 "supporting_statements": reverse_support,
             }
         return {
@@ -212,22 +228,68 @@ class SpatialSolverV13(SpatialSolver):
             "x_conflict": False,
             "y_conflict": False,
         }
+        x_edges: list[tuple[str, str, int]] = []
+        y_edges: list[tuple[str, str, int]] = []
+        for a, direction, b, statement_index in relations:
+            x_part, y_part = _axis_edges(a, direction, b)
+            x_edges.extend(
+                (source, dest, statement_index) for source, dest in x_part
+            )
+            y_edges.extend(
+                (source, dest, statement_index) for source, dest in y_part
+            )
 
         query = re.search(
             r"In which direction is ([^?]+?) relative to ([^?]+?)\?",
             question_part,
         )
         if not query:
-            return SolvedProblem(grade=grade, structure=result)
+            set_query = re.search(
+                r"(?:Which object is|How many objects are) in the (\w+) of ([^?]+?)\?",
+                question_part,
+            )
+            if set_query:
+                direction = set_query.group(1).strip().title()
+                reference = _strip_the(set_query.group(2))
+                requirements = _DIRECTION_REQUIREMENTS.get(direction, ())
+                proven_entity_proofs = []
+                for entity in sorted(obj for obj in objects if obj != reference):
+                    proofs = {
+                        "x": self._axis_proof(x_edges, entity, reference),
+                        "y": self._axis_proof(y_edges, entity, reference),
+                    }
+                    if all(
+                        proofs[axis]["relation"] == required_relation
+                        for axis, required_relation in requirements
+                    ):
+                        proof = {"entity": entity}
+                        for axis, _ in requirements:
+                            proof[f"{axis}_path"] = proofs[axis]["path"]
+                            proof[f"{axis}_depth"] = proofs[axis]["depth"]
+                            proof[f"{axis}_supporting_statements"] = proofs[axis]["supporting_statements"]
+                        proven_entity_proofs.append(proof)
+                result.update(
+                    {
+                        "query_reference": reference,
+                        "query_direction": direction,
+                        "required_axes": [axis for axis, _ in requirements],
+                        "proven_entities": [
+                            proof["entity"] for proof in proven_entity_proofs
+                        ],
+                        "proven_entity_proofs": proven_entity_proofs,
+                    }
+                )
+            return SolvedProblem(
+                grade=grade,
+                structure=result,
+                objects=tuple(objects),
+                relations=tuple(
+                    (a, direction, b) for a, direction, b, _ in relations
+                ),
+                question_part=question_part,
+            )
         target = _strip_the(query.group(1))
         reference = _strip_the(query.group(2))
-        x_edges: list[tuple[str, str, int]] = []
-        y_edges: list[tuple[str, str, int]] = []
-        for a, direction, b, statement_index in relations:
-            x_part, y_part = _axis_edges(a, direction, b)
-            x_edges.extend((source, dest, statement_index) for source, dest in x_part)
-            y_edges.extend((source, dest, statement_index) for source, dest in y_part)
-
         x_proof = self._axis_proof(x_edges, target, reference)
         y_proof = self._axis_proof(y_edges, target, reference)
         shared = sorted(
@@ -253,7 +315,15 @@ class SpatialSolverV13(SpatialSolver):
                 "y_conflict": y_proof["conflict"],
             }
         )
-        return SolvedProblem(grade=grade, structure=result)
+        return SolvedProblem(
+            grade=grade,
+            structure=result,
+            objects=tuple(objects),
+            relations=tuple(
+                (a, direction, b) for a, direction, b, _ in relations
+            ),
+            question_part=question_part,
+        )
 
     def analyze(self, text: str) -> dict[str, Any]:
         """Compatibility convenience returning only structural metadata."""

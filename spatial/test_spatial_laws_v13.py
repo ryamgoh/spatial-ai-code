@@ -162,3 +162,23 @@ def test_solve_and_analyze_returns_one_authoritative_result() -> None:
     assert solved.structure["x_depth"] == 2
     assert solved.structure["y_depth"] == 1
     assert solved.structure == SOLVER.analyze(text)
+
+
+def test_reported_paths_follow_low_to_high_axis_order_for_west_and_south() -> None:
+    text = prompt(
+        [
+            "The Museum is to the West of the Bank.",
+            "The Library is to the West of the Museum.",
+            "The Park is to the South of the Bank.",
+            "The Library is to the South of the Park.",
+        ],
+        "In which direction is the Library relative to the Bank?",
+        DIR_OPTIONS,
+    )
+
+    solved = SOLVER.solve_and_analyze(text)
+
+    assert solved.grade.x_rel == "lt"
+    assert solved.grade.y_rel == "lt"
+    assert solved.structure["x_path"] == ["Library", "Museum", "Bank"]
+    assert solved.structure["y_path"] == ["Library", "Park", "Bank"]

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 
 import pytest
 
@@ -26,6 +27,14 @@ def user_text(example) -> str:
         message["content"]
         for message in example.messages
         if message["role"] == "user"
+    )
+
+
+def assistant_text(example) -> str:
+    return next(
+        message["content"]
+        for message in example.messages
+        if message["role"] == "assistant"
     )
 
 
@@ -224,3 +233,115 @@ def test_generate_accepts_depth_ranges_not_only_exact_values() -> None:
 
     assert 2 <= example.difficulty["x_depth"] <= 3
     assert 3 <= example.difficulty["y_depth"] <= 4
+
+
+def test_trace_initialization_contains_exactly_prompt_visible_entities() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.CARDINAL,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(1),
+            y_depth=DepthRange.exact(1),
+        ),
+        num_entities=8,
+        num_relations=10,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(101))
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+    match = re.search(r"\*\*Entities Detected\*\*: (.+)", assistant_text(example))
+
+    assert match
+    trace_entities = {part.strip() for part in match.group(1).split(",")}
+    assert trace_entities == set(solved.objects)
+
+
+def test_trace_final_deduction_shows_solver_verified_paths_and_composition() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.MIXED,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(3),
+            y_depth=DepthRange.exact(4),
+        ),
+        num_entities=10,
+        num_relations=12,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(102))
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+    trace = assistant_text(example)
+    x_path = " < ".join(solved.structure["x_path"])
+    y_path = " < ".join(solved.structure["y_path"])
+
+    assert f"**Target**: {solved.structure['target']}" in trace
+    assert f"**Reference**: {solved.structure['reference']}" in trace
+    assert f"**X-Proof**: {x_path}" in trace
+    assert f"**Y-Proof**: {y_path}" in trace
+    assert "**X-Conclusion**:" in trace
+    assert "**Y-Conclusion**:" in trace
+    assert "**Composition**:" in trace
+    assert trace.index("**X-Proof**:") < trace.index("**Options**:")
+    assert trace.index("**Y-Proof**:") < trace.index("**Options**:")
+
+
+def test_trace_does_not_claim_a_path_for_an_unknown_axis() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_2,
+        relation_mode=RelationMode.CARDINAL,
+        num_entities=8,
+        num_relations=10,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(171))
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+    trace = assistant_text(example)
+
+    assert (solved.structure["x_path"] is None) != (solved.structure["y_path"] is None)
+    if solved.structure["x_path"] is None:
+        assert "**X-Proof**: none (no ordering path)" in trace
+    else:
+        assert "**Y-Proof**: none (no ordering path)" in trace
+
+
+def test_which_trace_shows_solver_verified_entity_proofs() -> None:
+    example = SpatialGenerator().generate(
+        GenerationSpec(
+            semantic_subtype=SemanticSubtype.WHICH_2,
+            relation_mode=RelationMode.MIXED,
+        ),
+        random.Random(177),
+    )
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+    trace = assistant_text(example)
+
+    assert f"**Reference**: {solved.structure['query_reference']}" in trace
+    assert f"**Direction Query**: {solved.structure['query_direction']}" in trace
+    assert "**Proven Entities**:" in trace
+    for proof in solved.structure["proven_entity_proofs"]:
+        for axis in solved.structure["required_axes"]:
+            assert (
+                f"**{proof['entity']} {axis.upper()}-Proof**: "
+                f"{' < '.join(proof[f'{axis}_path'])}"
+            ) in trace
+
+
+def test_count_trace_shows_solver_verified_entity_set_and_count() -> None:
+    example = SpatialGenerator().generate(
+        GenerationSpec(
+            semantic_subtype=SemanticSubtype.COUNT_OMIT,
+            relation_mode=RelationMode.MIXED,
+        ),
+        random.Random(178),
+    )
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+    trace = assistant_text(example)
+
+    names = solved.structure["proven_entities"]
+    rendered_names = ", ".join(names) if names else "none"
+    assert f"**Reference**: {solved.structure['query_reference']}" in trace
+    assert f"**Direction Query**: {solved.structure['query_direction']}" in trace
+    assert f"**Proven Entities**: {rendered_names}" in trace
+    assert f"**Count**: {len(names)}" in trace

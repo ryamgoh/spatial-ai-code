@@ -20,7 +20,7 @@ from typing import Any
 
 from spatial_graph import AxisGraph, ENTITY_NAMES
 from spatial_solver import Grade
-from spatial_solver_v13 import SpatialSolverV13
+from spatial_solver_v13 import SolvedProblem, SpatialSolverV13
 
 
 COMPOUNDS = ["Northeast", "Northwest", "Southeast", "Southwest"]
@@ -580,9 +580,93 @@ def _count_prompt(
     )
 
 
-def _trace(
-    entities: Sequence[str], relations: Sequence[Relation], grade: Grade
-) -> str:
+def _axis_conclusion(axis: str, relation: str, target: str, reference: str) -> str:
+    labels = {
+        ("X", "gt"): "East",
+        ("X", "lt"): "West",
+        ("Y", "gt"): "North",
+        ("Y", "lt"): "South",
+    }
+    direction = labels.get((axis, relation))
+    if direction:
+        return f"{target} is {direction} of {reference}."
+    return f"{target}'s {axis}-axis relation to {reference} is unknown."
+
+
+def _query_proof_lines(solved: SolvedProblem) -> list[str]:
+    structure = solved.structure
+    if solved.grade.q_type in (1, 2):
+        reference = structure["query_reference"]
+        direction = structure["query_direction"]
+        proven_entities = structure["proven_entities"]
+        lines = [
+            f"**Reference**: {reference}",
+            f"**Direction Query**: {direction}",
+        ]
+        for proof in structure["proven_entity_proofs"]:
+            for axis in structure["required_axes"]:
+                path = proof[f"{axis}_path"]
+                lines.append(
+                    f"**{proof['entity']} {axis.upper()}-Proof**: "
+                    f"{' < '.join(path)}"
+                )
+        rendered_entities = ", ".join(proven_entities) if proven_entities else "none"
+        lines.append(f"**Proven Entities**: {rendered_entities}")
+        if solved.grade.q_type == 2:
+            lines.append(f"**Count**: {len(proven_entities)}")
+        return lines
+    if solved.grade.q_type != 0:
+        return []
+    target = structure["target"]
+    reference = structure["reference"]
+    lines = [f"**Target**: {target}", f"**Reference**: {reference}"]
+    components: list[str] = []
+    for axis in ("X", "Y"):
+        key = axis.lower()
+        path = structure[f"{key}_path"]
+        conflict = structure[f"{key}_conflict"]
+        relation = getattr(solved.grade, f"{key}_rel")
+        if path:
+            lines.append(f"**{axis}-Proof**: {' < '.join(path)}")
+        elif conflict:
+            lines.append(f"**{axis}-Proof**: none (contradictory ordering paths)")
+        else:
+            lines.append(f"**{axis}-Proof**: none (no ordering path)")
+        conclusion = _axis_conclusion(axis, relation, target, reference)
+        lines.append(f"**{axis}-Conclusion**: {conclusion}")
+        if relation != "unknown":
+            components.append(
+                {
+                    ("X", "gt"): "East",
+                    ("X", "lt"): "West",
+                    ("Y", "gt"): "North",
+                    ("Y", "lt"): "South",
+                }[(axis, relation)]
+            )
+    if len(components) == 2:
+        x_component = components[0]
+        y_component = components[1]
+        compound = f"{y_component}{x_component.lower()}"
+        lines.append(
+            f"**Composition**: {x_component} + {y_component} = {compound}."
+        )
+    elif components:
+        lines.append(
+            f"**Composition**: only {components[0]} is proven; the other axis "
+            "remains unknown."
+        )
+    else:
+        lines.append("**Composition**: neither axis yields a unique compound.")
+    return lines
+
+
+def _trace(solved: SolvedProblem) -> str:
+    entities = solved.objects
+    relations = tuple(
+        Relation(subject=a, direction=Direction(direction.title()), reference=b)
+        for a, direction, b in solved.relations
+    )
+    grade = solved.grade
     x_graph, y_graph = AxisGraph(), AxisGraph()
     x_graph.nodes.update(entities)
     y_graph.nodes.update(entities)
@@ -619,7 +703,7 @@ def _trace(
             + f"\n**X-State**: {x_graph.format_state(active)}"
             + f"\n**Y-State**: {y_graph.format_state(active)}"
         )
-    verdicts = ["### Final Deduction"]
+    verdicts = ["### Final Deduction", *_query_proof_lines(solved), "**Options**:"]
     for letter, value, accepted, reason in grade.verdicts:
         verdicts.append(f"- {letter}. {value} — {reason}. {'In' if accepted else 'Out'}.")
     return "<think>\n" + "\n\n".join(chunks + ["\n".join(verdicts)]) + f"\n</think>\nAnswer: {grade.pretty}"
@@ -742,7 +826,7 @@ class SpatialGenerator:
                     {"role": "user", "content": user_prompt},
                     {
                         "role": "assistant",
-                        "content": _trace(entities, relations, grade),
+                        "content": _trace(solved),
                     },
                 ),
                 oracle_option=grade.raw,

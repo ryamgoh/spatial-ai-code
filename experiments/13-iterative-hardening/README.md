@@ -133,6 +133,36 @@ New complexity should normally extend `GenerationSpec`/`StructuralConstraints`
 and the solver profile rather than add more positional flags to
 `generate_sample`.
 
+### Trace contract
+
+The rendered user prompt is the sole source of truth for v13 supervision.
+`SolvedProblem` carries the entities and relations reparsed from that prompt,
+and the assistant trace is rendered from those parsed facts rather than the
+generator's internal scene. Therefore `Entities Detected` cannot contain an
+entity that is absent from the question.
+
+Every trace keeps the incremental Chain-of-State section:
+
+```text
+Sentence → X/Y extraction → updated X-State/Y-State
+```
+
+Its final deduction is query-focused and solver-backed:
+
+- Type 0 shows target/reference, one shortest X proof, one shortest Y proof,
+  each axis conclusion, and their compound-direction composition. Unknown or
+  contradictory axes are stated explicitly instead of receiving invented
+  paths.
+- Type 1 shows the reference/direction, the required shortest axis paths for
+  every proven entity, and the complete proven-entity set before evaluating
+  the options.
+- Type 2 shows the same proven-entity evidence and then the explicit derived
+  count before evaluating the options.
+
+All displayed paths use the state convention `lower < higher` (West→East or
+South→North), including when the queried target lies West or South of the
+reference.
+
 ### Proof-depth cells
 
 Typed callers specify exact or ranged proof depths through `DepthRange`:
