@@ -276,3 +276,7 @@ set enumeration, counting, cardinal/mixed parsing, and consistency
 discrimination—while retaining its clean direction-chain reasoning. More data
 from a narrow trace template is not automatically beneficial; the V12
 1.5K-to-6K degradation is the warning this experiment must address.
+
+The first intervention is therefore a 400-row, one-epoch native V13 safety
+probe. Its recipe and explicit go/no-go gates are documented in `README.md`; it
+is not the final 1.5K/6K scaling experiment.

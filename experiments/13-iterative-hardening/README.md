@@ -8,6 +8,40 @@
 Pre-training diagnostic findings and their interpretation are recorded in
 [`OBSERVATIONS.md`](./OBSERVATIONS.md).
 
+## Native V13 400-row safety probe
+
+Before scaling to 1.5K/6K, the first native V13 SFT run is a deliberately
+small safety probe trained from untouched `Qwen/Qwen3.5-4B`:
+
+| target | train rows | purpose |
+|---|---:|---|
+| cardinal depth 1–4 | 100 | retain clean direction chains and teach one-axis extraction |
+| mixed independent axes | 80 | compose separate X/Y evidence; includes structured distractors |
+| `dir-2` | 60 | teach the two-letter partial-information rule |
+| which subtypes | 60 | complete entity-set enumeration |
+| count/count-omit | 40 | set-to-count and menu policy |
+| closed cycles | 30 | global inconsistency |
+| matched open controls | 30 | prevent indiscriminate refusal |
+
+The validation split contains 120 independently generated rows (three per
+cell) using seed 13132; training uses seed 13131. Exact prompts and premise
+worlds are checked for overlap across train, validation, and the frozen V13
+diagnostic. Depth 5 remains evaluation-only. Training is one QLoRA epoch at
+`5e-5`, half the V12 learning rate, to reduce specialization risk.
+
+Run the full generate/train/evaluate pipeline on one H100-47:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-probe-h100-47.sh
+```
+
+The launcher uses `gpu-long` with its `3-00:00:00` limit. It evaluates the
+probe on V13 with both one- and two-stage decoding and on the original V12 2K
+test with stage 1. `results/PROBE-SUMMARY.md` applies five gates: improvement
+on `dir-2`, improvement on consistent which/count, no more than a five-point
+depth-5 loss, at least 90% V12 retention, and at least 50% on both closed
+cycles and open controls. Do not scale the recipe unless all five pass.
+
 The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.
