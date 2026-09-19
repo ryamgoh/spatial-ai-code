@@ -107,6 +107,42 @@ class DistractorSpec:
             raise ValueError("a distractor policy requires a positive count")
 
 
+class CycleAxes(str, Enum):
+    X = "x"
+    Y = "y"
+    BOTH = "both"
+
+
+class CycleTopology(str, Enum):
+    DIRECT = "direct"
+    INDIRECT = "indirect"
+
+
+class CyclePlacement(str, Enum):
+    QUERY_CONNECTED = "query-connected"
+    DISCONNECTED = "disconnected"
+
+
+class WorldConsistency(str, Enum):
+    CONSISTENT = "consistent"
+    INCONSISTENT = "inconsistent"
+
+
+@dataclass(frozen=True)
+class CycleSpec:
+    axes: CycleAxes
+    topology: CycleTopology
+    placement: CyclePlacement
+    length: int
+    world_consistency: WorldConsistency = WorldConsistency.INCONSISTENT
+
+    def __post_init__(self) -> None:
+        if self.topology is CycleTopology.DIRECT and self.length != 2:
+            raise ValueError("direct cycle requires length 2")
+        if self.topology is CycleTopology.INDIRECT and self.length < 3:
+            raise ValueError("indirect cycle requires length of at least 3")
+
+
 @dataclass(frozen=True)
 class StructuralConstraints:
     require_independent_axes: bool = False
@@ -174,6 +210,7 @@ class GenerationSpec:
     num_relations: int = 10
     max_attempts: int = 500
     system_prompt: str | None = None
+    cycle: CycleSpec | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.semantic_subtype, SemanticSubtype):
@@ -186,6 +223,43 @@ class GenerationSpec:
             raise ValueError("num_relations must be positive")
         if self.max_attempts < 1:
             raise ValueError("max_attempts must be positive")
+        if self.cycle is not None and self.semantic_subtype is SemanticSubtype.DIR_CYCLE:
+            raise ValueError(
+                "use a base semantic subtype with CycleSpec; dir-cycle is the "
+                "compatibility subtype"
+            )
+        if self.cycle is not None and (
+            self.constraints.x_depth
+            or self.constraints.y_depth
+            or self.constraints.distractors.policy is not DistractorPolicy.NONE
+        ):
+            raise ValueError(
+                "CycleSpec is currently separate from depth/distractor constraints"
+            )
+        if self.cycle is not None:
+            cycle_nodes = self.cycle.length + (
+                1
+                if self.cycle.world_consistency is WorldConsistency.CONSISTENT
+                else 0
+            )
+            fresh_cycle_entities = cycle_nodes - (
+                1
+                if self.cycle.placement is CyclePlacement.QUERY_CONNECTED
+                else 0
+            )
+            cycle_relations = _cycle_relation_count(
+                self.relation_mode, self.cycle
+            )
+            if self.num_entities < 8 + fresh_cycle_entities:
+                raise ValueError(
+                    "num_entities cannot fit an eight-entity base question "
+                    "plus the requested cycle/control"
+                )
+            if self.num_relations < 10 + cycle_relations:
+                raise ValueError(
+                    "num_relations cannot fit a ten-relation base question "
+                    "plus the requested cycle/control"
+                )
         if (
             self.constraints.require_independent_axes
             and self.semantic_subtype is not SemanticSubtype.DIR_1
@@ -291,14 +365,16 @@ class GeneratedExample:
     messages: tuple[dict[str, str], ...]
     oracle_option: str
     difficulty: dict[str, Any]
-    generator_version: str = "v13.3-structured-distractors"
+    base_semantic_subtype: str
+    generator_version: str = "v13.4-global-consistency"
 
     def to_row(self, *, generation_cell: str | None = None) -> dict[str, Any]:
         row: dict[str, Any] = {
             "messages": [dict(message) for message in self.messages],
             "oracle_option": self.oracle_option,
+            "base_semantic_subtype": self.base_semantic_subtype,
             "difficulty": dict(self.difficulty),
-            "difficulty_schema_version": 2,
+            "difficulty_schema_version": 3,
             "generator_version": self.generator_version,
         }
         if generation_cell is not None:
@@ -336,7 +412,9 @@ DEFAULT_SYSTEM_PROMPT = (
     "2. If exactly one axis is derived and only one matching compound is "
     "listed, select Cannot be determined.\n"
     "3. If both orders hold for a pair on an axis, treat that axis as "
-    "contradictory and unknown.\n"
+    "a globally inconsistent world. Any contradiction anywhere in the X or "
+    "Y graph overrides every question type: select Cannot be determined and "
+    "do not continue with local query reasoning.\n"
     "If neither axis is derived, select Cannot be determined. If a proven "
     "answer is absent, select None of the Options. End with Answer: followed "
     "by the exact letter set."
@@ -485,6 +563,73 @@ def _make_depth_scene(
         )
     rng.shuffle(relations)
     return Scene(tuple(entities), tuple(relations)), target, reference
+
+
+def _cycle_relation_count(mode: RelationMode, cycle: CycleSpec) -> int:
+    if cycle.axes is CycleAxes.BOTH and mode is RelationMode.CARDINAL:
+        return cycle.length * 2
+    return cycle.length
+
+
+def _cycle_relations(
+    nodes: Sequence[str], mode: RelationMode, cycle: CycleSpec
+) -> list[Relation]:
+    pairs = (
+        list(zip(nodes, [*nodes[1:], nodes[0]]))
+        if cycle.world_consistency is WorldConsistency.INCONSISTENT
+        else list(zip(nodes, nodes[1:]))
+    )
+    if cycle.axes is CycleAxes.X:
+        return [Relation(source, Direction.EAST, target) for source, target in pairs]
+    if cycle.axes is CycleAxes.Y:
+        return [Relation(source, Direction.NORTH, target) for source, target in pairs]
+    if mode is RelationMode.CARDINAL:
+        return [
+            *[Relation(source, Direction.EAST, target) for source, target in pairs],
+            *[Relation(source, Direction.NORTH, target) for source, target in pairs],
+        ]
+    return [
+        Relation(source, Direction.NORTHEAST, target)
+        for source, target in pairs
+    ]
+
+
+def _inject_cycle(
+    prompt: str,
+    base_objects: Sequence[str],
+    anchor: str,
+    mode: RelationMode,
+    cycle: CycleSpec,
+    rng: random.Random,
+) -> str:
+    fresh = [name for name in ENTITY_NAMES if name not in set(base_objects)]
+    cycle_node_count = cycle.length + (
+        1 if cycle.world_consistency is WorldConsistency.CONSISTENT else 0
+    )
+    needed = (
+        cycle_node_count
+        if cycle.placement is CyclePlacement.DISCONNECTED
+        else cycle_node_count - 1
+    )
+    if len(fresh) < needed:
+        raise ValueError("not enough fresh entities to construct the requested cycle")
+    selected = rng.sample(fresh, needed)
+    nodes = (
+        selected
+        if cycle.placement is CyclePlacement.DISCONNECTED
+        else [anchor, *selected]
+    )
+    additions = _cycle_relations(nodes, mode, cycle)
+    map_part, question_part = prompt.split("\n\nQuestion:", 1)
+    # Every globally inconsistent question uses the same refusal option.
+    question_part = question_part.replace(NONE, SPECIAL)
+    return (
+        map_part.rstrip()
+        + " "
+        + " ".join(relation.render() for relation in additions)
+        + "\n\nQuestion:"
+        + question_part
+    )
 
 
 def _graphs(entities: Sequence[str], relations: Sequence[Relation]) -> tuple[AxisGraph, AxisGraph]:
@@ -735,6 +880,18 @@ def _query_proof_lines(solved: SolvedProblem) -> list[str]:
     return lines
 
 
+def _consistency_lines(solved: SolvedProblem) -> list[str]:
+    lines: list[str] = []
+    for axis in solved.structure["cycle_axes"]:
+        witness = list(reversed(solved.structure["cycle_witnesses"][axis]))
+        lines.append(f"**{axis.upper()}-Cycle**: {' < '.join(witness)}")
+    lines.append(
+        "**Conclusion**: The complete map is inconsistent, so the requested "
+        "answer cannot be determined reliably."
+    )
+    return lines
+
+
 def _trace(solved: SolvedProblem) -> str:
     entities = solved.objects
     relations = tuple(
@@ -778,7 +935,18 @@ def _trace(solved: SolvedProblem) -> str:
             + f"\n**X-State**: {x_graph.format_state(active)}"
             + f"\n**Y-State**: {y_graph.format_state(active)}"
         )
-    verdicts = ["### Final Deduction", *_query_proof_lines(solved), "**Options**:"]
+    if solved.structure["world_consistency"] == "inconsistent":
+        verdicts = [
+            "### Consistency Check",
+            *_consistency_lines(solved),
+            "**Options**:",
+        ]
+    else:
+        verdicts = [
+            "### Final Deduction",
+            *_query_proof_lines(solved),
+            "**Options**:",
+        ]
     for letter, value, accepted, reason in grade.verdicts:
         verdicts.append(f"- {letter}. {value} — {reason}. {'In' if accepted else 'Out'}.")
     return "<think>\n" + "\n\n".join(chunks + ["\n".join(verdicts)]) + f"\n</think>\nAnswer: {grade.pretty}"
@@ -805,8 +973,36 @@ class SpatialGenerator:
                 scene, target, reference = _make_depth_scene(spec, rng)
                 forced_pair = (target, reference)
             else:
+                cycle_relation_count = (
+                    _cycle_relation_count(spec.relation_mode, spec.cycle)
+                    if spec.cycle
+                    else 0
+                )
+                fresh_cycle_entities = (
+                    (
+                        spec.cycle.length
+                        + (
+                            1
+                            if spec.cycle.world_consistency
+                            is WorldConsistency.CONSISTENT
+                            else 0
+                        )
+                    )
+                    - (
+                        1
+                        if spec.cycle.placement
+                        is CyclePlacement.QUERY_CONNECTED
+                        else 0
+                    )
+                    if spec.cycle else 0
+                )
+                base_num_entities = spec.num_entities - fresh_cycle_entities
+                base_num_relations = spec.num_relations - cycle_relation_count
+                if base_num_entities < 2 or base_num_relations < 1:
+                    rejections["cycle_does_not_fit"] += 1
+                    continue
                 scene = _make_scene(
-                    rng, spec.num_entities, spec.num_relations, relation_mode
+                    rng, base_num_entities, base_num_relations, relation_mode
                 )
             entities = list(scene.entities)
             relations = list(scene.relations)
@@ -857,13 +1053,43 @@ class SpatialGenerator:
             if not user_prompt:
                 rejections["no_qualifying_query"] += 1
                 continue
+            base_solved = self.solver.solve_and_analyze(user_prompt)
+            if spec.cycle is not None:
+                if base_solved.structure["world_consistency"] != "consistent":
+                    rejections["base_world_inconsistent"] += 1
+                    continue
+                if base_solved.structure["semantic_subtype"] != subtype:
+                    rejections["wrong_base_semantic_subtype"] += 1
+                    continue
+            if spec.cycle is not None:
+                anchor = (
+                    base_solved.structure["reference"]
+                    if question_type == 0
+                    else base_solved.structure["query_reference"]
+                )
+                user_prompt = _inject_cycle(
+                    user_prompt,
+                    base_solved.objects,
+                    anchor,
+                    spec.relation_mode,
+                    spec.cycle,
+                    rng,
+                )
             solved = self.solver.solve_and_analyze(user_prompt)
             grade = solved.grade
             difficulty = solved.structure
             if not grade.accept or len(grade.options) != 5:
                 rejections["solver_rejected"] += 1
                 continue
-            if difficulty["semantic_subtype"] != subtype:
+            expected_subtype = (
+                {0: "dir-cycle", 1: "which-cycle", 2: "count-cycle"}[
+                    question_type
+                ]
+                if spec.cycle
+                and spec.cycle.world_consistency is WorldConsistency.INCONSISTENT
+                else subtype
+            )
+            if difficulty["semantic_subtype"] != expected_subtype:
                 rejections["wrong_semantic_subtype"] += 1
                 continue
             expected_mix = {
@@ -874,6 +1100,30 @@ class SpatialGenerator:
             if difficulty["relation_mix"] != expected_mix:
                 rejections["wrong_relation_mode"] += 1
                 continue
+            if spec.cycle is not None:
+                expected_axes = (
+                    []
+                    if spec.cycle.world_consistency is WorldConsistency.CONSISTENT
+                    else ["x", "y"]
+                    if spec.cycle.axes is CycleAxes.BOTH
+                    else [spec.cycle.axes.value]
+                )
+                if difficulty["cycle_axes"] != expected_axes:
+                    rejections["wrong_cycle_axes"] += 1
+                    continue
+                if spec.cycle.world_consistency is WorldConsistency.INCONSISTENT:
+                    if difficulty["cycle_topology"] != spec.cycle.topology.value:
+                        rejections["wrong_cycle_topology"] += 1
+                        continue
+                    if difficulty["cycle_placement"] != spec.cycle.placement.value:
+                        rejections["wrong_cycle_placement"] += 1
+                        continue
+                    if any(
+                        length != spec.cycle.length
+                        for length in difficulty["cycle_lengths"].values()
+                    ):
+                        rejections["wrong_cycle_length"] += 1
+                        continue
             if (
                 spec.constraints.require_independent_axes
                 and difficulty["axes_independent"] is not True
@@ -918,6 +1168,7 @@ class SpatialGenerator:
                 ),
                 oracle_option=grade.raw,
                 difficulty=difficulty,
+                base_semantic_subtype=subtype,
             )
         raise GenerationError(spec, spec.max_attempts, rejections)
 

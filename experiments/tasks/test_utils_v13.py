@@ -20,6 +20,7 @@ def test_v13_loader_preserves_solver_measured_difficulty() -> None:
                     {"role": "assistant", "content": "<think>x</think>\nAnswer: B, D"},
                 ],
                 "oracle_option": "B,D",
+                "base_semantic_subtype": "dir-1",
                 "difficulty": {
                     "relation_mix": "mixed",
                     "x_depth": 2,
@@ -38,6 +39,7 @@ def test_v13_loader_preserves_solver_measured_difficulty() -> None:
     assert converted == {
         "text": "question",
         "oracle_option": "B,D",
+        "base_semantic_subtype": "dir-1",
         "difficulty": {
             "relation_mix": "mixed",
             "x_depth": 2,

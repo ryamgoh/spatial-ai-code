@@ -7,6 +7,8 @@ Run with:
 
 from __future__ import annotations
 
+import pytest
+
 from spatial_solver_v13 import SpatialSolverV13
 
 
@@ -206,3 +208,81 @@ def test_solver_classifies_query_branch_and_disconnected_distractors() -> None:
     assert structure["disconnected_distractor_statement_indices"] == [5]
     assert structure["num_relevant_relations"] == 4
     assert structure["num_distractor_relations"] == 2
+
+
+@pytest.mark.parametrize(
+    "question,options",
+    [
+        (
+            "In which direction is the Library relative to the Bank?",
+            {
+                "A": "Northeast",
+                "B": "Northwest",
+                "C": "Southeast",
+                "D": "Southwest",
+                "E": "Cannot be determined",
+            },
+        ),
+        (
+            "Which object is in the East of the Bank?",
+            {
+                "A": "Library",
+                "B": "Museum",
+                "C": "Zoo",
+                "D": "Park",
+                "E": "Cannot be determined",
+            },
+        ),
+        (
+            "How many objects are in the East of the Bank?",
+            {
+                "A": "0",
+                "B": "1",
+                "C": "2",
+                "D": "3",
+                "E": "Cannot be determined",
+            },
+        ),
+    ],
+)
+def test_any_global_cycle_overrides_every_question_family(
+    question: str, options: dict[str, str]
+) -> None:
+    text = prompt(
+        [
+            "The Library is to the East of the Bank.",
+            "The Museum is to the North of the Zoo.",
+            "The Zoo is to the North of the Park.",
+            "The Park is to the North of the Museum.",
+        ],
+        question,
+        options,
+    )
+
+    solved = SOLVER.solve_and_analyze(text)
+
+    assert solved.grade.raw == "E"
+    assert solved.structure["world_consistency"] == "inconsistent"
+    assert solved.structure["cycle_axes"] == ["y"]
+    assert solved.structure["cycle_topology"] == "indirect"
+    assert solved.structure["cycle_placement"] == "disconnected"
+    assert solved.structure["cycle_witnesses"]["y"][0] == (
+        solved.structure["cycle_witnesses"]["y"][-1]
+    )
+
+
+def test_consistent_world_is_not_overridden() -> None:
+    text = prompt(
+        [
+            "The Library is to the East of the Bank.",
+            "The Library is to the North of the Bank.",
+        ],
+        "In which direction is the Library relative to the Bank?",
+        DIR_OPTIONS,
+    )
+
+    solved = SOLVER.solve_and_analyze(text)
+
+    assert solved.grade.raw == "A"
+    assert solved.structure["world_consistency"] == "consistent"
+    assert solved.structure["cycle_axes"] == []

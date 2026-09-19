@@ -129,6 +129,176 @@ class SpatialSolverV13(SpatialSolver):
         )
 
     @staticmethod
+    def _find_cycle(
+        edges: list[tuple[str, str, int]],
+    ) -> tuple[list[str], list[int]] | None:
+        """Return one closed directed-cycle witness and its statement ids."""
+        adjacency: dict[str, list[tuple[str, int]]] = {}
+        for source, target, statement_index in edges:
+            adjacency.setdefault(source, []).append((target, statement_index))
+        visited: set[str] = set()
+        active: set[str] = set()
+        node_stack: list[str] = []
+        edge_stack: list[int] = []
+
+        def visit(node: str) -> tuple[list[str], list[int]] | None:
+            visited.add(node)
+            active.add(node)
+            node_stack.append(node)
+            for neighbor, statement_index in sorted(adjacency.get(node, [])):
+                if neighbor not in visited:
+                    edge_stack.append(statement_index)
+                    found = visit(neighbor)
+                    if found:
+                        return found
+                    edge_stack.pop()
+                elif neighbor in active:
+                    cycle_start = node_stack.index(neighbor)
+                    return (
+                        node_stack[cycle_start:] + [neighbor],
+                        edge_stack[cycle_start:] + [statement_index],
+                    )
+            node_stack.pop()
+            active.remove(node)
+            return None
+
+        for node in sorted(adjacency):
+            if node not in visited:
+                found = visit(node)
+                if found:
+                    return found
+        return None
+
+    @staticmethod
+    def _query_anchors(question_part: str) -> set[str]:
+        direction_query = re.search(
+            r"In which direction is ([^?]+?) relative to ([^?]+?)\?",
+            question_part,
+        )
+        if direction_query:
+            return {
+                _strip_the(direction_query.group(1)),
+                _strip_the(direction_query.group(2)),
+            }
+        set_query = re.search(
+            r"(?:Which object is|How many objects are) in the \w+ of ([^?]+?)\?",
+            question_part,
+        )
+        return {_strip_the(set_query.group(1))} if set_query else set()
+
+    @staticmethod
+    def _connected_nodes(
+        relations: list[tuple[str, str, str, int]], anchors: set[str]
+    ) -> set[str]:
+        adjacency: dict[str, set[str]] = {}
+        for a, _direction, b, _statement_index in relations:
+            adjacency.setdefault(a, set()).add(b)
+            adjacency.setdefault(b, set()).add(a)
+        connected = set(anchors)
+        frontier = list(anchors)
+        while frontier:
+            node = frontier.pop()
+            for neighbor in adjacency.get(node, set()):
+                if neighbor not in connected:
+                    connected.add(neighbor)
+                    frontier.append(neighbor)
+        return connected
+
+    def _global_cycle_profile(
+        self,
+        relations: list[tuple[str, str, str, int]],
+        question_part: str,
+    ) -> dict[str, Any]:
+        x_edges: list[tuple[str, str, int]] = []
+        y_edges: list[tuple[str, str, int]] = []
+        for a, direction, b, statement_index in relations:
+            x_part, y_part = _axis_edges(a, direction, b)
+            x_edges.extend(
+                (source, target, statement_index) for source, target in x_part
+            )
+            y_edges.extend(
+                (source, target, statement_index) for source, target in y_part
+            )
+        witnesses = {
+            axis: witness
+            for axis, edges in (("x", x_edges), ("y", y_edges))
+            if (witness := self._find_cycle(edges)) is not None
+        }
+        axes = sorted(witnesses)
+        statement_indices = sorted(
+            {index for _nodes, indices in witnesses.values() for index in indices}
+        )
+        cycle_nodes = {node for nodes, _indices in witnesses.values() for node in nodes}
+        connected = self._connected_nodes(relations, self._query_anchors(question_part))
+        placement = (
+            "none"
+            if not axes
+            else "query-connected"
+            if cycle_nodes & connected
+            else "disconnected"
+        )
+        cycle_lengths = [len(indices) for _nodes, indices in witnesses.values()]
+        topology = (
+            "none"
+            if not cycle_lengths
+            else "direct"
+            if max(cycle_lengths) == 2
+            else "indirect"
+        )
+        return {
+            "world_consistency": "inconsistent" if axes else "consistent",
+            "cycle_axes": axes,
+            "cycle_topology": topology,
+            "cycle_placement": placement,
+            "cycle_statement_indices": statement_indices,
+            "cycle_lengths": {
+                axis: len(indices)
+                for axis, (_nodes, indices) in witnesses.items()
+            },
+            "cycle_witnesses": {
+                axis: nodes for axis, (nodes, _indices) in witnesses.items()
+            },
+        }
+
+    def grade(self, text: str) -> Grade:
+        """Apply global world consistency before the inherited query rules."""
+        objects, relations, question_part = self._parse_indexed_relations(text)
+        cycle_profile = self._global_cycle_profile(relations, question_part)
+        if cycle_profile["world_consistency"] == "consistent":
+            return super().grade(text)
+        options = self.parse_options(question_part)
+        q_type = self.detect_type(question_part)
+        gold_keys = [
+            key
+            for key in sorted(options)
+            if self.is_undetermined_option(options[key])
+        ]
+        verdicts = [
+            (
+                key,
+                value,
+                key in gold_keys,
+                (
+                    "the complete premise set is inconsistent"
+                    if key in gold_keys
+                    else "the world is inconsistent, so no content answer is reliable"
+                ),
+            )
+            for key, value in sorted(options.items())
+        ]
+        raw = ",".join(gold_keys) if gold_keys else "No valid options found"
+        return Grade(
+            raw=raw,
+            q_type=q_type,
+            options=options,
+            verdicts=verdicts,
+            x_rel="unknown",
+            y_rel="unknown",
+            x_conflict="x" in cycle_profile["cycle_axes"],
+            y_conflict="y" in cycle_profile["cycle_axes"],
+        )
+
+    @staticmethod
     def _shortest_path(
         edges: list[tuple[str, str, int]], start: str, end: str
     ) -> tuple[list[str] | None, list[int]]:
@@ -238,7 +408,17 @@ class SpatialSolverV13(SpatialSolver):
     def solve_and_analyze(self, text: str) -> SolvedProblem:
         """Grade and structurally analyse a rendered prompt in one pass."""
         objects, relations, question_part = self._parse_indexed_relations(text)
+        local_grade = super().grade(text)
         grade = self.grade(text)
+        cycle_profile = self._global_cycle_profile(relations, question_part)
+        local_subtype = self._semantic_subtype(local_grade)
+        final_subtype = (
+            {0: "dir-cycle", 1: "which-cycle", 2: "count-cycle"}.get(
+                grade.q_type, "unknown-cycle"
+            )
+            if cycle_profile["world_consistency"] == "inconsistent"
+            else local_subtype
+        )
         directions = [direction for _, direction, _, _ in relations]
         cardinal_count = sum(direction in {"north", "south", "east", "west"} for direction in directions)
         diagonal_count = len(directions) - cardinal_count
@@ -253,7 +433,8 @@ class SpatialSolverV13(SpatialSolver):
 
         result: dict[str, Any] = {
             "question_type": self.detect_type(question_part),
-            "semantic_subtype": self._semantic_subtype(grade),
+            "local_semantic_subtype": local_subtype,
+            "semantic_subtype": final_subtype,
             "num_entities": len(objects),
             "num_relations": len(relations),
             "num_cardinal_relations": cardinal_count,
@@ -269,8 +450,8 @@ class SpatialSolverV13(SpatialSolver):
             "y_supporting_statements": [],
             "shared_supporting_statements": [],
             "axes_independent": None,
-            "x_conflict": False,
-            "y_conflict": False,
+            "x_conflict": "x" in cycle_profile["cycle_axes"],
+            "y_conflict": "y" in cycle_profile["cycle_axes"],
             "relevant_statement_indices": [],
             "distractor_statement_indices": [],
             "num_relevant_relations": 0,
@@ -279,6 +460,7 @@ class SpatialSolverV13(SpatialSolver):
             "query_branch_distractor_statement_indices": [],
             "num_disconnected_distractors": 0,
             "num_query_branch_distractors": 0,
+            **cycle_profile,
         }
         x_edges: list[tuple[str, str, int]] = []
         y_edges: list[tuple[str, str, int]] = []
@@ -289,6 +471,17 @@ class SpatialSolverV13(SpatialSolver):
             )
             y_edges.extend(
                 (source, dest, statement_index) for source, dest in y_part
+            )
+
+        if cycle_profile["world_consistency"] == "inconsistent":
+            return SolvedProblem(
+                grade=grade,
+                structure=result,
+                objects=tuple(objects),
+                relations=tuple(
+                    (a, direction, b) for a, direction, b, _ in relations
+                ),
+                question_part=question_part,
             )
 
         query = re.search(

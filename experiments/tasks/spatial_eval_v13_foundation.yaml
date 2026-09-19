@@ -27,4 +27,4 @@ metric_list:
     higher_is_better: true
 metadata:
   version: 1.0
-  note: "Exp 13 semantic grid, independent-axis depth cells, and structured distractors; difficulty metadata comes from SpatialSolverV13"
+  note: "Exp 13 semantic grid, depth/distractor cells, and global-consistency cases; difficulty metadata comes from SpatialSolverV13"

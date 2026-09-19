@@ -150,6 +150,9 @@ def process_docs_v13_sft(dataset):
         return {
             "text": user_content,
             "oracle_option": str(doc.get("oracle_option") or ""),
+            "base_semantic_subtype": str(
+                doc.get("base_semantic_subtype") or ""
+            ),
             "difficulty": dict(doc.get("difficulty") or {}),
             "difficulty_schema_version": int(
                 doc.get("difficulty_schema_version") or 1

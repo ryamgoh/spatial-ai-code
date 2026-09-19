@@ -9,6 +9,10 @@ import re
 import pytest
 
 from spatial_generation_v13 import (
+    CycleAxes,
+    CyclePlacement,
+    CycleSpec,
+    CycleTopology,
     DepthRange,
     DistractorPolicy,
     DistractorSpec,
@@ -19,6 +23,7 @@ from spatial_generation_v13 import (
     SemanticSubtype,
     SpatialGenerator,
     StructuralConstraints,
+    WorldConsistency,
     generate_dataset,
 )
 from spatial_solver_v13 import SpatialSolverV13
@@ -57,7 +62,7 @@ def test_generate_accepts_one_coherent_spec() -> None:
     assert row.difficulty["semantic_subtype"] == "dir-1"
     assert row.difficulty["relation_mix"] == "mixed"
     assert row.difficulty["axes_independent"] is True
-    assert row.to_row()["difficulty_schema_version"] == 2
+    assert row.to_row()["difficulty_schema_version"] == 3
 
 
 @pytest.mark.parametrize("relation_mode", tuple(RelationMode))
@@ -400,3 +405,105 @@ def test_distractor_constraints_require_depth_controlled_dir1() -> None:
                 ),
             ),
         )
+
+
+@pytest.mark.parametrize(
+    "semantic_subtype,expected_subtype",
+    [
+        (SemanticSubtype.DIR_1, "dir-cycle"),
+        (SemanticSubtype.WHICH_2, "which-cycle"),
+        (SemanticSubtype.COUNT_1, "count-cycle"),
+    ],
+)
+@pytest.mark.parametrize(
+    "axes,topology,placement,length",
+    [
+        (CycleAxes.X, CycleTopology.DIRECT, CyclePlacement.QUERY_CONNECTED, 2),
+        (CycleAxes.Y, CycleTopology.INDIRECT, CyclePlacement.DISCONNECTED, 3),
+        (CycleAxes.BOTH, CycleTopology.INDIRECT, CyclePlacement.QUERY_CONNECTED, 4),
+    ],
+)
+def test_global_cycle_generation_applies_to_every_question_family(
+    semantic_subtype: SemanticSubtype,
+    expected_subtype: str,
+    axes: CycleAxes,
+    topology: CycleTopology,
+    placement: CyclePlacement,
+    length: int,
+) -> None:
+    cycle = CycleSpec(
+        axes=axes,
+        topology=topology,
+        placement=placement,
+        length=length,
+    )
+    cycle_relations = length
+    fresh_cycle_entities = length - (
+        1 if placement is CyclePlacement.QUERY_CONNECTED else 0
+    )
+    spec = GenerationSpec(
+        semantic_subtype=semantic_subtype,
+        relation_mode=RelationMode.MIXED,
+        cycle=cycle,
+        num_entities=8 + fresh_cycle_entities,
+        num_relations=10 + cycle_relations,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1801))
+    difficulty = example.difficulty
+
+    assert difficulty["world_consistency"] == "inconsistent"
+    assert difficulty["semantic_subtype"] == expected_subtype
+    assert difficulty["cycle_axes"] == (
+        ["x", "y"] if axes is CycleAxes.BOTH else [axes.value]
+    )
+    assert difficulty["cycle_topology"] == topology.value
+    assert difficulty["cycle_placement"] == placement.value
+    assert example.oracle_option in {"A", "B", "C", "D", "E"}
+    trace = assistant_text(example)
+    assert "### Consistency Check" in trace
+    assert "The complete map is inconsistent" in trace
+    assert "### Final Deduction" not in trace
+    assert "**Composition**:" not in trace
+
+
+def test_cycle_spec_validates_topology_and_length() -> None:
+    with pytest.raises(ValueError, match="direct cycle.*length 2"):
+        CycleSpec(
+            axes=CycleAxes.X,
+            topology=CycleTopology.DIRECT,
+            placement=CyclePlacement.DISCONNECTED,
+            length=3,
+        )
+    with pytest.raises(ValueError, match="indirect cycle.*at least 3"):
+        CycleSpec(
+            axes=CycleAxes.Y,
+            topology=CycleTopology.INDIRECT,
+            placement=CyclePlacement.DISCONNECTED,
+            length=2,
+        )
+
+
+def test_near_cycle_control_preserves_base_answer_and_has_no_cycle() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.WHICH_2,
+        relation_mode=RelationMode.MIXED,
+        cycle=CycleSpec(
+            axes=CycleAxes.Y,
+            topology=CycleTopology.INDIRECT,
+            placement=CyclePlacement.DISCONNECTED,
+            length=4,
+            world_consistency=WorldConsistency.CONSISTENT,
+        ),
+        num_entities=13,
+        num_relations=14,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1807))
+
+    assert example.difficulty["world_consistency"] == "consistent"
+    assert example.difficulty["semantic_subtype"] == "which-2"
+    assert example.difficulty["cycle_axes"] == []
+    assert example.difficulty["cycle_topology"] == "none"
+    assert example.difficulty["cycle_placement"] == "none"
+    assert "### Consistency Check" not in assistant_text(example)

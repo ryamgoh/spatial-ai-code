@@ -310,3 +310,66 @@ def test_cli_rejects_malformed_distractor_cells(tmp_path) -> None:
 
     assert result.exit_code != 0
     assert "distractor cell" in result.output.lower()
+
+
+def test_cli_generates_global_cycle_cells_and_matched_controls(tmp_path) -> None:
+    output = tmp_path / "cycles.jsonl"
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(output),
+            "--subtypes",
+            "",
+            "--samples-per-cell",
+            "0",
+            "--independent-mixed-dir1",
+            "0",
+            "--cycle-cells",
+            (
+                "dir-1:mixed:x:direct:query-connected:2:2,"
+                "which-2:mixed:y:indirect:disconnected:3:2,"
+                "count-1:mixed:both:indirect:query-connected:4:2"
+            ),
+            "--cycle-controls",
+            "--test-split",
+            "0",
+            "--seed",
+            "13",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "cycles_train.jsonl").read_text().splitlines()
+    ]
+    assert len(rows) == 12
+    invalid = [row for row in rows if row["difficulty"]["world_consistency"] == "inconsistent"]
+    controls = [row for row in rows if row["difficulty"]["world_consistency"] == "consistent"]
+    assert len(invalid) == len(controls) == 6
+    assert {row["difficulty"]["semantic_subtype"] for row in invalid} == {
+        "dir-cycle",
+        "which-cycle",
+        "count-cycle",
+    }
+    assert {row["base_semantic_subtype"] for row in rows} == {
+        "dir-1",
+        "which-2",
+        "count-1",
+    }
+
+
+def test_cli_rejects_malformed_cycle_cells(tmp_path) -> None:
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(tmp_path / "bad-cycle.jsonl"),
+            "--cycle-cells",
+            "which-2:mixed:z:indirect:disconnected:3:2",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "cycle cell" in result.output.lower()

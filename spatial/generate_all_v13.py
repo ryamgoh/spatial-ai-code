@@ -17,6 +17,10 @@ import typer
 from spatial_generation_v13 import (
     DEFAULT_SYSTEM_PROMPT,
     SEMANTIC_SUBTYPES,
+    CycleAxes,
+    CyclePlacement,
+    CycleSpec,
+    CycleTopology,
     DepthRange,
     DistractorPolicy,
     DistractorSpec,
@@ -27,6 +31,7 @@ from spatial_generation_v13 import (
     SemanticSubtype,
     SpatialGenerator,
     StructuralConstraints,
+    WorldConsistency,
     generate_dataset,
 )
 
@@ -152,6 +157,98 @@ def _parse_distractor_cells(raw: str) -> list[GenerationCell]:
                 count=count,
             )
         )
+    return cells
+
+
+def _parse_cycle_cells(raw: str, *, include_controls: bool) -> list[GenerationCell]:
+    if not raw.strip():
+        return []
+    cells: list[GenerationCell] = []
+    for encoded in raw.split(","):
+        try:
+            (
+                subtype_raw,
+                mode_raw,
+                axes_raw,
+                topology_raw,
+                placement_raw,
+                length_raw,
+                count_raw,
+            ) = encoded.strip().split(":", 6)
+            subtype = SemanticSubtype(subtype_raw)
+            if subtype is SemanticSubtype.DIR_CYCLE:
+                raise ValueError("use a base semantic subtype, not dir-cycle")
+            mode = RelationMode(mode_raw)
+            axes = CycleAxes(axes_raw)
+            topology = CycleTopology(topology_raw)
+            placement = CyclePlacement(placement_raw)
+            length = int(length_raw)
+            count = int(count_raw)
+            if count < 0:
+                raise ValueError("count must be non-negative")
+            inconsistent = CycleSpec(
+                axes=axes,
+                topology=topology,
+                placement=placement,
+                length=length,
+            )
+            cycle_relations = (
+                length * 2
+                if axes is CycleAxes.BOTH and mode is RelationMode.CARDINAL
+                else length
+            )
+            # One fixed overall budget for the invalid cell and its open-chain
+            # control. The control uses one extra fresh node but the same edge
+            # count, so prompt length and relation count remain matched.
+            control_cycle_nodes = length + 1
+            fresh_cycle_entities = control_cycle_nodes - (
+                1 if placement is CyclePlacement.QUERY_CONNECTED else 0
+            )
+            num_entities = 8 + fresh_cycle_entities
+            num_relations = 10 + cycle_relations
+        except ValueError as exc:
+            raise typer.BadParameter(
+                f"invalid cycle cell '{encoded}': {exc}; expected "
+                "SUBTYPE:MODE:AXES:TOPOLOGY:PLACEMENT:LENGTH:COUNT",
+                param_hint="--cycle-cells",
+            ) from exc
+        base_name = (
+            f"{subtype.value}-{mode.value}-cycle-{axes.value}-"
+            f"{topology.value}-{placement.value}-l{length}"
+        )
+        cells.append(
+            GenerationCell(
+                name=base_name,
+                spec=GenerationSpec(
+                    semantic_subtype=subtype,
+                    relation_mode=mode,
+                    cycle=inconsistent,
+                    num_entities=num_entities,
+                    num_relations=num_relations,
+                ),
+                count=count,
+            )
+        )
+        if include_controls:
+            cells.append(
+                GenerationCell(
+                    name=base_name + "-control",
+                    spec=GenerationSpec(
+                        semantic_subtype=subtype,
+                        relation_mode=mode,
+                        cycle=CycleSpec(
+                            axes=axes,
+                            topology=topology,
+                            placement=placement,
+                            length=length,
+                            world_consistency=WorldConsistency.CONSISTENT,
+                        ),
+                        num_entities=num_entities,
+                        num_relations=num_relations,
+                    ),
+                    count=count,
+                )
+            )
     return cells
 
 
@@ -338,6 +435,19 @@ def main(
             "MODE:XxY:POLICY:DISTRACTORS:COUNT."
         ),
     ),
+    cycle_cells: str = typer.Option(
+        "",
+        "--cycle-cells",
+        help=(
+            "Global-cycle cells as "
+            "SUBTYPE:MODE:AXES:TOPOLOGY:PLACEMENT:LENGTH:COUNT."
+        ),
+    ),
+    cycle_controls: bool = typer.Option(
+        True,
+        "--cycle-controls/--no-cycle-controls",
+        help="Generate a matched consistent open-chain control per cycle cell.",
+    ),
     test_split: float = typer.Option(0.2, min=0.0, max=1.0),
     seed: int = typer.Option(13),
 ) -> None:
@@ -364,7 +474,7 @@ def main(
             "select at least one relation mode", param_hint="--relation-modes"
         )
     if not selected_subtypes and independent_mixed_dir1 == 0:
-        if depth_cells.strip() or distractor_cells.strip():
+        if depth_cells.strip() or distractor_cells.strip() or cycle_cells.strip():
             pass
         else:
             raise typer.BadParameter(
@@ -378,6 +488,9 @@ def main(
     )
     cells.extend(_parse_depth_cells(depth_cells))
     cells.extend(_parse_distractor_cells(distractor_cells))
+    cells.extend(
+        _parse_cycle_cells(cycle_cells, include_controls=cycle_controls)
+    )
     train_path, test_path = generate_dataset(
         cells,
         output_file=out,

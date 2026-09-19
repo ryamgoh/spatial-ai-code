@@ -39,10 +39,10 @@ At the default 100 rows per cell, this produces 3,900 ordinary rows plus 100
 independent-axis rows. This is a balanced construction interface, not yet the
 final 1.5k/6k/18k experiment split recipe.
 
-The current implementation now supports solver-verified X/Y proof-depth ranges
-and structured distractors for independent-axis `dir-1` cells. It does **not**
-yet change contradiction scope; that remains a separate decision-gated
-iteration.
+The current implementation supports solver-verified X/Y proof-depth ranges,
+structured distractors, and global world-consistency checks. Any X/Y cycle
+anywhere in the rendered premises invalidates the world before Type 0, Type 1,
+or Type 2 query evaluation.
 
 Foundation smoke command:
 
@@ -68,6 +68,7 @@ The generator exposes the two foundational dimensions independently:
 | optional structural cell | `mixed-dir-1-independent` |
 | proof depth | exact or ranged X/Y depths for independent `dir-1` in cardinal/mixed mode |
 | distractor policy | exact-count `disconnected` or `query-branch` relations on depth-controlled `dir-1` |
+| world consistency | globally consistent, or an X/Y/both-axis direct/indirect cycle with query-connected/disconnected placement |
 
 Python callers should request any mixture as explicit `GenerationCell` values
 passed to `generate_dataset`. The compatibility `batch_generate` adapter and
@@ -258,6 +259,66 @@ or Y proof. Distractor cells currently use exact rather than ranged proof
 depths so their total relation count is explicit and auditable. New rows use
 `generator_version=v13.3-structured-distractors` and
 `difficulty_schema_version=2`.
+
+### Global-consistency cells
+
+V13 treats every premise as an objectively true statement about one world. A
+cycle on either axis therefore makes the complete world unrealizable and
+overrides every question family with `Cannot be determined`:
+
+```text
+parse all premises
+    → detect a cycle anywhere on X or Y
+        → inconsistent world: Cannot be determined
+        → consistent world: evaluate the direction/which/count query
+```
+
+`CycleSpec` is orthogonal to the base semantic subtype:
+
+```python
+GenerationSpec(
+    semantic_subtype=SemanticSubtype.WHICH_2,
+    relation_mode=RelationMode.MIXED,
+    cycle=CycleSpec(
+        axes=CycleAxes.Y,
+        topology=CycleTopology.INDIRECT,
+        placement=CyclePlacement.DISCONNECTED,
+        length=3,
+    ),
+    num_entities=11,
+    num_relations=13,
+)
+```
+
+The final solver subtype becomes `dir-cycle`, `which-cycle`, or `count-cycle`.
+Top-level `base_semantic_subtype` preserves the consistent question constructed
+before cycle injection. Solver metadata records `world_consistency`, cycle
+axes, direct/indirect topology, query-connected/disconnected placement, cycle
+lengths, statement indices, and one closed witness per cyclic axis.
+
+The CLI format is
+`BASE_SUBTYPE:MODE:AXES:TOPOLOGY:PLACEMENT:LENGTH:COUNT`:
+
+```bash
+cd spatial
+uv run --no-project --with typer python generate_all_v13.py \
+  --out ../data/spatial_sft_v13_cycles.jsonl \
+  --subtypes '' \
+  --samples-per-cell 0 \
+  --independent-mixed-dir1 0 \
+  --cycle-cells \
+    dir-1:mixed:x:direct:query-connected:2:100,which-2:mixed:y:indirect:disconnected:3:100,count-1:mixed:both:indirect:query-connected:4:100 \
+  --cycle-controls \
+  --test-split 0.2 \
+  --seed 13
+```
+
+Matched controls are enabled by default. Each control replaces the closed cycle
+with an open chain while preserving the base question family, requested axis,
+placement intent, relation count, and total entity budget. Invalid-world traces
+show the closed witness under `### Consistency Check` and stop before local
+query deduction. New rows use `generator_version=v13.4-global-consistency` and
+`difficulty_schema_version=3`.
 
 ## Motivation
 
@@ -518,6 +579,15 @@ construction is not testing the intended capability.
 **New lever:** replace the recognizable direct-reversal pattern with varied
 conflict structures.
 
+**Decision:** all premises describe one objectively true world, so any cycle
+on either axis invalidates the complete problem. Placement remains an
+evaluation dimension measuring detection difficulty; it never changes the
+gold. This applies equally to direction, which-object, and count questions.
+
+**Implementation status:** global X/Y cycle detection, closed witnesses,
+direct/indirect topology, query-connected/disconnected placement, all three
+question families, and matched acyclic open-chain controls are implemented.
+
 Possible ordered additions:
 
 1. direct relevant reversal;
@@ -527,14 +597,9 @@ Possible ordered additions:
 5. irrelevant cycle connected to one query entity; and
 6. multiple cycles where only one can affect the query.
 
-Before generating these cases, define the oracle semantics precisely:
-
-> Does a cycle invalidate an entire connected axis component, or only a
-> conclusion whose proof depends on the inconsistent region?
-
-The chosen rule must be deterministic, solver-backed, and visible in the task
-contract. The model should not be rewarded for the shortcut "any contradiction
-anywhere means Cannot be determined."
+The intended rule is explicitly "any contradiction anywhere means Cannot be
+determined." Matched open-chain controls prevent shortcutting on cycle length,
+placement, prompt size, or recurring entities.
 
 ### Test buckets
 
@@ -648,9 +713,9 @@ Rough calibration targets, not acceptance requirements:
 
 ## Immediate next step
 
-Generate a small paired evaluation in which proof depth is held fixed and only
-distractor topology changes: no distractors versus disconnected versus
-query-branch. Include at least `3x4` and `6x8`, then evaluate the untuned and
-current SFT models. This isolates whether connected plausible branches add
-difficulty beyond proof length before moving to contradiction relevance and
-scope.
+Generate one compact diagnostic suite spanning the implemented dimensions
+before adding another mechanism: proof depth, distractor topology, and global
+cycles with matched open-chain controls across all three question families.
+Evaluate the untuned model and current v12 SFT adapter first; use their
+bucket-level failure curves to choose the final 1.5k/6k training mixture and
+structural holdouts.
