@@ -565,6 +565,11 @@ def main(
         "--relation-modes",
         help="Comma-separated relation modes to cross with all 13 subtypes.",
     ),
+    subtypes: str = typer.Option(
+        ",".join(SEMANTIC_SUBTYPES),
+        "--subtypes",
+        help="Comma-separated semantic subtypes to generate.",
+    ),
     samples_per_cell: int = typer.Option(
         100, min=0, help="Rows for each relation-mode × semantic-subtype cell."
     ),
@@ -576,11 +581,35 @@ def main(
     test_split: float = typer.Option(0.2, min=0.0, max=1.0),
     seed: int = typer.Option(13),
 ) -> None:
-    modes = tuple(mode.strip() for mode in relation_modes.split(",") if mode.strip())
+    modes = tuple(dict.fromkeys(
+        mode.strip() for mode in relation_modes.split(",") if mode.strip()
+    ))
+    selected_subtypes = tuple(dict.fromkeys(
+        subtype.strip() for subtype in subtypes.split(",") if subtype.strip()
+    ))
+    invalid_modes = set(modes) - {"diagonal", "cardinal", "mixed"}
+    if invalid_modes:
+        raise typer.BadParameter(
+            f"unknown relation modes: {sorted(invalid_modes)}",
+            param_hint="--relation-modes",
+        )
+    invalid_subtypes = set(selected_subtypes) - set(SEMANTIC_SUBTYPES)
+    if invalid_subtypes:
+        raise typer.BadParameter(
+            f"unknown semantic subtypes: {sorted(invalid_subtypes)}",
+            param_hint="--subtypes",
+        )
+    if not modes:
+        raise typer.BadParameter("select at least one relation mode", param_hint="--relation-modes")
+    if not selected_subtypes and independent_mixed_dir1 == 0:
+        raise typer.BadParameter(
+            "select at least one semantic subtype or an independent dir-1 count",
+            param_hint="--subtypes",
+        )
     train_path, test_path = batch_generate(
         out,
         relation_modes=modes,
-        subtype_counts={subtype: samples_per_cell for subtype in SEMANTIC_SUBTYPES},
+        subtype_counts={subtype: samples_per_cell for subtype in selected_subtypes},
         independent_mixed_dir1=independent_mixed_dir1,
         test_split=test_split,
         seed=seed,

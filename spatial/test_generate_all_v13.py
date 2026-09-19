@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 import pytest
+from typer.testing import CliRunner
 
-from generate_all_v13 import batch_generate, generate_sample
+from generate_all_v13 import app, batch_generate, generate_sample
 from spatial_solver_v13 import SpatialSolverV13
 
 
@@ -83,11 +85,14 @@ def test_generated_non_direction_questions_round_trip(
     assert sample["difficulty"]["question_type"] == question_type
 
 
+@pytest.mark.parametrize("relation_mode", ("diagonal", "cardinal", "mixed"))
 @pytest.mark.parametrize("subtype", V13_SUBTYPES)
-def test_every_semantic_subtype_round_trips_through_the_solver(subtype: str) -> None:
+def test_every_semantic_subtype_and_relation_mode_round_trips(
+    subtype: str, relation_mode: str
+) -> None:
     sample = generate_sample(
         seed=1313,
-        relation_mode="mixed",
+        relation_mode=relation_mode,
         subtype=subtype,
         num_entities=10,
         num_sentences=15,
@@ -98,6 +103,11 @@ def test_every_semantic_subtype_round_trips_through_the_solver(subtype: str) -> 
     assert sample["oracle_option"] == SOLVER.solve(text) == answer_text(sample)
     assert sample["difficulty"] == SOLVER.analyze(text)
     assert sample["difficulty"]["semantic_subtype"] == subtype
+    assert sample["difficulty"]["relation_mix"] == {
+        "diagonal": "diagonal-only",
+        "cardinal": "cardinal-only",
+        "mixed": "mixed",
+    }[relation_mode]
 
 
 def test_mixed_dir1_can_require_independent_axis_evidence() -> None:
@@ -145,3 +155,73 @@ def test_balanced_batch_crosses_modes_and_semantic_subtypes(tmp_path) -> None:
     hard = [row for row in rows if row.get("generation_cell") == "mixed-dir-1-independent"]
     assert len(hard) == 1
     assert hard[0]["difficulty"]["axes_independent"] is True
+
+
+def test_batch_can_generate_an_arbitrary_subset_of_cells(tmp_path) -> None:
+    train_path, _ = batch_generate(
+        str(tmp_path / "subset.jsonl"),
+        relation_modes=("cardinal", "mixed"),
+        subtype_counts={"dir-incomplete": 2, "which-4": 3},
+        test_split=0.0,
+        seed=1337,
+    )
+
+    rows = [json.loads(line) for line in train_path.read_text().splitlines()]
+    assert len(rows) == 10
+    assert {row["generation_cell"] for row in rows} == {
+        "cardinal-dir-incomplete",
+        "cardinal-which-4",
+        "mixed-dir-incomplete",
+        "mixed-which-4",
+    }
+
+
+def test_cli_accepts_requested_relation_and_subtype_subsets(tmp_path) -> None:
+    output = tmp_path / "cli-subset.jsonl"
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(output),
+            "--relation-modes",
+            "cardinal,mixed",
+            "--subtypes",
+            "dir-2,count-omit",
+            "--samples-per-cell",
+            "2",
+            "--independent-mixed-dir1",
+            "0",
+            "--test-split",
+            "0",
+            "--seed",
+            "13",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    train_path = tmp_path / "cli-subset_train.jsonl"
+    rows = [json.loads(line) for line in train_path.read_text().splitlines()]
+    assert len(rows) == 8
+    assert {row["generation_cell"] for row in rows} == {
+        "cardinal-dir-2",
+        "cardinal-count-omit",
+        "mixed-dir-2",
+        "mixed-count-omit",
+    }
+
+
+def test_cli_rejects_unknown_generation_dimensions(tmp_path) -> None:
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(tmp_path / "bad.jsonl"),
+            "--relation-modes",
+            "mixed,teleport",
+            "--subtypes",
+            "dir-1,which-99",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "unknown relation modes" in result.output or "unknown semantic subtypes" in result.output

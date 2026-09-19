@@ -53,6 +53,38 @@ uv run --no-project --with typer python generate_all_v13.py \
   --seed 13
 ```
 
+### Generation matrix
+
+The generator exposes the two foundational dimensions independently:
+
+| dimension | supported values |
+|---|---|
+| relation mode | `diagonal`, `cardinal`, `mixed` |
+| semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-cycle`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
+| optional structural cell | `mixed-dir-1-independent` |
+
+Python callers can request any subset through `batch_generate(relation_modes=...,
+subtype_counts=...)`. The CLI exposes the same selection through
+`--relation-modes` and `--subtypes`. For example, generate only cardinal and
+mixed `dir-2`/`count-omit` cells:
+
+```bash
+cd spatial
+uv run --no-project --with typer python generate_all_v13.py \
+  --out ../data/spatial_sft_v13_subset.jsonl \
+  --relation-modes cardinal,mixed \
+  --subtypes dir-2,count-omit \
+  --samples-per-cell 100 \
+  --independent-mixed-dir1 0 \
+  --test-split 0.2 \
+  --seed 13
+```
+
+Generation fails explicitly for an unknown dimension. Every emitted row is
+accepted only after the solver reclassifies its rendered prompt as the
+requested semantic subtype and relation mode. This means future experiments
+can choose their own cell mixture without adding another generator entrypoint.
+
 ## Motivation
 
 The current spatial task is close to saturated for Qwen3.5-4B after SFT. The
