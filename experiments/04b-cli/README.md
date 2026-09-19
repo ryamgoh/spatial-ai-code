@@ -29,7 +29,7 @@ see both MIG slices. 4a's `finetune.py` already ran as a single process.
 
 These are ours, not Axolotl:
 
-- `finetune/generate_grpo.py` — synthetic GRPO prompts
+- `spatial/generate_grpo.py` — synthetic GRPO prompts
 - `eval/eval_new.py` — two-pass SpatialMap eval
 - this SLURM script — GPU pin, skip/resume, vLLM health, result layout
 

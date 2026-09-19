@@ -160,9 +160,9 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   if [[ -s "$A_GRPO_DATA" ]]; then
     echo "GRPO data already at $A_GRPO_DATA, regenerating would be identical (seeded); skipping"
   else
-    srun uv run python generate_grpo.py --n 300 --seed 42 --out "../$GRPO_DATA"
+    srun uv run python ../spatial/generate_grpo.py --n 300 --seed 42 --out "../$GRPO_DATA"
   fi
-  srun uv run python generate_grpo.py --annotate --out "../$GRPO_DATA"
+  srun uv run python ../spatial/generate_grpo.py --annotate --out "../$GRPO_DATA"
 
   echo "=== [4/5] GRPO 20 steps (GPU0 vLLM serve, GPU1 train) ==="
   CFG=../experiments/04a-smoke/train-grpo-4b-smoke.yaml

@@ -60,7 +60,7 @@ if [[ ! -s "$POOL" ]]; then
   mkdir -p "$SLURM_SUBMIT_DIR/data"
   exec 9>"$SLURM_SUBMIT_DIR/data/.spatial_sft_v12.lock"
   flock 9
-  uv run --no-project --with typer python generate_all_v6.py \
+  uv run --no-project --with typer python ../spatial/generate_all_v6.py \
     --out ../data/spatial_sft_v12_21000_pool.jsonl \
     --test-split 0 \
     --seed 52 \

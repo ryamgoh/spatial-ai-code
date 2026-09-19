@@ -52,7 +52,7 @@ if [[ -s "$A_SFT_DATA" ]]; then
   echo "=== 5k mix already at $SFT_DATA ==="
 else
   echo "=== Generate 5000 Corr-mix traces (seed 42) ==="
-  srun uv run python generate_all.py \
+  srun uv run python ../spatial/generate_all.py \
     --out ../data/spatial_sft_corr_mix_5000.jsonl \
     --test-split 0 \
     --seed 42 \

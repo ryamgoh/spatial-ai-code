@@ -24,7 +24,7 @@ Exp 3/4b `eval-sft`), so train and test match.
 
 ## Training data (5,000, single-letter gold only)
 
-Not the 1,038 eval rows. Synthetic traces from `finetune/generate_all.py`,
+Not the 1,038 eval rows. Synthetic traces from `spatial/generate_all.py`,
 type mix matched to TQA-Corr-Single (count 404 / dir 332 / which 302 of 1,038):
 
 | type | 1-ans n | share |

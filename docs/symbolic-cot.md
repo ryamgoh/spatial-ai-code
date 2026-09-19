@@ -1,6 +1,6 @@
 # Symbolic chain-of-thought for SpatialMap
 
-Design note for the SFT traces in `finetune/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`finetune/generate_all.py`) is frozen.
+Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.
 
@@ -258,8 +258,8 @@ Answer: E
 
 | Piece | Where |
 |---|---|
-| Shared gold rules | `eval/spatial_solver.py` (`SpatialSolver.grade`) — **only** gold |
-| World + traces | `finetune/generate_all_v6.py` proposes a map; keeps the sample iff `grade.accept` |
+| Shared gold rules | `spatial/spatial_solver.py` (`SpatialSolver.grade`) — **only** gold |
+| World + traces | `spatial/generate_all_v6.py` proposes a map; keeps the sample iff `grade.accept` |
 | Type 0 undetermined count | `--num-type0-undetermined` (gold E). No 4-ans flag. |
 | SpatialMap JSONL labels | `eval/clean_v6.py` (calls the same solver) |
 | Old SpatialMap cleaner | `eval/clean_v5.py` (do not edit for this calculus) |

@@ -159,6 +159,31 @@ def check_layout(errors: list[str]) -> None:
         names = ", ".join(path.name for path in root_launchers)
         errors.append(f"root launchers must live with their experiment: {names}")
 
+    expected_spatial_files = {
+        "generate_all.py",
+        "generate_all_v6.py",
+        "generate_grpo.py",
+        "spatial_solver.py",
+        "test_spatial_laws.py",
+    }
+    actual_spatial_files = {
+        path.name for path in (ROOT / "spatial").glob("*.py")
+    }
+    missing = sorted(expected_spatial_files - actual_spatial_files)
+    if missing:
+        errors.append(f"spatial/: missing domain files: {', '.join(missing)}")
+
+    legacy_locations = [
+        ROOT / "eval" / "spatial_solver.py",
+        ROOT / "eval" / "test_spatial_laws.py",
+        ROOT / "finetune" / "generate_all.py",
+        ROOT / "finetune" / "generate_all_v6.py",
+        ROOT / "finetune" / "generate_grpo.py",
+    ]
+    stale = [str(path.relative_to(ROOT)) for path in legacy_locations if path.exists()]
+    if stale:
+        errors.append(f"domain files must live in spatial/: {', '.join(stale)}")
+
 
 def check_documented_launchers(errors: list[str]) -> None:
     paths = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]

@@ -106,7 +106,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [0] v12 21k pool already at $POOL ==="
   else
     echo "=== [0] Generate 21000 v12 traces (seed 52, hierarchical uniform) ==="
-    uv run --no-project --with typer python generate_all_v6.py \
+    uv run --no-project --with typer python ../spatial/generate_all_v6.py \
       --out ../data/spatial_sft_v12_21000_pool.jsonl \
       --test-split 0 \
       --seed 52 \

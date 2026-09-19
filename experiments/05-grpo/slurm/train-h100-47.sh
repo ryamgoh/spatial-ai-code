@@ -19,8 +19,8 @@ source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm/lib/pin-srun-c
 cd finetune
 srun uv sync
 if [[ -s ../spatial_grpo_data.jsonl ]]; then
-  srun uv run python generate_grpo.py --annotate --out ../spatial_grpo_data.jsonl
+  srun uv run python ../spatial/generate_grpo.py --annotate --out ../spatial_grpo_data.jsonl
 else
-  srun uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+  srun uv run python ../spatial/generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 fi
 srun uv run python finetune.py ../experiments/05-grpo/train-grpo-8b.yaml

@@ -58,7 +58,7 @@ SFT QLoRA  →  merge to bf16 (sibling dir)  →  new GRPO LoRA
 
 ### 3.1 Data (prompt-only)
 
-Generator: `finetune/generate_grpo.py` wrapping `generate_all.py`.
+Generator: `spatial/generate_grpo.py` wrapping `generate_all_v6.py`.
 
 - Conversational `prompt` + `oracle_option` (`A` / `A,C`). **No gold CoT.**
 - Mix aligned to cleaned SpatialMap (~32% direction, ~38% which-object, ~30% count), not the SFT 40/40/20 uncertainty mix.
@@ -309,7 +309,7 @@ A longer run where format/outcome stay ~0.2, `frac_reward_zero_std` stays high, 
 | 20-step GRPO LoRA | `experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-vllm` |
 | 2000-prompt GRPO LoRA | `experiments/05-grpo/models/deepseek-r1-qwen3-8b-grpo-h100` |
 | Rewards | `finetune/rewards.py` |
-| Prompt-only data gen | `finetune/generate_grpo.py` |
+| Prompt-only data gen | `spatial/generate_grpo.py` |
 | Probe yaml | `experiments/05-grpo/train-grpo-8b-vllm.yaml` |
 | 2000-prompt yaml (H200 or H100) | `experiments/05-grpo/train-grpo-8b-vllm-h100.yaml` |
 | Train **2× H200 141GB** (preferred) | `experiments/05-grpo/slurm/train-h200x2.sh` |

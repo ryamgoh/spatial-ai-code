@@ -105,7 +105,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [0] 20k Full-mix pool already at $POOL ==="
   else
     echo "=== [0] Generate 20000 Full-mix traces (seed 42) ==="
-    srun uv run python generate_all.py \
+    srun uv run python ../spatial/generate_all.py \
       --out ../data/spatial_sft_full_scale_20000.jsonl \
       --test-split 0 \
       --seed 42 \

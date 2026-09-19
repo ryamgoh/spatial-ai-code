@@ -3,7 +3,8 @@
 The gold is necessity on two linear orders, not "everything consistent."
 
 Run:
-    cd eval && uv run --with pytest --with typer pytest test_spatial_laws.py -q
+    uv run --python 3.12 --no-project --with pytest --with typer \
+      pytest spatial/test_spatial_laws.py -q
 """
 
 from __future__ import annotations
@@ -16,11 +17,6 @@ from pathlib import Path
 import pytest
 
 from spatial_solver import SpatialSolver
-
-_FINETUNE = Path(__file__).resolve().parent.parent / "finetune"
-if str(_FINETUNE) not in sys.path:
-    sys.path.insert(0, str(_FINETUNE))
-
 
 SOLVER = SpatialSolver()
 

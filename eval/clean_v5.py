@@ -2,7 +2,7 @@
 Spatial Reasoning Question Solver
 ==================================
 Supports three question types (canonical numbering, also used by
-finetune/generate_all.py):
+spatial/generate_all.py):
   Type 0: "In which direction is X relative to Y?"
   Type 1: "Which object is in the [Direction] of X?"
   Type 2: "How many objects are in the [broad direction] of X?"

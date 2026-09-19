@@ -2,7 +2,7 @@
 
 Shared gold rules for:
   eval/clean_v6.py            — re-label SpatialMap JSONL
-  finetune/generate_all_v6.py — proposes a map; this class is the only gold
+  spatial/generate_all_v6.py  — proposes a map; this class is the only gold
 
 Type 0: unique compound / two remaining compounds / E. Never A,B,C,D.
 Type 1: only entities proven on every required axis. No all-four fallback.

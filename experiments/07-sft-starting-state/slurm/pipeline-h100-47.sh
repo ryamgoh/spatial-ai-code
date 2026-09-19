@@ -60,7 +60,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [0/4] SFT data already at $SFT_DATA ==="
   else
     echo "=== [0/4] Generate 5000 single-answer traces (seed 42) ==="
-    srun uv run python generate_all.py \
+    srun uv run python ../spatial/generate_all.py \
       --out ../data/spatial_sft_single_5000.jsonl \
       --test-split 0 \
       --seed 42 \

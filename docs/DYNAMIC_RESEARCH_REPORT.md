@@ -60,7 +60,7 @@ chapter for this dissertation.
 
 ## 2. What Changes in Axis Decomposition — and What Doesn't
 
-Your current pipeline (per `finetune/generate_all.py` and `eval/clean_v3.py`):
+Your current pipeline (per `spatial/generate_all.py` and `eval/clean_v3.py`):
 
 1. Assign each entity a **fixed** (x, y) in [0, 100].
 2. Emit relational sentences ("The A is to the Northeast of the B").

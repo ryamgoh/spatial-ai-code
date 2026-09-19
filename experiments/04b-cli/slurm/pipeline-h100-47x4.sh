@@ -155,9 +155,9 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   if [[ -s "$A_GRPO_DATA" ]]; then
     echo "GRPO data already at $A_GRPO_DATA; skipping generate"
   else
-    srun uv run python generate_grpo.py --n 300 --seed 42 --out "../$GRPO_DATA"
+    srun uv run python ../spatial/generate_grpo.py --n 300 --seed 42 --out "../$GRPO_DATA"
   fi
-  srun uv run python generate_grpo.py --annotate --out "../$GRPO_DATA"
+  srun uv run python ../spatial/generate_grpo.py --annotate --out "../$GRPO_DATA"
 
   echo "=== [4/5] GRPO 20 steps (vLLM last GPU, trainer first GPU) ==="
   CUDA_VISIBLE_DEVICES="$VLLM_DEV" \

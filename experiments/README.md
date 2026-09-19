@@ -14,8 +14,9 @@ are post-thesis follow-ups and are not part of the report.
 Exp **9** (mixed-cardinality SFT) was scrapped unused; see
 `archive/09-multi-sft/`.
 
-`eval/` and `finetune/` contain only code and their uv environments — no
-configs. New experiments get a new numbered directory here.
+`spatial/` contains the solver and data generators. `eval/` contains
+evaluation code and dataset cleaners; `finetune/` contains Axolotl training,
+model merging, and reward functions. New experiment configs still belong here.
 
 ## Layout
 

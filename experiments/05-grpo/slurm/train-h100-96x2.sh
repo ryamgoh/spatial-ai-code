@@ -28,10 +28,10 @@ if [[ ! -s "$DATA_2K" ]]; then
     echo "Writing 2000-row subset from $DATA_4K"
     head -n 2000 "$DATA_4K" > "$DATA_2K"
   else
-    srun uv run python generate_grpo.py --n 2000 --out "$DATA_2K"
+    srun uv run python ../spatial/generate_grpo.py --n 2000 --out "$DATA_2K"
   fi
 fi
-srun uv run python generate_grpo.py --annotate --out "$DATA_2K"
+srun uv run python ../spatial/generate_grpo.py --annotate --out "$DATA_2K"
 
 SFT_ADAPTER=../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b
 MERGED=../experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged

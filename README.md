@@ -9,8 +9,9 @@ LM Evaluation Harness with a custom one- or two-stage vLLM backend.
 | Path | Purpose |
 | --- | --- |
 | data/ | Versioned source and evaluation datasets |
-| finetune/ | SFT/GRPO generation and training code |
-| eval/ | Evaluation backend, metrics, and tests |
+| spatial/ | Spatial solver, synthetic generators, and contract tests |
+| finetune/ | Axolotl training, model merging, and reward functions |
+| eval/ | Evaluation backend and dataset cleaners |
 | experiments/<id>/ | One experiment's configs, notes, scripts, logs, and results |
 | experiments/<id>/slurm/ | Slurm launchers for that experiment |
 | experiments/tasks/ | Shared LM Evaluation Harness task definitions |
@@ -65,9 +66,8 @@ Job output is kept with its experiment:
 ## Validate before submitting
 
     python3 tools/validate_repo.py
-    cd eval
     uv run --python 3.12 --no-project --with pytest --with typer \
-      pytest test_spatial_laws.py -q
+      pytest spatial/test_spatial_laws.py -q
 
 The validator is GPU-free. It checks shell syntax, Slurm headers, time limits,
 shared CPU pinning, and local shell-script references. It also parses every

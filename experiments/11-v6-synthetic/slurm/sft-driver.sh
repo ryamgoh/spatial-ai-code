@@ -102,7 +102,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [0] 20k v6 train pool already at $POOL ==="
   else
     echo "=== [0] Generate 20000 v6 traces (seed 42, no test split) ==="
-    uv run --no-project --with typer python generate_all_v6.py \
+    uv run --no-project --with typer python ../spatial/generate_all_v6.py \
       --out ../data/spatial_sft_v6_scale_20000.jsonl \
       --test-split 0 \
       --seed 42 \
@@ -139,7 +139,7 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     echo "=== [0] v6 test split already at $TEST ==="
   else
     echo "=== [0] Generate 4000 v6 test traces (seed 43) ==="
-    uv run --no-project --with typer python generate_all_v6.py \
+    uv run --no-project --with typer python ../spatial/generate_all_v6.py \
       --out ../data/spatial_sft_v6_scale_test.jsonl \
       --test-split 0 \
       --seed 43 \

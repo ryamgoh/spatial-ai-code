@@ -2,7 +2,7 @@
 """SpatialMap TQA with v6 fifth option and SpatialSolver gold.
 
 Reads data/spatialeval_org.jsonl (fallback: spatialeval_cleaned.jsonl).
-Appends one fifth option and re-grades with eval/spatial_solver.py.
+Appends one fifth option and re-grades with spatial/spatial_solver.py.
 
 Writes data/spatialeval_v6_corr.jsonl (1500 rows).
 """
@@ -15,7 +15,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "eval"))
+sys.path.insert(0, str(ROOT / "spatial"))
 from spatial_solver import SpatialSolver  # noqa: E402
 
 ORG = ROOT / "data" / "spatialeval_org.jsonl"

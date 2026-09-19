@@ -2,7 +2,7 @@
 SpatialMap cleaner (v6)
 =======================
 Re-labels SpatialEval JSONL with the shared v6 solver
-(`eval/spatial_solver.py`). Gold matches `finetune/generate_all_v6.py`.
+(`spatial/spatial_solver.py`). Gold matches `spatial/generate_all_v6.py`.
 
   Type 0: unique compound / two remaining compounds / E. Never A,B,C,D.
   Type 1: proven entities only. No all-four fallback.
@@ -10,9 +10,14 @@ Re-labels SpatialEval JSONL with the shared v6 solver
 """
 
 import json
+import sys
+from pathlib import Path
 
 import typer
 
+_SPATIAL_DIR = Path(__file__).resolve().parent.parent / "spatial"
+if str(_SPATIAL_DIR) not in sys.path:
+    sys.path.insert(0, str(_SPATIAL_DIR))
 from spatial_solver import parse_options, parse_problem, solve
 
 

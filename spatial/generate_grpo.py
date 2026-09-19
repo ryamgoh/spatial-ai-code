@@ -3,8 +3,8 @@
 Writes conversational `prompt` + `oracle_option` JSONL. No gold traces.
 
 Usage:
-    cd finetune && uv run python generate_grpo.py
-    cd finetune && uv run python generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+    cd finetune && uv run python ../spatial/generate_grpo.py
+    cd finetune && uv run python ../spatial/generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 """
 
 from __future__ import annotations

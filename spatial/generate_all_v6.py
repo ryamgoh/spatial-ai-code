@@ -17,9 +17,6 @@ from pathlib import Path
 
 import typer
 
-_EVAL_DIR = Path(__file__).resolve().parent.parent / "eval"
-if str(_EVAL_DIR) not in sys.path:
-    sys.path.insert(0, str(_EVAL_DIR))
 from spatial_solver import SpatialSolver  # noqa: E402
 
 _SOLVER = SpatialSolver()
