@@ -5,6 +5,9 @@
 > intentionally provisional: make one structural change, measure it, and pause
 > before choosing the next one.
 
+Pre-training diagnostic findings and their interpretation are recorded in
+[`OBSERVATIONS.md`](./OBSERVATIONS.md).
+
 The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.
