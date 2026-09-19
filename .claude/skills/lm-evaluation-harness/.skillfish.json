@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "lm-evaluation-harness",
+  "owner": "zechenzhangagi",
+  "repo": "ai-research-skills",
+  "path": "11-evaluation/lm-evaluation-harness",
+  "branch": "main",
+  "sha": "49a7222576281c8f04ff6a899e99154733d36a3e",
+  "source": "manual"
+}

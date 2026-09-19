@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "axolotl": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "skillPath": "cli-tool/components/skills/ai-research/fine-tuning-axolotl/SKILL.md",
+      "computedHash": "50c3dbc01b0ed4fb821c3e47cfc21e3b5f1de730e53ea681dc8c42f3e4ae782a"
+    }
+  }
+}
