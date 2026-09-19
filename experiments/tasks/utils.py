@@ -152,6 +152,7 @@ def process_docs_v13_sft(dataset):
             "oracle_option": str(doc.get("oracle_option") or ""),
             "difficulty": dict(doc.get("difficulty") or {}),
             "generator_version": str(doc.get("generator_version") or ""),
+            "generation_cell": str(doc.get("generation_cell") or ""),
         }
 
     return dataset.map(convert)

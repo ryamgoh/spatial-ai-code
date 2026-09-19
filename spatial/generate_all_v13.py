@@ -25,6 +25,21 @@ COMPOUNDS = ["Northeast", "Northwest", "Southeast", "Southwest"]
 DIRECTIONS = ["North", "South", "East", "West", *COMPOUNDS]
 SPECIAL = "Cannot be determined"
 NONE = "None of the Options"
+SEMANTIC_SUBTYPES = (
+    "dir-1",
+    "dir-2",
+    "dir-undetermined",
+    "dir-cycle",
+    "dir-incomplete",
+    "dir-omit",
+    "which-1",
+    "which-2",
+    "which-3",
+    "which-4",
+    "which-0",
+    "count-1",
+    "count-omit",
+)
 
 DEFAULT_SYSTEM_PROMPT = (
     "You are an advanced spatial reasoning agent. Process the spatial "
@@ -65,6 +80,18 @@ def _relation_for_pair(
         direction = east_west
     else:
         direction = north_south
+    x_comp, y_comp = _components(direction)
+    return {
+        "a": a,
+        "b": b,
+        "direction": direction,
+        "x": x_comp,
+        "y": y_comp,
+        "text": f"The {a} is to the {direction} of the {b}.",
+    }
+
+
+def _explicit_relation(a: str, direction: str, b: str) -> dict[str, Any]:
     x_comp, y_comp = _components(direction)
     return {
         "a": a,
@@ -141,6 +168,7 @@ def _direction_prompt(
     y_graph: AxisGraph,
     target_num_answers: int | None,
     rng: random.Random,
+    subtype: str | None = None,
 ) -> str | None:
     x_closure, y_closure = x_graph.get_transitive_closure(), y_graph.get_transitive_closure()
     candidates: list[tuple[str, str]] = []
@@ -153,7 +181,26 @@ def _direction_prompt(
     if not candidates:
         return None
     target, reference = rng.choice(candidates)
-    options = [*COMPOUNDS, SPECIAL]
+    x_state = _status(x_closure, target, reference)
+    y_state = _status(y_closure, target, reference)
+    x_comp = "East" if x_state == "high" else "West" if x_state == "low" else None
+    y_comp = "North" if y_state == "high" else "South" if y_state == "low" else None
+    xs = [x_comp] if x_comp else ["East", "West"]
+    ys = [y_comp] if y_comp else ["North", "South"]
+    possible = [f"{y}{x.lower()}" for y in ys for x in xs]
+    if subtype == "dir-incomplete":
+        if len(possible) != 2:
+            return None
+        kept = rng.choice(possible)
+        pool = [direction for direction in DIRECTIONS if direction not in possible]
+        options = [kept, *rng.sample(pool, 3), SPECIAL]
+    elif subtype == "dir-omit":
+        pool = [direction for direction in DIRECTIONS if direction not in possible]
+        if len(pool) < 4:
+            return None
+        options = [*rng.sample(pool, 4), NONE]
+    else:
+        options = [*COMPOUNDS, SPECIAL]
     rng.shuffle(options)
     return (
         "Consider a map with multiple locations:\n\n"
@@ -301,16 +348,70 @@ def generate_sample(
     num_sentences: int = 10,
     system_prompt: str = DEFAULT_SYSTEM_PROMPT,
     max_attempts: int = 500,
+    subtype: str | None = None,
+    require_independent_axes: bool = False,
 ) -> dict[str, Any] | None:
     """Generate one solver-verified sample at the public v13 seam."""
+    if subtype is not None and subtype not in SEMANTIC_SUBTYPES:
+        raise ValueError(f"unknown v13 semantic subtype: {subtype}")
+    if subtype is not None:
+        if subtype == "dir-1":
+            question_type, target_num_answers = 0, 1
+        elif subtype == "dir-2":
+            question_type, target_num_answers = 0, 2
+        elif subtype in {"dir-undetermined", "dir-cycle"}:
+            question_type, target_num_answers = 0, 0
+        elif subtype in {"dir-incomplete", "dir-omit"}:
+            question_type, target_num_answers = 0, 2 if subtype == "dir-incomplete" else 1
+        elif subtype.startswith("which-"):
+            question_type = 1
+            target_num_answers = int(subtype.split("-", 1)[1])
+        elif subtype == "count-1":
+            question_type, target_num_answers = 2, None
+        else:
+            question_type, target_num_answers = 2, 0
+    if require_independent_axes and not (
+        question_type == 0 and target_num_answers == 1
+    ):
+        raise ValueError(
+            "require_independent_axes currently requires a dir-1 question"
+        )
     rng = random.Random(seed)
     for _ in range(max_attempts):
         entities, relations = _make_scene(rng, num_entities, num_sentences, relation_mode)
+        if subtype == "dir-cycle":
+            target, reference = entities[0], entities[1]
+            if relation_mode == "cardinal":
+                relations.extend(
+                    [
+                        _explicit_relation(target, "East", reference),
+                        _explicit_relation(reference, "East", target),
+                        _explicit_relation(target, "North", reference),
+                        _explicit_relation(reference, "North", target),
+                    ]
+                )
+            else:
+                relations.extend(
+                    [
+                        _explicit_relation(target, "Northeast", reference),
+                        _explicit_relation(reference, "Northeast", target),
+                    ]
+                )
         x_graph, y_graph = _graphs(entities, relations)
         if question_type == 0:
-            user_prompt = _direction_prompt(
-                entities, relations, x_graph, y_graph, target_num_answers, rng
-            )
+            if subtype == "dir-cycle":
+                options = [*COMPOUNDS, SPECIAL]
+                rng.shuffle(options)
+                user_prompt = (
+                    "Consider a map with multiple locations:\n\n"
+                    + " ".join(relation["text"] for relation in relations)
+                    + f"\n\nQuestion: In which direction is the {target} relative to the {reference}? "
+                    + f"Available options: {_options_text(options)}"
+                )
+            else:
+                user_prompt = _direction_prompt(
+                    entities, relations, x_graph, y_graph, target_num_answers, rng, subtype
+                )
         elif question_type == 1:
             user_prompt = _which_prompt(
                 entities, relations, x_graph, y_graph, target_num_answers, rng
@@ -326,7 +427,12 @@ def generate_sample(
         grade = SOLVER.grade(user_prompt)
         if not grade.accept or len(grade.options) != 5:
             continue
-        if question_type == 0:
+        difficulty = SOLVER.analyze(user_prompt)
+        if subtype is not None and difficulty["semantic_subtype"] != subtype:
+            continue
+        if require_independent_axes and difficulty["axes_independent"] is not True:
+            continue
+        if question_type == 0 and subtype not in {"dir-incomplete", "dir-omit", "dir-cycle"}:
             expected = target_num_answers
             is_special = len(grade.letters) == 1 and any(
                 accepted and SOLVER.is_undetermined_option(value)
@@ -343,8 +449,8 @@ def generate_sample(
                 {"role": "assistant", "content": _trace(entities, relations, user_prompt)},
             ],
             "oracle_option": grade.raw,
-            "difficulty": SOLVER.analyze(user_prompt),
-            "generator_version": "v13.0-cardinal-foundation",
+            "difficulty": difficulty,
+            "generator_version": "v13.1-semantic-grid",
         }
         if sample["difficulty"]["relation_mix"] == (
             {"diagonal": "diagonal-only", "cardinal": "cardinal-only", "mixed": "mixed"}[relation_mode]
@@ -356,44 +462,92 @@ def generate_sample(
 def batch_generate(
     output_file: str,
     *,
-    relation_mode: str,
-    num_type0_1_answer: int,
-    num_type0_2_answer: int,
-    num_type0_undetermined: int,
-    num_type1_1_answer: int,
-    num_type2: int,
+    relation_modes: tuple[str, ...] | None = None,
+    subtype_counts: dict[str, int] | None = None,
+    independent_mixed_dir1: int = 0,
     test_split: float,
     seed: int,
+    # Backward-compatible v13.0 foundation interface.
+    relation_mode: str | None = None,
+    num_type0_1_answer: int = 0,
+    num_type0_2_answer: int = 0,
+    num_type0_undetermined: int = 0,
+    num_type1_1_answer: int = 0,
+    num_type2: int = 0,
 ) -> tuple[Path, Path]:
-    plan = [
-        (0, 1, num_type0_1_answer),
-        (0, 2, num_type0_2_answer),
-        (0, 0, num_type0_undetermined),
-        (1, 1, num_type1_1_answer),
-        (2, None, num_type2),
-    ]
+    if not 0.0 <= test_split <= 1.0:
+        raise ValueError("test_split must be between 0 and 1")
+    if relation_modes is None:
+        relation_modes = (relation_mode or "mixed",)
+    invalid_modes = set(relation_modes) - {"diagonal", "cardinal", "mixed"}
+    if invalid_modes:
+        raise ValueError(f"unknown relation modes: {sorted(invalid_modes)}")
+    if subtype_counts is None:
+        subtype_counts = {
+            "dir-1": num_type0_1_answer,
+            "dir-2": num_type0_2_answer,
+            "dir-undetermined": num_type0_undetermined,
+            "which-1": num_type1_1_answer,
+            "count-1": num_type2,
+        }
+    invalid_subtypes = set(subtype_counts) - set(SEMANTIC_SUBTYPES)
+    if invalid_subtypes:
+        raise ValueError(f"unknown semantic subtypes: {sorted(invalid_subtypes)}")
+    if any(count < 0 for count in subtype_counts.values()):
+        raise ValueError("subtype counts must be non-negative")
+    if independent_mixed_dir1 < 0:
+        raise ValueError("independent_mixed_dir1 must be non-negative")
+
     seed_rng = random.Random(seed)
-    rows: list[dict[str, Any]] = []
-    for question_type, target_num_answers, count in plan:
-        for _ in range(count):
+    cells: list[list[dict[str, Any]]] = []
+    for mode in relation_modes:
+        for subtype in SEMANTIC_SUBTYPES:
+            cell: list[dict[str, Any]] = []
+            for _ in range(subtype_counts.get(subtype, 0)):
+                sample = generate_sample(
+                    seed=seed_rng.randrange(2**63),
+                    relation_mode=mode,
+                    subtype=subtype,
+                )
+                if sample is None:
+                    raise RuntimeError(
+                        f"could not generate mode={mode} subtype={subtype}"
+                    )
+                sample["generation_cell"] = f"{mode}-{subtype}"
+                cell.append(sample)
+            if cell:
+                cells.append(cell)
+
+    if independent_mixed_dir1:
+        cell = []
+        for _ in range(independent_mixed_dir1):
             sample = generate_sample(
                 seed=seed_rng.randrange(2**63),
-                relation_mode=relation_mode,
-                question_type=question_type,
-                target_num_answers=target_num_answers,
+                relation_mode="mixed",
+                subtype="dir-1",
+                require_independent_axes=True,
             )
             if sample is None:
-                raise RuntimeError(
-                    f"could not generate qtype={question_type} target={target_num_answers}"
-                )
-            rows.append(sample)
-    seed_rng.shuffle(rows)
-    split_at = len(rows) - int(len(rows) * test_split)
+                raise RuntimeError("could not generate mixed independent dir-1")
+            sample["generation_cell"] = "mixed-dir-1-independent"
+            cell.append(sample)
+        cells.append(cell)
+
+    train_rows: list[dict[str, Any]] = []
+    test_rows: list[dict[str, Any]] = []
+    for cell in cells:
+        seed_rng.shuffle(cell)
+        test_count = int(len(cell) * test_split)
+        split_at = len(cell) - test_count
+        train_rows.extend(cell[:split_at])
+        test_rows.extend(cell[split_at:])
+    seed_rng.shuffle(train_rows)
+    seed_rng.shuffle(test_rows)
     base = Path(output_file)
     train_path = base.with_name(base.stem + "_train.jsonl")
     test_path = base.with_name(base.stem + "_test.jsonl")
     train_path.parent.mkdir(parents=True, exist_ok=True)
-    for path, subset in ((train_path, rows[:split_at]), (test_path, rows[split_at:])):
+    for path, subset in ((train_path, train_rows), (test_path, test_rows)):
         with path.open("w", encoding="utf-8") as handle:
             for row in subset:
                 handle.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -406,23 +560,28 @@ app = typer.Typer(help="v13 cardinal/diagonal synthetic SFT generator")
 @app.command()
 def main(
     out: str = typer.Option("../data/spatial_sft_v13_foundation.jsonl", "--out"),
-    relation_mode: str = typer.Option("mixed", "--relation-mode"),
-    num_type0_1_answer: int = typer.Option(100, min=0),
-    num_type0_2_answer: int = typer.Option(100, min=0),
-    num_type0_undetermined: int = typer.Option(100, min=0),
-    num_type1_1_answer: int = typer.Option(100, min=0),
-    num_type2: int = typer.Option(100, min=0),
+    relation_modes: str = typer.Option(
+        "diagonal,cardinal,mixed",
+        "--relation-modes",
+        help="Comma-separated relation modes to cross with all 13 subtypes.",
+    ),
+    samples_per_cell: int = typer.Option(
+        100, min=0, help="Rows for each relation-mode × semantic-subtype cell."
+    ),
+    independent_mixed_dir1: int = typer.Option(
+        100,
+        min=0,
+        help="Extra mixed dir-1 rows whose shortest X/Y proofs are independent.",
+    ),
     test_split: float = typer.Option(0.2, min=0.0, max=1.0),
     seed: int = typer.Option(13),
 ) -> None:
+    modes = tuple(mode.strip() for mode in relation_modes.split(",") if mode.strip())
     train_path, test_path = batch_generate(
         out,
-        relation_mode=relation_mode,
-        num_type0_1_answer=num_type0_1_answer,
-        num_type0_2_answer=num_type0_2_answer,
-        num_type0_undetermined=num_type0_undetermined,
-        num_type1_1_answer=num_type1_1_answer,
-        num_type2=num_type2,
+        relation_modes=modes,
+        subtype_counts={subtype: samples_per_cell for subtype in SEMANTIC_SUBTYPES},
+        independent_mixed_dir1=independent_mixed_dir1,
         test_split=test_split,
         seed=seed,
     )

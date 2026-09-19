@@ -22,9 +22,36 @@ The first narrow implementation increment is complete:
   synthetic v13 evaluation task definition.
 - Law, generator round-trip, loader, and existing v6 regression tests pass.
 
-This foundation does **not** yet force independent axes, minimum proof depth,
-structured distractors, or new contradiction policies. Those remain separate
-decision-gated iterations below.
+The next accepted increment is also implemented:
+
+- all 13 v12 semantic subtypes are available in every relation mode;
+- subtype labels are inferred from the v13 solver's rendered-prompt verdict,
+  not trusted from generator intent;
+- batch generation crosses 3 relation modes × 13 semantic subtypes;
+- splitting is stratified within each generation cell; and
+- an additional `mixed-dir-1-independent` cell requires the shortest X and Y
+  proofs to share no supporting statement.
+
+At the default 100 rows per cell, this produces 3,900 ordinary rows plus 100
+independent-axis rows. This is a balanced construction interface, not yet the
+final 1.5k/6k/18k experiment split recipe.
+
+The current implementation does **not** yet control minimum proof depth, add
+structured distractors, or change contradiction scope. Independent-axis rows
+can still use short paths; those remain separate decision-gated iterations.
+
+Foundation smoke command:
+
+```bash
+cd spatial
+uv run --no-project --with typer python generate_all_v13.py \
+  --out ../data/spatial_sft_v13_foundation.jsonl \
+  --relation-modes diagonal,cardinal,mixed \
+  --samples-per-cell 100 \
+  --independent-mixed-dir1 100 \
+  --test-split 0.2 \
+  --seed 13
+```
 
 ## Motivation
 
@@ -141,6 +168,11 @@ unless an existing response file is unavailable.
 ## Iteration 1 — cardinal one-axis relations
 
 **New lever:** allow relation sentences that update only one axis.
+
+**Implementation status:** accepted foundation complete. Diagonal-only,
+cardinal-only, and mixed controls are available. The extra mixed hard cell
+verifies that the queried `dir-1` answer actually uses independent X/Y
+evidence; merely containing a cardinal sentence is not sufficient.
 
 Examples:
 
@@ -399,8 +431,9 @@ Rough calibration targets, not acceptance requirements:
 
 ## Immediate next step
 
-Choose the first data experiment from the implemented foundation. The safest
-next step is a small, balanced cardinal/diagonal/mixed dataset and baseline
-evaluation, while still treating **Iteration 0** (the v12 structural census) as
-required evidence before committing to independent-axis or depth-controlled
-generation.
+Run the small balanced cardinal/diagonal/mixed evaluation grid, including the
+independent-axis `dir-1` cell, to measure the untuned and current SFT models.
+Use that result to choose whether Iteration 2 should increase the mass of
+independent-axis examples or proceed to explicit proof-depth bands. The v12
+structural census remains useful supporting evidence, but no later difficulty
+lever should be added before this new cell is measured.

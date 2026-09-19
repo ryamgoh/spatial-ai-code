@@ -153,6 +153,7 @@ class SpatialSolverV13(SpatialSolver):
     def analyze(self, text: str) -> dict[str, Any]:
         """Describe the actual structure recovered from a rendered prompt."""
         objects, relations, question_part = self._parse_indexed_relations(text)
+        grade = self.grade(text)
         directions = [direction for _, direction, _, _ in relations]
         cardinal_count = sum(direction in {"north", "south", "east", "west"} for direction in directions)
         diagonal_count = len(directions) - cardinal_count
@@ -167,6 +168,7 @@ class SpatialSolverV13(SpatialSolver):
 
         result: dict[str, Any] = {
             "question_type": self.detect_type(question_part),
+            "semantic_subtype": self._semantic_subtype(grade),
             "num_entities": len(objects),
             "num_relations": len(relations),
             "num_cardinal_relations": cardinal_count,
@@ -227,6 +229,37 @@ class SpatialSolverV13(SpatialSolver):
             }
         )
         return result
+
+    def _semantic_subtype(self, grade: Grade) -> str:
+        """Classify answer semantics from the solver verdict, not generator intent."""
+        accepted = [
+            value for _, value, is_accepted, _ in grade.verdicts if is_accepted
+        ]
+        if grade.q_type == 0:
+            if grade.x_conflict or grade.y_conflict:
+                return "dir-cycle"
+            if any(self.is_none_of_above(value) for value in accepted):
+                return "dir-omit"
+            if any(self.is_undetermined_option(value) for value in accepted):
+                one_axis_known = (grade.x_rel == "unknown") != (grade.y_rel == "unknown")
+                return "dir-incomplete" if one_axis_known else "dir-undetermined"
+            if len(grade.letters) == 1:
+                return "dir-1"
+            if len(grade.letters) == 2:
+                return "dir-2"
+            return "dir-unknown"
+        if grade.q_type == 1:
+            if any(
+                self.is_none_of_above(value) or self.is_undetermined_option(value)
+                for value in accepted
+            ):
+                return "which-0"
+            return f"which-{len(grade.letters)}"
+        if grade.q_type == 2:
+            if any(self.is_none_of_above(value) for value in accepted):
+                return "count-omit"
+            return "count-1"
+        return "unknown"
 
 
 _SOLVER = SpatialSolverV13()

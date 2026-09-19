@@ -27,4 +27,4 @@ metric_list:
     higher_is_better: true
 metadata:
   version: 1.0
-  note: "Exp 13 cardinal/diagonal foundation; difficulty metadata comes from SpatialSolverV13"
+  note: "Exp 13 balanced semantic grid plus independent-axis dir-1 cell; difficulty metadata comes from SpatialSolverV13"

@@ -27,6 +27,7 @@ def test_v13_loader_preserves_solver_measured_difficulty() -> None:
                     "axes_independent": True,
                 },
                 "generator_version": "v13.0-cardinal-foundation",
+                "generation_cell": "mixed-dir-1-independent",
             }
         ]
     )
@@ -43,4 +44,5 @@ def test_v13_loader_preserves_solver_measured_difficulty() -> None:
             "axes_independent": True,
         },
         "generator_version": "v13.0-cardinal-foundation",
+        "generation_cell": "mixed-dir-1-independent",
     }
