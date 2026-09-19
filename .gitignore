@@ -214,3 +214,7 @@ results/
 # finetune model outputs (moved to experiments/<exp>/models/)
 finetune/outputs/
 experiments/**/models/
+
+# Exp 12 v12 generated data (regenerable from seed 52 via run_batch_12_baseline_eval_h200.sh / make_v12_data.py)
+data/spatial_sft_v12_*.jsonl
+data/spatialeval_v6_corr.jsonl
