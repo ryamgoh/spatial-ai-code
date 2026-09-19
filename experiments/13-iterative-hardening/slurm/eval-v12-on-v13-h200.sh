@@ -65,21 +65,16 @@ cd eval
 srun uv sync || exit 1
 cd "$SLURM_SUBMIT_DIR"
 
+if [[ "${FORCE_DATA:-0}" != "1" && -s "$DATA" ]]; then
+  uv run --no-project python "$EXP/scripts/validate_diagnostic_data.py" "$DATA" || FORCE_DATA=1
+fi
 if [[ "${FORCE_DATA:-0}" == "1" || ! -s "$DATA" ]]; then
   echo "=== Generate frozen V13 diagnostic suite (2,256 rows, seed 1313) ==="
   srun --cpu-bind=cores uv run python spatial/generate_diagnostic_v13.py \
     --out data/spatial_v13_diagnostic.jsonl \
     --seed 1313 || exit 1
 fi
-if [[ ! -s "$DATA" ]]; then
-  echo "Missing $DATA after generation; aborting"
-  exit 1
-fi
-rows=$(wc -l < "$DATA")
-if [[ "$rows" -ne 2256 ]]; then
-  echo "Expected 2256 diagnostic rows, found $rows; use FORCE_DATA=1 to rebuild"
-  exit 1
-fi
+uv run --no-project python "$EXP/scripts/validate_diagnostic_data.py" "$DATA" || exit 1
 
 selected=0
 for row in "${CELLS[@]}"; do

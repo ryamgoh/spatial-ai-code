@@ -762,22 +762,18 @@ class SpatialSolverV13:
     def solve_and_analyze(self, text: str) -> SolvedProblem:
         """Grade and structurally analyse a rendered prompt in one pass."""
         objects, relations, question_part = self._parse_indexed_relations(text)
-        local_grade = self._grade_consistent(
-            objects,
-            relations,
-            question_part,
-            self.parse_options(question_part),
-            self.detect_type(question_part),
-        )
         grade = self.grade(text)
         cycle_profile = self._global_cycle_profile(relations, question_part)
-        local_subtype = self._semantic_subtype(local_grade)
-        final_subtype = (
-            {0: "dir-cycle", 1: "which-cycle", 2: "count-cycle"}.get(
-                grade.q_type, "unknown-cycle"
-            )
+        question_family = {0: "direction", 1: "which", 2: "count"}.get(
+            grade.q_type, "unknown"
+        )
+        # An inconsistent world has no meaningful local query semantics. The
+        # generator may attach its pre-injection, solver-verified base subtype
+        # to a dataset row, but the prompt-only analyser must not invent one.
+        semantic_subtype = (
+            None
             if cycle_profile["world_consistency"] == "inconsistent"
-            else local_subtype
+            else self._semantic_subtype(grade)
         )
         directions = [direction for _, direction, _, _ in relations]
         cardinal_count = sum(direction in {"north", "south", "east", "west"} for direction in directions)
@@ -793,8 +789,8 @@ class SpatialSolverV13:
 
         result: dict[str, Any] = {
             "question_type": self.detect_type(question_part),
-            "local_semantic_subtype": local_subtype,
-            "semantic_subtype": final_subtype,
+            "question_family": question_family,
+            "semantic_subtype": semantic_subtype,
             "num_entities": len(objects),
             "num_relations": len(relations),
             "num_cardinal_relations": cardinal_count,
@@ -962,8 +958,6 @@ class SpatialSolverV13:
             value for _, value, is_accepted, _ in grade.verdicts if is_accepted
         ]
         if grade.q_type == 0:
-            if grade.x_conflict or grade.y_conflict:
-                return "dir-cycle"
             if any(self.is_none_of_above(value) for value in accepted):
                 return "dir-omit"
             if any(self.is_undetermined_option(value) for value in accepted):

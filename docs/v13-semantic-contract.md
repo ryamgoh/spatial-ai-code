@@ -90,9 +90,12 @@ count-1, count-omit
 ```
 
 Cycle is not a base subtype. It is an orthogonal world property applied through
-`CycleSpec`. After global invalidation, the solver reports `dir-cycle`,
-`which-cycle`, or `count-cycle`, while the generated row retains the original
-`base_semantic_subtype`.
+`CycleSpec`. `semantic_subtype` always remains one of the 12 base values, while
+`world_consistency`, `cycle_axes`, `cycle_topology`, and `cycle_placement`
+describe global inconsistency independently. A raw prompt-only solver reports
+`semantic_subtype=null` for an inconsistent world because local question
+semantics are no longer meaningful; a generated dataset row retains the
+pre-injection subtype that was verified on its consistent base prompt.
 
 ## Source of truth
 

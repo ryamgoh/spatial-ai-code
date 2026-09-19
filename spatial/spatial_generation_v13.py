@@ -355,16 +355,16 @@ class GeneratedExample:
     messages: tuple[dict[str, str], ...]
     oracle_option: str
     difficulty: dict[str, Any]
-    base_semantic_subtype: str
-    generator_version: str = "v13.5-diagnostic"
+    semantic_subtype: str
+    generator_version: str = "v13.6-orthogonal-taxonomy"
 
     def to_row(self, *, generation_cell: str | None = None) -> dict[str, Any]:
         row: dict[str, Any] = {
             "messages": [dict(message) for message in self.messages],
             "oracle_option": self.oracle_option,
-            "base_semantic_subtype": self.base_semantic_subtype,
+            "semantic_subtype": self.semantic_subtype,
             "difficulty": dict(self.difficulty),
-            "difficulty_schema_version": 3,
+            "difficulty_schema_version": 4,
             "generator_version": self.generator_version,
         }
         if generation_cell is not None:
@@ -1035,7 +1035,7 @@ class SpatialGenerator:
                     rejections["base_world_inconsistent"] += 1
                     continue
                 if base_solved.structure["semantic_subtype"] != subtype:
-                    rejections["wrong_base_semantic_subtype"] += 1
+                    rejections["wrong_semantic_subtype"] += 1
                     continue
             if spec.cycle is not None:
                 anchor = (
@@ -1053,20 +1053,25 @@ class SpatialGenerator:
                 )
             solved = self.solver.solve_and_analyze(user_prompt)
             grade = solved.grade
-            difficulty = solved.structure
+            difficulty = dict(solved.structure)
+            is_inconsistent = (
+                spec.cycle is not None
+                and spec.cycle.world_consistency is WorldConsistency.INCONSISTENT
+            )
+            solver_subtype = difficulty["semantic_subtype"]
+            if is_inconsistent:
+                if solver_subtype is not None:
+                    rejections["unexpected_inconsistent_semantic_subtype"] += 1
+                    continue
+            elif solver_subtype != subtype:
+                rejections["wrong_semantic_subtype"] += 1
+                continue
+            # The inconsistent prompt alone cannot recover the intended base
+            # subtype. It was verified on the consistent base prompt above,
+            # so retain that orthogonal generation dimension explicitly.
+            difficulty["semantic_subtype"] = subtype
             if not grade.accept or len(grade.options) != 5:
                 rejections["solver_rejected"] += 1
-                continue
-            expected_subtype = (
-                {0: "dir-cycle", 1: "which-cycle", 2: "count-cycle"}[
-                    question_type
-                ]
-                if spec.cycle
-                and spec.cycle.world_consistency is WorldConsistency.INCONSISTENT
-                else subtype
-            )
-            if difficulty["semantic_subtype"] != expected_subtype:
-                rejections["wrong_semantic_subtype"] += 1
                 continue
             expected_mix = {
                 RelationMode.DIAGONAL: "diagonal-only",
@@ -1144,7 +1149,7 @@ class SpatialGenerator:
                 ),
                 oracle_option=grade.raw,
                 difficulty=difficulty,
-                base_semantic_subtype=subtype,
+                semantic_subtype=subtype,
             )
         raise GenerationError(spec, spec.max_attempts, rejections)
 

@@ -263,6 +263,8 @@ def test_any_global_cycle_overrides_every_question_family(
 
     assert solved.grade.raw == "E"
     assert solved.structure["world_consistency"] == "inconsistent"
+    assert solved.structure["question_family"] in {"direction", "which", "count"}
+    assert solved.structure["semantic_subtype"] is None
     assert solved.structure["cycle_axes"] == ["y"]
     assert solved.structure["cycle_topology"] == "indirect"
     assert solved.structure["cycle_placement"] == "disconnected"
@@ -285,6 +287,8 @@ def test_consistent_world_is_not_overridden() -> None:
 
     assert solved.grade.raw == "A"
     assert solved.structure["world_consistency"] == "consistent"
+    assert solved.structure["question_family"] == "direction"
+    assert solved.structure["semantic_subtype"] == "dir-1"
     assert solved.structure["cycle_axes"] == []
 
 

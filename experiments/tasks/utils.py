@@ -147,13 +147,26 @@ def process_docs_v13_sft(dataset):
             if msg.get("role") == "user":
                 user_content = str(msg.get("content") or "")
                 break
+        difficulty = dict(doc.get("difficulty") or {})
+        semantic_subtype = str(
+            doc.get("semantic_subtype")
+            or doc.get("base_semantic_subtype")
+            or difficulty.get("semantic_subtype")
+            or ""
+        )
+        # Schema <=3 used derived *-cycle labels in difficulty while retaining
+        # the real base subtype separately. Normalize old generated rows at the
+        # evaluation boundary so historical results remain analysable.
+        if semantic_subtype and (
+            not difficulty.get("semantic_subtype")
+            or str(difficulty.get("semantic_subtype")).endswith("-cycle")
+        ):
+            difficulty["semantic_subtype"] = semantic_subtype
         return {
             "text": user_content,
             "oracle_option": str(doc.get("oracle_option") or ""),
-            "base_semantic_subtype": str(
-                doc.get("base_semantic_subtype") or ""
-            ),
-            "difficulty": dict(doc.get("difficulty") or {}),
+            "semantic_subtype": semantic_subtype,
+            "difficulty": difficulty,
             "difficulty_schema_version": int(
                 doc.get("difficulty_schema_version") or 1
             ),

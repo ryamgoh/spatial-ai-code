@@ -348,15 +348,16 @@ def test_cli_generates_global_cycle_cells_and_matched_controls(tmp_path) -> None
     controls = [row for row in rows if row["difficulty"]["world_consistency"] == "consistent"]
     assert len(invalid) == len(controls) == 6
     assert {row["difficulty"]["semantic_subtype"] for row in invalid} == {
-        "dir-cycle",
-        "which-cycle",
-        "count-cycle",
-    }
-    assert {row["base_semantic_subtype"] for row in rows} == {
         "dir-1",
         "which-2",
         "count-1",
     }
+    assert {row["semantic_subtype"] for row in rows} == {
+        "dir-1",
+        "which-2",
+        "count-1",
+    }
+    assert all("base_semantic_subtype" not in row for row in rows)
 
 
 def test_cli_rejects_malformed_cycle_cells(tmp_path) -> None:

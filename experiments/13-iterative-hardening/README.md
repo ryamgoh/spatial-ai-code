@@ -297,11 +297,12 @@ GenerationSpec(
 )
 ```
 
-The final solver subtype becomes `dir-cycle`, `which-cycle`, or `count-cycle`.
-Top-level `base_semantic_subtype` preserves the consistent question constructed
-before cycle injection. Solver metadata records `world_consistency`, cycle
-axes, direct/indirect topology, query-connected/disconnected placement, cycle
-lengths, statement indices, and one closed witness per cyclic axis.
+The generated row retains its original 12-value `semantic_subtype`. Solver
+metadata records `world_consistency`, cycle axes, direct/indirect topology,
+query-connected/disconnected placement, cycle lengths, statement indices, and
+one closed witness per cyclic axis as independent dimensions. A raw prompt-only
+analysis uses `semantic_subtype=null` for an inconsistent world because the
+invalidated prompt does not have meaningful local query semantics.
 
 The CLI format is
 `BASE_SUBTYPE:MODE:AXES:TOPOLOGY:PLACEMENT:LENGTH:COUNT`:
@@ -324,8 +325,9 @@ Matched controls are enabled by default. Each control replaces the closed cycle
 with an open chain while preserving the base question family, requested axis,
 placement intent, relation count, and total entity budget. Invalid-world traces
 show the closed witness under `### Consistency Check` and stop before local
-query deduction. Those rows used `generator_version=v13.4-global-consistency` and
-`difficulty_schema_version=3`.
+query deduction. Those rows used `generator_version=v13.4-global-consistency`
+and `difficulty_schema_version=3`; schema 4 replaces the derived `*-cycle`
+labels with the orthogonal taxonomy above.
 
 ## Motivation
 
@@ -745,8 +747,9 @@ Mixed depth-1 with no distractors is also absent: two independent direct-axis
 proofs cannot contain a relevant diagonal edge, so claiming a clean mixed
 condition would be false. Mixed depth-1 remains covered for both distractor
 topologies, while clean mixed depth starts at depth 2.
-Diagnostic rows use `generator_version=v13.5-diagnostic`; this revision also
-fixes clean depth cells so they no longer receive an accidental filler edge.
+Diagnostic rows use `generator_version=v13.6-orthogonal-taxonomy`; this
+revision also fixes clean depth cells so they no longer receive an accidental
+filler edge.
 
 Run the complete transfer diagnostic on one H200:
 

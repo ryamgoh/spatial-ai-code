@@ -87,3 +87,25 @@ def test_diagonal_cycle_cells_only_request_both_axes() -> None:
 
     assert diagonal
     assert all("-both-" in name for name in diagonal)
+
+
+def test_generated_cycle_rows_keep_base_subtype_orthogonal_to_consistency(
+    tmp_path,
+) -> None:
+    cells = [
+        cell
+        for cell in build_diagnostic_cells(
+            semantic_per_cell=0, structural_per_cell=0, cycle_per_cell=1
+        )
+        if cell.count
+    ]
+    _, test_path = generate_dataset(
+        cells, output_file=tmp_path / "cycles.jsonl", test_fraction=1.0, seed=1313
+    )
+
+    for line in test_path.read_text().splitlines():
+        row = json.loads(line)
+        assert row["semantic_subtype"] in {"dir-1", "which-2", "count-1"}
+        assert row["difficulty"]["semantic_subtype"] == row["semantic_subtype"]
+        assert not row["semantic_subtype"].endswith("-cycle")
+        assert row["difficulty_schema_version"] == 4

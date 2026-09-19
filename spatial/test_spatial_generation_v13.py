@@ -62,7 +62,7 @@ def test_generate_accepts_one_coherent_spec() -> None:
     assert row.difficulty["semantic_subtype"] == "dir-1"
     assert row.difficulty["relation_mix"] == "mixed"
     assert row.difficulty["axes_independent"] is True
-    assert row.to_row()["difficulty_schema_version"] == 3
+    assert row.to_row()["difficulty_schema_version"] == 4
 
 
 @pytest.mark.parametrize("relation_mode", tuple(RelationMode))
@@ -427,11 +427,11 @@ def test_distractor_constraints_require_depth_controlled_dir1() -> None:
 
 
 @pytest.mark.parametrize(
-    "semantic_subtype,expected_subtype",
+    "semantic_subtype,expected_family",
     [
-        (SemanticSubtype.DIR_1, "dir-cycle"),
-        (SemanticSubtype.WHICH_2, "which-cycle"),
-        (SemanticSubtype.COUNT_1, "count-cycle"),
+        (SemanticSubtype.DIR_1, "direction"),
+        (SemanticSubtype.WHICH_2, "which"),
+        (SemanticSubtype.COUNT_1, "count"),
     ],
 )
 @pytest.mark.parametrize(
@@ -444,7 +444,7 @@ def test_distractor_constraints_require_depth_controlled_dir1() -> None:
 )
 def test_global_cycle_generation_applies_to_every_question_family(
     semantic_subtype: SemanticSubtype,
-    expected_subtype: str,
+    expected_family: str,
     axes: CycleAxes,
     topology: CycleTopology,
     placement: CyclePlacement,
@@ -472,7 +472,8 @@ def test_global_cycle_generation_applies_to_every_question_family(
     difficulty = example.difficulty
 
     assert difficulty["world_consistency"] == "inconsistent"
-    assert difficulty["semantic_subtype"] == expected_subtype
+    assert difficulty["question_family"] == expected_family
+    assert difficulty["semantic_subtype"] == semantic_subtype.value
     assert difficulty["cycle_axes"] == (
         ["x", "y"] if axes is CycleAxes.BOTH else [axes.value]
     )
@@ -484,6 +485,10 @@ def test_global_cycle_generation_applies_to_every_question_family(
     assert "The complete map is inconsistent" in trace
     assert "### Final Deduction" not in trace
     assert "**Composition**:" not in trace
+    row = example.to_row()
+    assert row["semantic_subtype"] == semantic_subtype.value
+    assert "base_semantic_subtype" not in row
+    assert row["difficulty_schema_version"] == 4
 
 
 def test_cycle_spec_validates_topology_and_length() -> None:
@@ -503,8 +508,10 @@ def test_cycle_spec_validates_topology_and_length() -> None:
         )
 
 
-def test_cycle_is_not_a_base_semantic_subtype() -> None:
-    assert "dir-cycle" not in {subtype.value for subtype in SemanticSubtype}
+def test_cycle_is_not_a_semantic_subtype() -> None:
+    assert not any(
+        subtype.value.endswith("-cycle") for subtype in SemanticSubtype
+    )
 
 
 def test_near_cycle_control_preserves_base_answer_and_has_no_cycle() -> None:

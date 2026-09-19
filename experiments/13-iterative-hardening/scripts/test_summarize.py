@@ -13,6 +13,7 @@ SPEC.loader.exec_module(SUMMARY)
 
 
 def _sample(text: str, cell: str, gold: str, predicted: str, q_type: int) -> dict:
+    inconsistent = cell.startswith("cycle-") and not cell.endswith("-control")
     return {
         "doc": {
             "text": text,
@@ -20,8 +21,11 @@ def _sample(text: str, cell: str, gold: str, predicted: str, q_type: int) -> dic
             "generation_cell": cell,
             "difficulty": {
                 "question_type": q_type,
-                "semantic_subtype": "dir-cycle" if "cycle-" in cell and not cell.endswith("-control") else "dir-1",
+                "semantic_subtype": "dir-1",
                 "relation_mix": "mixed",
+                "world_consistency": (
+                    "inconsistent" if inconsistent else "consistent"
+                ),
             },
         },
         "filtered_resps": [predicted],
@@ -55,6 +59,10 @@ def test_summary_reports_structural_buckets_and_paired_errors(tmp_path) -> None:
 
     assert "Controlled proof depth" in report
     assert "Cycle versus open-chain control" in report
+    assert "Semantic subtype by world consistency" in report
+    assert "Question family by world consistency" in report
+    assert "`direction / closed cycle`" in report
+    assert "`dir-1 / inconsistent`" in report
     assert "1 fixed by 6k" in report
     assert "1 regressed at 6k" in report
 
@@ -68,3 +76,13 @@ def test_unfiltered_response_parser_only_reads_the_answer_line() -> None:
 
     assert SUMMARY.prediction(sample) == ("B", "D")
     assert SUMMARY.strict_correct(sample)
+
+
+def test_summary_uses_legacy_base_subtype_instead_of_cycle_label() -> None:
+    sample = _sample("q", "cycle-which-2-mixed-x-direct-disconnected-l2", "E", "E", 1)
+    sample["doc"]["base_semantic_subtype"] = "which-2"
+    sample["doc"]["difficulty"]["semantic_subtype"] = "which-cycle"
+
+    assert SUMMARY._semantic_subtype(sample) == "which-2"
+    assert SUMMARY._question_family(sample) == "which"
+    assert SUMMARY._consistency(sample) == "inconsistent"

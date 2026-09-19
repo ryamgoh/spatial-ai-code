@@ -71,9 +71,32 @@ def _cell(sample: dict) -> str:
 
 
 def _question_family(sample: dict) -> str:
-    return {0: "direction", 1: "which", 2: "count"}.get(
-        _difficulty(sample).get("question_type"), "unknown"
+    difficulty = _difficulty(sample)
+    return str(
+        difficulty.get("question_family")
+        or {0: "direction", 1: "which", 2: "count"}.get(
+            difficulty.get("question_type"), "unknown"
+        )
     )
+
+
+def _semantic_subtype(sample: dict) -> str:
+    doc = sample.get("doc") or {}
+    difficulty = _difficulty(sample)
+    value = str(
+        doc.get("semantic_subtype")
+        or doc.get("base_semantic_subtype")
+        or difficulty.get("semantic_subtype")
+        or "unknown"
+    )
+    # Historical schema-3 response files may contain only a derived cycle
+    # label. The current process_docs adapter normally restores the base value;
+    # keep a readable fallback for copied old outputs.
+    return "unknown" if value.endswith("-cycle") else value
+
+
+def _consistency(sample: dict) -> str:
+    return str(_difficulty(sample).get("world_consistency") or "unknown")
 
 
 def _depth_group(sample: dict) -> str | None:
@@ -218,7 +241,27 @@ def summarize(results_dir: Path, tags: tuple[str, ...]) -> str:
     )
     lines += _table(
         "Semantic subtype", tags, samples,
-        lambda row: str(_difficulty(row).get("semantic_subtype") or "unknown"),
+        _semantic_subtype,
+    )
+    lines += _table(
+        "World consistency", tags, samples, _consistency,
+        ("consistent", "inconsistent"),
+    )
+    lines += _table(
+        "Semantic subtype by world consistency", tags, samples,
+        lambda row: f"{_semantic_subtype(row)} / {_consistency(row)}",
+    )
+    lines += _table(
+        "Question family by world consistency", tags, samples,
+        lambda row: f"{_question_family(row)} / {_consistency(row)}",
+        (
+            "direction / consistent",
+            "direction / inconsistent",
+            "which / consistent",
+            "which / inconsistent",
+            "count / consistent",
+            "count / inconsistent",
+        ),
     )
     lines += _table("Controlled proof depth", tags, samples, _depth_group, map(str, range(1, 6)))
     lines += _table(
@@ -232,7 +275,7 @@ def summarize(results_dir: Path, tags: tuple[str, ...]) -> str:
     lines += _table(
         "Cycle/control by question family", tags, samples,
         lambda row: (
-            f"{_cycle_dimension(row, 1)} / {_cycle_group(row)}"
+            f"{_question_family(row)} / {_cycle_group(row)}"
             if _cycle_group(row) else None
         ),
     )
