@@ -324,7 +324,7 @@ Matched controls are enabled by default. Each control replaces the closed cycle
 with an open chain while preserving the base question family, requested axis,
 placement intent, relation count, and total entity budget. Invalid-world traces
 show the closed witness under `### Consistency Check` and stop before local
-query deduction. New rows use `generator_version=v13.4-global-consistency` and
+query deduction. Those rows used `generator_version=v13.4-global-consistency` and
 `difficulty_schema_version=3`.
 
 ## Motivation
@@ -726,3 +726,41 @@ cycles with matched open-chain controls across all three question families.
 Evaluate the untuned model and current v12 SFT adapter first; use their
 bucket-level failure curves to choose the final 1.5k/6k training mixture and
 structural holdouts.
+
+The diagnostic is now a frozen, evaluation-only 2,256-row suite (seed 1313):
+
+- 720 semantic controls: 3 relation modes x 12 base subtypes x 20 rows;
+- 696 depth/distractor cases: cardinal and mixed, depths 1 through 5, and
+  none/disconnected/query-branch conditions, 24 rows per feasible cell; and
+- 840 cycle cases: direction/which/count, valid axis combinations, direct or
+  indirect topology, query-connected or disconnected placement, with a
+  budget-matched open-chain control for every closed cycle, 5 rows per cell.
+
+Diagonal depth cells are deliberately absent: one diagonal premise updates
+both axes, so it cannot express the independent X/Y proof-depth intervention.
+Diagonal examples remain present in the semantic and cycle grids. Likewise,
+diagonal cycle cells use `both` axes because a diagonal edge cannot create an
+X-only or Y-only contradiction while remaining diagonal-only.
+Mixed depth-1 with no distractors is also absent: two independent direct-axis
+proofs cannot contain a relevant diagonal edge, so claiming a clean mixed
+condition would be false. Mixed depth-1 remains covered for both distractor
+topologies, while clean mixed depth starts at depth 2.
+Diagnostic rows use `generator_version=v13.5-diagnostic`; this revision also
+fixes clean depth cells so they no longer receive an accidental filler edge.
+
+Run the complete transfer diagnostic on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/eval-v12-on-v13-h200.sh
+```
+
+This generates `data/spatial_v13_diagnostic_test.jsonl` if missing, then
+evaluates the untuned Qwen3.5-4B model and the frozen Exp 12 1.5k and 6k
+adapters. It writes aggregate and structural breakdowns to
+`experiments/13-iterative-hardening/results/SUMMARY.md`, with all 233 cells in
+`BUCKETS.csv`. Useful rerun controls are `ONLY=baseline`,
+`ONLY=v12-4b-1.5k,v12-4b-6k`, `FORCE=1`, and `FORCE_DATA=1`. The
+default `STAGES=2` preserves the earlier experiment protocol (LoRA reasoning
+followed by the constrained base-model letter readout); use `STAGES=1` as the
+direct adapter-output check. Stage-1 results are written to separate
+`*-stage1` directories so they cannot overwrite the default comparison.

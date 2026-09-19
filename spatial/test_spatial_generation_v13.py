@@ -242,6 +242,25 @@ def test_generate_accepts_depth_ranges_not_only_exact_values() -> None:
     assert 3 <= example.difficulty["y_depth"] <= 4
 
 
+def test_clean_depth_generation_does_not_add_an_extra_filler_relation() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.CARDINAL,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(3),
+            y_depth=DepthRange.exact(4),
+        ),
+        num_entities=10,
+        num_relations=7,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1404))
+
+    assert example.difficulty["num_relations"] == 7
+    assert example.difficulty["num_distractor_relations"] == 0
+
+
 def test_trace_initialization_contains_exactly_prompt_visible_entities() -> None:
     spec = GenerationSpec(
         semantic_subtype=SemanticSubtype.DIR_1,

@@ -307,9 +307,8 @@ class GenerationSpec:
         if (
             distractors.policy is DistractorPolicy.NONE
             and self.relation_mode is RelationMode.MIXED
-            and (
-            self.constraints.x_depth or self.constraints.y_depth
-            )
+            and self.constraints.x_depth
+            and self.constraints.x_depth.minimum == 1
         ):
             required_entities += 2
             required_relations += 1
@@ -357,7 +356,7 @@ class GeneratedExample:
     oracle_option: str
     difficulty: dict[str, Any]
     base_semantic_subtype: str
-    generator_version: str = "v13.4-global-consistency"
+    generator_version: str = "v13.5-diagnostic"
 
     def to_row(self, *, generation_cell: str | None = None) -> dict[str, Any]:
         row: dict[str, Any] = {
@@ -485,10 +484,25 @@ def _make_depth_scene(
     relations: list[Relation] = []
     x_nodes = [reference, *x_internal, target]
     y_nodes = [reference, *y_internal, target]
-    relations.extend(
+    x_relations = [
         Relation(subject=right, direction=x_direction, reference=left)
         for left, right in zip(x_nodes, x_nodes[1:])
-    )
+    ]
+    # For a clean mixed-mode cell, make one X-proof edge diagonal instead of
+    # adding an irrelevant diagonal marker. This retains independent shortest
+    # X/Y proofs because the X-chain's internal node is not on the Y-chain.
+    if (
+        spec.relation_mode is RelationMode.MIXED
+        and spec.constraints.distractors.policy is DistractorPolicy.NONE
+        and x_depth > 1
+    ):
+        vertical = rng.choice(("North", "South"))
+        x_relations[0] = Relation(
+            subject=x_relations[0].subject,
+            direction=Direction(f"{vertical}{x_direction.value.lower()}"),
+            reference=x_relations[0].reference,
+        )
+    relations.extend(x_relations)
     relations.extend(
         Relation(subject=right, direction=y_direction, reference=left)
         for left, right in zip(y_nodes, y_nodes[1:])
@@ -519,9 +533,12 @@ def _make_depth_scene(
                 )
             )
             relations.append(Relation(node, direction, reference))
-    elif spec.relation_mode is RelationMode.MIXED:
+    elif spec.relation_mode is RelationMode.MIXED and x_depth == 1:
         # Mixed depth controls need diagonal evidence, but it stays in an
         # irrelevant component so it cannot collapse either requested path.
+        # This special case is not used by the clean diagnostic matrix: with
+        # direct independent X/Y proofs, any relevant diagonal edge would be
+        # shared by both proofs.
         relations.append(Relation(extras[1], Direction.NORTHEAST, extras[0]))
 
     # Cardinal filler is confined to the opposite axis's internal nodes and
@@ -536,13 +553,13 @@ def _make_depth_scene(
     rng.shuffle(filler)
     used = {(r.subject, r.direction, r.reference) for r in relations}
     for relation in filler:
+        if len(relations) >= spec.num_relations:
+            break
         key = (relation.subject, relation.direction, relation.reference)
         if key in used:
             continue
         relations.append(relation)
         used.add(key)
-        if len(relations) >= spec.num_relations:
-            break
     if len(relations) < spec.num_relations:
         raise ValueError(
             f"num_relations={spec.num_relations} cannot be filled without "
