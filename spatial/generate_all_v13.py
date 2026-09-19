@@ -17,6 +17,7 @@ import typer
 from spatial_generation_v13 import (
     DEFAULT_SYSTEM_PROMPT,
     SEMANTIC_SUBTYPES,
+    DepthRange,
     GenerationCell,
     GenerationError,
     GenerationSpec,
@@ -26,6 +27,67 @@ from spatial_generation_v13 import (
     StructuralConstraints,
     generate_dataset,
 )
+
+
+def _parse_depth_range(raw: str) -> DepthRange:
+    parts = raw.strip().split("-", 1)
+    try:
+        minimum = int(parts[0])
+        maximum = int(parts[1]) if len(parts) == 2 else minimum
+        return DepthRange(minimum, maximum)
+    except (ValueError, IndexError) as exc:
+        raise ValueError(f"invalid depth range: {raw}") from exc
+
+
+def _parse_depth_cells(raw: str) -> list[GenerationCell]:
+    if not raw.strip():
+        return []
+    cells: list[GenerationCell] = []
+    for encoded in raw.split(","):
+        try:
+            mode_raw, depths_raw, count_raw = encoded.strip().split(":", 2)
+            x_raw, y_raw = depths_raw.lower().split("x", 1)
+            mode = RelationMode(mode_raw)
+            if mode is RelationMode.DIAGONAL:
+                raise ValueError("diagonal depth cells are not supported")
+            x_depth = _parse_depth_range(x_raw)
+            y_depth = _parse_depth_range(y_raw)
+            count = int(count_raw)
+            if count < 0:
+                raise ValueError("count must be non-negative")
+        except ValueError as exc:
+            raise typer.BadParameter(
+                f"invalid depth cell '{encoded}': {exc}; expected MODE:XxY:COUNT",
+                param_hint="--depth-cells",
+            ) from exc
+        x_label = (
+            str(x_depth.minimum)
+            if x_depth.minimum == x_depth.maximum
+            else f"{x_depth.minimum}-{x_depth.maximum}"
+        )
+        y_label = (
+            str(y_depth.minimum)
+            if y_depth.minimum == y_depth.maximum
+            else f"{y_depth.minimum}-{y_depth.maximum}"
+        )
+        cells.append(
+            GenerationCell(
+                name=f"{mode.value}-dir-1-depth-x{x_label}-y{y_label}",
+                spec=GenerationSpec(
+                    semantic_subtype=SemanticSubtype.DIR_1,
+                    relation_mode=mode,
+                    constraints=StructuralConstraints(
+                        require_independent_axes=True,
+                        x_depth=x_depth,
+                        y_depth=y_depth,
+                    ),
+                    num_entities=max(8, x_depth.maximum + y_depth.maximum + (2 if mode is RelationMode.MIXED else 0)),
+                    num_relations=max(10, x_depth.maximum + y_depth.maximum + (1 if mode is RelationMode.MIXED else 0)),
+                ),
+                count=count,
+            )
+        )
+    return cells
 
 
 def _semantic_subtype_for_compatibility(
@@ -198,6 +260,11 @@ def main(
         min=0,
         help="Extra mixed dir-1 rows whose shortest X/Y proofs are independent.",
     ),
+    depth_cells: str = typer.Option(
+        "",
+        "--depth-cells",
+        help="Extra dir-1 cells as MODE:XxY:COUNT; ranges use MIN-MAX.",
+    ),
     test_split: float = typer.Option(0.2, min=0.0, max=1.0),
     seed: int = typer.Option(13),
 ) -> None:
@@ -224,16 +291,23 @@ def main(
             "select at least one relation mode", param_hint="--relation-modes"
         )
     if not selected_subtypes and independent_mixed_dir1 == 0:
-        raise typer.BadParameter(
-            "select at least one semantic subtype or an independent dir-1 count",
-            param_hint="--subtypes",
-        )
-    train_path, test_path = batch_generate(
-        out,
-        relation_modes=modes,
-        subtype_counts={subtype: samples_per_cell for subtype in selected_subtypes},
-        independent_mixed_dir1=independent_mixed_dir1,
-        test_split=test_split,
+        if depth_cells.strip():
+            pass
+        else:
+            raise typer.BadParameter(
+                "select a semantic subtype, independent dir-1 count, or depth cell",
+                param_hint="--subtypes",
+            )
+    cells = _build_cells(
+        modes,
+        {subtype: samples_per_cell for subtype in selected_subtypes},
+        independent_mixed_dir1,
+    )
+    cells.extend(_parse_depth_cells(depth_cells))
+    train_path, test_path = generate_dataset(
+        cells,
+        output_file=out,
+        test_fraction=test_split,
         seed=seed,
     )
     typer.echo(f"wrote {train_path} and {test_path}")

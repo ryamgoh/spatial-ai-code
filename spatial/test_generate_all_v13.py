@@ -200,3 +200,60 @@ def test_cli_rejects_unknown_generation_dimensions(tmp_path) -> None:
 
     assert result.exit_code != 0
     assert "unknown relation modes" in result.output or "unknown semantic subtypes" in result.output
+
+
+def test_cli_generates_exact_and_ranged_depth_cells(tmp_path) -> None:
+    output = tmp_path / "depths.jsonl"
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(output),
+            "--subtypes",
+            "",
+            "--samples-per-cell",
+            "0",
+            "--independent-mixed-dir1",
+            "0",
+            "--depth-cells",
+            "cardinal:3x4:2,mixed:2-3x3-4:2",
+            "--test-split",
+            "0",
+            "--seed",
+            "13",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "depths_train.jsonl").read_text().splitlines()
+    ]
+    assert len(rows) == 4
+    assert {row["generation_cell"] for row in rows} == {
+        "cardinal-dir-1-depth-x3-y4",
+        "mixed-dir-1-depth-x2-3-y3-4",
+    }
+    for row in rows:
+        difficulty = row["difficulty"]
+        assert difficulty["axes_independent"] is True
+        if row["generation_cell"].startswith("cardinal"):
+            assert (difficulty["x_depth"], difficulty["y_depth"]) == (3, 4)
+        else:
+            assert 2 <= difficulty["x_depth"] <= 3
+            assert 3 <= difficulty["y_depth"] <= 4
+
+
+def test_cli_rejects_malformed_depth_cells(tmp_path) -> None:
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(tmp_path / "bad-depth.jsonl"),
+            "--depth-cells",
+            "mixed:not-a-depth",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "depth cell" in result.output.lower()

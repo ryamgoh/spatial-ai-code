@@ -66,8 +66,32 @@ SEMANTIC_SUBTYPES = tuple(subtype.value for subtype in SemanticSubtype)
 
 
 @dataclass(frozen=True)
+class DepthRange:
+    minimum: int
+    maximum: int
+
+    def __post_init__(self) -> None:
+        if self.minimum < 1:
+            raise ValueError("depth minimum must be positive")
+        if self.maximum < self.minimum:
+            raise ValueError("depth maximum must be greater than or equal to minimum")
+
+    @classmethod
+    def exact(cls, depth: int) -> "DepthRange":
+        return cls(depth, depth)
+
+    def contains(self, depth: int | None) -> bool:
+        return depth is not None and self.minimum <= depth <= self.maximum
+
+    def choose(self, rng: random.Random) -> int:
+        return rng.randint(self.minimum, self.maximum)
+
+
+@dataclass(frozen=True)
 class StructuralConstraints:
     require_independent_axes: bool = False
+    x_depth: DepthRange | None = None
+    y_depth: DepthRange | None = None
 
 
 @dataclass(frozen=True)
@@ -146,6 +170,58 @@ class GenerationSpec:
             and self.semantic_subtype is not SemanticSubtype.DIR_1
         ):
             raise ValueError("independent axes are currently supported only for dir-1")
+        if (self.constraints.x_depth or self.constraints.y_depth) and (
+            self.semantic_subtype is not SemanticSubtype.DIR_1
+        ):
+            raise ValueError("proof depth constraints currently require dir-1")
+        if (self.constraints.x_depth or self.constraints.y_depth) and not (
+            self.constraints.require_independent_axes
+        ):
+            raise ValueError(
+                "proof depth constraints currently require independent axes"
+            )
+        if bool(self.constraints.x_depth) != bool(self.constraints.y_depth):
+            raise ValueError(
+                "x_depth and y_depth must be specified together for dir-1"
+            )
+        if (self.constraints.x_depth or self.constraints.y_depth) and (
+            self.relation_mode is RelationMode.DIAGONAL
+        ):
+            raise ValueError(
+                "proof depth constraints currently require cardinal or mixed relations"
+            )
+        required_entities = 2
+        required_relations = 1
+        if self.constraints.x_depth and self.constraints.y_depth:
+            required_entities = (
+                self.constraints.x_depth.maximum
+                + self.constraints.y_depth.maximum
+            )
+            required_relations = (
+                self.constraints.x_depth.maximum
+                + self.constraints.y_depth.maximum
+            )
+        elif self.constraints.x_depth:
+            required_entities = self.constraints.x_depth.maximum + 1
+            required_relations = self.constraints.x_depth.maximum + 1
+        elif self.constraints.y_depth:
+            required_entities = self.constraints.y_depth.maximum + 1
+            required_relations = self.constraints.y_depth.maximum + 1
+        if self.relation_mode is RelationMode.MIXED and (
+            self.constraints.x_depth or self.constraints.y_depth
+        ):
+            required_entities += 2
+            required_relations += 1
+        if self.num_entities < required_entities:
+            raise ValueError(
+                f"num_entities={self.num_entities} cannot fit the minimum "
+                f"proof skeleton ({required_entities})"
+            )
+        if self.num_relations < required_relations:
+            raise ValueError(
+                f"num_relations={self.num_relations} cannot fit the minimum "
+                f"proof skeleton ({required_relations})"
+            )
 
 
 @dataclass(frozen=True)
@@ -273,6 +349,69 @@ def _make_scene(
     return Scene(tuple(entities), tuple(relations))
 
 
+def _make_depth_scene(
+    spec: GenerationSpec, rng: random.Random
+) -> tuple[Scene, str, str]:
+    """Build disjoint X/Y proof chains, with safe filler off the query paths."""
+    assert spec.constraints.x_depth is not None
+    assert spec.constraints.y_depth is not None
+    x_depth = spec.constraints.x_depth.choose(rng)
+    y_depth = spec.constraints.y_depth.choose(rng)
+    entities = list(rng.sample(ENTITY_NAMES, spec.num_entities))
+    reference, target = entities[0], entities[1]
+    cursor = 2
+    x_internal = entities[cursor : cursor + x_depth - 1]
+    cursor += x_depth - 1
+    y_internal = entities[cursor : cursor + y_depth - 1]
+    cursor += y_depth - 1
+    extras = entities[cursor:]
+
+    x_direction = rng.choice((Direction.EAST, Direction.WEST))
+    y_direction = rng.choice((Direction.NORTH, Direction.SOUTH))
+    relations: list[Relation] = []
+    x_nodes = [reference, *x_internal, target]
+    y_nodes = [reference, *y_internal, target]
+    relations.extend(
+        Relation(subject=right, direction=x_direction, reference=left)
+        for left, right in zip(x_nodes, x_nodes[1:])
+    )
+    relations.extend(
+        Relation(subject=right, direction=y_direction, reference=left)
+        for left, right in zip(y_nodes, y_nodes[1:])
+    )
+
+    # Mixed mode needs diagonal evidence, but it stays in an irrelevant
+    # subgraph so it cannot collapse either requested query proof.
+    if spec.relation_mode is RelationMode.MIXED:
+        relations.append(Relation(extras[1], Direction.NORTHEAST, extras[0]))
+
+    # Cardinal filler is confined to the opposite axis's internal nodes and
+    # unrelated entities. It increases prompt size without introducing a path
+    # from the query reference to target on the protected axis.
+    filler: list[Relation] = []
+    for left, right in itertools.combinations([*y_internal, *extras], 2):
+        filler.append(Relation(right, Direction.EAST, left))
+    for left, right in itertools.combinations([*x_internal, *extras], 2):
+        filler.append(Relation(right, Direction.NORTH, left))
+    rng.shuffle(filler)
+    used = {(r.subject, r.direction, r.reference) for r in relations}
+    for relation in filler:
+        key = (relation.subject, relation.direction, relation.reference)
+        if key in used:
+            continue
+        relations.append(relation)
+        used.add(key)
+        if len(relations) >= spec.num_relations:
+            break
+    if len(relations) < spec.num_relations:
+        raise ValueError(
+            f"num_relations={spec.num_relations} cannot be filled without "
+            "touching the protected proof paths"
+        )
+    rng.shuffle(relations)
+    return Scene(tuple(entities), tuple(relations)), target, reference
+
+
 def _graphs(entities: Sequence[str], relations: Sequence[Relation]) -> tuple[AxisGraph, AxisGraph]:
     x_graph, y_graph = AxisGraph(), AxisGraph()
     x_graph.nodes.update(entities)
@@ -310,6 +449,7 @@ def _direction_prompt(
     target_num_answers: int | None,
     rng: random.Random,
     subtype: str | None = None,
+    forced_pair: tuple[str, str] | None = None,
 ) -> str | None:
     x_closure, y_closure = x_graph.get_transitive_closure(), y_graph.get_transitive_closure()
     candidates: list[tuple[str, str]] = []
@@ -319,9 +459,14 @@ def _direction_prompt(
         answer_count = 1 if x_known and y_known else 2 if x_known or y_known else 0
         if target_num_answers is None or answer_count == target_num_answers:
             candidates.append((target, reference))
-    if not candidates:
+    if forced_pair is not None:
+        if forced_pair not in candidates:
+            return None
+        target, reference = forced_pair
+    elif not candidates:
         return None
-    target, reference = rng.choice(candidates)
+    else:
+        target, reference = rng.choice(candidates)
     x_state = _status(x_closure, target, reference)
     y_state = _status(y_closure, target, reference)
     x_comp = "East" if x_state == "high" else "West" if x_state == "low" else None
@@ -496,9 +641,14 @@ class SpatialGenerator:
         relation_mode = spec.relation_mode.value
         rejections: Counter[str] = Counter()
         for _ in range(spec.max_attempts):
-            scene = _make_scene(
-                rng, spec.num_entities, spec.num_relations, relation_mode
-            )
+            forced_pair = None
+            if spec.constraints.x_depth and spec.constraints.y_depth:
+                scene, target, reference = _make_depth_scene(spec, rng)
+                forced_pair = (target, reference)
+            else:
+                scene = _make_scene(
+                    rng, spec.num_entities, spec.num_relations, relation_mode
+                )
             entities = list(scene.entities)
             relations = list(scene.relations)
             if spec.semantic_subtype is SemanticSubtype.DIR_CYCLE:
@@ -533,7 +683,7 @@ class SpatialGenerator:
                 else:
                     user_prompt = _direction_prompt(
                         entities, relations, x_graph, y_graph,
-                        target_num_answers, rng, subtype,
+                        target_num_answers, rng, subtype, forced_pair,
                     )
             elif question_type == 1:
                 user_prompt = _which_prompt(
@@ -570,6 +720,18 @@ class SpatialGenerator:
                 and difficulty["axes_independent"] is not True
             ):
                 rejections["axes_not_independent"] += 1
+                continue
+            if (
+                spec.constraints.x_depth
+                and not spec.constraints.x_depth.contains(difficulty["x_depth"])
+            ):
+                rejections["x_depth_out_of_range"] += 1
+                continue
+            if (
+                spec.constraints.y_depth
+                and not spec.constraints.y_depth.contains(difficulty["y_depth"])
+            ):
+                rejections["y_depth_out_of_range"] += 1
                 continue
             return GeneratedExample(
                 messages=(

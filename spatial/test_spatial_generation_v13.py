@@ -8,6 +8,7 @@ import random
 import pytest
 
 from spatial_generation_v13 import (
+    DepthRange,
     GenerationCell,
     GenerationError,
     GenerationSpec,
@@ -146,3 +147,80 @@ def test_generate_dataset_accepts_explicit_cells(tmp_path) -> None:
         "cardinal-dir-2",
         "mixed-count-omit",
     }
+
+
+def test_depth_range_validates_bounds() -> None:
+    assert DepthRange.exact(3).contains(3)
+    assert not DepthRange(3, 5).contains(2)
+    assert DepthRange(3, 5).contains(5)
+    with pytest.raises(ValueError, match="minimum.*positive"):
+        DepthRange(0, 2)
+    with pytest.raises(ValueError, match="maximum.*minimum"):
+        DepthRange(4, 3)
+
+
+def test_depth_constraints_require_dir1() -> None:
+    with pytest.raises(ValueError, match="proof depth.*dir-1"):
+        GenerationSpec(
+            semantic_subtype=SemanticSubtype.DIR_2,
+            relation_mode=RelationMode.CARDINAL,
+            constraints=StructuralConstraints(x_depth=DepthRange.exact(2)),
+        )
+    with pytest.raises(ValueError, match="proof depth.*independent axes"):
+        GenerationSpec(
+            semantic_subtype=SemanticSubtype.DIR_1,
+            relation_mode=RelationMode.CARDINAL,
+            constraints=StructuralConstraints(
+                x_depth=DepthRange.exact(2),
+                y_depth=DepthRange.exact(2),
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    "relation_mode,x_depth,y_depth",
+    [
+        (RelationMode.CARDINAL, 3, 4),
+        (RelationMode.MIXED, 4, 3),
+    ],
+)
+def test_generate_enforces_independent_axis_depths(
+    relation_mode: RelationMode, x_depth: int, y_depth: int
+) -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=relation_mode,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(x_depth),
+            y_depth=DepthRange.exact(y_depth),
+        ),
+        num_entities=10,
+        num_relations=12,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1401))
+
+    assert example.difficulty["x_depth"] == x_depth
+    assert example.difficulty["y_depth"] == y_depth
+    assert example.difficulty["axes_independent"] is True
+    assert example.difficulty["shared_supporting_statements"] == []
+
+
+def test_generate_accepts_depth_ranges_not_only_exact_values() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.CARDINAL,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange(2, 3),
+            y_depth=DepthRange(3, 4),
+        ),
+        num_entities=9,
+        num_relations=10,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1403))
+
+    assert 2 <= example.difficulty["x_depth"] <= 3
+    assert 3 <= example.difficulty["y_depth"] <= 4

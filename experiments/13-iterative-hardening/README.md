@@ -39,9 +39,10 @@ At the default 100 rows per cell, this produces 3,900 ordinary rows plus 100
 independent-axis rows. This is a balanced construction interface, not yet the
 final 1.5k/6k/18k experiment split recipe.
 
-The current implementation does **not** yet control minimum proof depth, add
-structured distractors, or change contradiction scope. Independent-axis rows
-can still use short paths; those remain separate decision-gated iterations.
+The current implementation now supports solver-verified X/Y proof-depth ranges
+for independent-axis `dir-1` cells. It does **not** yet add structured
+distractors or change contradiction scope; those remain separate
+decision-gated iterations.
 
 Foundation smoke command:
 
@@ -65,6 +66,7 @@ The generator exposes the two foundational dimensions independently:
 | relation mode | `diagonal`, `cardinal`, `mixed` |
 | semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-cycle`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
 | optional structural cell | `mixed-dir-1-independent` |
+| proof depth | exact or ranged X/Y depths for independent `dir-1` in cardinal/mixed mode |
 
 Python callers should request any mixture as explicit `GenerationCell` values
 passed to `generate_dataset`. The compatibility `batch_generate` adapter and
@@ -130,6 +132,46 @@ list[GenerationCell] ──► generate_dataset ──► stratified train/test 
 New complexity should normally extend `GenerationSpec`/`StructuralConstraints`
 and the solver profile rather than add more positional flags to
 `generate_sample`.
+
+### Proof-depth cells
+
+Typed callers specify exact or ranged proof depths through `DepthRange`:
+
+```python
+GenerationSpec(
+    semantic_subtype=SemanticSubtype.DIR_1,
+    relation_mode=RelationMode.MIXED,
+    constraints=StructuralConstraints(
+        require_independent_axes=True,
+        x_depth=DepthRange(3, 4),
+        y_depth=DepthRange.exact(5),
+    ),
+    num_entities=11,
+    num_relations=12,
+)
+```
+
+The CLI accepts extra cells as `MODE:XxY:COUNT`; each axis may be an exact
+integer or a `MIN-MAX` range:
+
+```bash
+cd spatial
+uv run --no-project --with typer python generate_all_v13.py \
+  --out ../data/spatial_sft_v13_depth.jsonl \
+  --subtypes '' \
+  --samples-per-cell 0 \
+  --independent-mixed-dir1 0 \
+  --depth-cells cardinal:1x1:100,mixed:2-3x3-4:100,mixed:6x8:100 \
+  --test-split 0.2 \
+  --seed 13
+```
+
+Depth cells currently require `dir-1`, independent axes, and cardinal or mixed
+relations. The generator constructs disjoint cardinal proof skeletons and
+places the mandatory mixed-mode diagonal relation away from the query paths.
+The final rendered prompt is still measured by `SpatialSolverV13`; a candidate
+is rejected if an accidental shortcut moves either shortest proof outside the
+requested range.
 
 ## Motivation
 
@@ -317,6 +359,11 @@ coverage rather than immediately adding another lever.
 ## Iteration 3 — controlled minimum proof depth
 
 **New lever:** construct queries with a verified minimum shortest-path depth.
+
+**Implementation status:** exact and ranged X/Y depth cells are implemented
+for independent-axis `dir-1` in cardinal and mixed modes. A feasibility stress
+check generated 50 examples for each of cardinal/mixed × `1x1`, `2x3`, `4x5`,
+and `6x8` with no failures or depth drift.
 
 Initial bands:
 
@@ -509,9 +556,9 @@ Rough calibration targets, not acceptance requirements:
 
 ## Immediate next step
 
-Run the small balanced cardinal/diagonal/mixed evaluation grid, including the
-independent-axis `dir-1` cell, to measure the untuned and current SFT models.
-Use that result to choose whether Iteration 2 should increase the mass of
-independent-axis examples or proceed to explicit proof-depth bands. The v12
-structural census remains useful supporting evidence, but no later difficulty
-lever should be added before this new cell is measured.
+Generate a small evaluation ladder with independent `dir-1` cells at `1x1`,
+`2x3`, `4x5`, and `6x8`, then evaluate the untuned and current SFT models. Use
+the resulting depth curve to choose the train/test mixture before adding
+structured distractors. The v12 structural census remains useful supporting
+evidence, but no later difficulty lever should be added before this depth
+ladder is measured.
