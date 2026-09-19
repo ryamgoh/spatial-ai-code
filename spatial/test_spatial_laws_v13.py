@@ -143,3 +143,22 @@ def test_cardinal_cycle_is_not_a_definite_order() -> None:
     assert grade.raw == "E"
     assert grade.x_conflict is True
     assert analysis["x_conflict"] is True
+
+
+def test_solve_and_analyze_returns_one_authoritative_result() -> None:
+    text = prompt(
+        [
+            "The Museum is to the East of the Bank.",
+            "The Library is to the East of the Museum.",
+            "The Library is to the North of the Bank.",
+        ],
+        "In which direction is the Library relative to the Bank?",
+        DIR_OPTIONS,
+    )
+
+    solved = SOLVER.solve_and_analyze(text)
+
+    assert solved.grade.raw == "A"
+    assert solved.structure["x_depth"] == 2
+    assert solved.structure["y_depth"] == 1
+    assert solved.structure == SOLVER.analyze(text)

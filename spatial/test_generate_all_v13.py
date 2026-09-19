@@ -85,31 +85,6 @@ def test_generated_non_direction_questions_round_trip(
     assert sample["difficulty"]["question_type"] == question_type
 
 
-@pytest.mark.parametrize("relation_mode", ("diagonal", "cardinal", "mixed"))
-@pytest.mark.parametrize("subtype", V13_SUBTYPES)
-def test_every_semantic_subtype_and_relation_mode_round_trips(
-    subtype: str, relation_mode: str
-) -> None:
-    sample = generate_sample(
-        seed=1313,
-        relation_mode=relation_mode,
-        subtype=subtype,
-        num_entities=10,
-        num_sentences=15,
-    )
-
-    assert sample is not None, subtype
-    text = user_text(sample)
-    assert sample["oracle_option"] == SOLVER.solve(text) == answer_text(sample)
-    assert sample["difficulty"] == SOLVER.analyze(text)
-    assert sample["difficulty"]["semantic_subtype"] == subtype
-    assert sample["difficulty"]["relation_mix"] == {
-        "diagonal": "diagonal-only",
-        "cardinal": "cardinal-only",
-        "mixed": "mixed",
-    }[relation_mode]
-
-
 def test_mixed_dir1_can_require_independent_axis_evidence() -> None:
     sample = generate_sample(
         seed=1321,

@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import re
 from collections import deque
+from dataclasses import dataclass
 from typing import Any
 
-from spatial_solver import Grade, SpatialSolver, _normalize_text, _strip_the
+from spatial_solver import Grade, SpatialSolver
 
 
 RELATION_RE = re.compile(
@@ -21,6 +22,30 @@ RELATION_RE = re.compile(
     r"of ([^.]+?)\.",
     re.IGNORECASE,
 )
+
+
+def _normalize_text(text: str) -> str:
+    return (
+        text.replace("\u2018", "'")
+        .replace("\u2019", "'")
+        .replace("\u201c", '"')
+        .replace("\u201d", '"')
+    )
+
+
+def _strip_the(name: str) -> str:
+    normalized = name.strip().strip(".")
+    if normalized.lower().startswith("the "):
+        return normalized[4:].strip()
+    return normalized
+
+
+@dataclass(frozen=True)
+class SolvedProblem:
+    """One authoritative parse/grade/structure result for a rendered prompt."""
+
+    grade: Grade
+    structure: dict[str, Any]
 
 
 def _axis_edges(a: str, direction: str, b: str) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
@@ -150,8 +175,8 @@ class SpatialSolverV13(SpatialSolver):
             "supporting_statements": [],
         }
 
-    def analyze(self, text: str) -> dict[str, Any]:
-        """Describe the actual structure recovered from a rendered prompt."""
+    def solve_and_analyze(self, text: str) -> SolvedProblem:
+        """Grade and structurally analyse a rendered prompt in one pass."""
         objects, relations, question_part = self._parse_indexed_relations(text)
         grade = self.grade(text)
         directions = [direction for _, direction, _, _ in relations]
@@ -193,7 +218,7 @@ class SpatialSolverV13(SpatialSolver):
             question_part,
         )
         if not query:
-            return result
+            return SolvedProblem(grade=grade, structure=result)
         target = _strip_the(query.group(1))
         reference = _strip_the(query.group(2))
         x_edges: list[tuple[str, str, int]] = []
@@ -228,7 +253,11 @@ class SpatialSolverV13(SpatialSolver):
                 "y_conflict": y_proof["conflict"],
             }
         )
-        return result
+        return SolvedProblem(grade=grade, structure=result)
+
+    def analyze(self, text: str) -> dict[str, Any]:
+        """Compatibility convenience returning only structural metadata."""
+        return self.solve_and_analyze(text).structure
 
     def _semantic_subtype(self, grade: Grade) -> str:
         """Classify answer semantics from the solver verdict, not generator intent."""
@@ -275,3 +304,7 @@ def grade(text: str) -> Grade:
 
 def analyze(text: str) -> dict[str, Any]:
     return _SOLVER.analyze(text)
+
+
+def solve_and_analyze(text: str) -> SolvedProblem:
+    return _SOLVER.solve_and_analyze(text)

@@ -11,9 +11,12 @@ The first narrow implementation increment is complete:
 
 - `spatial/spatial_solver_v13.py` preserves the v6 answer laws, parses cardinal
   and diagonal relations, and measures shortest X/Y proof paths for Type 0.
-- `spatial/generate_all_v13.py` supports `diagonal`, `cardinal`, and `mixed`
-  relation modes across Type 0/1/2 questions. It emits `oracle_option`,
-  solver-measured `difficulty`, and a `generator_version` stamp.
+- `spatial/spatial_generation_v13.py` owns typed generation specs, scenes,
+  subtype policies, constraint checking, and dataset construction.
+- `spatial/generate_all_v13.py` is the CLI/compatibility adapter supporting
+  `diagonal`, `cardinal`, and `mixed` relation modes across Type 0/1/2.
+  Generated rows include `oracle_option`, solver-measured `difficulty`, and
+  independent generator/schema version stamps.
 - Every generated row is reparsed from its rendered user prompt; the
   generator's internal graph is not accepted as final gold.
 - `experiments/tasks/utils.py::process_docs_v13_sft` is a versioned lm-eval
@@ -63,10 +66,11 @@ The generator exposes the two foundational dimensions independently:
 | semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-cycle`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
 | optional structural cell | `mixed-dir-1-independent` |
 
-Python callers can request any subset through `batch_generate(relation_modes=...,
-subtype_counts=...)`. The CLI exposes the same selection through
-`--relation-modes` and `--subtypes`. For example, generate only cardinal and
-mixed `dir-2`/`count-omit` cells:
+Python callers should request any mixture as explicit `GenerationCell` values
+passed to `generate_dataset`. The compatibility `batch_generate` adapter and
+CLI expose the common cross-product selection through `--relation-modes` and
+`--subtypes`. For example, generate only cardinal and mixed
+`dir-2`/`count-omit` cells:
 
 ```bash
 cd spatial
@@ -84,6 +88,48 @@ Generation fails explicitly for an unknown dimension. Every emitted row is
 accepted only after the solver reclassifies its rendered prompt as the
 requested semantic subtype and relation mode. This means future experiments
 can choose their own cell mixture without adding another generator entrypoint.
+
+### Generation architecture
+
+The extensible interface lives in `spatial/spatial_generation_v13.py`:
+
+```text
+GenerationSpec + seeded RNG
+            │
+            ▼
+SpatialGenerator.generate
+            │
+            ├─ construct typed Scene / Relation values
+            ├─ construct subtype-specific query and options
+            ├─ render prompt and SFT trace
+            └─ SpatialSolverV13.solve_and_analyze
+                         │
+                         ▼
+              verified GeneratedExample
+
+list[GenerationCell] ──► generate_dataset ──► stratified train/test JSONL
+```
+
+- `GenerationSpec` is the single description of one requested example.
+- `StructuralConstraints` is where future proof-depth, distractor, and conflict
+  requirements belong.
+- `GenerationCell` gives an experiment cell a name, spec, and row count.
+- `SpatialGenerator.generate` owns rejection sampling and raises
+  `GenerationError` with per-reason rejection counts if the spec cannot be
+  satisfied.
+- `GeneratedExample.to_row` is the only conversion to JSON-compatible data and
+  stamps `difficulty_schema_version`.
+- `generate_dataset` owns cell-stratified splitting and JSONL output.
+- `spatial/generate_all_v13.py` is intentionally only a CLI plus compatibility
+  adapter for early v13 callers.
+- `spatial/spatial_graph.py` holds stable graph primitives; v13 no longer
+  imports implementation details from the v6 generator.
+- `SpatialSolverV13.solve_and_analyze` returns one `SolvedProblem`, keeping the
+  accepted grade and structural profile together.
+
+New complexity should normally extend `GenerationSpec`/`StructuralConstraints`
+and the solver profile rather than add more positional flags to
+`generate_sample`.
 
 ## Motivation
 
