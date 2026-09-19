@@ -10,6 +10,8 @@ import pytest
 
 from spatial_generation_v13 import (
     DepthRange,
+    DistractorPolicy,
+    DistractorSpec,
     GenerationCell,
     GenerationError,
     GenerationSpec,
@@ -55,7 +57,7 @@ def test_generate_accepts_one_coherent_spec() -> None:
     assert row.difficulty["semantic_subtype"] == "dir-1"
     assert row.difficulty["relation_mix"] == "mixed"
     assert row.difficulty["axes_independent"] is True
-    assert row.to_row()["difficulty_schema_version"] == 1
+    assert row.to_row()["difficulty_schema_version"] == 2
 
 
 @pytest.mark.parametrize("relation_mode", tuple(RelationMode))
@@ -345,3 +347,56 @@ def test_count_trace_shows_solver_verified_entity_set_and_count() -> None:
     assert f"**Direction Query**: {solved.structure['query_direction']}" in trace
     assert f"**Proven Entities**: {rendered_names}" in trace
     assert f"**Count**: {len(names)}" in trace
+
+
+@pytest.mark.parametrize(
+    "policy,expected_key",
+    [
+        (DistractorPolicy.DISCONNECTED, "num_disconnected_distractors"),
+        (DistractorPolicy.QUERY_BRANCH, "num_query_branch_distractors"),
+    ],
+)
+def test_generate_exact_solver_classified_distractors_without_depth_drift(
+    policy: DistractorPolicy, expected_key: str
+) -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.MIXED,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(3),
+            y_depth=DepthRange.exact(4),
+            distractors=DistractorSpec(policy=policy, count=3),
+        ),
+        num_entities=12 if policy is DistractorPolicy.DISCONNECTED else 10,
+        num_relations=10,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(1501))
+    difficulty = example.difficulty
+
+    assert difficulty["x_depth"] == 3
+    assert difficulty["y_depth"] == 4
+    assert difficulty["axes_independent"] is True
+    assert difficulty["num_distractor_relations"] == 3
+    assert difficulty[expected_key] == 3
+    other_key = (
+        "num_query_branch_distractors"
+        if expected_key == "num_disconnected_distractors"
+        else "num_disconnected_distractors"
+    )
+    assert difficulty[other_key] == 0
+
+
+def test_distractor_constraints_require_depth_controlled_dir1() -> None:
+    with pytest.raises(ValueError, match="distractors.*proof depth"):
+        GenerationSpec(
+            semantic_subtype=SemanticSubtype.DIR_1,
+            relation_mode=RelationMode.MIXED,
+            constraints=StructuralConstraints(
+                require_independent_axes=True,
+                distractors=DistractorSpec(
+                    policy=DistractorPolicy.DISCONNECTED, count=2
+                ),
+            ),
+        )

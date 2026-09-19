@@ -182,3 +182,27 @@ def test_reported_paths_follow_low_to_high_axis_order_for_west_and_south() -> No
     assert solved.grade.y_rel == "lt"
     assert solved.structure["x_path"] == ["Library", "Museum", "Bank"]
     assert solved.structure["y_path"] == ["Library", "Park", "Bank"]
+
+
+def test_solver_classifies_query_branch_and_disconnected_distractors() -> None:
+    text = prompt(
+        [
+            "The Museum is to the East of the Bank.",
+            "The Library is to the East of the Museum.",
+            "The Park is to the North of the Bank.",
+            "The Library is to the North of the Park.",
+            "The Zoo is to the West of the Bank.",
+            "The Pharmacy is to the Northeast of the Hospital.",
+        ],
+        "In which direction is the Library relative to the Bank?",
+        DIR_OPTIONS,
+    )
+
+    structure = SOLVER.solve_and_analyze(text).structure
+
+    assert structure["relevant_statement_indices"] == [0, 1, 2, 3]
+    assert structure["distractor_statement_indices"] == [4, 5]
+    assert structure["query_branch_distractor_statement_indices"] == [4]
+    assert structure["disconnected_distractor_statement_indices"] == [5]
+    assert structure["num_relevant_relations"] == 4
+    assert structure["num_distractor_relations"] == 2

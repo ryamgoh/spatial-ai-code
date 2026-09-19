@@ -87,11 +87,32 @@ class DepthRange:
         return rng.randint(self.minimum, self.maximum)
 
 
+class DistractorPolicy(str, Enum):
+    NONE = "none"
+    DISCONNECTED = "disconnected"
+    QUERY_BRANCH = "query-branch"
+
+
+@dataclass(frozen=True)
+class DistractorSpec:
+    policy: DistractorPolicy = DistractorPolicy.NONE
+    count: int = 0
+
+    def __post_init__(self) -> None:
+        if self.count < 0:
+            raise ValueError("distractor count must be non-negative")
+        if self.policy is DistractorPolicy.NONE and self.count != 0:
+            raise ValueError("none distractor policy requires count 0")
+        if self.policy is not DistractorPolicy.NONE and self.count < 1:
+            raise ValueError("a distractor policy requires a positive count")
+
+
 @dataclass(frozen=True)
 class StructuralConstraints:
     require_independent_axes: bool = False
     x_depth: DepthRange | None = None
     y_depth: DepthRange | None = None
+    distractors: DistractorSpec = field(default_factory=DistractorSpec)
 
 
 @dataclass(frozen=True)
@@ -184,6 +205,17 @@ class GenerationSpec:
             raise ValueError(
                 "x_depth and y_depth must be specified together for dir-1"
             )
+        distractors = self.constraints.distractors
+        if distractors.policy is not DistractorPolicy.NONE:
+            if not (self.constraints.x_depth and self.constraints.y_depth):
+                raise ValueError("distractors currently require proof depth constraints")
+            if not self.constraints.require_independent_axes:
+                raise ValueError("distractors currently require independent axes")
+            if (
+                self.constraints.x_depth.minimum != self.constraints.x_depth.maximum
+                or self.constraints.y_depth.minimum != self.constraints.y_depth.maximum
+            ):
+                raise ValueError("distractors currently require exact proof depths")
         if (self.constraints.x_depth or self.constraints.y_depth) and (
             self.relation_mode is RelationMode.DIAGONAL
         ):
@@ -207,11 +239,21 @@ class GenerationSpec:
         elif self.constraints.y_depth:
             required_entities = self.constraints.y_depth.maximum + 1
             required_relations = self.constraints.y_depth.maximum + 1
-        if self.relation_mode is RelationMode.MIXED and (
+        if (
+            distractors.policy is DistractorPolicy.NONE
+            and self.relation_mode is RelationMode.MIXED
+            and (
             self.constraints.x_depth or self.constraints.y_depth
+            )
         ):
             required_entities += 2
             required_relations += 1
+        elif distractors.policy is DistractorPolicy.DISCONNECTED:
+            required_entities += distractors.count + 1
+            required_relations += distractors.count
+        elif distractors.policy is DistractorPolicy.QUERY_BRANCH:
+            required_entities += distractors.count
+            required_relations += distractors.count
         if self.num_entities < required_entities:
             raise ValueError(
                 f"num_entities={self.num_entities} cannot fit the minimum "
@@ -221,6 +263,13 @@ class GenerationSpec:
             raise ValueError(
                 f"num_relations={self.num_relations} cannot fit the minimum "
                 f"proof skeleton ({required_relations})"
+            )
+        if distractors.policy is not DistractorPolicy.NONE and (
+            self.num_relations != required_relations
+        ):
+            raise ValueError(
+                "distractor cells require num_relations to equal proof edges "
+                "plus distractor count"
             )
 
 
@@ -242,14 +291,14 @@ class GeneratedExample:
     messages: tuple[dict[str, str], ...]
     oracle_option: str
     difficulty: dict[str, Any]
-    generator_version: str = "v13.2-deep-generation"
+    generator_version: str = "v13.3-structured-distractors"
 
     def to_row(self, *, generation_cell: str | None = None) -> dict[str, Any]:
         row: dict[str, Any] = {
             "messages": [dict(message) for message in self.messages],
             "oracle_option": self.oracle_option,
             "difficulty": dict(self.difficulty),
-            "difficulty_schema_version": 1,
+            "difficulty_schema_version": 2,
             "generator_version": self.generator_version,
         }
         if generation_cell is not None:
@@ -380,19 +429,45 @@ def _make_depth_scene(
         for left, right in zip(y_nodes, y_nodes[1:])
     )
 
-    # Mixed mode needs diagonal evidence, but it stays in an irrelevant
-    # subgraph so it cannot collapse either requested query proof.
-    if spec.relation_mode is RelationMode.MIXED:
+    distractors = spec.constraints.distractors
+    if distractors.policy is DistractorPolicy.DISCONNECTED:
+        distractor_nodes = extras[: distractors.count + 1]
+        for index, (left, right) in enumerate(
+            zip(distractor_nodes, distractor_nodes[1:])
+        ):
+            direction = (
+                Direction.NORTHEAST
+                if spec.relation_mode is RelationMode.MIXED and index == 0
+                else rng.choice(
+                    (Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH)
+                )
+            )
+            relations.append(Relation(right, direction, left))
+    elif distractors.policy is DistractorPolicy.QUERY_BRANCH:
+        distractor_nodes = extras[: distractors.count]
+        for index, node in enumerate(distractor_nodes):
+            direction = (
+                Direction.NORTHEAST
+                if spec.relation_mode is RelationMode.MIXED and index == 0
+                else rng.choice(
+                    (Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH)
+                )
+            )
+            relations.append(Relation(node, direction, reference))
+    elif spec.relation_mode is RelationMode.MIXED:
+        # Mixed depth controls need diagonal evidence, but it stays in an
+        # irrelevant component so it cannot collapse either requested path.
         relations.append(Relation(extras[1], Direction.NORTHEAST, extras[0]))
 
     # Cardinal filler is confined to the opposite axis's internal nodes and
     # unrelated entities. It increases prompt size without introducing a path
     # from the query reference to target on the protected axis.
     filler: list[Relation] = []
-    for left, right in itertools.combinations([*y_internal, *extras], 2):
-        filler.append(Relation(right, Direction.EAST, left))
-    for left, right in itertools.combinations([*x_internal, *extras], 2):
-        filler.append(Relation(right, Direction.NORTH, left))
+    if distractors.policy is DistractorPolicy.NONE:
+        for left, right in itertools.combinations([*y_internal, *extras], 2):
+            filler.append(Relation(right, Direction.EAST, left))
+        for left, right in itertools.combinations([*x_internal, *extras], 2):
+            filler.append(Relation(right, Direction.NORTH, left))
     rng.shuffle(filler)
     used = {(r.subject, r.direction, r.reference) for r in relations}
     for relation in filler:
@@ -817,6 +892,18 @@ class SpatialGenerator:
             ):
                 rejections["y_depth_out_of_range"] += 1
                 continue
+            distractors = spec.constraints.distractors
+            if distractors.policy is not DistractorPolicy.NONE:
+                if difficulty["num_distractor_relations"] != distractors.count:
+                    rejections["wrong_distractor_count"] += 1
+                    continue
+                policy_key = {
+                    DistractorPolicy.DISCONNECTED: "num_disconnected_distractors",
+                    DistractorPolicy.QUERY_BRANCH: "num_query_branch_distractors",
+                }[distractors.policy]
+                if difficulty[policy_key] != distractors.count:
+                    rejections["wrong_distractor_topology"] += 1
+                    continue
             return GeneratedExample(
                 messages=(
                     {

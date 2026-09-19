@@ -40,9 +40,9 @@ independent-axis rows. This is a balanced construction interface, not yet the
 final 1.5k/6k/18k experiment split recipe.
 
 The current implementation now supports solver-verified X/Y proof-depth ranges
-for independent-axis `dir-1` cells. It does **not** yet add structured
-distractors or change contradiction scope; those remain separate
-decision-gated iterations.
+and structured distractors for independent-axis `dir-1` cells. It does **not**
+yet change contradiction scope; that remains a separate decision-gated
+iteration.
 
 Foundation smoke command:
 
@@ -67,6 +67,7 @@ The generator exposes the two foundational dimensions independently:
 | semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-cycle`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
 | optional structural cell | `mixed-dir-1-independent` |
 | proof depth | exact or ranged X/Y depths for independent `dir-1` in cardinal/mixed mode |
+| distractor policy | exact-count `disconnected` or `query-branch` relations on depth-controlled `dir-1` |
 
 Python callers should request any mixture as explicit `GenerationCell` values
 passed to `generate_dataset`. The compatibility `batch_generate` adapter and
@@ -202,6 +203,61 @@ places the mandatory mixed-mode diagonal relation away from the query paths.
 The final rendered prompt is still measured by `SpatialSolverV13`; a candidate
 is rejected if an accidental shortcut moves either shortest proof outside the
 requested range.
+
+### Structured-distractor cells
+
+Typed callers add an exact distractor policy and count to the same structural
+constraints:
+
+```python
+GenerationSpec(
+    semantic_subtype=SemanticSubtype.DIR_1,
+    relation_mode=RelationMode.MIXED,
+    constraints=StructuralConstraints(
+        require_independent_axes=True,
+        x_depth=DepthRange.exact(3),
+        y_depth=DepthRange.exact(4),
+        distractors=DistractorSpec(
+            policy=DistractorPolicy.QUERY_BRANCH,
+            count=3,
+        ),
+    ),
+    num_entities=10,
+    num_relations=10,
+)
+```
+
+The CLI accepts `MODE:XxY:POLICY:DISTRACTORS:COUNT`:
+
+```bash
+cd spatial
+uv run --no-project --with typer python generate_all_v13.py \
+  --out ../data/spatial_sft_v13_distractors.jsonl \
+  --subtypes '' \
+  --samples-per-cell 0 \
+  --independent-mixed-dir1 0 \
+  --distractor-cells \
+    cardinal:3x4:disconnected:3:100,mixed:3x4:query-branch:3:100 \
+  --test-split 0.2 \
+  --seed 13
+```
+
+For these cells, a **relevant** relation is one used by the solver-selected
+shortest X or Y proof. Every other relation is a distractor. The solver then
+classifies each distractor from the rendered prompt's undirected relation
+graph:
+
+- `disconnected`: the relation is outside the component containing the query
+  proof;
+- `query-branch`: it is connected to that component but absent from both
+  selected shortest proofs.
+
+The requested distractor count is exact. Generation rejects a row if the
+solver finds the wrong count/topology or if any distractor creates a shorter X
+or Y proof. Distractor cells currently use exact rather than ranged proof
+depths so their total relation count is explicit and auditable. New rows use
+`generator_version=v13.3-structured-distractors` and
+`difficulty_schema_version=2`.
 
 ## Motivation
 
@@ -432,6 +488,12 @@ increasing the number of entities does not qualify as increasing proof depth.
 plausible enough to compete with the correct proof. Keep proof-depth buckets
 fixed while measuring this lever.
 
+**Implementation status:** `disconnected` and `query-branch` policies are
+implemented for exact-depth independent-axis `dir-1` cells in cardinal and
+mixed modes. The solver reports relevant/distractor statement indices and
+counts for both topologies. Random filler remains outside this controlled
+cell type.
+
 Candidate distractors, introduced in small groups:
 
 - disconnected irrelevant components;
@@ -586,9 +648,9 @@ Rough calibration targets, not acceptance requirements:
 
 ## Immediate next step
 
-Generate a small evaluation ladder with independent `dir-1` cells at `1x1`,
-`2x3`, `4x5`, and `6x8`, then evaluate the untuned and current SFT models. Use
-the resulting depth curve to choose the train/test mixture before adding
-structured distractors. The v12 structural census remains useful supporting
-evidence, but no later difficulty lever should be added before this depth
-ladder is measured.
+Generate a small paired evaluation in which proof depth is held fixed and only
+distractor topology changes: no distractors versus disconnected versus
+query-branch. Include at least `3x4` and `6x8`, then evaluate the untuned and
+current SFT models. This isolates whether connected plausible branches add
+difficulty beyond proof length before moving to contradiction relevance and
+scope.

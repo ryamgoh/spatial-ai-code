@@ -257,3 +257,56 @@ def test_cli_rejects_malformed_depth_cells(tmp_path) -> None:
 
     assert result.exit_code != 0
     assert "depth cell" in result.output.lower()
+
+
+def test_cli_generates_disconnected_and_query_branch_distractor_cells(tmp_path) -> None:
+    output = tmp_path / "distractors.jsonl"
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(output),
+            "--subtypes",
+            "",
+            "--samples-per-cell",
+            "0",
+            "--independent-mixed-dir1",
+            "0",
+            "--distractor-cells",
+            "cardinal:3x4:disconnected:3:2,mixed:3x4:query-branch:3:2",
+            "--test-split",
+            "0",
+            "--seed",
+            "13",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    rows = [
+        json.loads(line)
+        for line in (tmp_path / "distractors_train.jsonl").read_text().splitlines()
+    ]
+    assert len(rows) == 4
+    for row in rows:
+        difficulty = row["difficulty"]
+        assert (difficulty["x_depth"], difficulty["y_depth"]) == (3, 4)
+        assert difficulty["num_distractor_relations"] == 3
+        if "disconnected" in row["generation_cell"]:
+            assert difficulty["num_disconnected_distractors"] == 3
+        else:
+            assert difficulty["num_query_branch_distractors"] == 3
+
+
+def test_cli_rejects_malformed_distractor_cells(tmp_path) -> None:
+    result = CliRunner().invoke(
+        app,
+        [
+            "--out",
+            str(tmp_path / "bad-distractor.jsonl"),
+            "--distractor-cells",
+            "mixed:3x4:random-noise:3:2",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "distractor cell" in result.output.lower()

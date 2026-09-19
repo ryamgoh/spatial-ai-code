@@ -191,6 +191,50 @@ class SpatialSolverV13(SpatialSolver):
             "supporting_statements": [],
         }
 
+    @staticmethod
+    def _distractor_profile(
+        relations: list[tuple[str, str, str, int]],
+        relevant_statements: set[int],
+        proof_nodes: set[str],
+    ) -> dict[str, Any]:
+        """Classify non-proof relations by connectivity to the query proof."""
+        adjacency: dict[str, set[str]] = {}
+        for a, _direction, b, _statement_index in relations:
+            adjacency.setdefault(a, set()).add(b)
+            adjacency.setdefault(b, set()).add(a)
+
+        query_component = set(proof_nodes)
+        frontier = list(proof_nodes)
+        while frontier:
+            node = frontier.pop()
+            for neighbor in adjacency.get(node, set()):
+                if neighbor not in query_component:
+                    query_component.add(neighbor)
+                    frontier.append(neighbor)
+
+        distractors = [
+            statement_index
+            for _a, _direction, _b, statement_index in relations
+            if statement_index not in relevant_statements
+        ]
+        query_branch = [
+            statement_index
+            for a, _direction, b, statement_index in relations
+            if statement_index in distractors
+            and (a in query_component or b in query_component)
+        ]
+        disconnected = sorted(set(distractors) - set(query_branch))
+        return {
+            "relevant_statement_indices": sorted(relevant_statements),
+            "distractor_statement_indices": sorted(distractors),
+            "num_relevant_relations": len(relevant_statements),
+            "num_distractor_relations": len(distractors),
+            "disconnected_distractor_statement_indices": disconnected,
+            "query_branch_distractor_statement_indices": sorted(query_branch),
+            "num_disconnected_distractors": len(disconnected),
+            "num_query_branch_distractors": len(query_branch),
+        }
+
     def solve_and_analyze(self, text: str) -> SolvedProblem:
         """Grade and structurally analyse a rendered prompt in one pass."""
         objects, relations, question_part = self._parse_indexed_relations(text)
@@ -227,6 +271,14 @@ class SpatialSolverV13(SpatialSolver):
             "axes_independent": None,
             "x_conflict": False,
             "y_conflict": False,
+            "relevant_statement_indices": [],
+            "distractor_statement_indices": [],
+            "num_relevant_relations": 0,
+            "num_distractor_relations": 0,
+            "disconnected_distractor_statement_indices": [],
+            "query_branch_distractor_statement_indices": [],
+            "num_disconnected_distractors": 0,
+            "num_query_branch_distractors": 0,
         }
         x_edges: list[tuple[str, str, int]] = []
         y_edges: list[tuple[str, str, int]] = []
@@ -279,6 +331,21 @@ class SpatialSolverV13(SpatialSolver):
                         "proven_entity_proofs": proven_entity_proofs,
                     }
                 )
+                relevant = {
+                    statement_index
+                    for proof in proven_entity_proofs
+                    for axis, _ in requirements
+                    for statement_index in proof[f"{axis}_supporting_statements"]
+                }
+                proof_nodes = {reference} | {
+                    node
+                    for proof in proven_entity_proofs
+                    for axis, _ in requirements
+                    for node in proof[f"{axis}_path"]
+                }
+                result.update(
+                    self._distractor_profile(relations, relevant, proof_nodes)
+                )
             return SolvedProblem(
                 grade=grade,
                 structure=result,
@@ -315,6 +382,13 @@ class SpatialSolverV13(SpatialSolver):
                 "y_conflict": y_proof["conflict"],
             }
         )
+        relevant = set(x_proof["supporting_statements"]) | set(
+            y_proof["supporting_statements"]
+        )
+        proof_nodes = {target, reference}
+        proof_nodes.update(x_proof["path"] or [])
+        proof_nodes.update(y_proof["path"] or [])
+        result.update(self._distractor_profile(relations, relevant, proof_nodes))
         return SolvedProblem(
             grade=grade,
             structure=result,

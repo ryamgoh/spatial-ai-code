@@ -18,6 +18,8 @@ from spatial_generation_v13 import (
     DEFAULT_SYSTEM_PROMPT,
     SEMANTIC_SUBTYPES,
     DepthRange,
+    DistractorPolicy,
+    DistractorSpec,
     GenerationCell,
     GenerationError,
     GenerationSpec,
@@ -83,6 +85,69 @@ def _parse_depth_cells(raw: str) -> list[GenerationCell]:
                     ),
                     num_entities=max(8, x_depth.maximum + y_depth.maximum + (2 if mode is RelationMode.MIXED else 0)),
                     num_relations=max(10, x_depth.maximum + y_depth.maximum + (1 if mode is RelationMode.MIXED else 0)),
+                ),
+                count=count,
+            )
+        )
+    return cells
+
+
+def _parse_distractor_cells(raw: str) -> list[GenerationCell]:
+    if not raw.strip():
+        return []
+    cells: list[GenerationCell] = []
+    for encoded in raw.split(","):
+        try:
+            mode_raw, depths_raw, policy_raw, distractor_raw, count_raw = (
+                encoded.strip().split(":", 4)
+            )
+            x_raw, y_raw = depths_raw.lower().split("x", 1)
+            mode = RelationMode(mode_raw)
+            if mode is RelationMode.DIAGONAL:
+                raise ValueError("diagonal distractor cells are not supported")
+            x_depth = DepthRange.exact(int(x_raw))
+            y_depth = DepthRange.exact(int(y_raw))
+            policy = DistractorPolicy(policy_raw)
+            if policy is DistractorPolicy.NONE:
+                raise ValueError("distractor policy must add distractors")
+            distractor_count = int(distractor_raw)
+            count = int(count_raw)
+            if distractor_count < 1 or count < 0:
+                raise ValueError("counts must be positive/non-negative")
+            extra_entities = (
+                distractor_count + 1
+                if policy is DistractorPolicy.DISCONNECTED
+                else distractor_count
+            )
+            num_entities = x_depth.maximum + y_depth.maximum + extra_entities
+            num_relations = (
+                x_depth.maximum + y_depth.maximum + distractor_count
+            )
+        except ValueError as exc:
+            raise typer.BadParameter(
+                f"invalid distractor cell '{encoded}': {exc}; expected "
+                "MODE:XxY:POLICY:DISTRACTORS:COUNT",
+                param_hint="--distractor-cells",
+            ) from exc
+        cells.append(
+            GenerationCell(
+                name=(
+                    f"{mode.value}-dir-1-depth-x{x_depth.minimum}-"
+                    f"y{y_depth.minimum}-{policy.value}-d{distractor_count}"
+                ),
+                spec=GenerationSpec(
+                    semantic_subtype=SemanticSubtype.DIR_1,
+                    relation_mode=mode,
+                    constraints=StructuralConstraints(
+                        require_independent_axes=True,
+                        x_depth=x_depth,
+                        y_depth=y_depth,
+                        distractors=DistractorSpec(
+                            policy=policy, count=distractor_count
+                        ),
+                    ),
+                    num_entities=num_entities,
+                    num_relations=num_relations,
                 ),
                 count=count,
             )
@@ -265,6 +330,14 @@ def main(
         "--depth-cells",
         help="Extra dir-1 cells as MODE:XxY:COUNT; ranges use MIN-MAX.",
     ),
+    distractor_cells: str = typer.Option(
+        "",
+        "--distractor-cells",
+        help=(
+            "Extra dir-1 cells as "
+            "MODE:XxY:POLICY:DISTRACTORS:COUNT."
+        ),
+    ),
     test_split: float = typer.Option(0.2, min=0.0, max=1.0),
     seed: int = typer.Option(13),
 ) -> None:
@@ -291,7 +364,7 @@ def main(
             "select at least one relation mode", param_hint="--relation-modes"
         )
     if not selected_subtypes and independent_mixed_dir1 == 0:
-        if depth_cells.strip():
+        if depth_cells.strip() or distractor_cells.strip():
             pass
         else:
             raise typer.BadParameter(
@@ -304,6 +377,7 @@ def main(
         independent_mixed_dir1,
     )
     cells.extend(_parse_depth_cells(depth_cells))
+    cells.extend(_parse_distractor_cells(distractor_cells))
     train_path, test_path = generate_dataset(
         cells,
         output_file=out,
