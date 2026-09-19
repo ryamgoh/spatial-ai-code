@@ -233,6 +233,12 @@ Likely but not yet directly proven:
    seeds and world fingerprints.
 5. Treat preservation of base depth performance as a first-class SFT metric.
 
+The corresponding repository entry points are
+`slurm/eval-v12-stage1-bridge-h200.sh` and
+`scripts/analyze_v13_error_traces.py`. The bridge writes
+`results/V12-STAGE1-BRIDGE.md`; the trace audit writes
+`results/ERROR-TRACE-AUDIT.md` and `ERROR-TRACE-EXAMPLES.jsonl`.
+
 ## Current training implication
 
 Native V13 SFT should target the base model's actual gaps—multi-answer rules,

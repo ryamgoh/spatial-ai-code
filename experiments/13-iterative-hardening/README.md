@@ -780,3 +780,26 @@ default `STAGES=2` preserves the earlier experiment protocol (LoRA reasoning
 followed by the constrained base-model letter readout); use `STAGES=1` as the
 direct adapter-output check. Stage-1 results are written to separate
 `*-stage1` directories so they cannot overwrite the default comparison.
+
+Before native V13 SFT, run the one-pass bridge on the original matched V12 2K
+test. The launcher uses the `gpu` partition's maximum `03:00:00` wall time:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/eval-v12-stage1-bridge-h200.sh
+```
+
+It writes `results/V12-STAGE1-BRIDGE.md`. Run individual cells with
+`ONLY=baseline`, `ONLY=v12-4b-1.5k`, or `ONLY=v12-4b-6k`.
+
+After the three V13 stage-1 response files are present, audit regressions on
+identical prompts:
+
+```bash
+uv run --no-project python \
+  experiments/13-iterative-hardening/scripts/analyze_v13_error_traces.py
+```
+
+This writes `results/ERROR-TRACE-AUDIT.md` and
+`results/ERROR-TRACE-EXAMPLES.jsonl`. Cohort membership is exact; labels such
+as `cardinal_cross_axis_update` are heuristic and the raw traces remain the
+review surface.
