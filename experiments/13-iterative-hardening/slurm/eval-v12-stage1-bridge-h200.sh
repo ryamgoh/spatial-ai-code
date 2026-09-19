@@ -60,6 +60,8 @@ if [[ ! -s "$TEST" ]]; then
   echo "=== Rebuild the frozen Exp 12 split ==="
   POOL=data/spatial_sft_v12_21000_pool.jsonl
   if [[ ! -s "$POOL" ]]; then
+    exec 9>data/.spatial_sft_v12.lock
+    flock 9
     cd finetune
     srun --cpu-bind=cores uv run --no-project --with typer python \
       ../spatial/generate_all_v6.py \
@@ -86,6 +88,7 @@ if [[ ! -s "$TEST" ]]; then
     if [[ -s data/spatial_sft_v12_21000_pool_train.jsonl ]]; then
       mv data/spatial_sft_v12_21000_pool_train.jsonl "$POOL"
     fi
+    flock -u 9
   fi
   uv run --no-project python experiments/12-v6-mix-reweight/scripts/make_v12_data.py || exit 1
 fi

@@ -45,14 +45,33 @@ def test_cardinal_axis_audit_detects_cross_axis_and_wrong_orientation() -> None:
         "The Park is to the West of the Museum.\n\nQuestion: x"
     )
     response = (
-        "### Step 1\n**X-Extraction**: Bank < Library\n**Y-Extraction**: Library < Bank\n"
-        "### Step 2\n**X-Extraction**: Museum < Park\n**Y-Extraction**: none\n"
+        "### Step 1\n**Sentence**: first\n**X-Extraction**: Bank < Library\n**Y-Extraction**: Library < Bank\n"
+        "### Step 2\n**Sentence**: second\n**X-Extraction**: Museum < Park\n**Y-Extraction**: none\n"
     )
 
     counts = AUDIT.cardinal_axis_errors(prompt, response)
 
     assert counts["cardinal_cross_axis_update"] == 1
     assert counts["incorrect_active_axis_update"] == 1
+
+
+def test_compact_trace_is_aligned_and_checks_axis_orientation() -> None:
+    prompt = (
+        "The Library is to the East of the Bank. "
+        "The Park is to the West of the Museum.\n\nQuestion: x"
+    )
+    response = (
+        "### Step 1: Parse the Spatial Relations\n"
+        "- Bank < Library (X-axis)\n"
+        "- Museum < Park (X-axis)\n"
+        "### Step 2: Build X-Axis Order\n"
+    )
+
+    counts = AUDIT.cardinal_axis_errors(prompt, response)
+
+    assert "unaligned_trace" not in counts
+    assert counts["incorrect_active_axis_update"] == 1
+    assert AUDIT.trace_format(response) == "compact-phases"
 
 
 def test_build_audit_finds_both_regression_cohorts(tmp_path) -> None:

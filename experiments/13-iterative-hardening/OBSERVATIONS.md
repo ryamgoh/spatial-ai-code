@@ -107,9 +107,38 @@ uses diagonal relations almost exclusively, so nearly every premise updates X
 and Y together. V13 cardinal premises require updating exactly one axis, and
 mixed worlds require keeping both graphs separate before composition. More V12
 training may make the diagonal trace pattern and answer-policy templates more
-rigid. This explanation fits the dose-dependent degradation but remains a
-hypothesis until error traces directly confirm incorrect axis updates or other
-V12-specific trace habits.
+rigid.
+
+### Raw-trace verification
+
+The paired trace audit found 493 base-correct/1.5K-wrong prompts and 495
+1.5K-correct/6K-wrong prompts. Its first automated report overstated
+`missing_active_axis_update` and `unaligned_trace`: the parser initially
+recognized only V13-style `X-Extraction` lines and one-step-per-sentence
+traces. Manual inspection of the exported raw examples corrected that
+interpretation.
+
+The 12 exported base-correct/1.5K-wrong representatives were all depth-5
+examples. Every 1.5K trace processed all 13 premises, but 10/12 wrote at least
+one cardinal premise to the irrelevant axis. Across 150 cardinal premises, 89
+spurious cross-axis updates were visible. A representative failure interpreted
+`Museum is North of Bank` as both `Bank < Museum` on X and Y. The model could
+then construct a fluent but false global graph and select the wrong direction.
+
+The 12 exported 1.5K-correct/6K-wrong representatives were also depth-5
+examples. The 6K model did not generally stop after five premises: it used five
+semantic phases and, in all 12 examples, listed all 13 premises in its parse
+phase. However, 9/12 already reversed at least one cardinal relation in that
+parse, and 10/12 later claimed a required query axis was unknown. Representative
+traces show correctly read facts being dropped or contaminated while merging
+the X/Y chains.
+
+These counts describe the analyzer's deliberately depth-ranked 12-example
+samples, not unbiased estimates over all 493/495 regressions. They nevertheless
+directly confirm both failure mechanisms exist. The analyzer now supports both
+the 1.5K sentence-step format and the 6K compact-phase format so the next full
+audit will count them without treating formatting differences as reasoning
+errors.
 
 ## What the base model is not good at
 
@@ -212,10 +241,11 @@ Established:
 - No model is simultaneously strong on closed cycles and open controls across
   all question families.
 
-Likely but not yet directly proven:
+Likely but not yet established across the full regression population:
 
-- V12 SFT causes incorrect one-axis updates because its premises are almost all
-  diagonal.
+- Incorrect one-axis updates and graph-merge omissions seen in the raw sample
+  explain a large share of the full V13 transfer gap. Their existence is
+  confirmed; their population prevalence still needs the corrected full audit.
 - The 6K adapter is more specialized to V12 trace and answer templates.
 - Some base closed-cycle success is conservative `Cannot be determined`
   behavior rather than exact cycle discrimination.

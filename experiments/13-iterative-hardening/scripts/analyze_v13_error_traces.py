@@ -31,9 +31,15 @@ RELATION_RE = re.compile(
 )
 STEP_RE = re.compile(r"### Step \d+\s*(.*?)(?=### Step \d+|### Final Deduction|### Consistency Check|$)", re.S)
 EXTRACTION_RE = {
-    axis: re.compile(rf"\*\*{axis}-Extraction\*\*:\s*([^\n]+)", re.I)
+    axis: re.compile(
+        rf"\*\*{axis}-(?:Extraction|axis)\*\*:\s*([^\n]+)", re.I
+    )
     for axis in ("X", "Y")
 }
+COMPACT_PARSE_RE = re.compile(
+    r"### Step 1:\s*Parse the Spatial Relations(.*?)(?=### Step 2|$)",
+    re.S | re.I,
+)
 
 
 def _text(sample: dict) -> str:
@@ -70,6 +76,30 @@ def _step_extractions(response: str) -> list[dict[str, str]]:
     return result
 
 
+def trace_format(response: str) -> str:
+    if "**Sentence**:" in response:
+        return "sentence-steps"
+    if COMPACT_PARSE_RE.search(response):
+        return "compact-phases"
+    return "free-form"
+
+
+def _expected_cardinal(
+    subject: str, direction: str, reference: str
+) -> tuple[str, str]:
+    axis = "x" if direction in {"east", "west"} else "y"
+    low, high = (
+        (reference, subject)
+        if direction in {"east", "north"}
+        else (subject, reference)
+    )
+    return axis, f"{low.strip()} < {high.strip()}"
+
+
+def _normalize_relation(value: str) -> str:
+    return re.sub(r"\s+", " ", value.split("(", 1)[0]).strip().lower()
+
+
 def cardinal_axis_errors(prompt: str, response: str) -> dict[str, int]:
     """Count template-shaped cardinal extraction mistakes.
 
@@ -77,34 +107,74 @@ def cardinal_axis_errors(prompt: str, response: str) -> dict[str, int]:
     with prompt relations. Missing or free-form steps are counted separately.
     """
     relations = list(RELATION_RE.finditer(prompt.split("Question:", 1)[0]))
-    steps = _step_extractions(response)
     counts = Counter()
-    if len(steps) != len(relations):
+    sentence_steps = [
+        block for block in STEP_RE.findall(response) if "**Sentence**:" in block
+    ]
+    compact_match = COMPACT_PARSE_RE.search(response)
+    compact_steps = (
+        re.findall(r"^-\s+(.+)$", compact_match.group(1), re.M)
+        if compact_match
+        else []
+    )
+    if len(sentence_steps) == len(relations):
+        mode = "sentence-steps"
+        steps: list[dict[str, str] | str] = _step_extractions(response)
+    elif len(compact_steps) == len(relations):
+        mode = "compact-phases"
+        steps = compact_steps
+    else:
         counts["unaligned_trace"] += 1
         return dict(counts)
     for relation, step in zip(relations, steps):
         subject, direction_raw, reference = relation.groups()
         direction = direction_raw.lower()
-        active = "x" if direction in {"east", "west"} else "y" if direction in {"north", "south"} else None
-        if active is None:
+        if direction not in {"east", "west", "north", "south"}:
             continue
+        active, expected = _expected_cardinal(subject, direction, reference)
         inactive = "y" if active == "x" else "x"
-        active_value = step.get(active, "")
-        inactive_value = step.get(inactive, "")
-        if not active_value or "none" in active_value.lower():
-            counts["missing_active_axis_update"] += 1
-        else:
-            low, high = (
-                (reference, subject)
-                if direction in {"east", "north"}
-                else (subject, reference)
-            )
-            expected = f"{low.strip()} < {high.strip()}"
-            normalized = re.sub(r"\s+", " ", active_value).strip()
-            if normalized != expected:
+        if mode == "sentence-steps":
+            assert isinstance(step, dict)
+            active_value = step.get(active, "")
+            inactive_value = step.get(inactive, "")
+            if not active_value or "none" in active_value.lower() or "neither" in active_value.lower():
+                counts["missing_active_axis_update"] += 1
+            elif _normalize_relation(active_value) != expected.lower():
                 counts["incorrect_active_axis_update"] += 1
-        if inactive_value and "none" not in inactive_value.lower():
-            counts["cardinal_cross_axis_update"] += 1
+            if (
+                inactive_value
+                and "none" not in inactive_value.lower()
+                and "neither" not in inactive_value.lower()
+                and "unknown" not in inactive_value.lower()
+            ):
+                counts["cardinal_cross_axis_update"] += 1
+        else:
+            assert isinstance(step, str)
+            normalized = _normalize_relation(step)
+            axes = {axis.lower() for axis in re.findall(r"\(([XY])-axis\)", step, re.I)}
+            if active not in axes:
+                counts["missing_active_axis_update"] += 1
+            if inactive in axes:
+                counts["cardinal_cross_axis_update"] += 1
+            if expected.lower() not in normalized:
+                counts["incorrect_active_axis_update"] += 1
+    return dict(counts)
+
+
+def query_axis_errors(sample: dict) -> dict[str, int]:
+    difficulty = _difficulty(sample)
+    if difficulty.get("question_family") != "direction":
+        return {}
+    response = _response(sample)
+    tail_markers = [response.rfind(marker) for marker in ("Determine", "Analyze the Target", "### Question")]
+    tail = response[max(tail_markers):] if max(tail_markers) >= 0 else response[-1800:]
+    counts = Counter()
+    for axis in ("x", "y"):
+        if difficulty.get(f"{axis}_depth") is None:
+            continue
+        match = re.search(rf"{axis.upper()}-axis:\s*([^\n]+)", tail, re.I)
+        if match and re.search(r"neither|unknown|not proven|not derived", match.group(1), re.I):
+            counts["proven_axis_claimed_unknown"] += 1
     return dict(counts)
 
 
@@ -124,6 +194,9 @@ def classify(sample: dict) -> list[str]:
     elif family == "count":
         labels.append("count_or_menu_policy")
     for label, count in cardinal_axis_errors(_text(sample), _response(sample)).items():
+        if count:
+            labels.append(label)
+    for label, count in query_axis_errors(sample).items():
         if count:
             labels.append(label)
     return sorted(set(labels or ["unclassified"]))
@@ -158,15 +231,22 @@ def build_audit(results_dir: Path, limit: int) -> tuple[str, list[dict]]:
         "",
         "All cohorts compare identical prompts. Cohort membership and answer correctness are deterministic. Trace labels are heuristics and must be verified against the included raw completions.",
         "",
-        "| cohort | rows | cardinal/mixed | depth 3–5 |",
-        "|---|---:|---:|---:|",
+        "| cohort | rows | cardinal/mixed | depth 3–5 | wrong-trace format |",
+        "|---|---:|---:|---:|---|",
     ]
     exported = []
     for name, groups in cohorts.items():
         representative = [group[TAGS[1] if "1.5k-wrong" in name else TAGS[2]] for group in groups]
         cardinal_mixed = sum(_difficulty(row).get("relation_mix") in {"cardinal-only", "mixed"} for row in representative)
         deep = sum(max(_difficulty(row).get("x_depth") or 0, _difficulty(row).get("y_depth") or 0) >= 3 for row in representative)
-        lines.append(f"| `{name}` | {len(groups)} | {cardinal_mixed} | {deep} |")
+        formats = Counter(trace_format(_response(row)) for row in representative)
+        rendered_formats = ", ".join(
+            f"{key}={value}" for key, value in formats.items()
+        ) or "none"
+        lines.append(
+            f"| `{name}` | {len(groups)} | {cardinal_mixed} | {deep} | "
+            f"{rendered_formats} |"
+        )
     lines += ["", "## Heuristic labels on regressed completions", ""]
     for name, groups in cohorts.items():
         wrong_tag = TAGS[1] if "1.5k-wrong" in name else TAGS[2]
@@ -176,6 +256,7 @@ def build_audit(results_dir: Path, limit: int) -> tuple[str, list[dict]]:
         for group in groups:
             wrong = group[wrong_tag]
             errors = cardinal_axis_errors(_text(wrong), _response(wrong))
+            errors.update(query_axis_errors(wrong))
             for label, count in errors.items():
                 axis_counts[label] += count
                 if count:
