@@ -720,6 +720,16 @@ Rough calibration targets, not acceptance requirements:
   the static controlled-hardness ladder is understood.
 - Implementing all iterations in one generator revision.
 
+## Optional follow-up — shared-world question bundles
+
+After the first native v13 SFT runs, optionally generate several question
+families from the exact same premise paragraph: direction, which-object, and
+count. Pair each inconsistent world with its matched open-chain control. This
+would measure whether one detected world-level contradiction is applied
+consistently across question formats and enable an all-questions-correct
+world-level metric. It is a diagnostic refinement, not a prerequisite for the
+first v13 SFT split and not a separate hardness mechanism.
+
 ## Immediate next step
 
 Generate one compact diagnostic suite spanning the implemented dimensions
