@@ -286,3 +286,61 @@ def test_consistent_world_is_not_overridden() -> None:
     assert solved.grade.raw == "A"
     assert solved.structure["world_consistency"] == "consistent"
     assert solved.structure["cycle_axes"] == []
+
+
+def test_v13_solver_is_not_a_v6_solver_subclass() -> None:
+    from spatial_solver import SpatialSolver
+
+    assert not issubclass(SpatialSolverV13, SpatialSolver)
+
+
+def test_v13_partial_information_and_missing_option_are_distinct() -> None:
+    one_axis = prompt(
+        ["The Library is to the East of the Bank."],
+        "In which direction is the Library relative to the Bank?",
+        DIR_OPTIONS,
+    )
+    omitted = prompt(
+        [
+            "The Library is to the East of the Bank.",
+            "The Library is to the North of the Bank.",
+        ],
+        "In which direction is the Library relative to the Bank?",
+        {
+            "A": "Northwest",
+            "B": "Southeast",
+            "C": "Southwest",
+            "D": "North",
+            "E": "None of the Options",
+        },
+    )
+
+    assert set(SOLVER.solve(one_axis).split(",")) == {"A", "C"}
+    assert SOLVER.solve(omitted) == "E"
+
+
+def test_v13_which_and_count_mean_logically_proven_entities() -> None:
+    sentences = [
+        "The Library is to the East of the Bank.",
+        "The Museum is to the East of the Library.",
+        "The Zoo is to the North of the Bank.",
+    ]
+    which_text = prompt(
+        sentences,
+        "Which object is in the East of the Bank?",
+        {
+            "A": "Library",
+            "B": "Museum",
+            "C": "Zoo",
+            "D": "Bank",
+            "E": "None of the Options",
+        },
+    )
+    count_text = prompt(
+        sentences,
+        "How many objects are in the East of the Bank?",
+        {"A": "0", "B": "1", "C": "2", "D": "3", "E": "None of the Options"},
+    )
+
+    assert SOLVER.solve(which_text) == "A,B"
+    assert SOLVER.solve(count_text) == "C"

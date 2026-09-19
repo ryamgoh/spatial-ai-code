@@ -176,8 +176,6 @@ def _parse_cycle_cells(raw: str, *, include_controls: bool) -> list[GenerationCe
                 count_raw,
             ) = encoded.strip().split(":", 6)
             subtype = SemanticSubtype(subtype_raw)
-            if subtype is SemanticSubtype.DIR_CYCLE:
-                raise ValueError("use a base semantic subtype, not dir-cycle")
             mode = RelationMode(mode_raw)
             axes = CycleAxes(axes_raw)
             topology = CycleTopology(topology_raw)

@@ -18,7 +18,6 @@ V13_SUBTYPES = (
     "dir-1",
     "dir-2",
     "dir-undetermined",
-    "dir-cycle",
     "dir-incomplete",
     "dir-omit",
     "which-1",

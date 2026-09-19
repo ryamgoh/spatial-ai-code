@@ -1,20 +1,16 @@
-"""Versioned solver and structural analyser for synthetic v13 data.
+"""Standalone solver and structural analyser for synthetic v13 data.
 
-v13 preserves the v6 multiple-choice laws while extending the relation
-language with the four cardinal directions.  The generator must round-trip
-every rendered prompt through this module; its internal scene is never the
-final source of gold.
+The v13 semantic contract is implemented here independently of older dataset
+versions. The generator must round-trip every rendered prompt through this
+module; its internal scene is never the final source of gold.
 """
 
 from __future__ import annotations
 
 import re
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
-
-from spatial_solver import Grade, SpatialSolver
-
 
 RELATION_RE = re.compile(
     r"([^.]+?) is to the "
@@ -22,6 +18,21 @@ RELATION_RE = re.compile(
     r"of ([^.]+?)\.",
     re.IGNORECASE,
 )
+_UNDETERMINED = {
+    "cannot be determined",
+    "undetermined",
+    "not enough information",
+}
+_NONE_OF_OPTIONS = {
+    "none of the options",
+    "none of these options",
+    "none of the given options",
+    "not among the options",
+    "not among the given options",
+    "no listed option is correct",
+    "none of the above",
+    "none of these",
+}
 
 _DIRECTION_REQUIREMENTS = {
     "North": (("y", "gt"),),
@@ -51,6 +62,49 @@ def _strip_the(name: str) -> str:
     return normalized
 
 
+def _letter_set(answer: str) -> set[str]:
+    return {
+        token.strip()
+        for token in re.split(r"[,;| ]+", answer.strip())
+        if token.strip() in {"A", "B", "C", "D", "E", "F"}
+    }
+
+
+@dataclass
+class Grade:
+    """V13 grading verdict for one rendered prompt."""
+
+    raw: str
+    q_type: int = -1
+    options: dict[str, str] = field(default_factory=dict)
+    verdicts: list[tuple[str, str, bool, str]] = field(default_factory=list)
+    x_rel: str = "unknown"
+    y_rel: str = "unknown"
+    x_conflict: bool = False
+    y_conflict: bool = False
+    error: str | None = None
+
+    @property
+    def letters(self) -> set[str]:
+        if self.raw.startswith("Error") or self.raw == "No valid options found":
+            return set()
+        return _letter_set(self.raw)
+
+    @property
+    def pretty(self) -> str:
+        return ", ".join(key for key, _, accepted, _ in self.verdicts if accepted)
+
+    @property
+    def accept(self) -> bool:
+        if self.error or self.raw.startswith("Error"):
+            return False
+        if self.raw == "No valid options found" or not self.letters:
+            return False
+        if self.q_type == 0 and len(self.letters) >= 4:
+            return False
+        return True
+
+
 @dataclass(frozen=True)
 class SolvedProblem:
     """One authoritative parse/grade/structure result for a rendered prompt."""
@@ -77,8 +131,8 @@ def _axis_edges(a: str, direction: str, b: str) -> tuple[list[tuple[str, str]], 
     return x_edges, y_edges
 
 
-class SpatialSolverV13(SpatialSolver):
-    """v6-compatible grader with cardinal parsing and proof metadata."""
+class SpatialSolverV13:
+    """Standalone v13 parser, grader, and structural analyser."""
 
     def _parse_indexed_relations(
         self, text: str
@@ -115,6 +169,58 @@ class SpatialSolverV13(SpatialSolver):
         objects, indexed, question_part = self._parse_indexed_relations(text)
         return objects, [(a, direction, b) for a, direction, b, _ in indexed], question_part
 
+    @staticmethod
+    def detect_type(question_part: str) -> int:
+        if "In which direction is" in question_part:
+            return 0
+        if "Which object is in the" in question_part:
+            return 1
+        if "How many objects are in the" in question_part:
+            return 2
+        return -1
+
+    @staticmethod
+    def parse_options(question_part: str) -> dict[str, str]:
+        options: dict[str, str] = {}
+        tail = question_part.split("Available options", 1)[-1]
+        if re.search(r"\b[A-F]\.\s*[^,\n]+,\s*[A-F]\.", tail):
+            for match in re.finditer(
+                r"\b([A-F])\.\s*(.+?)(?=\s*,\s*[A-F]\.|\s*$)", tail
+            ):
+                options[match.group(1)] = match.group(2).strip().rstrip(".,")
+            return options
+        for match in re.finditer(r"\b([A-F])\.\s*([^\n]+)", question_part):
+            options[match.group(1)] = match.group(2).strip().rstrip(".")
+        return options
+
+    @staticmethod
+    def is_undetermined_option(value: str) -> bool:
+        return value.strip().rstrip(".").lower() in _UNDETERMINED
+
+    @staticmethod
+    def is_none_of_above(value: str) -> bool:
+        return value.strip().rstrip(".").lower() in _NONE_OF_OPTIONS
+
+    @staticmethod
+    def _transitive_closure(
+        objects: list[str], edges: list[tuple[str, str]]
+    ) -> dict[str, set[str]]:
+        reach: dict[str, set[str]] = {obj: set() for obj in objects}
+        for source, target in edges:
+            reach.setdefault(source, set()).add(target)
+            reach.setdefault(target, set())
+        changed = True
+        while changed:
+            changed = False
+            for source in list(reach):
+                before = len(reach[source])
+                additions: set[str] = set()
+                for target in reach[source]:
+                    additions |= reach.get(target, set())
+                reach[source] |= additions
+                changed |= len(reach[source]) > before
+        return reach
+
     def build_order_graphs(self, objects: list[str], relations: list[tuple]):
         x_edges: list[tuple[str, str]] = []
         y_edges: list[tuple[str, str]] = []
@@ -126,6 +232,44 @@ class SpatialSolverV13(SpatialSolver):
         return (
             self._transitive_closure(objects, x_edges),
             self._transitive_closure(objects, y_edges),
+        )
+
+    @staticmethod
+    def axis_status(
+        reach: dict[str, set[str]], target: str, reference: str
+    ) -> tuple[str, bool]:
+        greater = reference in reach.get(target, set())
+        lesser = target in reach.get(reference, set())
+        if greater and lesser:
+            return "unknown", True
+        if greater:
+            return "gt", False
+        if lesser:
+            return "lt", False
+        return "unknown", False
+
+    @classmethod
+    def get_rel(cls, reach: dict[str, set[str]], a: str, b: str) -> str:
+        relation, _ = cls.axis_status(reach, a, b)
+        return relation
+
+    def _in_axis(
+        self,
+        x_reach: dict[str, set[str]],
+        y_reach: dict[str, set[str]],
+        candidate: str,
+        reference: str,
+        axis: str,
+    ) -> bool:
+        expected = {
+            "north": (y_reach, "gt"),
+            "south": (y_reach, "lt"),
+            "east": (x_reach, "gt"),
+            "west": (x_reach, "lt"),
+        }.get(axis)
+        return bool(
+            expected
+            and self.get_rel(expected[0], candidate, reference) == expected[1]
         )
 
     @staticmethod
@@ -261,13 +405,19 @@ class SpatialSolverV13(SpatialSolver):
         }
 
     def grade(self, text: str) -> Grade:
-        """Apply global world consistency before the inherited query rules."""
+        """Apply the standalone v13 semantic contract to one prompt."""
         objects, relations, question_part = self._parse_indexed_relations(text)
         cycle_profile = self._global_cycle_profile(relations, question_part)
-        if cycle_profile["world_consistency"] == "consistent":
-            return super().grade(text)
         options = self.parse_options(question_part)
         q_type = self.detect_type(question_part)
+        if not question_part:
+            return Grade(raw="Error: no question found", error="no question found")
+        if not options:
+            return Grade(
+                raw="Error: no options found", error="no options found", q_type=q_type
+            )
+        if cycle_profile["world_consistency"] == "consistent":
+            return self._grade_consistent(objects, relations, question_part, options, q_type)
         gold_keys = [
             key
             for key in sorted(options)
@@ -297,6 +447,210 @@ class SpatialSolverV13(SpatialSolver):
             x_conflict="x" in cycle_profile["cycle_axes"],
             y_conflict="y" in cycle_profile["cycle_axes"],
         )
+
+    def _grade_consistent(
+        self,
+        objects: list[str],
+        relations: list[tuple[str, str, str, int]],
+        question_part: str,
+        options: dict[str, str],
+        q_type: int,
+    ) -> Grade:
+        x_reach, y_reach = self.build_order_graphs(objects, relations)
+        object_set = set(objects)
+        valid: list[str] = []
+        verdicts: list[tuple[str, str, bool, str]] = []
+        x_rel = y_rel = "unknown"
+
+        if q_type == 0:
+            match = re.search(
+                r"In which direction is ([^?]+?) relative to ([^?]+?)\?",
+                question_part,
+            )
+            if not match:
+                return Grade(
+                    raw="Error: cannot parse type-0 question",
+                    error="parse type-0",
+                    q_type=0,
+                )
+            target = _strip_the(match.group(1))
+            reference = _strip_the(match.group(2))
+            x_rel, _ = self.axis_status(x_reach, target, reference)
+            y_rel, _ = self.axis_status(y_reach, target, reference)
+            possible = self._possible_directions(x_rel, y_rel)
+            listed = [
+                key for key in sorted(options) if options[key] in possible
+            ]
+            listed_values = {options[key] for key in listed}
+            incomplete = (
+                len(possible) == 2
+                and bool(listed_values)
+                and listed_values != set(possible)
+            )
+            if not possible or incomplete:
+                valid = [
+                    key
+                    for key in sorted(options)
+                    if self.is_undetermined_option(options[key])
+                ]
+            elif listed_values == set(possible):
+                valid = listed
+            else:
+                valid = [
+                    key
+                    for key in sorted(options)
+                    if self.is_none_of_above(options[key])
+                ]
+            for key in sorted(options):
+                value = options[key]
+                accepted = key in valid
+                if accepted and self.is_undetermined_option(value):
+                    reason = (
+                        "only one of the two possible compounds is listed"
+                        if incomplete
+                        else "neither axis is logically determined"
+                    )
+                elif accepted and self.is_none_of_above(value):
+                    reason = "the proven direction is not listed"
+                elif accepted:
+                    reason = "matches every derived axis component"
+                elif value in possible:
+                    reason = "not selectable under the complete option-set rule"
+                else:
+                    reason = "does not match the derived axis information"
+                verdicts.append((key, value, accepted, reason))
+
+        elif q_type in (1, 2):
+            pattern = (
+                r"Which object is in the (\w+) of ([^?]+?)\?"
+                if q_type == 1
+                else r"How many objects are in the (\w+) of ([^?]+?)\?"
+            )
+            match = re.search(pattern, question_part)
+            if not match:
+                return Grade(
+                    raw=f"Error: cannot parse type-{q_type} question",
+                    error=f"parse type-{q_type}",
+                    q_type=q_type,
+                )
+            direction = match.group(1).strip().title()
+            reference = _strip_the(match.group(2))
+            requirements = _DIRECTION_REQUIREMENTS.get(direction)
+            if not requirements:
+                return Grade(
+                    raw="Error: unknown direction",
+                    error="unknown direction",
+                    q_type=q_type,
+                )
+            proven = sorted(
+                obj
+                for obj in objects
+                if obj != reference
+                and all(
+                    self.get_rel(
+                        x_reach if axis == "x" else y_reach, obj, reference
+                    )
+                    == required_relation
+                    for axis, required_relation in requirements
+                )
+            )
+            if q_type == 1:
+                for key in sorted(options):
+                    value = options[key]
+                    candidate = _strip_the(value)
+                    if self.is_undetermined_option(value) or self.is_none_of_above(value):
+                        continue
+                    accepted = candidate in object_set and candidate in proven
+                    verdicts.append(
+                        (
+                            key,
+                            value,
+                            accepted,
+                            (
+                                f"proven on every required axis of {direction}"
+                                if accepted
+                                else f"not proven on every required axis of {direction}"
+                            ),
+                        )
+                    )
+                    if accepted:
+                        valid.append(key)
+            else:
+                count = len(proven)
+                for key in sorted(options):
+                    value = options[key]
+                    if self.is_undetermined_option(value) or self.is_none_of_above(value):
+                        continue
+                    try:
+                        accepted = int(value.strip()) == count
+                    except (TypeError, ValueError):
+                        accepted = False
+                    verdicts.append(
+                        (
+                            key,
+                            value,
+                            accepted,
+                            f"matches the derived count {count}"
+                            if accepted
+                            else f"count is {count}, not {value}",
+                        )
+                    )
+                    if accepted:
+                        valid.append(key)
+            if not valid:
+                valid = [
+                    key
+                    for key in sorted(options)
+                    if self.is_none_of_above(options[key])
+                ]
+            seen = {key for key, *_ in verdicts}
+            for key in sorted(options):
+                if key in seen:
+                    continue
+                value = options[key]
+                accepted = key in valid
+                if self.is_none_of_above(value):
+                    reason = (
+                        "no listed answer is logically proven"
+                        if accepted
+                        else "a listed answer is logically proven"
+                    )
+                elif self.is_undetermined_option(value):
+                    reason = "the world is consistent; this option is reserved for inconsistency"
+                else:
+                    reason = "not a valid content option"
+                verdicts.append((key, value, accepted, reason))
+        else:
+            return Grade(
+                raw="Error: unknown question type",
+                error="unknown type",
+                q_type=q_type,
+            )
+
+        raw = ",".join(valid) if valid else "No valid options found"
+        return Grade(
+            raw=raw,
+            q_type=q_type,
+            options=options,
+            verdicts=verdicts,
+            x_rel=x_rel,
+            y_rel=y_rel,
+        )
+
+    @staticmethod
+    def _possible_directions(x_rel: str, y_rel: str) -> list[str]:
+        x_values = ("East",) if x_rel == "gt" else ("West",) if x_rel == "lt" else ("East", "West")
+        y_values = ("North",) if y_rel == "gt" else ("South",) if y_rel == "lt" else ("North", "South")
+        if x_rel == y_rel == "unknown":
+            return []
+        return [f"{y}{x.lower()}" for y in y_values for x in x_values]
+
+    def solve(self, text: str) -> str:
+        return self.grade(text).raw
+
+    def agrees(self, text: str, answer: str) -> bool:
+        grade = self.grade(text)
+        return grade.accept and grade.letters == _letter_set(answer)
 
     @staticmethod
     def _shortest_path(
@@ -408,7 +762,13 @@ class SpatialSolverV13(SpatialSolver):
     def solve_and_analyze(self, text: str) -> SolvedProblem:
         """Grade and structurally analyse a rendered prompt in one pass."""
         objects, relations, question_part = self._parse_indexed_relations(text)
-        local_grade = super().grade(text)
+        local_grade = self._grade_consistent(
+            objects,
+            relations,
+            question_part,
+            self.parse_options(question_part),
+            self.detect_type(question_part),
+        )
         grade = self.grade(text)
         cycle_profile = self._global_cycle_profile(relations, question_part)
         local_subtype = self._semantic_subtype(local_grade)

@@ -5,12 +5,17 @@
 > intentionally provisional: make one structural change, measure it, and pause
 > before choosing the next one.
 
+The authoritative v13 meaning of worlds, questions, and special options is
+[`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
+are frozen comparison suites, not semantic dependencies of v13.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:
 
-- `spatial/spatial_solver_v13.py` preserves the v6 answer laws, parses cardinal
-  and diagonal relations, and measures shortest X/Y proof paths for Type 0.
+- `spatial/spatial_solver_v13.py` independently implements the explicit v13
+  semantic contract, parses cardinal/diagonal relations, and measures shortest
+  X/Y proof paths. It does not subclass or import the v6 solver.
 - `spatial/spatial_generation_v13.py` owns typed generation specs, scenes,
   subtype policies, constraint checking, and dataset construction.
 - `spatial/generate_all_v13.py` is the CLI/compatibility adapter supporting
@@ -27,15 +32,16 @@ The first narrow implementation increment is complete:
 
 The next accepted increment is also implemented:
 
-- all 13 v12 semantic subtypes are available in every relation mode;
+- all 12 consistent-world base semantic subtypes are available in every
+  relation mode;
 - subtype labels are inferred from the v13 solver's rendered-prompt verdict,
   not trusted from generator intent;
-- batch generation crosses 3 relation modes × 13 semantic subtypes;
+- batch generation crosses 3 relation modes × 12 base semantic subtypes;
 - splitting is stratified within each generation cell; and
 - an additional `mixed-dir-1-independent` cell requires the shortest X and Y
   proofs to share no supporting statement.
 
-At the default 100 rows per cell, this produces 3,900 ordinary rows plus 100
+At the default 100 rows per cell, this produces 3,600 ordinary rows plus 100
 independent-axis rows. This is a balanced construction interface, not yet the
 final 1.5k/6k/18k experiment split recipe.
 
@@ -64,7 +70,7 @@ The generator exposes the two foundational dimensions independently:
 | dimension | supported values |
 |---|---|
 | relation mode | `diagonal`, `cardinal`, `mixed` |
-| semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-cycle`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
+| base semantic subtype | `dir-1`, `dir-2`, `dir-undetermined`, `dir-incomplete`, `dir-omit`, `which-1`, `which-2`, `which-3`, `which-4`, `which-0`, `count-1`, `count-omit` |
 | optional structural cell | `mixed-dir-1-independent` |
 | proof depth | exact or ranged X/Y depths for independent `dir-1` in cardinal/mixed mode |
 | distractor policy | exact-count `disconnected` or `query-branch` relations on depth-controlled `dir-1` |
@@ -273,7 +279,8 @@ parse all premises
         → consistent world: evaluate the direction/which/count query
 ```
 
-`CycleSpec` is orthogonal to the base semantic subtype:
+`CycleSpec` is the only v13 mechanism for requesting a cycle and is orthogonal
+to the base semantic subtype:
 
 ```python
 GenerationSpec(

@@ -484,6 +484,10 @@ def test_cycle_spec_validates_topology_and_length() -> None:
         )
 
 
+def test_cycle_is_not_a_base_semantic_subtype() -> None:
+    assert "dir-cycle" not in {subtype.value for subtype in SemanticSubtype}
+
+
 def test_near_cycle_control_preserves_base_answer_and_has_no_cycle() -> None:
     spec = GenerationSpec(
         semantic_subtype=SemanticSubtype.WHICH_2,

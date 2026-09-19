@@ -1,9 +1,8 @@
 """Deep v13 synthetic generation module.
 
-This is intentionally a narrow foundation.  It preserves the v6 question and
-option laws, adds cardinal relations, and records structure measured by
-``SpatialSolverV13`` after reparsing the final prompt.  Later v13 iterations
-will add controlled proof-depth targets, distractors, and richer conflicts.
+This module implements the explicit v13 semantic contract, cardinal and
+diagonal relations, and structural constraints measured by
+``SpatialSolverV13`` after reparsing the final prompt.
 """
 
 from __future__ import annotations
@@ -19,8 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from spatial_graph import AxisGraph, ENTITY_NAMES
-from spatial_solver import Grade
-from spatial_solver_v13 import SolvedProblem, SpatialSolverV13
+from spatial_solver_v13 import Grade, SolvedProblem, SpatialSolverV13
 
 
 COMPOUNDS = ["Northeast", "Northwest", "Southeast", "Southwest"]
@@ -39,7 +37,6 @@ class SemanticSubtype(str, Enum):
     DIR_1 = "dir-1"
     DIR_2 = "dir-2"
     DIR_UNDETERMINED = "dir-undetermined"
-    DIR_CYCLE = "dir-cycle"
     DIR_INCOMPLETE = "dir-incomplete"
     DIR_OMIT = "dir-omit"
     WHICH_1 = "which-1"
@@ -188,7 +185,6 @@ _SUBTYPE_POLICIES = {
     SemanticSubtype.DIR_1: _SubtypePolicy(0, 1),
     SemanticSubtype.DIR_2: _SubtypePolicy(0, 2),
     SemanticSubtype.DIR_UNDETERMINED: _SubtypePolicy(0, 0),
-    SemanticSubtype.DIR_CYCLE: _SubtypePolicy(0, 0),
     SemanticSubtype.DIR_INCOMPLETE: _SubtypePolicy(0, 2),
     SemanticSubtype.DIR_OMIT: _SubtypePolicy(0, 1),
     SemanticSubtype.WHICH_1: _SubtypePolicy(1, 1),
@@ -223,11 +219,6 @@ class GenerationSpec:
             raise ValueError("num_relations must be positive")
         if self.max_attempts < 1:
             raise ValueError("max_attempts must be positive")
-        if self.cycle is not None and self.semantic_subtype is SemanticSubtype.DIR_CYCLE:
-            raise ValueError(
-                "use a base semantic subtype with CycleSpec; dir-cycle is the "
-                "compatibility subtype"
-            )
         if self.cycle is not None and (
             self.constraints.x_depth
             or self.constraints.y_depth
@@ -440,10 +431,6 @@ def _relation_for_pair(
         direction = east_west
     else:
         direction = north_south
-    return Relation(a, Direction(direction), b)
-
-
-def _explicit_relation(a: str, direction: str, b: str) -> Relation:
     return Relation(a, Direction(direction), b)
 
 
@@ -1006,40 +993,12 @@ class SpatialGenerator:
                 )
             entities = list(scene.entities)
             relations = list(scene.relations)
-            if spec.semantic_subtype is SemanticSubtype.DIR_CYCLE:
-                target, reference = entities[0], entities[1]
-                if spec.relation_mode is RelationMode.CARDINAL:
-                    relations.extend(
-                        [
-                            _explicit_relation(target, "East", reference),
-                            _explicit_relation(reference, "East", target),
-                            _explicit_relation(target, "North", reference),
-                            _explicit_relation(reference, "North", target),
-                        ]
-                    )
-                else:
-                    relations.extend(
-                        [
-                            _explicit_relation(target, "Northeast", reference),
-                            _explicit_relation(reference, "Northeast", target),
-                        ]
-                    )
             x_graph, y_graph = _graphs(entities, relations)
             if question_type == 0:
-                if spec.semantic_subtype is SemanticSubtype.DIR_CYCLE:
-                    options = [*COMPOUNDS, SPECIAL]
-                    rng.shuffle(options)
-                    user_prompt = (
-                        "Consider a map with multiple locations:\n\n"
-                        + " ".join(relation.render() for relation in relations)
-                        + f"\n\nQuestion: In which direction is the {target} relative to the {reference}? "
-                        + f"Available options: {_options_text(options)}"
-                    )
-                else:
-                    user_prompt = _direction_prompt(
-                        entities, relations, x_graph, y_graph,
-                        target_num_answers, rng, subtype, forced_pair,
-                    )
+                user_prompt = _direction_prompt(
+                    entities, relations, x_graph, y_graph,
+                    target_num_answers, rng, subtype, forced_pair,
+                )
             elif question_type == 1:
                 user_prompt = _which_prompt(
                     entities, relations, x_graph, y_graph,
