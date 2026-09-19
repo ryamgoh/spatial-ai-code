@@ -29,13 +29,13 @@ worlds are checked for overlap across train, validation, and the frozen V13
 diagnostic. Depth 5 remains evaluation-only. Training is one QLoRA epoch at
 `5e-5`, half the V12 learning rate, to reduce specialization risk.
 
-Run the full generate/train/evaluate pipeline on one H100-47:
+Run the full generate/train/evaluate pipeline on one H200:
 
 ```bash
-sbatch experiments/13-iterative-hardening/slurm/run-probe-h100-47.sh
+sbatch experiments/13-iterative-hardening/slurm/run-probe-h200.sh
 ```
 
-The launcher uses `gpu-long` with its `3-00:00:00` limit. It evaluates the
+The launcher uses `gpu` with its `03:00:00` limit. It evaluates the
 probe on V13 with both one- and two-stage decoding and on the original V12 2K
 test with stage 1. `results/PROBE-SUMMARY.md` applies five gates: improvement
 on `dir-2`, improvement on consistent which/count, no more than a five-point

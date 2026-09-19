@@ -1,14 +1,15 @@
 #!/bin/bash
 # Native V13 400-row SFT safety probe: generate, train, then evaluate V13 and
-# V12 retention. H100-47 uses gpu-long; that partition allows 3-00:00:00.
+# V12 retention. This short probe uses one full H200 on the gpu partition.
 #SBATCH --job-name=spatial13-probe
-#SBATCH --partition=gpu-long
+#SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
-#SBATCH --time=3-00:00:00
-#SBATCH --gres=gpu:h100-47:1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+# The gpu partition has a three-hour wall-time limit.
+#SBATCH --time=03:00:00
+#SBATCH --gres=gpu:h200-141:1
 #SBATCH --output=experiments/13-iterative-hardening/logs/%x-%j.out
 #SBATCH --error=experiments/13-iterative-hardening/logs/%x-%j.err
 
