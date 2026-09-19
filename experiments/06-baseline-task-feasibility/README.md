@@ -70,7 +70,7 @@ not the decoder grammar. Prompt is a constant, not an arm.
 ## Run (1× H100-47)
 
 ```bash
-sbatch run_batch_06_feasibility.sh
+sbatch experiments/06-baseline-task-feasibility/slurm/eval-h100-47.sh
 ```
 
 Idempotent per tag: a tag with `results.json` is skipped. Overrides:

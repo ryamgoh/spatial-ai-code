@@ -18,7 +18,10 @@ Exp 1.
   gemma-3-12b-it, Ministral-3-8B-Instruct-2512-BF16, Mistral-NeMo-12B-Instruct,
   NVIDIA-Nemotron-3-Nano-4B-BF16 (baselines; also used in Exp 0)
 
-Launcher: `run_batch_h100.sh` (active: Ministral / gemma / Mistral-NeMo).
+The historical multi-model launcher is retained at
+`slurm/archive/legacy-model-sweep-h100.sh`. It is not a canonical experiment
+entrypoint; copy the required commands into a dedicated launcher here before a
+new run.
 
 **Result (from thesis Fig. 6).** Specialised spatial models land in the
 **~40–57%** range with native prompts — well below DeepSeek's 73.7%.

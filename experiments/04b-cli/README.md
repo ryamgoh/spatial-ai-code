@@ -51,7 +51,7 @@ GRPO train is CLI again.
 ## Run (2× H100-47)
 
 ```bash
-sbatch run_batch_4b_cli_h100.sh
+sbatch experiments/04b-cli/slurm/pipeline-h100-47x4.sh
 ```
 
 Overrides: `SKIP_TRAIN=1`, `SKIP_EVAL=1` (same as 4a).

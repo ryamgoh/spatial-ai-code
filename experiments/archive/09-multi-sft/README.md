@@ -74,8 +74,8 @@ Summarize like 8b: all / single / multi + type × cardinality + flags.
 Train on H100-96 (`gpu-long`); eval on H200 (`gpu`, 3h) or 96 fallback.
 
 ```bash
-sbatch run_batch_09_multi_sft_h100_96.sh    # generate 5k + SFT
-sbatch run_batch_09_eval_corr_h200.sh       # after adapter exists
+sbatch experiments/archive/09-multi-sft/slurm/train-h100-96.sh    # generate 5k + SFT
+sbatch experiments/archive/09-multi-sft/slurm/eval-h200.sh       # after adapter exists
 ```
 
 ```bash

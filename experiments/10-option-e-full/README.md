@@ -78,12 +78,12 @@ Preferred: **three jobs**, one `h100-47:1` each, 1.5k → 5k → 20k sequential
 (`--launcher python`, acc 8). 3 MIGs, under the ~4 GRES cap.
 
 ```bash
-sbatch run_batch_10_sft_h100_47_0.8b.sh        # 0.8B 1.5k + 5k + 20k
-sbatch run_batch_10_sft_h100_47_2b.sh          # 2B  1.5k + 5k + 20k
-sbatch run_batch_10_sft_h100_47_4b_small.sh    # 4B  1.5k + 5k + 20k
+sbatch experiments/10-option-e-full/slurm/sft-0.8b-h100-47.sh        # 0.8B 1.5k + 5k + 20k
+sbatch experiments/10-option-e-full/slurm/sft-2b-h100-47.sh          # 2B  1.5k + 5k + 20k
+sbatch experiments/10-option-e-full/slurm/sft-4b-small-h100-47.sh    # 4B  1.5k + 5k + 20k
 ```
 
-Do not sbatch the DDP `run_batch_10_sft_h100_47.sh` / `*_47_20k.sh`.
+Do not sbatch the DDP `experiments/10-option-e-full/slurm/sft-ddp-h100-47x2.sh` / `*_47_20k.sh`.
 Do not also submit the 96 4B jobs (same adapter dirs). 96 launchers remain
 the 1-GPU fallback if a full 96 is free.
 
@@ -99,22 +99,22 @@ not finish in 3h — resubmit; it skips tags that already have
 `results.json`. For a single sweep, submit on `gpu-long`.
 
 `#SBATCH --cpus-per-task` and `SLURM_CPUS_PER_TASK` must never differ
-(Slurm 23+ fatal; job 830266). Launchers source `slurm_pin_srun_cpus.sh`
+(Slurm 23+ fatal; job 830266). Launchers source `slurm/lib/pin-srun-cpus.sh`
 so leftover login `SLURM_CPUS_PER_TASK=16` cannot override this job's 8.
 See `experiments/README.md` → "srun cpus-per-task".
 
 ```bash
-sbatch run_batch_10_eval_full_h200.sh                 # 8 ready cells (gpu, 3h)
-ONLY=4b-20k sbatch run_batch_10_eval_full_h200.sh     # after 4B-20k adapter exists
-SKIP_TAGS= sbatch run_batch_10_eval_full_h200.sh      # all 9
-FORCE=1 sbatch run_batch_10_eval_full_h200.sh         # redo existing results.json
+sbatch experiments/10-option-e-full/slurm/eval-h200.sh                 # 8 ready cells (gpu, 3h)
+ONLY=4b-20k sbatch experiments/10-option-e-full/slurm/eval-h200.sh     # after 4B-20k adapter exists
+SKIP_TAGS= sbatch experiments/10-option-e-full/slurm/eval-h200.sh      # all 9
+FORCE=1 sbatch experiments/10-option-e-full/slurm/eval-h200.sh         # redo existing results.json
 ```
 
 H100-47 MIG on `gpu-long` (3 days) instead of H200 / `gpu` (3h):
 
 ```bash
 sbatch --partition=gpu-long --time=3-00:00:00 --gres=gpu:h100-47:1 \
-  run_batch_10_eval_full_h200.sh
+  experiments/10-option-e-full/slurm/eval-h200.sh
 ```
 
 ```bash

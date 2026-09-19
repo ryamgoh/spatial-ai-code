@@ -45,10 +45,10 @@ cited): [`docs/split-and-distribution.md`](../../docs/split-and-distribution.md)
 |---|---|---|
 | `4b-1.5k` | `models/qwen3.5-4b-sft-v12-1500/` | default |
 | `4b-6k` | `models/qwen3.5-4b-sft-v12-6000/` | `ONLY=4b-6k` |
-| `4b-18k` | `models/qwen3.5-4b-sft-v12-18000/` | `ONLY=4b-18k` or `run_batch_12_sft_h100_47_4b_18k.sh` |
-| `baseline` | none (untuned `Qwen/Qwen3.5-4B`) | `run_batch_12_baseline_eval_h200.sh` |
-| `baseline-oneshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-oneshot sbatch run_batch_12_baseline_eval_h200.sh` |
-| `baseline-threeshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-threeshot sbatch run_batch_12_baseline_eval_h200.sh` |
+| `4b-18k` | `models/qwen3.5-4b-sft-v12-18000/` | `ONLY=4b-18k` or `experiments/12-v6-mix-reweight/slurm/sft-4b-18k-h100-47.sh` |
+| `baseline` | none (untuned `Qwen/Qwen3.5-4B`) | `experiments/12-v6-mix-reweight/slurm/eval-baseline-h200.sh` |
+| `baseline-oneshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-oneshot sbatch experiments/12-v6-mix-reweight/slurm/eval-baseline-h200.sh` |
+| `baseline-threeshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-threeshot sbatch experiments/12-v6-mix-reweight/slurm/eval-baseline-h200.sh` |
 
 Baseline: same 2k test + SpatialMap v6, same two-stage protocol, `lora_path`
 removed. `baseline` uses the three-letter-rule system prompt (matches the SFT
@@ -98,13 +98,13 @@ Easy buckets should stay high (dir-1 / which-* / count-* ≳ 95%). Type 2 equal-
 ## Run
 
 ```bash
-sbatch run_batch_12_sft_h100_47_4b.sh              # 4B-1.5k
-ONLY=4b-6k sbatch run_batch_12_sft_h100_47_4b.sh
-sbatch run_batch_12_sft_h100_47_4b_18k.sh          # 4B-18k (own 47)
-SKIP_EVAL=1 sbatch run_batch_12_sft_h100_47_4b.sh
-sbatch run_batch_12_eval_h200.sh
-SCORE_CKPTS=1 sbatch run_batch_12_eval_h200.sh     # letter-set pick on saves
-sbatch run_batch_12_baseline_eval_h200.sh          # baseline + baseline-nonshot2 (untuned 4B)
+sbatch experiments/12-v6-mix-reweight/slurm/sft-4b-h100-47.sh              # 4B-1.5k
+ONLY=4b-6k sbatch experiments/12-v6-mix-reweight/slurm/sft-4b-h100-47.sh
+sbatch experiments/12-v6-mix-reweight/slurm/sft-4b-18k-h100-47.sh          # 4B-18k (own 47)
+SKIP_EVAL=1 sbatch experiments/12-v6-mix-reweight/slurm/sft-4b-h100-47.sh
+sbatch experiments/12-v6-mix-reweight/slurm/eval-sft-h200.sh
+SCORE_CKPTS=1 sbatch experiments/12-v6-mix-reweight/slurm/eval-sft-h200.sh     # letter-set pick on saves
+sbatch experiments/12-v6-mix-reweight/slurm/eval-baseline-h200.sh          # baseline + baseline-nonshot2 (untuned 4B)
 ```
 
 Data gen is `flock`'d on `data/.spatial_sft_v12.lock`.

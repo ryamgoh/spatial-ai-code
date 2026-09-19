@@ -43,12 +43,12 @@ One `eval_new.py` run, two tasks:
 ## Run (three `h100-47:1` jobs)
 
 `--cpus-per-task=16` (same as Exp 10). Launchers source
-`slurm_pin_srun_cpus.sh`. Data gen is `flock`'d.
+`slurm/lib/pin-srun-cpus.sh`. Data gen is `flock`'d.
 
 ```bash
-sbatch run_batch_11_sft_h100_47_2b.sh          # 2B  1.5k + 6k + 20k
-sbatch run_batch_11_sft_h100_47_4b_small.sh    # 4B  1.5k + 6k
-sbatch run_batch_11_sft_h100_47_4b_20k.sh      # 4B  20k
+sbatch experiments/11-v6-synthetic/slurm/sft-2b-h100-47.sh          # 2B  1.5k + 6k + 20k
+sbatch experiments/11-v6-synthetic/slurm/sft-4b-small-h100-47.sh    # 4B  1.5k + 6k
+sbatch experiments/11-v6-synthetic/slurm/sft-4b-20k-h100-47.sh      # 4B  20k
 ```
 
 `SKIP_EVAL=1` to train only. `ONLY=2b-6k` to run one cell.

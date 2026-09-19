@@ -224,18 +224,20 @@ None of this is the research contribution. It is why the probe could run at all.
 
 ### 6.3 2000-prompt H200-141×2 run (this is the train job)
 
-Submit **`run_grpo_h200.sh`** (not `run_grpo_h100_96.sh` unless 96s are the only ones free). Do not queue both for the same run.
+Submit **`sbatch experiments/05-grpo/slurm/train-h200x2.sh`** (not
+the H100-96 fallback unless 96s are the only ones free). Do not queue both for
+the same run.
 
 - `--gres=gpu:h200-141:2`, 3h, same yaml `qwen3-8b-spatial-grpo-vllm-h100.yaml`
 - ~2000 prompts, 8 unique/step, **max_steps 250**, checkpoints every 10, `--resume` on resubmit
 - Output dir still `…-grpo-h100` (does not clobber SFT or the 20-step LoRA)
 - KV still **3072**, utilization **0.70** — 141GB does **not** mean a longer context
 - **No 1329 eval inside this job**
-- Fallback: `run_grpo_h100_96.sh` is the same recipe on 2× H100 96GB
+- Fallback: `experiments/05-grpo/slurm/train-h100-96x2.sh` is the same recipe on 2× H100 96GB
 
 ### 6.4 1329 eval (separate job)
 
-`run_eval_grpo_1329.sh` — one GPU, two-pass vLLM, task `spatial_eval_gen_cleaned_1329` (drop empty oracles). **Base = merged SFT**, **LoRA = GRPO adapter**. Same system prompt / `strict_acc` as the 87% SFT yaml.
+`experiments/05-grpo/slurm/eval-1329-h100-96.sh` — one GPU, two-pass vLLM, task `spatial_eval_gen_cleaned_1329` (drop empty oracles). **Base = merged SFT**, **LoRA = GRPO adapter**. Same system prompt / `strict_acc` as the 87% SFT yaml.
 
 Compare **that** number to 87%. Anything else is a different experiment.
 
@@ -310,7 +312,7 @@ A longer run where format/outcome stay ~0.2, `frac_reward_zero_std` stays high, 
 | Prompt-only data gen | `finetune/generate_grpo.py` |
 | Probe yaml | `experiments/05-grpo/train-grpo-8b-vllm.yaml` |
 | 2000-prompt yaml (H200 or H100) | `experiments/05-grpo/train-grpo-8b-vllm-h100.yaml` |
-| Train **2× H200 141GB** (preferred) | `run_grpo_h200.sh` |
-| Train 2× H100 96GB (fallback) | `run_grpo_h100_96.sh` |
-| 1329 eval | `run_eval_grpo_1329.sh`, `experiments/05-grpo/eval-grpo-1329.yaml` |
+| Train **2× H200 141GB** (preferred) | `experiments/05-grpo/slurm/train-h200x2.sh` |
+| Train 2× H100 96GB (fallback) | `experiments/05-grpo/slurm/train-h100-96x2.sh` |
+| 1329 eval | `experiments/05-grpo/slurm/eval-1329-h100-96.sh`, `experiments/05-grpo/eval-grpo-1329.yaml` |
 | Eval entrypoint | `eval/eval_new.py` (`vllm_staged_pass`, `--stages 1\|2`) |

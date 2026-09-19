@@ -28,8 +28,8 @@ Two 4B × 1,038 evals will not both finish in 3h on one card. Submit
 **two jobs** (you have four H200s):
 
 ```bash
-sbatch --export=ALL,TAGS=instruct run_batch_07b_eval_single_h200.sh
-sbatch --export=ALL,TAGS=base     run_batch_07b_eval_single_h200.sh
+sbatch --export=ALL,TAGS=instruct experiments/07b-zero-shot-single/slurm/eval-h200.sh
+sbatch --export=ALL,TAGS=base     experiments/07b-zero-shot-single/slurm/eval-h200.sh
 ```
 
 Writes `results/zero-shot-single/{instruct,base}/`. After both finish:
@@ -44,8 +44,8 @@ Same SFT prompt, no LoRA. One 1,329 run per checkpoint; summarize slices
 multi (291) the way Exp 6 did.
 
 ```bash
-sbatch --export=ALL,TAGS=instruct-corr run_batch_07b_eval_single_h200.sh
-sbatch --export=ALL,TAGS=base-corr     run_batch_07b_eval_single_h200.sh
+sbatch --export=ALL,TAGS=instruct-corr experiments/07b-zero-shot-single/slurm/eval-h200.sh
+sbatch --export=ALL,TAGS=base-corr     experiments/07b-zero-shot-single/slurm/eval-h200.sh
 ```
 
 ## Stages 1 vs 2 (does the constrained re-ask matter?)
@@ -55,14 +55,14 @@ completion. Re-run Single (or Corr) with `--stages 1` into `*-s1/` dirs
 (does not overwrite the tables above):
 
 ```bash
-sbatch --export=ALL,TAGS=instruct,STAGES=1 run_batch_07b_eval_single_h200.sh
-sbatch --export=ALL,TAGS=base,STAGES=1     run_batch_07b_eval_single_h200.sh
+sbatch --export=ALL,TAGS=instruct,STAGES=1 experiments/07b-zero-shot-single/slurm/eval-h200.sh
+sbatch --export=ALL,TAGS=base,STAGES=1     experiments/07b-zero-shot-single/slurm/eval-h200.sh
 ```
 
 The SFT check that actually matters for GRPO is 4B-5k, not 7b zs:
 
 ```bash
-sbatch run_batch_08_eval_4b5k_s1_h200.sh
+sbatch experiments/08-dual-scaling/slurm/eval-4b-5k-stage1-h200.sh
 ```
 
 ```bash

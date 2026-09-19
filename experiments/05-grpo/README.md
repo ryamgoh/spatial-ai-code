@@ -27,7 +27,8 @@ to the model. Rewards: `rewards.outcome_reward`, `format_reward`,
 
 The GRPO configs expect merged SFT weights at
 `experiments/05-grpo/models/deepseek-r1-qwen3-8b-merged`; the launchers
-(`run_grpo_*.sh`) create it via `merge_sft.py` if missing.
+under `experiments/05-grpo/slurm/` create it via `merge_sft.py` if
+missing.
 
 ## Eval config (run from `cd eval`)
 
@@ -35,7 +36,7 @@ The GRPO configs expect merged SFT weights at
 |---|---|
 | `eval-grpo-1329.yaml` | GRPO LoRA on merged SFT, 1329 cleaned set |
 
-Launcher: `run_eval_grpo_1329.sh`.
+Launcher: `experiments/05-grpo/slurm/eval-1329-h100-96.sh`.
 
 ## Run log
 

@@ -70,7 +70,7 @@ which-4 even zero-shot. Dir-2 stays ~0 for everyone (exact 2-subset).
 
 **Do not use 7b s1 to decide GRPO eval.** GRPO and SFT traces already
 end with `Answer: A`. Exp 8 4B-5k s2 has 0% `format_fail`. The check
-that matters is `sbatch run_batch_08_eval_4b5k_s1_h200.sh` (SFT
+that matters is `sbatch experiments/08-dual-scaling/slurm/eval-4b-5k-stage1-h200.sh` (SFT
 `--stages 1`). If that stays ~98%, GRPO eval can be one pass. If 7b
 Instruct s1 being 4% talks you into keeping two-pass for SFT, you are
 optimizing for a model that no longer exists.

@@ -48,7 +48,7 @@ TQA-CORR; empty-oracle rows are filtered by the task.)
 ## Run (2× H100-47)
 
 ```bash
-sbatch run_batch_4a_smoke_h100.sh
+sbatch experiments/04a-smoke/slurm/pipeline-h100-47x4.sh
 ```
 
 One submission runs the whole pipeline: SFT (2 epochs, 4k context,

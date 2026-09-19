@@ -33,8 +33,8 @@ SFT prompt, so the paired zero-shot is Exp 7b, not Exp 6.
 H200 (`gpu`, 3h) first; if it times out, the 96GB long job:
 
 ```bash
-sbatch run_batch_08b_eval_corr_h200.sh
-sbatch run_batch_08b_eval_corr_h100_96.sh   # fallback
+sbatch experiments/08b-sft-transfer-corr/slurm/eval-h200.sh
+sbatch experiments/08b-sft-transfer-corr/slurm/eval-h100-96.sh   # fallback
 ```
 
 Writes `results/transfer/4b-5k-corr/`. After it finishes:

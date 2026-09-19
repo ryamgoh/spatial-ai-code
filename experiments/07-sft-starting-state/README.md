@@ -52,7 +52,7 @@ lr 1e-4, 2 epochs, seq 4096, microbatch 1, grad acc 8, early stopping on
 ## Run (1× H100-47)
 
 ```bash
-sbatch run_batch_07_sft_start_h100.sh
+sbatch experiments/07-sft-starting-state/slurm/pipeline-h100-47.sh
 ```
 
 Idempotent: existing adapter / 5k jsonl / `results.json` are skipped.

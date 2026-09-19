@@ -98,9 +98,9 @@ Same QLoRA recipe on both cards (microbatch 1, grad acc 8). 96GB is
 only more VRAM / less paging, not a different training condition.
 
 ```bash
-sbatch run_batch_08_scaling_h100_96.sh     # 4B × {1.5k, 5k, 20k}
-sbatch run_batch_08_scaling_h100_47.sh     # 0.8B-20k (+ 2B-20k if not split off)
-sbatch run_batch_08_scaling_h100_96_b.sh   # 2B-20k on a second 96, other folders
+sbatch experiments/08-dual-scaling/slurm/scaling-h100-96.sh     # 4B × {1.5k, 5k, 20k}
+sbatch experiments/08-dual-scaling/slurm/scaling-h100-47.sh     # 0.8B-20k (+ 2B-20k if not split off)
+sbatch experiments/08-dual-scaling/slurm/scaling-h100-96-2b.sh   # 2B-20k on a second 96, other folders
 ```
 
 | job | GRES | cells | adapter dir |
@@ -122,7 +122,7 @@ If `h100-96` is only on partition `gpu`, resubmit the 96 job with
 Sequential fallback (all five cells on one 47GB slice):
 
 ```bash
-sbatch run_batch_08_scaling_h100.sh
+sbatch experiments/08-dual-scaling/slurm/scaling-all-h100-47.sh
 ```
 
 Idempotent: existing 20k jsonl / nested slices / adapter / `results.json`
@@ -136,13 +136,13 @@ are skipped. Overrides:
 0.8B train finished, eval not run (prefer H200, 3h `gpu` cap):
 
 ```bash
-sbatch run_batch_08_eval_0.8b_h200.sh
+sbatch experiments/08-dual-scaling/slurm/eval-0.8b-h200.sh
 ```
 
 One `h200-141`, not `:4`. Writes `results/scaling/0.8b-20k/`. Fallback MIG:
 
 ```bash
-sbatch run_batch_08_eval_0.8b_h100_47.sh
+sbatch experiments/08-dual-scaling/slurm/eval-0.8b-h100-47.sh
 ```
 
 Do **not** wait for a job to write `SUMMARY.md`. After **both** GPU jobs
