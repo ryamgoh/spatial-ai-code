@@ -134,6 +134,29 @@ def process_docs_v6_sft(dataset):
     return dataset.map(convert)
 
 
+def process_docs_v13_sft(dataset):
+    """Synthetic v13 chat JSONL → lm-eval docs with difficulty metadata.
+
+    Unlike the legacy v6 adapter, v13 rows already carry solver-verified gold
+    at the top level.  Preserve that gold and the structural analysis instead
+    of re-extracting an answer from the supervised assistant trace.
+    """
+    def convert(doc):
+        user_content = ""
+        for msg in doc.get("messages") or []:
+            if msg.get("role") == "user":
+                user_content = str(msg.get("content") or "")
+                break
+        return {
+            "text": user_content,
+            "oracle_option": str(doc.get("oracle_option") or ""),
+            "difficulty": dict(doc.get("difficulty") or {}),
+            "generator_version": str(doc.get("generator_version") or ""),
+        }
+
+    return dataset.map(convert)
+
+
 def filter_v6_spatialmap(dataset):
     """SpatialMap with v6 fifth option; keep nonempty A–E gold."""
     def keep(doc):

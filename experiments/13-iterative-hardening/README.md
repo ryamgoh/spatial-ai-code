@@ -1,0 +1,406 @@
+# Experiment 13 — iterative SFT task hardening (rough plan)
+
+> **Status:** the v13 cardinal/diagonal foundation is implemented. No full v13
+> dataset, training configuration, or result exists yet. This document remains
+> intentionally provisional: make one structural change, measure it, and pause
+> before choosing the next one.
+
+## Implemented foundation
+
+The first narrow implementation increment is complete:
+
+- `spatial/spatial_solver_v13.py` preserves the v6 answer laws, parses cardinal
+  and diagonal relations, and measures shortest X/Y proof paths for Type 0.
+- `spatial/generate_all_v13.py` supports `diagonal`, `cardinal`, and `mixed`
+  relation modes across Type 0/1/2 questions. It emits `oracle_option`,
+  solver-measured `difficulty`, and a `generator_version` stamp.
+- Every generated row is reparsed from its rendered user prompt; the
+  generator's internal graph is not accepted as final gold.
+- `experiments/tasks/utils.py::process_docs_v13_sft` is a versioned lm-eval
+  adapter that preserves structural metadata. The v6 adapter is unchanged.
+- `experiments/tasks/spatial_eval_v13_foundation.yaml` provides the first
+  synthetic v13 evaluation task definition.
+- Law, generator round-trip, loader, and existing v6 regression tests pass.
+
+This foundation does **not** yet force independent axes, minimum proof depth,
+structured distractors, or new contradiction policies. Those remain separate
+decision-gated iterations below.
+
+## Motivation
+
+The current spatial task is close to saturated for Qwen3.5-4B after SFT. The
+1.5k model is around 97% on the matched 2k test and the 6k model is around
+96%. At that level, adding more examples from the same generator does not give
+us a useful SFT scaling problem. It also leaves too little residual error to
+study later training methods cleanly.
+
+Experiment 13 is **not a GRPO experiment**. Its goal is to build a harder,
+well-controlled SFT task where:
+
+1. difficulty comes from spatial reasoning structure rather than label noise,
+   hidden task rules, or arbitrary prompt length;
+2. 1.5k and 6k SFT form a meaningful learning curve;
+3. individual sources of difficulty can be measured separately; and
+4. the existing v12 task and SpatialMap remain frozen regression checks.
+
+The desired outcome is not a predetermined low aggregate score. A useful task
+has an interpretable slope from easy to hard cases, improves with additional
+SFT data, and preserves previously learned behavior.
+
+## Main hypothesis
+
+The current generator is easy because most ordinary relation sentences are
+diagonal (for example, Northeast), so one sentence supplies an X-axis fact and
+a Y-axis fact together. Queries are often direct or have short proofs, and the
+special contradiction cases have recognizable construction patterns.
+
+The primary v13 hypothesis is:
+
+> SFT becomes meaningfully harder when the two axes must be reconstructed from
+> separate facts over controlled multi-hop paths, especially in the presence
+> of plausible but irrelevant graph structure.
+
+We will test that hypothesis incrementally rather than adding every proposed
+feature at once.
+
+## Experimental controls
+
+Unless a later decision explicitly changes them, keep these fixed across v13
+iterations:
+
+- Model: `Qwen/Qwen3.5-4B`.
+- Training method: the same QLoRA/Axolotl recipe as Experiments 11 and 12.
+- Epochs, LoRA rank, optimizer family, and effective batch size.
+- Nested train sizes: **1.5k ⊂ 6k**. Run 18k only when the 1.5k to 6k
+  comparison is informative.
+- Strict exact letter-set accuracy as the primary answer metric.
+- A separate validation split for checkpoint selection. Never select on test.
+- Experiment 12's 2k test and SpatialMap v6 as frozen regression/transfer
+  suites.
+- Five-option question contract and the three Type-0 option rules from v12.
+
+Keeping the training recipe fixed makes changes attributable mainly to the data
+and reasoning structure. The option rules remain explicit because hiding an
+unusual rule would create task ambiguity, not better spatial reasoning.
+
+## General iteration protocol
+
+For each iteration:
+
+1. Add **one major complexity lever**.
+2. Generate disjoint train, validation, and test splits.
+3. Validate every gold answer with the symbolic solver.
+4. Verify that generated examples actually satisfy their requested structural
+   properties; reject accidental shortcuts.
+5. Run the untuned 4B baseline, 1.5k SFT, and 6k SFT.
+6. Report accuracy by structural bucket and macro-average the buckets.
+7. Run all earlier frozen regression slices.
+8. Stop, inspect errors, and decide whether to deepen, revise, or abandon the
+   lever before implementing the next iteration.
+
+Do not let a naturally frequent easy bucket dominate the headline. Overall
+accuracy may still be included, but the primary result is the stratified table.
+
+## Iteration 0 — measure the current task
+
+**Change to task:** none.
+
+Before modifying the generator, annotate or derive structural metadata for the
+current v12 examples:
+
+- question family and subtype;
+- number of entities and relation statements;
+- shortest X-axis proof depth for the queried conclusion;
+- shortest Y-axis proof depth;
+- whether either component is stated directly;
+- whether the X and Y proofs use the same supporting statements/entities;
+- number of statements relevant to at least one shortest proof;
+- number of irrelevant statements;
+- gold letter-set cardinality;
+- contradiction type and affected axis; and
+- whether the queried pair is the directly injected conflict pair.
+
+### Questions
+
+- Are most v12 questions direct or one/two-hop?
+- Does entity count still predict errors after controlling for proof depth?
+- Are there existing deep examples that can seed v13?
+- Is the high overall result concealing a remaining structural pocket?
+
+### Deliverable
+
+A v12 structural census and accuracy report. No new training run is required
+unless an existing response file is unavailable.
+
+### Decision gate
+
+- If current deep examples already form a useful difficulty curve, first build
+  a balanced dataset around those structures.
+- If all existing structural buckets are saturated, proceed to Iteration 1.
+
+## Iteration 1 — cardinal one-axis relations
+
+**New lever:** allow relation sentences that update only one axis.
+
+Examples:
+
+```text
+The Library is east of the Bank.     # X only
+The School is north of the Museum.   # Y only
+The Hospital is southwest of the Zoo. # X and Y
+```
+
+Keep map size, statement count, question families, option semantics, and
+contradiction behavior otherwise close to v12. The purpose is to validate the
+new representation boundary before introducing long proofs.
+
+### Test buckets
+
+- diagonal-only maps (compatibility control);
+- cardinal-only maps;
+- mixed cardinal/diagonal maps;
+- direct one-axis queries; and
+- compound directions assembled from separate cardinal facts.
+
+### Decision gate
+
+- If cardinal extraction itself fails badly, repair the representation or
+  traces before increasing complexity.
+- If all buckets remain saturated, proceed to independent-axis composition.
+- If 6k clearly improves on 1.5k, retain the lever and examine the error types
+  before choosing the next step.
+
+## Iteration 2 — independent X/Y composition
+
+**New lever:** force the two components of a compound direction to use
+different evidence.
+
+A qualifying example should usually satisfy all of the following:
+
+- no relation directly states the queried compound direction;
+- no single diagonal fact supplies both required components;
+- the X proof and Y proof use different intermediate entities or edges; and
+- the query cannot be answered from only one proof path.
+
+Illustrative structure:
+
+```text
+X proof: Reference < A < B < Target
+Y proof: Target < C < D < Reference
+Conclusion: Target is Southeast of Reference
+```
+
+### Test buckets
+
+- X and Y share their evidence;
+- X and Y partially share evidence;
+- X and Y use independent paths;
+- one axis proven and one genuinely unknown; and
+- both axes independently proven.
+
+### Decision gate
+
+There should be an interpretable gap between shared- and independent-evidence
+cases. If both 1.5k and 6k fail uniformly, inspect trace correctness and SFT
+coverage rather than immediately adding another lever.
+
+## Iteration 3 — controlled minimum proof depth
+
+**New lever:** construct queries with a verified minimum shortest-path depth.
+
+Initial bands:
+
+| tier | shortest proof depth | role |
+|---|---:|---|
+| easy | 1 | direct-fact control |
+| short | 2–3 | ordinary composition |
+| medium | 4–5 | multi-hop SFT target |
+| hard | 6–8 | long matched reasoning |
+
+Depth must be measured independently for X and Y. The generator must reject an
+example if an unintended direct edge or shorter alternate path exists. Merely
+increasing the number of entities does not qualify as increasing proof depth.
+
+### Primary report
+
+| X depth | Y depth | baseline | SFT 1.5k | SFT 6k |
+|---:|---:|---:|---:|---:|
+| 1 | 1 | | | |
+| 2–3 | 2–3 | | | |
+| 4–5 | 4–5 | | | |
+| 6–8 | 6–8 | | | |
+| short | long | | | |
+| long | short | | | |
+
+### Decision gate
+
+- A gradual decline with proof depth is desirable.
+- If every band remains near ceiling, extend depth cautiously.
+- If performance collapses abruptly, add intermediate coverage or inspect for
+  accidental ambiguity/trace truncation.
+
+## Iteration 4 — structured distractors
+
+**New lever:** add graph structure that is irrelevant to the answer but
+plausible enough to compete with the correct proof. Keep proof-depth buckets
+fixed while measuring this lever.
+
+Candidate distractors, introduced in small groups:
+
+- disconnected irrelevant components;
+- branches touching the target but never reaching the reference;
+- branches touching the reference but ending at the wrong entity;
+- a valid-looking X path paired with an irrelevant Y path;
+- redundant facts that restate an implied relation; and
+- nearly complete alternative paths missing one required edge.
+
+Track total distractor statements, connected distractors, target/reference
+contact, and the relevant-to-irrelevant ratio. Avoid arbitrary prose filler: it
+mainly tests context length rather than graph reasoning.
+
+### Decision gate
+
+Compare equal-depth examples with and without distractors. Connected plausible
+distractors should be more difficult than disconnected noise; otherwise the
+construction is not testing the intended capability.
+
+## Iteration 5 — contradiction relevance and scope
+
+**New lever:** replace the recognizable direct-reversal pattern with varied
+conflict structures.
+
+Possible ordered additions:
+
+1. direct relevant reversal;
+2. indirect relevant cycle such as `A < B < C < A`;
+3. contradiction on one axis while the other axis remains valid;
+4. irrelevant cycle in a disconnected component;
+5. irrelevant cycle connected to one query entity; and
+6. multiple cycles where only one can affect the query.
+
+Before generating these cases, define the oracle semantics precisely:
+
+> Does a cycle invalidate an entire connected axis component, or only a
+> conclusion whose proof depends on the inconsistent region?
+
+The chosen rule must be deterministic, solver-backed, and visible in the task
+contract. The model should not be rewarded for the shortcut "any contradiction
+anywhere means Cannot be determined."
+
+### Test buckets
+
+- relevant versus irrelevant conflict;
+- direct versus indirect conflict;
+- X-only, Y-only, and both-axis conflict; and
+- conflict depth/distance from the queried pair.
+
+## Iteration 6 — structural generalization holdouts
+
+**New lever:** hold out combinations or depths, rather than adding another
+training feature.
+
+Maintain three distinct evaluation regimes:
+
+1. **Matched:** unseen maps with the same structures and depth distribution as
+   training.
+2. **Depth extrapolation:** for example, train through depth 5 and test on
+   depths 6–8.
+3. **Compositional holdout:** show individual phenomena during training but
+   reserve their combination for test.
+
+Example compositional holdout:
+
+- training contains long paths;
+- training contains independent-axis paths;
+- training contains irrelevant cycles;
+- training never combines all three; and
+- test contains long independent-axis paths plus an irrelevant cycle.
+
+Define and freeze these test strata before running the model. Do not build a
+test set by mining the current model's failures.
+
+## Iteration 7 — controlled language variation (optional)
+
+**New lever:** controlled paraphrase families for atomic relations. This comes
+after structural difficulty is calibrated so parsing failures are not confused
+with reasoning failures.
+
+```text
+A is east of B.
+A lies to B's east.
+Relative to B, A is positioned eastward.
+B has A on its eastern side.
+```
+
+Use some paraphrase families in training and reserve others for test. Always
+retain a canonical-language slice so structural reasoning and linguistic
+generalization can be reported separately.
+
+## Cumulative evaluation suite
+
+Each accepted iteration adds a frozen slice rather than replacing earlier
+tests:
+
+```text
+v12 matched test              existing semantics and easy-task retention
+SpatialMap v6                 external-distribution transfer
+v13 cardinal                 one-axis relation extraction
+v13 independent axes         separate X/Y composition
+v13 depth                    controlled shortest proofs
+v13 distractors              relevance filtering
+v13 contradictions           inconsistency scope
+v13 structural holdouts      depth and compositional generalization
+```
+
+## Result format
+
+Every iteration should record at least:
+
+| cell | matched macro | hardest new bucket | v12 regression | SpatialMap |
+|---|---:|---:|---:|---:|
+| untuned 4B | | | | |
+| 4B SFT 1.5k | | | | |
+| 4B SFT 6k | | | | |
+| 4B SFT 18k (optional) | | | | |
+
+Also include the complete per-bucket table and paired 1.5k-versus-6k errors. A
+one-point aggregate difference is not meaningful unless we know which
+structures changed and whether the two models fail on the same rows.
+
+## Interpreting an iteration
+
+| observation | likely interpretation | next action |
+|---|---|---|
+| high accuracy at all levels | task still saturated | deepen the same lever before adding another |
+| low accuracy at all levels; 1.5k ≈ 6k | representation, specification, or coverage problem | inspect examples/traces and simplify |
+| 6k clearly improves over 1.5k | useful SFT scaling regime | retain lever; analyze residuals |
+| new slice improves but old slices regress | forgetting or mix imbalance | repair the mix before proceeding |
+| only prompt length predicts errors | accidental attention benchmark | redesign structure, not just size |
+| gradual degradation by depth/structure | intended controlled difficulty | freeze the slice and consider next lever |
+
+Rough calibration targets, not acceptance requirements:
+
+- old/easy regressions remain at roughly 95% or better;
+- medium matched buckets land around 75–90%;
+- hard matched buckets land around 50–75%;
+- extrapolation may reasonably land around 30–60%; and
+- 6k shows a repeatable gain over 1.5k on at least some hard buckets.
+
+## Out of scope for v13 initially
+
+- GRPO, PPO, or any reward-model training.
+- Lowering model size merely to reduce accuracy.
+- Label noise or deliberately ambiguous gold.
+- Hiding the task's option semantics.
+- Increasing entity count without controlling proof structure.
+- Dynamic movement/state-update tasks. Those may be a later experiment after
+  the static controlled-hardness ladder is understood.
+- Implementing all iterations in one generator revision.
+
+## Immediate next step
+
+Choose the first data experiment from the implemented foundation. The safest
+next step is a small, balanced cardinal/diagonal/mixed dataset and baseline
+evaluation, while still treating **Iteration 0** (the v12 structural census) as
+required evidence before committing to independent-axis or depth-controlled
+generation.
