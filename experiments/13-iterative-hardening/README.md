@@ -42,6 +42,27 @@ on `dir-2`, improvement on consistent which/count, no more than a five-point
 depth-5 loss, at least 90% V12 retention, and at least 50% on both closed
 cycles and open controls. Do not scale the recipe unless all five pass.
 
+### Probe v2 — consistency-focused curriculum
+
+Probe v1 learned `dir-2`, which-object enumeration, counting, and open controls
+while preserving one-pass depth 5, but closed-cycle accuracy fell to 22.6%.
+Probe v2 is a fresh-base controlled follow-up: training strength remains one
+epoch at `5e-5`, and only the 400-row curriculum changes. It uses 250
+non-cycle rows plus 75 closed cycles and 75 matched open controls across all
+three question families and five cycle configurations per family.
+
+Run on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-probe-v2-h200.sh
+```
+
+Probe v2 is disjoint from the frozen diagnostic and from both Probe v1 train
+and validation worlds. `results/PROBE-V2-SUMMARY.md` compares base, v1, and v2.
+V12 compatibility is informational rather than a gate. V2 advances only if it
+retains v1's overall/`dir-2`/which/count/one-pass-depth gains and reaches at
+least 50% on both closed cycles and open controls.
+
 The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.

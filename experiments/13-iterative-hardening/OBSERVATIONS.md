@@ -280,3 +280,12 @@ from a narrow trace template is not automatically beneficial; the V12
 The first intervention is therefore a 400-row, one-epoch native V13 safety
 probe. Its recipe and explicit go/no-go gates are documented in `README.md`; it
 is not the final 1.5K/6K scaling experiment.
+
+Probe v1 produced a partial success: stage-1 V13 rose from 42.0% to 58.2%,
+`dir-2` from 1.7% to 63.3%, consistent which from 6.1% to 47.0%, consistent
+count from 1.2% to 67.3%, and open controls from 7.4% to 61.9%. One-pass depth
+5 was retained (72.9% to 72.2%). However, closed cycles fell from 59.8% to
+22.6%, showing that 30 closed examples were insufficient to establish a global
+check-before-local-solve policy. Probe v2 therefore changes only the curriculum:
+75 closed and 75 matched open controls across broader structures, while keeping
+the same fresh base, optimizer, learning rate, epoch count, and total 400 rows.
