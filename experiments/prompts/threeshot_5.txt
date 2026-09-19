@@ -1,0 +1,258 @@
+You are an advanced spatial reasoning agent. Process the spatial relations step-by-step.
+First, initialize by detecting all entities in the text to establish the global scope.
+Then, step-by-step, extract relations and update the spatial state for the X-axis (West to East) and Y-axis (South to North), tracking ONLY the entities that have been mentioned so far.
+Rules for State Representation:
+1. Use "<" for strict ordering (e.g., A < B means A is West/South of B).
+2. Group topologically equivalent entities using "{}" (e.g., {A, B} < C).
+3. Merge relations into maximal chains to represent the spatial topology clearly.
+4. Keep isolated active entities separated by commas until they are connected.
+
+CRITICAL RULE FOR FINAL DEDUCTION:
+Read the final X-State and Y-State. For the queried pair, derive each axis from whether A < B is in that state. A two-axis direction is proven only if both components are derived.
+
+Three Type-0 letter rules:
+1. If exactly one axis is derived and both remaining matching compounds are listed, those two letters are the answer.
+2. If exactly one axis is derived and only one of the two remaining compounds is listed, select "Cannot be determined".
+3. If A < B and B < A both hold on an axis (cycle / contradiction), select "Cannot be determined".
+
+If neither axis is derived, select "Cannot be determined". If a direction is proven but not listed, select "None of the Options". Then accept or reject each option from those facts.
+
+### Example
+
+Question:
+Consider a map with multiple locations:
+
+The Pharmacy is to the Southeast of the Police Station. The Church is to the Southeast of the Pharmacy. The Pharmacy is to the Northwest of the Shopping Mall. The Church is to the Southeast of the Police Station. The Supermarket is to the Northeast of the Police Station.
+
+Question: In which direction is the Supermarket relative to the Pharmacy? Available options: A. Northwest, B. Southwest, C. Northeast, D. North, E. None of these options
+
+Reasoning and answer:
+<think>
+### Initialization
+**Entities Detected**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+**Initial X-State**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+**Initial Y-State**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+
+
+### Step 1
+**Sentence**: "The Pharmacy is to the Southeast of the Police Station."
+**X-Extraction**: Police Station < Pharmacy
+**Y-Extraction**: Pharmacy < Police Station
+**X-State**: Police Station < Pharmacy
+**Y-State**: Pharmacy < Police Station
+
+
+### Step 2
+**Sentence**: "The Church is to the Southeast of the Pharmacy."
+**X-Extraction**: Pharmacy < Church
+**Y-Extraction**: Church < Pharmacy
+**X-State**: Police Station < Pharmacy < Church
+**Y-State**: Church < Pharmacy < Police Station
+
+
+### Step 3
+**Sentence**: "The Pharmacy is to the Northwest of the Shopping Mall."
+**X-Extraction**: Pharmacy < Shopping Mall
+**Y-Extraction**: Shopping Mall < Pharmacy
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station
+
+
+### Step 4
+**Sentence**: "The Church is to the Southeast of the Police Station."
+**X-Extraction**: Police Station < Church
+**Y-Extraction**: Church < Police Station
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station
+
+
+### Step 5
+**Sentence**: "The Supermarket is to the Northeast of the Police Station."
+**X-Extraction**: Police Station < Supermarket
+**Y-Extraction**: Police Station < Supermarket
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}, Police Station < Supermarket
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station < Supermarket
+
+
+### Final Deduction
+**Target**: Supermarket
+**Reference**: Pharmacy
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}, Police Station < Supermarket
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station < Supermarket
+**X-axis**: neither Pharmacy < Supermarket nor Supermarket < Pharmacy → East/West unknown.
+**Y-axis**: Pharmacy < Supermarket → Supermarket is North of Pharmacy.
+**Derived direction**: North proven, East/West unknown → must be Northeast or Northwest.
+**Options**:
+- A. Northwest — Northwest remains possible given the derived axis. In.
+- B. Southwest — does not match the derived axis. Out.
+- C. Northeast — Northeast remains possible given the derived axis. In.
+- D. North — does not match the derived axis. Out.
+- E. None of these options — a listed compound matches. Out.
+
+</think>
+Answer: A, C
+
+### Example
+
+Question:
+Consider a map with multiple locations:
+
+The Shopping Mall is to the Northwest of the Library. The Shopping Mall is to the Northwest of the Post Office. The Post Office is to the Southwest of the Museum. The Shopping Mall is to the Southwest of the Museum. The Post Office is to the Southeast of the Library. The Museum is to the Southwest of the Shopping Mall.
+
+Question: In which direction is the Museum relative to the Shopping Mall? Available options: A. Northeast, B. Northwest, C. Cannot be determined, D. Southwest, E. Southeast
+
+Reasoning and answer:
+<think>
+### Initialization
+**Entities Detected**: Library, Museum, Post Office, Shopping Mall
+**Initial X-State**: Library, Museum, Post Office, Shopping Mall
+**Initial Y-State**: Library, Museum, Post Office, Shopping Mall
+
+
+### Step 1
+**Sentence**: "The Shopping Mall is to the Northwest of the Library."
+**X-Extraction**: Shopping Mall < Library
+**Y-Extraction**: Library < Shopping Mall
+**X-State**: Shopping Mall < Library
+**Y-State**: Library < Shopping Mall
+
+
+### Step 2
+**Sentence**: "The Shopping Mall is to the Northwest of the Post Office."
+**X-Extraction**: Shopping Mall < Post Office
+**Y-Extraction**: Post Office < Shopping Mall
+**X-State**: Shopping Mall < {Library, Post Office}
+**Y-State**: {Library, Post Office} < Shopping Mall
+
+
+### Step 3
+**Sentence**: "The Post Office is to the Southwest of the Museum."
+**X-Extraction**: Post Office < Museum
+**Y-Extraction**: Post Office < Museum
+**X-State**: Shopping Mall < Library, Shopping Mall < Post Office < Museum
+**Y-State**: Library < Shopping Mall, Post Office < Museum, Post Office < Shopping Mall
+
+
+### Step 4
+**Sentence**: "The Shopping Mall is to the Southwest of the Museum."
+**X-Extraction**: Shopping Mall < Museum
+**Y-Extraction**: Shopping Mall < Museum
+**X-State**: Shopping Mall < Library, Shopping Mall < Post Office < Museum
+**Y-State**: {Library, Post Office} < Shopping Mall < Museum
+
+
+### Step 5
+**Sentence**: "The Post Office is to the Southeast of the Library."
+**X-Extraction**: Library < Post Office
+**Y-Extraction**: Post Office < Library
+**X-State**: Shopping Mall < Library < Post Office < Museum
+**Y-State**: Post Office < Library < Shopping Mall < Museum
+
+
+### Step 6
+**Sentence**: "The Museum is to the Southwest of the Shopping Mall."
+**X-Extraction**: Museum < Shopping Mall
+**Y-Extraction**: Museum < Shopping Mall
+**X-State**: Library, Museum, Post Office, Shopping Mall
+**Y-State**: Post Office < Library, {Museum, Shopping Mall}
+
+
+### Final Deduction
+**Target**: Museum
+**Reference**: Shopping Mall
+**X-State**: Library, Museum, Post Office, Shopping Mall
+**Y-State**: Post Office < Library, {Museum, Shopping Mall}
+**X-axis**: both Shopping Mall < Museum and Museum < Shopping Mall (contradiction) → East/West unknown.
+**Y-axis**: both Shopping Mall < Museum and Museum < Shopping Mall (contradiction) → North/South unknown.
+**Derived direction**: none (both axes unknown / contradiction).
+**Options**:
+- A. Northeast — axis contradiction, so this direction is not proven. Out.
+- B. Northwest — axis contradiction, so this direction is not proven. Out.
+- C. Cannot be determined — X-axis contradiction and Y-axis contradiction, so no compound is proven. In.
+- D. Southwest — axis contradiction, so this direction is not proven. Out.
+- E. Southeast — axis contradiction, so this direction is not proven. Out.
+
+</think>
+Answer: C
+
+### Example
+
+Question:
+Consider a map with multiple locations:
+
+The Zoo is to the Northwest of the Bank. The Zoo is to the Northwest of the Supermarket. The Coffee Shop is to the Northeast of the Shopping Mall. The Zoo is to the Northwest of the Shopping Mall. The Coffee Shop is to the Northwest of the Bank. The Supermarket is to the Southeast of the Bank.
+
+Question: How many objects are in the North of the Coffee Shop? Available options: A. 4, B. 1, C. 3, D. None of these options, E. 2
+
+Reasoning and answer:
+<think>
+### Initialization
+**Entities Detected**: Bank, Coffee Shop, Shopping Mall, Supermarket, Zoo
+**Initial X-State**: Bank, Coffee Shop, Shopping Mall, Supermarket, Zoo
+**Initial Y-State**: Bank, Coffee Shop, Shopping Mall, Supermarket, Zoo
+
+
+### Step 1
+**Sentence**: "The Zoo is to the Northwest of the Bank."
+**X-Extraction**: Zoo < Bank
+**Y-Extraction**: Bank < Zoo
+**X-State**: Zoo < Bank
+**Y-State**: Bank < Zoo
+
+
+### Step 2
+**Sentence**: "The Zoo is to the Northwest of the Supermarket."
+**X-Extraction**: Zoo < Supermarket
+**Y-Extraction**: Supermarket < Zoo
+**X-State**: Zoo < {Bank, Supermarket}
+**Y-State**: {Bank, Supermarket} < Zoo
+
+
+### Step 3
+**Sentence**: "The Coffee Shop is to the Northeast of the Shopping Mall."
+**X-Extraction**: Shopping Mall < Coffee Shop
+**Y-Extraction**: Shopping Mall < Coffee Shop
+**X-State**: Shopping Mall < Coffee Shop, Zoo < {Bank, Supermarket}
+**Y-State**: Shopping Mall < Coffee Shop, {Bank, Supermarket} < Zoo
+
+
+### Step 4
+**Sentence**: "The Zoo is to the Northwest of the Shopping Mall."
+**X-Extraction**: Zoo < Shopping Mall
+**Y-Extraction**: Shopping Mall < Zoo
+**X-State**: Zoo < Shopping Mall < Coffee Shop, Zoo < {Bank, Supermarket}
+**Y-State**: Shopping Mall < Coffee Shop, Shopping Mall < Zoo, {Bank, Supermarket} < Zoo
+
+
+### Step 5
+**Sentence**: "The Coffee Shop is to the Northwest of the Bank."
+**X-Extraction**: Coffee Shop < Bank
+**Y-Extraction**: Bank < Coffee Shop
+**X-State**: Zoo < Shopping Mall < Coffee Shop < Bank, Zoo < Supermarket
+**Y-State**: Supermarket < Zoo, {Bank, Shopping Mall} < Coffee Shop, {Bank, Shopping Mall} < Zoo
+
+
+### Step 6
+**Sentence**: "The Supermarket is to the Southeast of the Bank."
+**X-Extraction**: Bank < Supermarket
+**Y-Extraction**: Supermarket < Bank
+**X-State**: Zoo < Shopping Mall < Coffee Shop < Bank < Supermarket
+**Y-State**: Shopping Mall < {Coffee Shop, Zoo}, Supermarket < Bank < {Coffee Shop, Zoo}
+
+
+### Final Deduction
+**X-State**: Zoo < Shopping Mall < Coffee Shop < Bank < Supermarket
+**Y-State**: Shopping Mall < {Coffee Shop, Zoo}, Supermarket < Bank < {Coffee Shop, Zoo}
+**Reference**: Coffee Shop
+**Direction Query**: North
+**Y-Axis Analysis**: Entities to the North of the Coffee Shop (Coffee Shop < Entity on Y-axis): None
+**Count**: |intersection| = 0.
+**Options**:
+- A. 4 — count is 0, not 4. Out.
+- B. 1 — count is 0, not 1. Out.
+- C. 3 — count is 0, not 3. Out.
+- E. 2 — count is 0, not 2. Out.
+- D. None of these options — derived count 0 is not among A–D. In.
+
+</think>
+Answer: D

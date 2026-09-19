@@ -46,6 +46,44 @@ cited): [`docs/split-and-distribution.md`](../../docs/split-and-distribution.md)
 | `4b-1.5k` | `models/qwen3.5-4b-sft-v12-1500/` | default |
 | `4b-6k` | `models/qwen3.5-4b-sft-v12-6000/` | `ONLY=4b-6k` |
 | `4b-18k` | `models/qwen3.5-4b-sft-v12-18000/` | `ONLY=4b-18k` or `run_batch_12_sft_h100_47_4b_18k.sh` |
+| `baseline` | none (untuned `Qwen/Qwen3.5-4B`) | `run_batch_12_baseline_eval_h200.sh` |
+| `baseline-oneshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-oneshot sbatch run_batch_12_baseline_eval_h200.sh` |
+| `baseline-threeshot` | none (untuned `Qwen/Qwen3.5-4B`) | `ONLY=baseline-threeshot sbatch run_batch_12_baseline_eval_h200.sh` |
+
+Baseline: same 2k test + SpatialMap v6, same two-stage protocol, `lora_path`
+removed. `baseline` uses the three-letter-rule system prompt (matches the SFT
+cells), so its only difference from the SFT cells is the adapter — it isolates
+the SFT gain.
+
+Few-shot baseline (zero/one/three-shot ladder): `baseline-oneshot` and
+`baseline-threeshot` keep the letter-rules prompt and append full v12 demos
+(question + CoT + `Answer:`). Demos are the shortest (≥350-word) 1k-val rows of
+`dir-2`, `dir-cycle`, `count-omit` — covering the two-letter gold, the
+cycle→CBD rule, and None-of-the-Options — and are verified disjoint from the
+2k test (`experiments/prompts/fewshot_demo_provenance.txt`). `max_model_len` is
+raised to 16384 for these two cells. They answer: can in-context demos close
+the Type-0 holes without the adapter?
+
+## Prompt family (canonical copies)
+
+Round-indexed in `experiments/prompts/` — a new iteration gets a new index,
+files are never edited in place (git history holds the old ones):
+
+| file | round | contents |
+|---|---|---|
+| `nonshot_1..4.txt` | Exp 1 zero-shot rounds 1–4 | pre-v6: no fifth option, no letter rules — **do not use for v12** |
+| `oneshot_3.txt`, `threeshot_3.txt` | Exp 1 few-shot round 3 | pre-v6 — **do not use for v12** |
+| `nonshot_5.txt` | Exp 12 zero-shot | the three Type-0 letter rules (= `12-v6-mix-reweight/system_prompt.txt`, the training/eval stamp) |
+| `oneshot_5.txt` | Exp 12 one-shot | `nonshot_5` + dir-2 demo |
+| `threeshot_5.txt` | Exp 12 three-shot | `nonshot_5` + dir-2 / dir-cycle / count-omit demos |
+
+`experiments/prompts/check_prompt_sync.py` fails if any inline copy in the
+yamls or the training stamp drifts from its canonical file — run it after
+touching prompts:
+
+```bash
+uv run --no-project python experiments/prompts/check_prompt_sync.py
+```
 
 QLoRA same as Exp 10/11 (r=64, 2 epochs, acc 8, 1 GPU, `cpus-per-task=16`).
 
@@ -66,6 +104,7 @@ sbatch run_batch_12_sft_h100_47_4b_18k.sh          # 4B-18k (own 47)
 SKIP_EVAL=1 sbatch run_batch_12_sft_h100_47_4b.sh
 sbatch run_batch_12_eval_h200.sh
 SCORE_CKPTS=1 sbatch run_batch_12_eval_h200.sh     # letter-set pick on saves
+sbatch run_batch_12_baseline_eval_h200.sh          # baseline + baseline-nonshot2 (untuned 4B)
 ```
 
 Data gen is `flock`'d on `data/.spatial_sft_v12.lock`.

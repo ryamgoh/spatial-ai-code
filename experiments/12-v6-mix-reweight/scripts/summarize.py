@@ -20,7 +20,7 @@ OUT = ROOT / "results"
 SYNTH_TEST = REPO / "data" / "spatial_sft_v12_2000_test.jsonl"
 SMAP = "spatial_eval_v6_spatialmap"
 SYNTH = "spatial_eval_v12_synth"
-TAGS = ["4b-1.5k", "4b-6k", "4b-18k"]
+TAGS = ["baseline", "baseline-oneshot", "baseline-threeshot", "4b-1.5k", "4b-6k", "4b-18k"]
 BUCKETS = [
     "dir-1",
     "dir-2",

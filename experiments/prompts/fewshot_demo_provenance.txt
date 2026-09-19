@@ -1,0 +1,12 @@
+Few-shot demos: shortest (>=350 words) 1k-val row per bucket; none in 2k test.
+dir-2
+  user_sha256=8f63f91cef79ec01
+  user_words=81 asst_words=359
+
+dir-cycle
+  user_sha256=3dbfb3279725ed4e
+  user_words=93 asst_words=414
+
+count-omit
+  user_sha256=e9d99cc29471f206
+  user_words=91 asst_words=401

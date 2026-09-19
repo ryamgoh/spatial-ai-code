@@ -1,0 +1,93 @@
+You are an advanced spatial reasoning agent. Process the spatial relations step-by-step.
+First, initialize by detecting all entities in the text to establish the global scope.
+Then, step-by-step, extract relations and update the spatial state for the X-axis (West to East) and Y-axis (South to North), tracking ONLY the entities that have been mentioned so far.
+Rules for State Representation:
+1. Use "<" for strict ordering (e.g., A < B means A is West/South of B).
+2. Group topologically equivalent entities using "{}" (e.g., {A, B} < C).
+3. Merge relations into maximal chains to represent the spatial topology clearly.
+4. Keep isolated active entities separated by commas until they are connected.
+
+CRITICAL RULE FOR FINAL DEDUCTION:
+Read the final X-State and Y-State. For the queried pair, derive each axis from whether A < B is in that state. A two-axis direction is proven only if both components are derived.
+
+Three Type-0 letter rules:
+1. If exactly one axis is derived and both remaining matching compounds are listed, those two letters are the answer.
+2. If exactly one axis is derived and only one of the two remaining compounds is listed, select "Cannot be determined".
+3. If A < B and B < A both hold on an axis (cycle / contradiction), select "Cannot be determined".
+
+If neither axis is derived, select "Cannot be determined". If a direction is proven but not listed, select "None of the Options". Then accept or reject each option from those facts.
+
+### Example
+
+Question:
+Consider a map with multiple locations:
+
+The Pharmacy is to the Southeast of the Police Station. The Church is to the Southeast of the Pharmacy. The Pharmacy is to the Northwest of the Shopping Mall. The Church is to the Southeast of the Police Station. The Supermarket is to the Northeast of the Police Station.
+
+Question: In which direction is the Supermarket relative to the Pharmacy? Available options: A. Northwest, B. Southwest, C. Northeast, D. North, E. None of these options
+
+Reasoning and answer:
+<think>
+### Initialization
+**Entities Detected**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+**Initial X-State**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+**Initial Y-State**: Church, Pharmacy, Police Station, Shopping Mall, Supermarket
+
+
+### Step 1
+**Sentence**: "The Pharmacy is to the Southeast of the Police Station."
+**X-Extraction**: Police Station < Pharmacy
+**Y-Extraction**: Pharmacy < Police Station
+**X-State**: Police Station < Pharmacy
+**Y-State**: Pharmacy < Police Station
+
+
+### Step 2
+**Sentence**: "The Church is to the Southeast of the Pharmacy."
+**X-Extraction**: Pharmacy < Church
+**Y-Extraction**: Church < Pharmacy
+**X-State**: Police Station < Pharmacy < Church
+**Y-State**: Church < Pharmacy < Police Station
+
+
+### Step 3
+**Sentence**: "The Pharmacy is to the Northwest of the Shopping Mall."
+**X-Extraction**: Pharmacy < Shopping Mall
+**Y-Extraction**: Shopping Mall < Pharmacy
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station
+
+
+### Step 4
+**Sentence**: "The Church is to the Southeast of the Police Station."
+**X-Extraction**: Police Station < Church
+**Y-Extraction**: Church < Police Station
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station
+
+
+### Step 5
+**Sentence**: "The Supermarket is to the Northeast of the Police Station."
+**X-Extraction**: Police Station < Supermarket
+**Y-Extraction**: Police Station < Supermarket
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}, Police Station < Supermarket
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station < Supermarket
+
+
+### Final Deduction
+**Target**: Supermarket
+**Reference**: Pharmacy
+**X-State**: Police Station < Pharmacy < {Church, Shopping Mall}, Police Station < Supermarket
+**Y-State**: {Church, Shopping Mall} < Pharmacy < Police Station < Supermarket
+**X-axis**: neither Pharmacy < Supermarket nor Supermarket < Pharmacy → East/West unknown.
+**Y-axis**: Pharmacy < Supermarket → Supermarket is North of Pharmacy.
+**Derived direction**: North proven, East/West unknown → must be Northeast or Northwest.
+**Options**:
+- A. Northwest — Northwest remains possible given the derived axis. In.
+- B. Southwest — does not match the derived axis. Out.
+- C. Northeast — Northeast remains possible given the derived axis. In.
+- D. North — does not match the derived axis. Out.
+- E. None of these options — a listed compound matches. Out.
+
+</think>
+Answer: A, C
