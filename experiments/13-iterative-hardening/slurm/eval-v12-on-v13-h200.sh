@@ -13,7 +13,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=04:00:00
+# The gpu partition has a three-hour wall-time limit.
+#SBATCH --time=03:00:00
 #SBATCH --gres=gpu:h200-141:1
 #SBATCH --output=experiments/13-iterative-hardening/logs/%x-%j.out
 #SBATCH --error=experiments/13-iterative-hardening/logs/%x-%j.err
