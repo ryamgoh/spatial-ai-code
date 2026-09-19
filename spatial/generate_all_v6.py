@@ -5,7 +5,6 @@ Proposes a map + question. Gold is only whatever
 (errors, empty, 4-letter) is dropped. Optional ``inject_conflict``
 adds a reversing sentence so cycles can appear; the solver still labels.
 
-Leave finetune/generate_all.py as the pre-cleanup generator.
 See docs/symbolic-cot.md.
 """
 import json
