@@ -1,0 +1,140 @@
+#!/bin/bash
+# Native V13 nested 6K run on one full H200. The gpu partition caps jobs at
+# 03:00:00, so stage 1 is the default and optional evaluations are resumable.
+# Re-submit unchanged after a timeout: a saved Axolotl checkpoint is resumed.
+#SBATCH --job-name=spatial13-sft6k
+#SBATCH --partition=gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=64G
+#SBATCH --time=03:00:00
+#SBATCH --gres=gpu:h200-141:1
+#SBATCH --output=experiments/13-iterative-hardening/logs/%x-%j.out
+#SBATCH --error=experiments/13-iterative-hardening/logs/%x-%j.err
+
+set -uo pipefail
+cd "$SLURM_SUBMIT_DIR"
+# shellcheck disable=SC1091
+source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm/lib/pin-srun-cpus.sh"
+
+EXP=experiments/13-iterative-hardening
+ADAPTER=$EXP/models/qwen3.5-4b-v13-sft-6000
+DIAGNOSTIC=data/spatial_v13_diagnostic_test.jsonl
+V1_TRAIN=data/spatial_v13_probe_train.jsonl
+V1_VAL=data/spatial_v13_probe_val.jsonl
+V2_TRAIN=data/spatial_v13_probe_v2_train.jsonl
+V2_VAL=data/spatial_v13_probe_v2_val.jsonl
+BASE_TRAIN=data/spatial_v13_sft_1500_train.jsonl
+BASE_VAL=data/spatial_v13_sft_1500_val.jsonl
+BASE_MANIFEST=data/spatial_v13_sft_1500_manifest.json
+TRAIN=data/spatial_v13_sft_6000_train.jsonl
+VAL=data/spatial_v13_sft_6000_val.jsonl
+MANIFEST=data/spatial_v13_sft_6000_manifest.json
+V12_TEST=data/spatial_sft_v12_2000_test.jsonl
+
+has_adapter() {
+  [[ -f "$1/adapter_config.json" ]] &&
+    { [[ -f "$1/adapter_model.safetensors" ]] || [[ -f "$1/adapter_model.bin" ]]; }
+}
+
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+export PYTORCH_ALLOC_CONF=expandable_segments:True
+export AXOLOTL_DO_NOT_TRACK=1
+export AXOLOTL_NO_TELEMETRY=1
+if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU-* ]]; then
+  export CUDA_VISIBLE_DEVICES=0
+fi
+mkdir -p "$EXP/logs" "$EXP/results" data
+nvidia-smi -L || true
+
+cd finetune
+uv sync || exit 1
+cd "$SLURM_SUBMIT_DIR"
+
+if [[ ! -s "$DIAGNOSTIC" ]]; then
+  uv run python spatial/generate_diagnostic_v13.py --out data/spatial_v13_diagnostic.jsonl --seed 1313 || exit 1
+fi
+uv run --no-project python "$EXP/scripts/validate_diagnostic_data.py" "$DIAGNOSTIC" || exit 1
+
+if [[ ! -s "$V1_TRAIN" || ! -s "$V1_VAL" ]]; then
+  uv run python "$EXP/scripts/make_probe_data.py" || exit 1
+fi
+uv run python "$EXP/scripts/make_probe_data.py" --validate-only || exit 1
+if [[ ! -s "$V2_TRAIN" || ! -s "$V2_VAL" ]]; then
+  uv run python "$EXP/scripts/make_probe_v2_data.py" || exit 1
+fi
+uv run python "$EXP/scripts/make_probe_v2_data.py" --validate-only || exit 1
+
+# Recreate the frozen 1.5K source only if it is absent or invalid.
+if [[ -s "$BASE_TRAIN" && -s "$BASE_VAL" && -s "$BASE_MANIFEST" ]]; then
+  uv run python "$EXP/scripts/make_sft_1500_data.py" --validate-only || FORCE_BASE_DATA=1
+else
+  FORCE_BASE_DATA=1
+fi
+if [[ "${FORCE_BASE_DATA:-0}" == "1" ]]; then
+  uv run python "$EXP/scripts/make_sft_1500_data.py" || exit 1
+fi
+uv run python "$EXP/scripts/make_sft_1500_data.py" --validate-only || exit 1
+
+if [[ "${FORCE_DATA:-0}" != "1" && -s "$TRAIN" && -s "$VAL" && -s "$MANIFEST" ]]; then
+  uv run python "$EXP/scripts/make_sft_6000_data.py" --validate-only || FORCE_DATA=1
+fi
+if [[ "${FORCE_DATA:-0}" == "1" || ! -s "$TRAIN" || ! -s "$VAL" || ! -s "$MANIFEST" ]]; then
+  echo "=== Generate exact-nested native V13 6K data ==="
+  uv run python "$EXP/scripts/make_sft_6000_data.py" || exit 1
+fi
+uv run python "$EXP/scripts/make_sft_6000_data.py" --validate-only || exit 1
+
+if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
+  if has_adapter "$ADAPTER"; then
+    echo "=== skip 6K training (adapter complete) ==="
+  else
+    cd finetune
+    train_args=(python finetune.py ../"$EXP"/train-sft-4b-6000.yaml)
+    if compgen -G "../$ADAPTER/checkpoint-*" >/dev/null; then
+      echo "=== resume 6K training from latest checkpoint ==="
+      train_args+=(--resume)
+    else
+      echo "=== train fresh native V13 6K adapter ==="
+    fi
+    uv run "${train_args[@]}" || exit 1
+    cd "$SLURM_SUBMIT_DIR"
+  fi
+fi
+if ! has_adapter "$ADAPTER"; then
+  echo "Missing 6K adapter: $ADAPTER"
+  exit 1
+fi
+
+if [[ "${SKIP_EVAL:-0}" != "1" ]]; then
+  cd eval
+  uv sync || exit 1
+  stages=(1)
+  if [[ "${RUN_STAGE2:-0}" == "1" ]]; then
+    stages+=(2)
+  fi
+  for stage in "${stages[@]}"; do
+    out=../$EXP/results/sft-6000-v13-stage$stage
+    if [[ "${FORCE_EVAL:-0}" == "1" || ! -f "$out/results.json" ]]; then
+      uv run python eval_new.py \
+        --config ../$EXP/eval-sft-4b-6000-v13.yaml \
+        --stages "$stage" \
+        --output-dir "$out" || exit 1
+    fi
+  done
+  if [[ "${RUN_V12:-0}" == "1" && -s "../$V12_TEST" ]]; then
+    out=../$EXP/results/sft-6000-v12-stage1
+    if [[ "${FORCE_EVAL:-0}" == "1" || ! -f "$out/results.json" ]]; then
+      uv run python eval_new.py \
+        --config ../$EXP/eval-sft-4b-6000-v12.yaml \
+        --stages 1 \
+        --output-dir "$out" || exit 1
+    fi
+  fi
+  cd "$SLURM_SUBMIT_DIR"
+fi
+
+uv run --no-project python "$EXP/scripts/summarize_sft_6000.py" || true
+echo "6K summary: $EXP/results/SFT-6000-SUMMARY.md"
+echo "Paired changes: $EXP/results/SFT-6000-PAIRED-CHANGES.jsonl"

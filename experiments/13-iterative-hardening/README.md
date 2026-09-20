@@ -105,6 +105,61 @@ The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.
 
+### Native V13 nested 6K scaling run
+
+The approved 1.5K result advances to a controlled 6K scale comparison. The
+6K train file retains the exact serialized 1.5K file as its first 1,500 rows
+and adds 4,500 independently generated rows. Every one of the 129 generation
+cells is scaled by exactly four, so dataset scale is the intervention:
+
+| category | 1.5K | nested 6K |
+|---|---:|---:|
+| ordinary consistent | 940 | 3,760 |
+| closed-loop condition | 280 | 1,120 |
+| open-chain control | 280 | 1,120 |
+
+The frozen 129-row validation set is reused byte-for-byte. Training,
+validation, both probes, and the 2,256-row diagnostic remain disjoint by exact
+prompt and order-insensitive premise-world fingerprint. Depth 5 remains
+evaluation-only. SHA-256 hashes of the 1.5K train, validation, and manifest are
+recorded in the 6K manifest to make nesting auditable.
+
+The 6K model starts independently from untouched `Qwen/Qwen3.5-4B`; it does
+not continue from the 1.5K adapter. It retains one epoch, `5e-5`, LoRA rank 64,
+optimizer, and effective batch size 8. On the full 141 GB H200 the micro-batch
+is raised from 1 to 2 and accumulation reduced from 8 to 4, preserving each
+optimizer batch while reducing accumulation overhead. Packing remains off
+because the installed Axolotl/Qwen3.5 packing patch is incompatible.
+
+Run the default time-efficient path (train plus the decisive stage-1 V13
+diagnostic):
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-sft-6000-h200.sh
+```
+
+The `gpu` partition is capped at `03:00:00`. The launcher saves every 100
+optimizer steps and automatically resumes the latest checkpoint when
+resubmitted. Completed data, training, and evaluation stages are skipped. If
+the adapter completes but evaluation does not, use:
+
+```bash
+SKIP_TRAIN=1 \
+sbatch experiments/13-iterative-hardening/slurm/run-sft-6000-h200.sh
+```
+
+Stage 2 and V12 compatibility are intentionally optional so they do not delay
+the primary stage-1 comparison:
+
+```bash
+SKIP_TRAIN=1 RUN_STAGE2=1 RUN_V12=1 \
+sbatch experiments/13-iterative-hardening/slurm/run-sft-6000-h200.sh
+```
+
+`results/SFT-6000-SUMMARY.md` reports aggregate and paired 1.5K-to-6K
+fix/regression counts. `results/SFT-6000-PAIRED-CHANGES.jsonl` preserves the
+individual changed prompts and completions for qualitative audit.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:
