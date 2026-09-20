@@ -217,8 +217,11 @@ again starts from untouched `Qwen/Qwen3.5-4B`.
 
 The new traces require a real context change: Qwen tokenization measures 769
 of the 2,000 additions above 4,096 tokens, with a maximum of 7,653. The 8K
-config therefore uses sequence length 8,192 and conservative micro-batch 1 /
-accumulation 8. Submit on one H200:
+config therefore uses sequence length 8,192. On the full 141 GB H200 it keeps
+the 6K run's micro-batch 2 / accumulation 4 setup, preserving effective batch
+size 8 while avoiding unnecessary accumulation overhead. If that unexpectedly
+exhausts memory, micro-batch 1 / accumulation 8 is the equivalent fallback.
+Submit on one H200:
 
 ```bash
 sbatch experiments/13-iterative-hardening/slurm/run-sft-8000-h200.sh

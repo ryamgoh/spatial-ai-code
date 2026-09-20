@@ -1,6 +1,7 @@
 #!/bin/bash
 # Native V13.1 nested 8K run, fresh Qwen3.5-4B, one full H200.
-# 8,192-token traces make checkpoint/resubmit support essential on gpu/03:00:00.
+# 8,192-token traces use micro-batch 2 on the 141 GB H200; checkpoint/resubmit
+# support remains available on the gpu partition's 03:00:00 limit.
 #SBATCH --job-name=spatial13-sft8k
 #SBATCH --partition=gpu
 #SBATCH --nodes=1

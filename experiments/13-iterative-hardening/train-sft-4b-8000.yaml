@@ -28,8 +28,8 @@ learning_rate: 0.00005
 # Measured with the Qwen3.5 tokenizer: 769/2,000 new traces exceed 4,096
 # tokens; the maximum is 7,653. Preserve complete traces instead of truncating.
 sequence_len: 8192
-micro_batch_size: 1
-gradient_accumulation_steps: 8
+micro_batch_size: 2
+gradient_accumulation_steps: 4
 gradient_checkpointing: true
 gradient_checkpointing_kwargs:
   use_reentrant: false
