@@ -346,3 +346,64 @@ enough, but 75 closed-loop examples paired with 75 structurally diverse
 open-chain controls teach the global check without producing indiscriminate
 refusal. Probe v2 is the first recipe approved for a native V13 1.5K scaling
 run.
+
+## Native V13 1.5K result — healthy SFT scaling
+
+The first scale run expanded the approved Probe v2 curriculum to 1,500 rows:
+940 ordinary consistent examples, 280 closed-loop conditions, and 280
+open-chain controls. It broadened the ordinary portion across all 12 semantic
+subtypes, all relation modes, depths 1–4, unequal-axis depths, and both
+distractor topologies. Training remained a fresh-base, one-epoch QLoRA run at
+`5e-5`; only data scale and coverage changed.
+
+The 1.5K model passed all six scaling gates.
+
+| capability, stage 1 | base | Probe v2 | V13 1.5K | 1.5K vs v2 |
+|---|---:|---:|---:|---:|
+| V13 overall | 42.0% | 68.7% | **85.4%** | **+16.7 pp** |
+| `dir-2` | 1.7% | 55.0% | **60.0%** | +5.0 pp |
+| consistent which | 6.1% | 51.6% | **69.5%** | +17.9 pp |
+| consistent count | 1.2% | 60.8% | **81.2%** | +20.4 pp |
+| depth 5 | 72.9% | 68.1% | **94.4%** | **+26.3 pp** |
+| closed-loop condition | 59.8% | 74.5% | **91.9%** | +17.4 pp |
+| open-chain control | 7.4% | 61.4% | **82.6%** | +21.2 pp |
+
+This is the first evidence of healthy native-V13 SFT scaling. More data did not
+repeat V12's pattern of improving only its familiar distribution while harming
+structural transfer. Instead, broader 1.5K coverage improved every reported V13
+capability relative to Probe v2, including the held-out depth-5 slice. The
+depth result is especially important: the 1.5K model was never trained on depth
+5, yet rose from 68.1% to 94.4%, indicating generalization from broader depths
+1–4 rather than memorization of the held-out depth.
+
+Closed-loop and open-chain performance also rose together. Closed loops improve
+from 74.5% to 91.9%, while open chains improve from 61.4% to 82.6%. This is a
+stronger discrimination result than merely increasing `Cannot be determined`
+responses: the model both rejects inconsistent loops and continues solving
+structurally matched valid chains.
+
+The model is already strong in one pass (85.4%) and gains another two points in
+stage 2 (87.4%). Stage-2 results remain consistent with the stage-1 picture:
+`dir-2` 66.7%, which 71.1%, count 81.5%, depth 5 93.8%, closed loops 97.9%,
+and open chains 83.6%. The small overall stage gap suggests the supervised
+reasoning and final answer are substantially aligned.
+
+V12 compatibility rises from 10.3% for Probe v2 to 29.6% at 1.5K. This remains
+informational because native V13 intentionally uses different relation and
+trace semantics, but the increase is reassuring: broader V13 coverage did not
+make legacy compatibility monotonically worse.
+
+### Scaling interpretation
+
+The move from 400 to 1,500 rows improved breadth, loop discrimination, and
+unseen-depth generalization simultaneously. This validates the Probe v2
+curriculum as a real scaling recipe rather than a small-data artifact. A 6K run
+is now scientifically justified, but it must remain a fresh-base model and use
+a frozen nested data design so the next question is clean:
+
+> Does additional diverse V13 data continue improving capability, or does the
+> specialization pattern seen in V12 return at larger scale?
+
+The 6K comparison must preserve the 1.5K rows as a subset, keep the diagnostic
+and depth 5 held out, and report paired fixes versus regressions—not only the
+aggregate score.
