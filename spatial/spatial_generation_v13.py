@@ -207,14 +207,21 @@ class GenerationSpec:
     max_attempts: int = 500
     system_prompt: str | None = None
     cycle: CycleSpec | None = None
+    entity_pool: tuple[str, ...] = ENTITY_NAMES
 
     def __post_init__(self) -> None:
         if not isinstance(self.semantic_subtype, SemanticSubtype):
             raise TypeError("semantic_subtype must be a SemanticSubtype")
         if not isinstance(self.relation_mode, RelationMode):
             raise TypeError("relation_mode must be a RelationMode")
-        if not 2 <= self.num_entities <= len(ENTITY_NAMES):
-            raise ValueError(f"num_entities must be in [2, {len(ENTITY_NAMES)}]")
+        if len(set(self.entity_pool)) != len(self.entity_pool):
+            raise ValueError("entity_pool must contain unique names")
+        if any(not name.strip() or "." in name for name in self.entity_pool):
+            raise ValueError("entity names must be non-empty and cannot contain periods")
+        if not 2 <= self.num_entities <= len(self.entity_pool):
+            raise ValueError(
+                f"num_entities must be in [2, {len(self.entity_pool)}]"
+            )
         if self.num_relations < 1:
             raise ValueError("num_relations must be positive")
         if self.max_attempts < 1:
@@ -434,13 +441,17 @@ def _relation_for_pair(
 
 
 def _make_scene(
-    rng: random.Random, num_entities: int, num_sentences: int, relation_mode: str
+    rng: random.Random,
+    num_entities: int,
+    num_sentences: int,
+    relation_mode: str,
+    entity_pool: Sequence[str] = ENTITY_NAMES,
 ) -> Scene:
     if relation_mode not in {"diagonal", "cardinal", "mixed"}:
         raise ValueError("relation_mode must be diagonal, cardinal, or mixed")
-    if not 2 <= num_entities <= len(ENTITY_NAMES):
-        raise ValueError(f"num_entities must be in [2, {len(ENTITY_NAMES)}]")
-    entities = rng.sample(ENTITY_NAMES, num_entities)
+    if not 2 <= num_entities <= len(entity_pool):
+        raise ValueError(f"num_entities must be in [2, {len(entity_pool)}]")
+    entities = rng.sample(entity_pool, num_entities)
     coords: dict[str, tuple[int, int]] = {}
     for entity in entities:
         while True:
@@ -470,7 +481,7 @@ def _make_depth_scene(
     assert spec.constraints.y_depth is not None
     x_depth = spec.constraints.x_depth.choose(rng)
     y_depth = spec.constraints.y_depth.choose(rng)
-    entities = list(rng.sample(ENTITY_NAMES, spec.num_entities))
+    entities = list(rng.sample(spec.entity_pool, spec.num_entities))
     reference, target = entities[0], entities[1]
     cursor = 2
     x_internal = entities[cursor : cursor + x_depth - 1]
@@ -605,8 +616,9 @@ def _inject_cycle(
     mode: RelationMode,
     cycle: CycleSpec,
     rng: random.Random,
+    entity_pool: Sequence[str] = ENTITY_NAMES,
 ) -> str:
-    fresh = [name for name in ENTITY_NAMES if name not in set(base_objects)]
+    fresh = [name for name in entity_pool if name not in set(base_objects)]
     cycle_node_count = cycle.length + (
         1 if cycle.world_consistency is WorldConsistency.CONSISTENT else 0
     )
@@ -1006,7 +1018,11 @@ class SpatialGenerator:
                     rejections["cycle_does_not_fit"] += 1
                     continue
                 scene = _make_scene(
-                    rng, base_num_entities, base_num_relations, relation_mode
+                    rng,
+                    base_num_entities,
+                    base_num_relations,
+                    relation_mode,
+                    spec.entity_pool,
                 )
             entities = list(scene.entities)
             relations = list(scene.relations)
@@ -1050,6 +1066,7 @@ class SpatialGenerator:
                     spec.relation_mode,
                     spec.cycle,
                     rng,
+                    spec.entity_pool,
                 )
             solved = self.solver.solve_and_analyze(user_prompt)
             grade = solved.grade

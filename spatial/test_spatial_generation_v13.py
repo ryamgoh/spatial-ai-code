@@ -99,6 +99,30 @@ def test_invalid_spec_fails_before_generation() -> None:
         )
 
 
+def test_generation_spec_can_use_an_explicit_larger_entity_pool() -> None:
+    entity_pool = tuple(f"Location {index}" for index in range(30))
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.CARDINAL,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(10),
+            y_depth=DepthRange.exact(10),
+            distractors=DistractorSpec(policy=DistractorPolicy.QUERY_BRANCH, count=10),
+        ),
+        num_entities=30,
+        num_relations=30,
+        entity_pool=entity_pool,
+    )
+
+    example = SpatialGenerator().generate(spec, random.Random(13700))
+
+    assert example.difficulty["num_entities"] == 30
+    assert example.difficulty["x_depth"] == 10
+    assert example.difficulty["y_depth"] == 10
+    assert example.difficulty["num_query_branch_distractors"] == 10
+
+
 def test_generation_error_reports_rejection_reasons() -> None:
     spec = GenerationSpec(
         semantic_subtype=SemanticSubtype.DIR_1,

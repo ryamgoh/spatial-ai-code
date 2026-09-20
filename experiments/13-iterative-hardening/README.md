@@ -160,6 +160,41 @@ sbatch experiments/13-iterative-hardening/slurm/run-sft-6000-h200.sh
 fix/regression counts. `results/SFT-6000-PAIRED-CHANGES.jsonl` preserves the
 individual changed prompts and completions for qualitative audit.
 
+### V13.1 structural breakpoint suite
+
+After the 6K model reached 94.9% and saturated the original depth-5 slice, the
+next step is an evaluation-only challenge rather than more same-distribution
+training. V13.1 contains 1,224 frozen rows across 186 cells:
+
+| family | rows | controlled variation |
+|---|---:|---|
+| long proof | 504 | depths 6/8/10, clean, disconnected, query-branch, and unequal-axis conditions |
+| long closed loop | 360 | lengths 6/8/10, all question families, placements, and selected relation/axis modes |
+| matched open chain | 360 | exactly matched cell budgets for calibrated consistency discrimination |
+
+The generator uses a larger named-entity pool only for V13.1; the default V13
+pool remains unchanged so old frozen seeds reproduce identically. The suite is
+disjoint by prompt and premise-world fingerprint from the original diagnostic,
+both probes, and native 6K train/validation data. Never train on this file.
+
+Evaluate the strongest model first on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/eval-breakpoint-h200.sh
+```
+
+The launcher uses `gpu` for `03:00:00`, stage 1 only, and defaults to `sft-6k`.
+Add comparison models in a later or combined submission:
+
+```bash
+ONLY=base,sft-1.5k,sft-6k \
+sbatch experiments/13-iterative-hardening/slurm/eval-breakpoint-h200.sh
+```
+
+Completed model outputs are skipped. `results/BREAKPOINT-SUMMARY.md` reports
+challenge family, structural scale, relation mode, and loop/control family;
+`BREAKPOINT-CELLS.csv` preserves the complete 186-cell breakdown.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:
