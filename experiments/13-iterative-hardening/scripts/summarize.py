@@ -113,7 +113,7 @@ def _cycle_group(sample: dict) -> str | None:
     match = CYCLE_CELL_RE.match(_cell(sample))
     if not match:
         return None
-    return "open control" if match.group(7) else "closed cycle"
+    return "open-chain control" if match.group(7) else "closed-loop condition"
 
 
 def _cycle_dimension(sample: dict, index: int) -> str | None:
@@ -269,8 +269,8 @@ def summarize(results_dir: Path, tags: tuple[str, ...]) -> str:
         ("none", "disconnected", "query-branch"),
     )
     lines += _table(
-        "Cycle versus open-chain control", tags, samples, _cycle_group,
-        ("closed cycle", "open control"),
+        "Closed-loop condition versus open-chain control", tags, samples, _cycle_group,
+        ("closed-loop condition", "open-chain control"),
     )
     lines += _table(
         "Cycle/control by question family", tags, samples,

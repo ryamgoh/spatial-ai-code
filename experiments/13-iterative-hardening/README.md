@@ -20,8 +20,8 @@ small safety probe trained from untouched `Qwen/Qwen3.5-4B`:
 | `dir-2` | 60 | teach the two-letter partial-information rule |
 | which subtypes | 60 | complete entity-set enumeration |
 | count/count-omit | 40 | set-to-count and menu policy |
-| closed cycles | 30 | global inconsistency |
-| matched open controls | 30 | prevent indiscriminate refusal |
+| closed-loop conditions | 30 | global inconsistency |
+| open-chain controls | 30 | prevent indiscriminate refusal |
 
 The validation split contains 120 independently generated rows (three per
 cell) using seed 13132; training uses seed 13131. Exact prompts and premise
@@ -39,17 +39,19 @@ The launcher uses `gpu` with its `03:00:00` limit. It evaluates the
 probe on V13 with both one- and two-stage decoding and on the original V12 2K
 test with stage 1. `results/PROBE-SUMMARY.md` applies five gates: improvement
 on `dir-2`, improvement on consistent which/count, no more than a five-point
-depth-5 loss, at least 90% V12 retention, and at least 50% on both closed
-cycles and open controls. Do not scale the recipe unless all five pass.
+depth-5 loss, at least 90% V12 retention, and at least 50% on both closed-loop
+conditions and open-chain controls. Do not scale the recipe unless all five
+pass.
 
 ### Probe v2 — consistency-focused curriculum
 
-Probe v1 learned `dir-2`, which-object enumeration, counting, and open controls
-while preserving one-pass depth 5, but closed-cycle accuracy fell to 22.6%.
+Probe v1 learned `dir-2`, which-object enumeration, counting, and open-chain
+controls while preserving one-pass depth 5, but closed-loop accuracy fell to
+22.6%.
 Probe v2 is a fresh-base controlled follow-up: training strength remains one
-epoch at `5e-5`, and only the 400-row curriculum changes. It uses 250
-non-cycle rows plus 75 closed cycles and 75 matched open controls across all
-three question families and five cycle configurations per family.
+epoch at `5e-5`, and only the 400-row curriculum changes. It uses 250 ordinary
+consistent rows plus 75 closed-loop conditions and 75 open-chain controls
+across all three question families and five loop configurations per family.
 
 Run on one H200:
 
@@ -61,7 +63,14 @@ Probe v2 is disjoint from the frozen diagnostic and from both Probe v1 train
 and validation worlds. `results/PROBE-V2-SUMMARY.md` compares base, v1, and v2.
 V12 compatibility is informational rather than a gate. V2 advances only if it
 retains v1's overall/`dir-2`/which/count/one-pass-depth gains and reaches at
-least 50% on both closed cycles and open controls.
+least 50% on both closed-loop conditions and open-chain controls.
+
+The closed-loop/open-chain manipulation preserves edge count and changes the final
+destination: `A → B → C → A` closes an inconsistent loop, whereas
+`A → B → C → D` remains a valid open chain. Current rows are independently
+sampled under matched structural settings; they are not literal copies of the
+same paragraph. Ordinary consistent rows are also valid, but unlike open-chain
+controls they are not deliberately matched to the loop-generating structure.
 
 The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
@@ -379,7 +388,7 @@ uv run --no-project --with typer python generate_all_v13.py \
   --seed 13
 ```
 
-Matched controls are enabled by default. Each control replaces the closed cycle
+Matched controls are enabled by default. Each control replaces the closed loop
 with an open chain while preserving the base question family, requested axis,
 placement intent, relation count, and total entity budget. Invalid-world traces
 show the closed witness under `### Consistency Check` and stop before local
@@ -792,7 +801,7 @@ first v13 SFT split and not a separate hardness mechanism.
 
 Generate one compact diagnostic suite spanning the implemented dimensions
 before adding another mechanism: proof depth, distractor topology, and global
-cycles with matched open-chain controls across all three question families.
+closed loops with matched open-chain controls across all three question families.
 Evaluate the untuned model and current v12 SFT adapter first; use their
 bucket-level failure curves to choose the final 1.5k/6k training mixture and
 structural holdouts.
@@ -802,9 +811,9 @@ The diagnostic is now a frozen, evaluation-only 2,256-row suite (seed 1313):
 - 720 semantic controls: 3 relation modes x 12 base subtypes x 20 rows;
 - 696 depth/distractor cases: cardinal and mixed, depths 1 through 5, and
   none/disconnected/query-branch conditions, 24 rows per feasible cell; and
-- 840 cycle cases: direction/which/count, valid axis combinations, direct or
+- 840 loop-control cases: direction/which/count, valid axis combinations, direct or
   indirect topology, query-connected or disconnected placement, with a
-  budget-matched open-chain control for every closed cycle, 5 rows per cell.
+  budget-matched open-chain control for every closed-loop condition, 5 rows per cell.
 
 Diagonal depth cells are deliberately absent: one diagonal premise updates
 both axes, so it cannot express the independent X/Y proof-depth intervention.

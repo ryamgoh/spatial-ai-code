@@ -43,7 +43,7 @@ controlled proof structures, and global consistency tests.
 | Prompt | V12 three-rule instruction | V13 cardinal/diagonal and global-consistency contract |
 
 The suite consists of 720 semantic controls, 696 controlled depth/distractor
-rows, and 840 closed-cycle/open-control rows. Its aggregate is intentionally
+rows, and 840 closed-loop/open-chain rows. Its aggregate is intentionally
 dominated by diagnostic interventions rather than ordinary matched examples.
 
 ## The untuned base is already strong at clean direction chains
@@ -181,14 +181,16 @@ Overall base accuracy rises from 42.0% to 71.1% between stages 1 and 2 despite
 zero invalid outputs. Its first pass often contains useful intermediate
 reasoning without a reliable final letter set.
 
-## Closed cycles versus open controls
+## Closed-loop conditions versus open-chain controls
 
-A closed cycle is an inconsistent strict-order loop. Every question over it
-must return `Cannot be determined`. A matched open control has the same family,
-relation/entity budget, topology intent, and placement intent, but does not
-close the chain and must be solved normally.
+A closed-loop condition is an inconsistent strict-order loop. Every question
+over it must return `Cannot be determined`. An open-chain control has the same
+family, relation/entity budget, topology intent, and placement intent, but its
+final edge ends at a fresh entity instead of returning to the start. It remains
+consistent and must be solved normally. Both conditions use the same number of
+relations.
 
-| model | closed cycle | open control |
+| model | closed loop | open chain |
 |---|---:|---:|
 | untuned 4B | 90.7% | 42.1% |
 | V12 1.5K | 17.4% | 57.1% |
@@ -202,17 +204,20 @@ Interpret both columns together:
   inconsistency; and
 - high closed / high open demonstrates genuine discrimination.
 
-Closed cycles collapse all families to one answer and bypass the base model's
+Closed loops collapse all families to one answer and bypass the base model's
 weak enumeration and counting skills:
 
-| family | closed cycle | open control |
+| family | closed loop | open chain |
 |---|---:|---:|
 | direction | 90.0% | 82.1% |
 | which | 87.1% | 32.9% |
 | count | 95.0% | 11.4% |
 
-Current pairs are budget-matched, not literal one-edge counterfactuals from the
-same paragraph. Shared-world bundles remain an optional later diagnostic.
+Current conditions are structurally distribution-matched and independently
+sampled, not literal one-edge counterfactuals from the same paragraph. Shared-
+world bundles remain an optional later diagnostic. Ordinary consistent examples
+teach general task behavior; open-chain controls are separately tracked hard
+negatives near the loop-closure decision boundary.
 
 ## What V12 SFT helps
 
@@ -237,9 +242,11 @@ Established:
 - The base is extremely strong on the current clean depth construction under
   stage 2.
 - V12 6K transfers worse than V12 1.5K overall and on deep direction proofs.
-- The base is weak on multi-answer, which-object, count, and open-control rows.
+- The base is weak on multi-answer, which-object, count, and open-chain-control
+  rows.
 - Before native V13 training, no evaluated model was simultaneously strong on
-  closed cycles and open controls; Probe v2 later closes that gap in aggregate.
+  closed-loop conditions and open-chain controls; Probe v2 later closes that
+  gap in aggregate.
 
 Likely causal interpretation after the corrected full audit:
 
@@ -248,7 +255,7 @@ Likely causal interpretation after the corrected full audit:
   updates in 389/493 base-correct/1.5K-wrong traces and incorrect or missing
   active-axis updates in 244/495 and 201/495 1.5K-correct/6K-wrong traces.
 - The 6K adapter is more specialized to V12 trace and answer templates.
-- Some base closed-cycle success is conservative `Cannot be determined`
+- Some base closed-loop success is conservative `Cannot be determined`
   behavior rather than exact cycle discrimination.
 
 ## Completed bridge tests before native V13 SFT
@@ -284,18 +291,19 @@ is not the final 1.5K/6K scaling experiment.
 
 Probe v1 produced a partial success: stage-1 V13 rose from 42.0% to 58.2%,
 `dir-2` from 1.7% to 63.3%, consistent which from 6.1% to 47.0%, consistent
-count from 1.2% to 67.3%, and open controls from 7.4% to 61.9%. One-pass depth
-5 was retained (72.9% to 72.2%). However, closed cycles fell from 59.8% to
-22.6%, showing that 30 closed examples were insufficient to establish a global
-check-before-local-solve policy. Probe v2 therefore changes only the curriculum:
-75 closed and 75 matched open controls across broader structures, while keeping
-the same fresh base, optimizer, learning rate, epoch count, and total 400 rows.
+count from 1.2% to 67.3%, and open-chain controls from 7.4% to 61.9%. One-pass
+depth 5 was retained (72.9% to 72.2%). However, closed-loop conditions fell
+from 59.8% to 22.6%, showing that 30 closed-loop examples were insufficient to
+establish a global check-before-local-solve policy. Probe v2 therefore changes
+only the curriculum: 75 closed-loop conditions and 75 open-chain controls
+across broader structures, while keeping the same fresh base, optimizer,
+learning rate, epoch count, and total 400 rows.
 
 ## Probe v2 result — curriculum repair succeeded
 
 Probe v2 passed all six V13 gates. It kept the training strength fixed and
-changed only the curriculum from 30 closed/30 open controls to 75 closed/75
-open controls across all three question families and broader cycle structures.
+changed only the curriculum from 30 closed loops/30 open chains to 75 closed
+loops/75 open chains across all three question families and broader structures.
 
 | capability, stage 1 | base | Probe v1 | Probe v2 | v2 vs v1 |
 |---|---:|---:|---:|---:|
@@ -304,14 +312,15 @@ open controls across all three question families and broader cycle structures.
 | consistent which | 6.1% | 47.0% | **51.6%** | +4.6 pp |
 | consistent count | 1.2% | **67.3%** | 60.8% | -6.5 pp |
 | depth 5 | 72.9% | **72.2%** | 68.1% | -4.1 pp |
-| closed cycles | 59.8% | 22.6% | **74.5%** | **+51.9 pp** |
-| open controls | 7.4% | **61.9%** | 61.4% | -0.5 pp |
+| closed-loop conditions | 59.8% | 22.6% | **74.5%** | **+51.9 pp** |
+| open-chain controls | 7.4% | **61.9%** | 61.4% | -0.5 pp |
 
-The decisive result is the closed/open pair. Closed-cycle accuracy rose by
-51.9 points while open-control accuracy remained essentially unchanged. This
+The decisive result is the closed-loop/open-chain comparison. Closed-loop
+accuracy rose by 51.9 points while open-chain accuracy remained essentially
+unchanged. This
 is evidence of learned inconsistency discrimination rather than blanket
 `Cannot be determined` refusal. Probe v2 also improves the untouched base by
-14.7 points on closed cycles and 54.0 points on open controls.
+14.7 points on closed loops and 54.0 points on open-chain controls.
 
 Probe v2 remains broadly useful rather than trading everything for the cycle
 policy: stage-1 overall rises 26.7 points over base; `dir-2`, which and count
@@ -332,7 +341,8 @@ the untouched base and learn V13's different cardinal/mixed semantics and trace
 contract. It would become an optimization objective only if backward V12
 compatibility were explicitly required.
 
-The curriculum lesson is now established: 30 closed examples were not enough,
-but 75 closed examples paired with 75 structurally diverse open controls teach
-the global check without producing indiscriminate refusal. Probe v2 is the
-first recipe approved for a native V13 1.5K scaling run.
+The curriculum lesson is now established: 30 closed-loop examples were not
+enough, but 75 closed-loop examples paired with 75 structurally diverse
+open-chain controls teach the global check without producing indiscriminate
+refusal. Probe v2 is the first recipe approved for a native V13 1.5K scaling
+run.

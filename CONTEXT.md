@@ -29,7 +29,20 @@ The diagnostic description of an injected contradiction: axis, topology,
 length, and placement. It is orthogonal to question family and semantic
 subtype.
 
-**Matched open-chain control**:
-A consistent world with the same question family, semantic subtype, cycle
-placement intent, relation count, and entity budget as a closed-cycle world,
-but whose final edge does not close the cycle.
+**Ordinary consistent example**:
+A valid world generated to teach the normal direction, which-object, count,
+depth, or distractor task without a cycle-template intervention.
+_Avoid_: Non-cycle example
+
+**Closed-loop condition**:
+An inconsistent world in which the final relation returns to an already
+visited entity, closing a strict-order loop. The correct response is
+`Cannot be determined`.
+_Avoid_: Closed example, positive cycle example
+
+**Open-chain control**:
+A consistent hard-negative condition with the same number of relations and
+matched structural settings as a closed-loop condition, except the final
+relation ends at a fresh entity instead of returning to the start. It must be
+solved normally.
+_Avoid_: Open example, non-cycle example

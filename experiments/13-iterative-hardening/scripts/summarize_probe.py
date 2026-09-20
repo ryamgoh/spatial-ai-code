@@ -54,7 +54,7 @@ def summarize(results_dir: Path) -> str:
     lines = [
         "# Native V13 400-row probe",
         "",
-        "| model/protocol | V13 overall | dir-2 | consistent which | consistent count | depth 5 | closed cycle | open control |",
+        "| model/protocol | V13 overall | dir-2 | consistent which | consistent count | depth 5 | closed loop | open chain |",
         "|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     prompt_sets = {
@@ -72,8 +72,8 @@ def summarize(results_dir: Path) -> str:
         lambda row: SUMMARY._question_family(row) == "which" and SUMMARY._consistency(row) == "consistent",
         lambda row: SUMMARY._question_family(row) == "count" and SUMMARY._consistency(row) == "consistent",
         lambda row: SUMMARY._depth_group(row) == "5",
-        lambda row: SUMMARY._cycle_group(row) == "closed cycle",
-        lambda row: SUMMARY._cycle_group(row) == "open control",
+        lambda row: SUMMARY._cycle_group(row) == "closed-loop condition",
+        lambda row: SUMMARY._cycle_group(row) == "open-chain control",
     )
     for tag, rows in cells.items():
         lines.append(
@@ -113,7 +113,7 @@ def summarize(results_dir: Path) -> str:
             "weak which/count improves": weak_delta is not None and weak_delta > 0,
             "depth-5 drop <= 5 pp": depth_delta is not None and depth_delta >= -5,
             "V12 stage-1 retention >= 90%": bool(retention[1]) and retention[0] / retention[1] >= 0.90,
-            "closed and open each >= 50%": all(
+            "closed-loop and open-chain conditions each >= 50%": all(
                 accuracy(probe2, predicate)[1]
                 and accuracy(probe2, predicate)[0] / accuracy(probe2, predicate)[1] >= 0.50
                 for predicate in predicates[5:7]

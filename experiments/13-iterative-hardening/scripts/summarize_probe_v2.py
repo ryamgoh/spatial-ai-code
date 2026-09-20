@@ -55,8 +55,8 @@ def summarize(results_dir: Path) -> str:
         ("which", lambda row: SUMMARY._question_family(row) == "which" and SUMMARY._consistency(row) == "consistent"),
         ("count", lambda row: SUMMARY._question_family(row) == "count" and SUMMARY._consistency(row) == "consistent"),
         ("depth-5", lambda row: SUMMARY._depth_group(row) == "5"),
-        ("closed", lambda row: SUMMARY._cycle_group(row) == "closed cycle"),
-        ("open", lambda row: SUMMARY._cycle_group(row) == "open control"),
+        ("closed loop", lambda row: SUMMARY._cycle_group(row) == "closed-loop condition"),
+        ("open chain", lambda row: SUMMARY._cycle_group(row) == "open-chain control"),
     )
     lines = [
         "# Native V13 Probe v2",
@@ -98,7 +98,10 @@ def summarize(results_dir: Path) -> str:
             "consistent which >= 40%": (rate(values["which"][1]) or 0) >= 0.40,
             "consistent count >= 55%": (rate(values["count"][1]) or 0) >= 0.55,
             "depth-5 stage 1 >= 67%": (rate(values["depth-5"][1]) or 0) >= 0.67,
-            "closed and open each >= 50%": all((rate(values[name][1]) or 0) >= 0.50 for name in ("closed", "open")),
+            "closed-loop and open-chain conditions each >= 50%": all(
+                (rate(values[name][1]) or 0) >= 0.50
+                for name in ("closed loop", "open chain")
+            ),
         }
         for name, passed in checks.items():
             lines.append(f"- {'PASS' if passed else 'FAIL'} — {name}")

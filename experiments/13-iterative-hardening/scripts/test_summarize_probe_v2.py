@@ -53,5 +53,5 @@ def test_probe_v2_report_emits_v13_only_gates(tmp_path) -> None:
     result = REPORT.summarize(tmp_path)
 
     assert "V12 compatibility is reported but is not a Probe v2 gate" in result
-    assert "closed and open each >= 50%" in result
+    assert "closed-loop and open-chain conditions each >= 50%" in result
     assert "**GO** only if all six V13 gates pass" in result

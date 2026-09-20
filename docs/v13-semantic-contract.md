@@ -42,6 +42,19 @@ any X or Y cycle
 Cycle axis, direct/indirect topology, length, and query-connected/disconnected
 placement affect diagnostic difficulty only. They never change the gold rule.
 
+For controlled comparisons, V13 distinguishes a **closed-loop condition** from
+an **open-chain control**:
+
+```text
+closed loop: A → B → C → A  (inconsistent; Cannot be determined)
+open chain:  A → B → C → D  (consistent; solve normally)
+```
+
+The conditions use the same number of relations; the final destination changes
+from an existing entity to a fresh entity. Current generated examples are
+matched on structural settings and budgets but are sampled independently; they
+are not literal copies of one paragraph with only its final endpoint changed.
+
 ## Consistent-world question semantics
 
 ### Type 0: direction of one object relative to another

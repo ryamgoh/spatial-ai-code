@@ -120,7 +120,8 @@ def build_probe_v2_cells(*, validation: bool = False) -> list:
             )
         )
 
-    # 75 closed + 75 open controls. Five configurations per family span axis,
+    # 75 closed-loop conditions + 75 open-chain controls. Five configurations
+    # per family span axis,
     # direct/indirect topology, connected/disconnected placement and relation
     # mode. This is the only intervention changed from Probe v1.
     configurations = (

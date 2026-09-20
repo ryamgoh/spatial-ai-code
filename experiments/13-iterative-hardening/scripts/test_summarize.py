@@ -58,10 +58,10 @@ def test_summary_reports_structural_buckets_and_paired_errors(tmp_path) -> None:
     )
 
     assert "Controlled proof depth" in report
-    assert "Cycle versus open-chain control" in report
+    assert "Closed-loop condition versus open-chain control" in report
     assert "Semantic subtype by world consistency" in report
     assert "Question family by world consistency" in report
-    assert "`direction / closed cycle`" in report
+    assert "`direction / closed-loop condition`" in report
     assert "`dir-1 / inconsistent`" in report
     assert "1 fixed by 6k" in report
     assert "1 regressed at 6k" in report

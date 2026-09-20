@@ -187,7 +187,7 @@ def build_probe_cells(rows_per_cell: int = ROWS_PER_CELL) -> list[GenerationCell
     ):
         cells.append(semantic_cell(f"probe-{subtype.value}-{mode.value}", subtype, mode, rows_per_cell))
 
-    # 30 closed + 30 open controls across all three question families.
+    # 30 closed-loop conditions + 30 open-chain controls across all families.
     for pair in (
         cycle_pair("probe-cycle-direction", SemanticSubtype.DIR_1, RelationMode.CARDINAL, CycleAxes.X, CycleTopology.DIRECT, CyclePlacement.QUERY_CONNECTED, rows_per_cell),
         cycle_pair("probe-cycle-which", SemanticSubtype.WHICH_2, RelationMode.MIXED, CycleAxes.Y, CycleTopology.INDIRECT, CyclePlacement.DISCONNECTED, rows_per_cell),

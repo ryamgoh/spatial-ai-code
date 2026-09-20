@@ -94,7 +94,7 @@ def _cycle_cells(
         if axes is CycleAxes.BOTH and mode is RelationMode.CARDINAL
         else length
     )
-    # The closed cycle and open-chain control have exactly the same overall
+    # The closed-loop condition and open-chain control have the same overall
     # entity and relation budgets.  The control spends its extra entity on
     # opening the final edge instead of closing the loop.
     fresh_entities = length + 1 - (
