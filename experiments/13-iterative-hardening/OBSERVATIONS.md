@@ -407,3 +407,75 @@ a frozen nested data design so the next question is clean:
 The 6K comparison must preserve the 1.5K rows as a subset, keep the diagnostic
 and depth 5 held out, and report paired fixes versus regressions—not only the
 aggregate score.
+
+## Native V13 nested 6K result — continued scaling and diagnostic saturation
+
+The nested 6K run cleanly isolates data scale. Its training set contains the
+exact frozen 1.5K rows plus 4,500 new rows, every generation-cell quota is
+scaled by four, and both adapters start independently from untouched
+`Qwen/Qwen3.5-4B`. Training strength otherwise remains fixed. The stage-1
+result passed all six gates and improves every reported capability over 1.5K.
+
+| capability, stage 1 | base | V13 1.5K | V13 6K | 6K vs 1.5K |
+|---|---:|---:|---:|---:|
+| V13 overall | 42.0% | 85.4% | **94.9%** | **+9.5 pp** |
+| `dir-2` | 1.7% | 60.0% | **78.3%** | +18.3 pp |
+| consistent which | 6.1% | 69.5% | **92.0%** | **+22.5 pp** |
+| consistent count | 1.2% | 81.2% | **90.4%** | +9.2 pp |
+| depth 5 | 72.9% | 94.4% | **100.0%** | +5.6 pp |
+| closed-loop condition | 59.8% | 91.9% | **99.8%** | +7.9 pp |
+| open-chain control | 7.4% | 82.6% | **95.0%** | +12.4 pp |
+
+The paired comparison is decisive rather than a small aggregate fluctuation.
+Across the same 2,256 prompts, the 6K model fixes 244 examples that 1.5K
+missed and regresses on 29 that 1.5K answered correctly: 8.4 fixes per
+regression and a net gain of 215 examples. Slice-level paired changes are:
+
+| slice | fixed by 6K | regressed at 6K | net fixes |
+|---|---:|---:|---:|
+| overall | 244 | 29 | +215 |
+| `dir-2` | 16 | 5 | +11 |
+| consistent which | 111 | 12 | +99 |
+| consistent count | 32 | 8 | +24 |
+| depth 5 | 8 | 0 | +8 |
+| closed-loop condition | 34 | 1 | +33 |
+| open-chain control | 58 | 6 | +52 |
+
+The largest capability gain is complete which-object enumeration, which rises
+22.5 points and accounts for 99 net paired fixes. `dir-2` also improves
+substantially but remains the weakest reported aggregate slice at 78.3%, so
+partial-axis answer-set policy is still a useful target when constructing a
+harder successor suite. Counting reaches 90.4% but still has 25 errors in its
+260-row consistent slice.
+
+The consistency curriculum continues to behave correctly at scale. Closed
+loops rise to 99.8% while structurally matched open chains rise to 95.0%. Since
+both improve together, this is evidence of stronger discrimination between a
+globally inconsistent world and a valid loop-shaped hard negative, not a
+blanket tendency to answer `Cannot be determined`. Only one of 420 closed-loop
+rows remains wrong; the consistency rule itself is therefore close to solved
+on the present construction.
+
+Depth-5 accuracy reaches 100% (144/144) even though depth 5 is absent from
+training. This confirms successful extrapolation from the broader depth-1–4
+curriculum on this construction. It does not establish unlimited depth
+generalization: the current depth-5 slice is now saturated and can no longer
+measure meaningful progress.
+
+### Decision and next implication
+
+The 6K adapter replaces 1.5K as the strongest native V13 SFT checkpoint. The
+29 paired regressions should remain available for qualitative inspection, but
+they do not outweigh 244 paired fixes or indicate broad specialization damage.
+
+Stage 2 is not a priority for this decision. Stage 1 directly measures whether
+the trained model's own reasoning trace and final answer are aligned, and the
+6K stage-1 result is already conclusive. V12 compatibility likewise remains
+informational rather than a native-V13 gate. Neither missing result blocks the
+6K conclusion.
+
+The main experimental implication is that the frozen V13 diagnostic is now
+approaching saturation. Simply expanding the same 6K distribution to another
+larger SFT set would offer diminishing information. Before scaling again, keep
+this suite as a retention benchmark and add a new controlled challenge suite
+that targets remaining policy failures and genuine structural extrapolation.
