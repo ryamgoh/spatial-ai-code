@@ -238,19 +238,20 @@ Established:
   stage 2.
 - V12 6K transfers worse than V12 1.5K overall and on deep direction proofs.
 - The base is weak on multi-answer, which-object, count, and open-control rows.
-- No model is simultaneously strong on closed cycles and open controls across
-  all question families.
+- Before native V13 training, no evaluated model was simultaneously strong on
+  closed cycles and open controls; Probe v2 later closes that gap in aggregate.
 
-Likely but not yet established across the full regression population:
+Likely causal interpretation after the corrected full audit:
 
-- Incorrect one-axis updates and graph-merge omissions seen in the raw sample
-  explain a large share of the full V13 transfer gap. Their existence is
-  confirmed; their population prevalence still needs the corrected full audit.
+- Incorrect one-axis updates and graph-merge omissions explain a large share
+  of the V13 transfer gap. The corrected audit found spurious cross-axis
+  updates in 389/493 base-correct/1.5K-wrong traces and incorrect or missing
+  active-axis updates in 244/495 and 201/495 1.5K-correct/6K-wrong traces.
 - The 6K adapter is more specialized to V12 trace and answer templates.
 - Some base closed-cycle success is conservative `Cannot be determined`
   behavior rather than exact cycle discrimination.
 
-## Required bridge tests before native V13 SFT
+## Completed bridge tests before native V13 SFT
 
 1. Evaluate the original V12 2K test with `STAGES=1` for both adapters. This
    separates evaluation-protocol effects from structural distribution shift.
@@ -289,3 +290,49 @@ count from 1.2% to 67.3%, and open controls from 7.4% to 61.9%. One-pass depth
 check-before-local-solve policy. Probe v2 therefore changes only the curriculum:
 75 closed and 75 matched open controls across broader structures, while keeping
 the same fresh base, optimizer, learning rate, epoch count, and total 400 rows.
+
+## Probe v2 result — curriculum repair succeeded
+
+Probe v2 passed all six V13 gates. It kept the training strength fixed and
+changed only the curriculum from 30 closed/30 open controls to 75 closed/75
+open controls across all three question families and broader cycle structures.
+
+| capability, stage 1 | base | Probe v1 | Probe v2 | v2 vs v1 |
+|---|---:|---:|---:|---:|
+| V13 overall | 42.0% | 58.2% | **68.7%** | **+10.5 pp** |
+| `dir-2` | 1.7% | **63.3%** | 55.0% | -8.3 pp |
+| consistent which | 6.1% | 47.0% | **51.6%** | +4.6 pp |
+| consistent count | 1.2% | **67.3%** | 60.8% | -6.5 pp |
+| depth 5 | 72.9% | **72.2%** | 68.1% | -4.1 pp |
+| closed cycles | 59.8% | 22.6% | **74.5%** | **+51.9 pp** |
+| open controls | 7.4% | **61.9%** | 61.4% | -0.5 pp |
+
+The decisive result is the closed/open pair. Closed-cycle accuracy rose by
+51.9 points while open-control accuracy remained essentially unchanged. This
+is evidence of learned inconsistency discrimination rather than blanket
+`Cannot be determined` refusal. Probe v2 also improves the untouched base by
+14.7 points on closed cycles and 54.0 points on open controls.
+
+Probe v2 remains broadly useful rather than trading everything for the cycle
+policy: stage-1 overall rises 26.7 points over base; `dir-2`, which and count
+remain far above base; and one-pass depth 5 stays within the planned five-point
+retention budget (72.9% to 68.1%). The modest v1-to-v2 losses on `dir-2`, count
+and depth are the cost of reallocating 90 rows toward paired consistency
+training, but all remained above their v2 gates.
+
+Probe v2 is also self-consistent across decoding protocols: 68.7% at stage 1
+and 68.6% at stage 2. Unlike the untouched base, it does not rely on a second
+readout pass to rescue its answer. Stage-2 depth remains lower than the base's
+96.5%, but the primary policy-retention measure is one-pass depth because the
+native SFT model must answer correctly itself.
+
+V12 compatibility falls from 17.9% in Probe v1 to 10.3% in Probe v2. This is
+reported as distribution compatibility, not a V13 gate: both probes start from
+the untouched base and learn V13's different cardinal/mixed semantics and trace
+contract. It would become an optimization objective only if backward V12
+compatibility were explicitly required.
+
+The curriculum lesson is now established: 30 closed examples were not enough,
+but 75 closed examples paired with 75 structurally diverse open controls teach
+the global check without producing indiscriminate refusal. Probe v2 is the
+first recipe approved for a native V13 1.5K scaling run.
