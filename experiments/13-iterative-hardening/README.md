@@ -195,6 +195,40 @@ Completed model outputs are skipped. `results/BREAKPOINT-SUMMARY.md` reports
 challenge family, structural scale, relation mode, and loop/control family;
 `BREAKPOINT-CELLS.csv` preserves the complete 186-cell breakdown.
 
+### Native V13.1 nested 8K curriculum
+
+The measured breakpoint motivates a narrow 2,000-row extension rather than a
+generic scale-up. The 8K train file contains the exact serialized V13 6K file
+as its first 6,000 rows, followed by:
+
+| new category | rows |
+|---|---:|
+| depth 6/8 with disconnected or query-branch interference | 1,250 |
+| unequal-axis depth 2–8 with query branches | 300 |
+| long closed loops at lengths 6/8 | 150 |
+| matched open-chain controls at lengths 6/8 | 250 |
+| large-world which/count semantic examples | 50 |
+| **total** | **2,000** |
+
+The entire 1,224-row breakpoint suite remains frozen and disjoint. Depth and
+loop length 10 remain evaluation-only. The original 129-row V13 validation set
+is reused byte-for-byte, so only the training curriculum changes. The 8K model
+again starts from untouched `Qwen/Qwen3.5-4B`.
+
+The new traces require a real context change: Qwen tokenization measures 769
+of the 2,000 additions above 4,096 tokens, with a maximum of 7,653. The 8K
+config therefore uses sequence length 8,192 and conservative micro-batch 1 /
+accumulation 8. Submit on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-sft-8000-h200.sh
+```
+
+The launcher uses the three-hour `gpu` limit and automatically resumes the
+latest checkpoint when resubmitted. It evaluates stage 1 on both original V13
+and V13.1. `SFT-8000-SUMMARY.md` reports paired 6K-to-8K changes and requires
+both original-V13 retention and breakpoint improvement.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:
