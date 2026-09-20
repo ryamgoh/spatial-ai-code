@@ -72,6 +72,35 @@ sampled under matched structural settings; they are not literal copies of the
 same paragraph. Ordinary consistent rows are also valid, but unlike open-chain
 controls they are not deliberately matched to the loop-generating structure.
 
+### Native V13 1.5K scaling run
+
+The first scale run freezes a 1,500-row curriculum derived from the successful
+Probe v2 ratio while broadening the ordinary consistent portion:
+
+| category | train rows | coverage |
+|---|---:|---|
+| ordinary consistent | 940 | all 12 subtypes, all relation modes, depth 1–4, unequal axes, both distractor topologies |
+| closed-loop condition | 280 | direction/which/count across axis, topology, placement, and relation-mode variants |
+| open-chain control | 280 | structurally matched valid chains for every closed-loop cell |
+
+Validation contains one independently generated row for each of the 129
+training cells. Training, validation, Probe v1, Probe v2, and the frozen
+diagnostic are disjoint by both exact prompt and order-insensitive premise-world
+fingerprint. Depth 5 remains evaluation-only.
+
+The model starts fresh from untouched `Qwen/Qwen3.5-4B` and keeps Probe v2's
+one epoch, `5e-5`, LoRA rank, optimizer, and effective batch size so data scale
+and coverage are the intervention. Run on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-sft-1500-h200.sh
+```
+
+The job uses `gpu` for `03:00:00`. It is idempotent: if training completes but
+evaluation does not fit in the allocation, rerun with
+`SKIP_TRAIN=1 sbatch .../run-sft-1500-h200.sh`. The final report is
+`results/SFT-1500-SUMMARY.md`; train 6K only if all six scaling gates pass.
+
 The authoritative v13 meaning of worlds, questions, and special options is
 [`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.
