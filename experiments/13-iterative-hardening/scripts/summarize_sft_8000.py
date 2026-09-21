@@ -68,6 +68,12 @@ def paired_table(
     return lines
 
 
+def challenge_scale(row: dict) -> str | None:
+    family = BREAK.challenge(row)
+    scale = BREAK.scale(row)
+    return f"{family} / {scale}" if family and scale else None
+
+
 def summarize(results_dir: Path) -> tuple[str, list[dict]]:
     v13_6 = SUMMARY.load_samples(results_dir, "sft-6000-v13-stage1")
     v13_8 = SUMMARY.load_samples(results_dir, "sft-8000-v13-stage1")
@@ -120,6 +126,22 @@ def summarize(results_dir: Path) -> tuple[str, list[dict]]:
         ),
         ("which / open", lambda row: BREAK.loop_family(row) == "which / open"),
     )
+    cross_predicates = tuple(
+        (
+            f"{family} / {scale}",
+            lambda row, expected=f"{family} / {scale}": (
+                challenge_scale(row) == expected
+            ),
+        )
+        for family in (
+            "long-disconnected",
+            "long-query-branch",
+            "unequal-query-branch",
+            "long closed loop",
+            "matched open chain",
+        )
+        for scale in ("6", "8", "10")
+    )
 
     lines = [
         "# Native V13.1 nested SFT 8K",
@@ -161,6 +183,23 @@ def summarize(results_dir: Path) -> tuple[str, list[dict]]:
         lines += paired_table(break_6, break_8, break_predicates)
     else:
         lines.append("6K or 8K breakpoint results are missing.")
+
+    lines += ["", "### Challenge by structural scale", ""]
+    lines += [
+        "| slice | sft-6k | sft-8k | delta |",
+        "|---|---:|---:|---:|",
+    ]
+    for name, predicate in cross_predicates:
+        before = accuracy(break_6, predicate)
+        after = accuracy(break_8, predicate)
+        before_rate = rate(before)
+        after_rate = rate(after)
+        delta = (
+            "—"
+            if before_rate is None or after_rate is None
+            else f"{100 * (after_rate - before_rate):+.1f} pp"
+        )
+        lines.append(f"| {name} | {V1.fmt(before)} | {V1.fmt(after)} | {delta} |")
 
     lines += ["", "## 8K gates", ""]
     if not all((v13_6, v13_8, break_6, break_8)):

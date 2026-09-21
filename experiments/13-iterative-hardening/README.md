@@ -232,6 +232,22 @@ latest checkpoint when resubmitted. It evaluates stage 1 on both original V13
 and V13.1. `SFT-8000-SUMMARY.md` reports paired 6K-to-8K changes and requires
 both original-V13 retention and breakpoint improvement.
 
+Because checkpoint selection uses the frozen 129-row original-V13 validation
+set, the exported adapter can differ from the numerically final training
+checkpoint. If the retained `checkpoint-*` directories still exist, audit the
+latest one on both frozen suites:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/audit-sft-8000-checkpoints-h200.sh
+```
+
+The job performs no training. It finds the highest checkpoint number, creates
+temporary evaluation configs, and writes
+`results/SFT-8000-CHECKPOINT-AUDIT.md`. The regular 8K summary is also expanded
+with challenge-by-scale rows, such as query-branch accuracy separately at
+depths 6, 8, and 10. If no checkpoint directory remains, the audit exits
+without modifying the exported adapter.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:

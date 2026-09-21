@@ -214,6 +214,7 @@ __marimo__/
 results/
 experiments/**/logs/*
 !experiments/**/logs/.gitkeep
+experiments/**/generated/*
 slurm/archive/logs/*
 !slurm/archive/logs/.gitkeep
 
