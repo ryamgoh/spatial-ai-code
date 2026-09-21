@@ -479,3 +479,94 @@ approaching saturation. Simply expanding the same 6K distribution to another
 larger SFT set would offer diminishing information. Before scaling again, keep
 this suite as a retention benchmark and add a new controlled challenge suite
 that targets remaining policy failures and genuine structural extrapolation.
+
+## V13.1 breakpoint and targeted 8K result — apparent depth cliff
+
+The evaluation-only V13.1 suite extended the static structural envelope to
+depths and loop lengths 6, 8, and 10, with heavier disconnected and
+query-connected interference. The native V13 6K model scored 82.4% overall.
+Its scale curve initially appeared to show a sharp extrapolation boundary:
+93.6% at scale 6, 90.7% at scale 8, and 62.7% at scale 10. However, the clean
+conditions were already essentially solved: long-clean and unequal-clean were
+both 98.6%. The real failures were graph selection under interference:
+long-disconnected 65.3%, long-query-branch 62.5%, and unequal-query-branch
+66.7%.
+
+A nested 8K curriculum added 2,000 failure-targeted rows while preserving the
+exact V13 6K rows. It improved original V13 from 94.9% to 95.5% and V13.1 from
+82.4% to 85.6%, but most of the V13.1 gain came from loops rather than the
+target interference families. Depth/length 10 moved only from 62.7% to 63.2%;
+long-disconnected, long-query-branch, and unequal-query-branch reached only
+66.7%, 65.3%, and 71.5%. This showed that adding more depth-6/8 interference
+examples did not repair the apparent depth-10 boundary.
+
+The numerically final retained 8K checkpoint was slightly better than the
+old-V13-validation-selected exported adapter: V13.1 86.6% versus 85.6%, while
+original V13 changed only from 95.5% to 95.4%. The late checkpoint mainly
+improved open chains and which/open. Checkpoint selection therefore concealed
+some useful learning, but it did not explain the flat interference families.
+
+## Matched trace-format ablation — representation was the bottleneck
+
+The decisive follow-up compared the frozen full-state 8K run with a fresh-base
+delta-state 8K run. Both arms used the exact same 8,000 user prompts, gold
+answers, row order, validation worlds, optimizer, context limit, and effective
+batch. Only the supervised assistant reasoning target changed.
+
+The full-state trace rewrites complete X/Y states after every premise. The
+delta-state trace keeps each exact X/Y edge extraction, renders only the
+affected component and current global conflict flags per step, and renders the
+complete states once before final deduction. Delta-state assistant text used
+84.7% as many characters overall. Its important reduction was concentrated in
+the long tail: p95 token length fell from 4,371 to 3,135, the maximum fell from
+7,653 to 6,574, and rows above 4,096 tokens fell from 769 to 38. Both arms still
+used an 8,192-token context, so truncation and context capacity were held
+constant.
+
+The delta-state result passed all three trace-ablation gates and produced a
+large structural-generalization gain.
+
+| capability, stage 1 | full-state 8K | delta-state 8K | delta |
+|---|---:|---:|---:|
+| original V13 overall | 95.5% | **96.2%** | +0.7 pp |
+| V13.1 overall | 85.6% | **97.8%** | **+12.2 pp** |
+| long clean | 100.0% | 100.0% | 0.0 pp |
+| long disconnected | 66.7% | **100.0%** | **+33.3 pp** |
+| long query branch | 65.3% | **100.0%** | **+34.7 pp** |
+| unequal query branch | 71.5% | **100.0%** | **+28.5 pp** |
+| depth/length 10 | 63.2% | **97.5%** | **+34.3 pp** |
+| matched open chain | 82.5% | **92.5%** | +10.0 pp |
+| which/open | 71.7% | **90.8%** | +19.1 pp |
+
+The paired V13.1 comparison contained 158 fixes and only 9 regressions, a net
+gain of 149 examples. At scale 10, full-state scored 0/24 on long-disconnected,
+0/24 on long-query-branch, and 7/48 on unequal-query-branch. Delta-state scored
+24/24, 24/24, and 48/48 respectively. This is not evidence that the model
+needed to see every intermediate depth. It is evidence that repeatedly
+serializing the entire growing graph created an artificial length-dependent
+failure mode.
+
+Original V13 also improved overall, so the representation gain did not require
+forgetting the old task. The main trade-off was consistent which-object
+accuracy, which fell from 94.1% to 92.5% (net seven paired regressions), while
+count improved from 89.2% to 93.8% and open-chain accuracy improved from 94.5%
+to 95.2%. Which-object enumeration should therefore remain an explicit
+retention metric in future delta-state experiments.
+
+### Decision and revised interpretation
+
+Adopt delta-state as the default trace architecture for future native V13
+training. Preserve full-state as the frozen ablation baseline. Do not respond
+to the old depth-10 cliff by incrementally training depth 9, 10, 11, and so on:
+the matched ablation shows that the cliff primarily came from the supervised
+state-serialization protocol rather than a missing depth curriculum.
+
+V13.1 is now close to saturation at 97.8%. The next useful static difficulty
+must introduce a qualitatively different graph-selection or compositional
+problem, such as multiple valid proof paths mixed with incomplete competing
+paths, internal-node distractor branches, or a frozen combination of familiar
+phenomena that never appears together in training. This result comes from one
+fresh-base run per trace format rather than a multi-seed variance study, but
+the exact matched worlds, +12.2-point aggregate gain, and 158-to-9 paired
+fix/regression ratio make the representation effect too large to plausibly
+attribute to ordinary run variance alone.
