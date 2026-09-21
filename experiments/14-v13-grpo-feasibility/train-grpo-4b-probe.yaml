@@ -1,0 +1,82 @@
+# V14 feasibility probe: delta-SFT warm start, GPU0 train + GPU1 vLLM server.
+base_model: ../experiments/14-v13-grpo-feasibility/models/qwen3.5-4b-delta-merged
+load_in_4bit: false
+adapter: lora
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - down_proj
+  - up_proj
+  - linear_attn.in_proj_qkv
+  - linear_attn.in_proj_z
+  - linear_attn.out_proj
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
+rl: grpo
+attn_implementation: sdpa
+chat_template: qwen3_5
+sample_packing: false
+remove_unused_columns: false
+skip_prepare_dataset: true
+sequence_len: 2048
+# Four completions from one prompt per micro-batch; accumulate two prompt
+# groups before each optimizer step. Effective batch remains 8 completions.
+micro_batch_size: 4
+gradient_accumulation_steps: 2
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+learning_rate: 0.000005
+optimizer: adamw_torch
+lr_scheduler: cosine
+warmup_steps: 4
+bf16: true
+max_grad_norm: 1.0
+num_epochs: 1
+max_steps: 40
+logging_steps: 1
+save_steps: 10
+save_total_limit: 4
+auto_resume_from_checkpoints: false
+eval_strategy: "no"
+val_set_size: 0.0
+load_best_model_at_end: false
+output_dir: ../experiments/14-v13-grpo-feasibility/models/qwen3.5-4b-grpo-probe
+datasets:
+  - path: ../data/spatial_v14_grpo_pool_train.jsonl
+    ds_type: json
+    type:
+trl:
+  beta: 0.04
+  epsilon: 0.2
+  num_generations: 4
+  max_completion_length: 4096
+  temperature: 0.7
+  top_p: 0.95
+  use_vllm: true
+  vllm_mode: server
+  vllm_lora_sync: true
+  vllm_server_host: 127.0.0.1
+  vllm_server_port: 8000
+  vllm_server_timeout: 600
+  log_completions: true
+  num_completions_to_print: 2
+  mask_truncated_completions: true
+  reward_funcs:
+    - rewards.outcome_reward
+    - rewards.format_reward
+  reward_weights: [1.0, 0.05]
+vllm:
+  host: 0.0.0.0
+  port: 8000
+  tensor_parallel_size: 1
+  gpu_memory_utilization: 0.80
+  dtype: auto
+  max_model_len: 6144
+  enforce_eager: true

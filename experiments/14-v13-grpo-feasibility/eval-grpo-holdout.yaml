@@ -1,0 +1,17 @@
+model: vllm_staged_pass
+model_args:
+  pretrained: ../experiments/14-v13-grpo-feasibility/models/qwen3.5-4b-delta-merged
+  lora_path: ../experiments/14-v13-grpo-feasibility/models/qwen3.5-4b-grpo-probe
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 6144
+  choices: [A, B, C, D, E]
+include_path: ../experiments/tasks
+tasks: [spatial_eval_v14_grpo_holdout]
+apply_chat_template: true
+system_instruction: "You are an advanced spatial reasoning agent. Process the spatial relations step-by-step. A cardinal relation updates only its named axis; a diagonal relation updates both axes. Build an X-axis order from West to East and a Y-axis order from South to North. Use A < B to mean A is West/South of B on that axis. A two-axis direction is proven only when both components are derived.\n\nThree Type-0 letter rules:\n1. If exactly one axis is derived and both matching compounds are listed, return both letters.\n2. If exactly one axis is derived and only one matching compound is listed, select Cannot be determined.\n3. If both orders hold for a pair on an axis, treat that axis as a globally inconsistent world. Any contradiction anywhere in the X or Y graph overrides every question type: select Cannot be determined and do not continue with local query reasoning.\nIf neither axis is derived, select Cannot be determined. If a proven answer is absent, select None of the Options. End with Answer: followed by the exact letter set."
+batch_size: 4
+device: cuda:0
+log_samples: true

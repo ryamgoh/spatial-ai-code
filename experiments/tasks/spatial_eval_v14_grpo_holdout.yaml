@@ -1,0 +1,27 @@
+# Frozen V14 hard holdout. Evaluation only; never a GRPO prompt pool.
+task: spatial_eval_v14_grpo_holdout
+dataset_path: json
+dataset_name: null
+dataset_kwargs:
+  data_files:
+    test: "../data/spatial_v14_grpo_pool_eval.jsonl"
+test_split: test
+output_type: generate_until
+process_docs: !function utils.process_docs_v13_sft
+doc_to_text: "{{text}}"
+doc_to_target: "{{oracle_option}}"
+generation_kwargs:
+  until: []
+filter_list:
+  - name: "extract-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "Answer:\\s*([A-E](?:\\s*,\\s*[A-E])*)"
+        group_select: -1
+metric_list:
+  - metric: !function utils.strict_acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
+  note: "V14 GRPO feasibility holdout: hard V13 structures at scales 10/12/14"
