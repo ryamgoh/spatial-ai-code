@@ -248,6 +248,40 @@ with challenge-by-scale rows, such as query-branch accuracy separately at
 depths 6, 8, and 10. If no checkpoint directory remains, the audit exits
 without modifying the exported adapter.
 
+### Matched full-state versus delta-state trace ablation
+
+The next static V13 experiment tests whether repeated complete-state rendering
+is itself limiting structural generalization. The full-state arm is the frozen
+native V13.1 8K model. A new delta-state arm starts fresh from the same base and
+uses the exact same 8,000 prompts, answers, row order, validation worlds, and
+optimization. Only the supervised assistant trace changes.
+
+Full-state traces print complete X/Y states after every premise. Delta-state
+traces retain each exact X/Y edge extraction, render only the affected graph
+component and current global conflict flags at each step, then print complete
+X/Y states once before the final solver-grounded proof and option verdicts.
+
+Measured with the Qwen3.5 tokenizer:
+
+| trace | median tokens | p95 | max | rows above 4,096 |
+|---|---:|---:|---:|---:|
+| full-state | 1,775 | 4,371 | 7,653 | 769 |
+| delta-state | 1,762 | 3,135 | 6,574 | 38 |
+
+Both arms retain the same 8,192-token context so truncation and context length
+cannot explain any difference. Train and evaluate the delta arm on one H200:
+
+```bash
+sbatch experiments/13-iterative-hardening/slurm/run-trace-ablation-delta-h200.sh
+```
+
+The full-state arm is reused rather than retrained because it already used the
+same frozen 8K worlds and training recipe. The launcher is resumable and writes
+`results/TRACE-ABLATION-SUMMARY.md`, including paired original-V13 retention,
+V13.1 results, and interference-by-scale comparisons. Adopt delta-state traces
+only if they improve structural generalization without materially harming the
+original V13 suite.
+
 ## Implemented foundation
 
 The first narrow implementation increment is complete:

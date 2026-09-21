@@ -23,8 +23,10 @@ from spatial_generation_v13 import (
     SemanticSubtype,
     SpatialGenerator,
     StructuralConstraints,
+    TraceFormat,
     WorldConsistency,
     generate_dataset,
+    render_trace,
 )
 from spatial_solver_v13 import SpatialSolverV13
 
@@ -305,6 +307,36 @@ def test_trace_initialization_contains_exactly_prompt_visible_entities() -> None
     assert match
     trace_entities = {part.strip() for part in match.group(1).split(",")}
     assert trace_entities == set(solved.objects)
+
+
+def test_delta_trace_keeps_updates_compact_and_renders_final_state_once() -> None:
+    spec = GenerationSpec(
+        semantic_subtype=SemanticSubtype.DIR_1,
+        relation_mode=RelationMode.MIXED,
+        constraints=StructuralConstraints(
+            require_independent_axes=True,
+            x_depth=DepthRange.exact(4),
+            y_depth=DepthRange.exact(4),
+            distractors=DistractorSpec(
+                policy=DistractorPolicy.QUERY_BRANCH, count=3
+            ),
+        ),
+        num_entities=11,
+        num_relations=11,
+    )
+    example = SpatialGenerator().generate(spec, random.Random(13777))
+    solved = SpatialSolverV13().solve_and_analyze(user_text(example))
+
+    full = render_trace(solved, TraceFormat.FULL_STATE)
+    delta = render_trace(solved, TraceFormat.DELTA_STATE)
+
+    assert delta.endswith(f"Answer: {solved.grade.pretty}")
+    assert delta.count("**Final X-State**:") == 1
+    assert delta.count("**Final Y-State**:") == 1
+    assert delta.count("**Conflict Status**:") == len(solved.relations)
+    assert "**X-State**:" not in delta
+    assert "**Y-State**:" not in delta
+    assert len(delta) < len(full)
 
 
 def test_trace_final_deduction_shows_solver_verified_paths_and_composition() -> None:

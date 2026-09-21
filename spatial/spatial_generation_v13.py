@@ -125,6 +125,11 @@ class WorldConsistency(str, Enum):
     INCONSISTENT = "inconsistent"
 
 
+class TraceFormat(str, Enum):
+    FULL_STATE = "full-state"
+    DELTA_STATE = "delta-state"
+
+
 @dataclass(frozen=True)
 class CycleSpec:
     axes: CycleAxes
@@ -908,7 +913,33 @@ def _consistency_lines(solved: SolvedProblem) -> list[str]:
     return lines
 
 
-def _trace(solved: SolvedProblem) -> str:
+def _axis_component(graph: AxisGraph, first: str, second: str) -> set[str]:
+    adjacency: dict[str, set[str]] = {}
+    for left, right in graph.edges:
+        adjacency.setdefault(left, set()).add(right)
+        adjacency.setdefault(right, set()).add(left)
+    component = {first, second}
+    frontier = [first, second]
+    while frontier:
+        node = frontier.pop()
+        for neighbor in adjacency.get(node, set()):
+            if neighbor not in component:
+                component.add(neighbor)
+                frontier.append(neighbor)
+    return component
+
+
+def _axis_has_cycle(graph: AxisGraph) -> bool:
+    closure = graph.get_transitive_closure()
+    return any(
+        left == right or (right, left) in closure
+        for left, right in closure
+    )
+
+
+def render_trace(
+    solved: SolvedProblem, trace_format: TraceFormat = TraceFormat.FULL_STATE
+) -> str:
     entities = solved.objects
     relations = tuple(
         Relation(subject=a, direction=Direction(direction.title()), reference=b)
@@ -945,11 +976,37 @@ def _trace(solved: SolvedProblem) -> str:
             extraction.append(f"**Y-Extraction**: {a} < {b}")
         else:
             extraction.append("**Y-Extraction**: none (cardinal X-only relation)")
+        if trace_format is TraceFormat.FULL_STATE:
+            state_lines = (
+                f"**X-State**: {x_graph.format_state(active)}\n"
+                f"**Y-State**: {y_graph.format_state(active)}"
+            )
+        else:
+            x_component = (
+                _axis_component(x_graph, a, b) if relation.x_component else set()
+            )
+            y_component = (
+                _axis_component(y_graph, a, b) if relation.y_component else set()
+            )
+            state_lines = (
+                "**X-Affected Component**: "
+                f"{'none' if not x_component else x_graph.format_state(x_component)}\n"
+                "**Y-Affected Component**: "
+                f"{'none' if not y_component else y_graph.format_state(y_component)}\n"
+                f"**Conflict Status**: X={'yes' if _axis_has_cycle(x_graph) else 'no'}; "
+                f"Y={'yes' if _axis_has_cycle(y_graph) else 'no'}"
+            )
         chunks.append(
             f"### Step {index}\n**Sentence**: \"{relation.render()}\"\n"
             + "\n".join(extraction)
-            + f"\n**X-State**: {x_graph.format_state(active)}"
-            + f"\n**Y-State**: {y_graph.format_state(active)}"
+            + "\n"
+            + state_lines
+        )
+    if trace_format is TraceFormat.DELTA_STATE:
+        chunks.append(
+            "### Complete State\n"
+            f"**Final X-State**: {x_graph.format_state(entities)}\n"
+            f"**Final Y-State**: {y_graph.format_state(entities)}"
         )
     if solved.structure["world_consistency"] == "inconsistent":
         verdicts = [
@@ -966,6 +1023,11 @@ def _trace(solved: SolvedProblem) -> str:
     for letter, value, accepted, reason in grade.verdicts:
         verdicts.append(f"- {letter}. {value} — {reason}. {'In' if accepted else 'Out'}.")
     return "<think>\n" + "\n\n".join(chunks + ["\n".join(verdicts)]) + f"\n</think>\nAnswer: {grade.pretty}"
+
+
+def _trace(solved: SolvedProblem) -> str:
+    """Backward-compatible full-state trace renderer."""
+    return render_trace(solved, TraceFormat.FULL_STATE)
 
 
 class SpatialGenerator:
