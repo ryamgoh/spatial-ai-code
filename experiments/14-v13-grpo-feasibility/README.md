@@ -77,3 +77,18 @@ sbatch experiments/14-v13-grpo-feasibility/slurm/run-grpo-probe-h200x2.sh
 The report is `results/SUMMARY.md`. A technically successful probe requires
 pre-training reward variance, an improvement on the frozen hard holdout, and no
 more than a two-point original-V13 retention drop.
+
+### Queue retention behind the GRPO job
+
+Retention needs only one GPU and can be queued immediately without occupying it
+while GRPO runs. Submit it with an `afterok` dependency:
+
+```bash
+sbatch --dependency=afterok:<GRPO_JOB_ID> \
+  experiments/14-v13-grpo-feasibility/slurm/eval-retention-h200.sh
+```
+
+The job becomes eligible only after GRPO exits successfully. It uses one H200,
+evaluates original V13 and V13.1, skips completed outputs, and refreshes
+`results/SUMMARY.md`. A failed or calibration-aborted GRPO job does not trigger
+the dependent retention job.
