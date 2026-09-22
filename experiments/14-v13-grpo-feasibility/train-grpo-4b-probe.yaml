@@ -72,7 +72,7 @@ trl:
   reward_funcs:
     - rewards.outcome_reward
     - rewards.format_reward
-  reward_weights: [1.0, 0.05]
+  reward_weights: [1.0, 0.1]
 vllm:
   host: 0.0.0.0
   port: 8000

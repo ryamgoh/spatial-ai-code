@@ -111,7 +111,7 @@ def main() -> None:
     parseable_rate = parseable_rollouts / total_rollouts if total_rollouts else 0.0
     mixed_rate = mixed_groups / groups if groups else 0.0
     checks = {
-        "at least 60% of rollouts have a parseable final answer": parseable_rate >= 0.60,
+        "at least 35% of rollouts have a parseable final answer": parseable_rate >= 0.35,
         "rollout pass rate is between 15% and 90%": 0.15 <= pass_rate <= 0.90,
         "at least 15% of prompt groups have mixed rewards": mixed_rate >= 0.15,
         "at least 4 prompt groups are not all correct": groups - all_correct >= 4,

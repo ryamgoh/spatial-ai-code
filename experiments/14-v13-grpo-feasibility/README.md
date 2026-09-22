@@ -46,14 +46,17 @@ instruction as the GRPO pool, a larger 8,192-token context, a 6,144-token
 completion cap, and a 1.1 repetition penalty so the model has enough room to
 finish with a final answer. GRPO starts only if:
 
-- at least 60% of rollouts produce a parseable final `Answer:` line;
+- at least 35% of rollouts produce a parseable final `Answer:` line;
 - rollout pass rate is between 15% and 90%;
 - at least 15% of prompt groups contain both correct and incorrect rollouts;
 - at least four groups are not uniformly correct.
 
-This gate ensures the within-group reward variance required by GRPO. A failed
-gate writes `results/CALIBRATION.json` and exits before any optimizer step.
-Run calibration alone with:
+This gate ensures the within-group reward variance required by GRPO. The
+parseability threshold is deliberately lower than a production-quality target:
+formatting is one of the behaviors the 0.1-weight format reward is meant to
+improve during the feasibility probe. A failed gate writes
+`results/CALIBRATION.json` and exits before any optimizer step. Run calibration
+alone with:
 
 ```bash
 CALIBRATE_ONLY=1 \

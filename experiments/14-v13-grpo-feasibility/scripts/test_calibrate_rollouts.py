@@ -18,9 +18,9 @@ def test_reward_parser_uses_last_exact_answer_set() -> None:
 
 def test_calibration_thresholds_include_parseability_gate() -> None:
     # Keep this in sync with the operational gate in calibrate_rollouts.py.
-    parseable_rate = 0.59
+    parseable_rate = 0.34
     checks = {
-        "at least 60% of rollouts have a parseable final answer": parseable_rate >= 0.60,
+        "at least 35% of rollouts have a parseable final answer": parseable_rate >= 0.35,
         "rollout pass rate is between 15% and 90%": True,
         "at least 15% of prompt groups have mixed rewards": True,
         "at least 4 prompt groups are not all correct": True,
