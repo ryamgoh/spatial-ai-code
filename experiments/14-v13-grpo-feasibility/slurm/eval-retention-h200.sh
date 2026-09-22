@@ -9,6 +9,8 @@
 #SBATCH --mem=64G
 #SBATCH --time=03:00:00
 #SBATCH --gres=gpu:h200-141:1
+#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90
+#SBATCH --mail-user=e0958116@u.nus.edu
 #SBATCH --output=experiments/14-v13-grpo-feasibility/logs/%x-%j.out
 #SBATCH --error=experiments/14-v13-grpo-feasibility/logs/%x-%j.err
 
