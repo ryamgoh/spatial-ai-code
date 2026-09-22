@@ -4,6 +4,9 @@ This is the first RL experiment after the successful V13 delta-state SFT
 foundation. It is intentionally a feasibility probe, not a claim that GRPO is
 already the best training method.
 
+Provisional follow-up ideas and a possible research sequence are recorded in
+[`ROUGH-RESEARCH-THOUGHTS.md`](./ROUGH-RESEARCH-THOUGHTS.md).
+
 ## Question
 
 Can exact-outcome GRPO improve a frozen hard V13 holdout without materially
