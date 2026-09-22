@@ -355,25 +355,184 @@ rejecting every long chain.
 
 ### Full-state and delta-state traces
 
-A full-state trace repeats the complete graph after each premise:
+Consider the same SpatialEval-style question under both trace formats:
 
 ```text
-Step 1: add B < A
-X-State: B < A
-Step 2: add C < B
-X-State: C < B < A
+A is west of B.
+A is south of E.
+B is southwest of C.
+E is south of F.
+C is west of D.
+F is southwest of G.
+D is west of J.
+G is south of J.
+H is north of B.
+K is southwest of L.
+
+Question: In which direction is J relative to A?
+Options:
+A. Northeast
+B. Southeast
+C. Southwest
+D. Northwest
+E. Cannot be determined
 ```
 
-A delta-state trace records only the new or affected component:
+This example maintains two independent proof chains:
 
 ```text
-Step 1: add B < A
-Affected X component: B < A
-Step 2: add C < B
-Affected X component: C < B < A
-Conflict status: X=no, Y=no
-Final state: print the complete X/Y graphs once
+X proof: A < B < C < D < J
+Y proof: A < E < F < G < J
 ```
 
-The final proof and answer rule are unchanged. Only the intermediate state
-representation differs.
+The diagonal statements also create secondary state: `B < C` on Y and `F < G`
+on X. `B < H` is a branch attached to the query graph, while `K < L` is a
+disconnected distractor. The answer is **A. Northeast**.
+
+#### Full-state reasoning
+
+The full-state trace rewrites everything known after every premise:
+
+```text
+<think>
+Step 1: A is west of B.
+X-Extraction: A < B
+Y-Extraction: none
+X-State: A < B
+Y-State: Empty
+
+Step 2: A is south of E.
+X-Extraction: none
+Y-Extraction: A < E
+X-State: A < B
+Y-State: A < E
+
+Step 3: B is southwest of C.
+X-Extraction: B < C
+Y-Extraction: B < C
+X-State: A < B < C
+Y-State: A < E; B < C
+
+Step 4: E is south of F.
+Y-Extraction: E < F
+X-State: A < B < C
+Y-State: A < E < F; B < C
+
+Step 5: C is west of D.
+X-Extraction: C < D
+X-State: A < B < C < D
+Y-State: A < E < F; B < C
+
+Step 6: F is southwest of G.
+X-Extraction: F < G
+Y-Extraction: F < G
+X-State: A < B < C < D; F < G
+Y-State: A < E < F < G; B < C
+
+Step 7: D is west of J.
+X-Extraction: D < J
+X-State: A < B < C < D < J; F < G
+Y-State: A < E < F < G; B < C
+
+Step 8: G is south of J.
+Y-Extraction: G < J
+X-State: A < B < C < D < J; F < G
+Y-State: A < E < F < G < J; B < C
+
+Step 9: H is north of B.
+Y-Extraction: B < H
+X-State: A < B < C < D < J; F < G
+Y-State: A < E < F < G < J; B < C; B < H
+
+Step 10: K is southwest of L.
+X-Extraction: K < L
+Y-Extraction: K < L
+X-State: A < B < C < D < J; F < G; K < L
+Y-State: A < E < F < G < J; B < C; B < H; K < L
+
+Final Deduction:
+X-proof: A < B < C < D < J -> J is east of A.
+Y-proof: A < E < F < G < J -> J is north of A.
+Composition: east + north = Northeast.
+</think>
+Answer: A
+```
+
+#### Delta-state reasoning
+
+The delta-state trace prints only the component affected by each premise, then
+prints the complete state once before answering:
+
+```text
+<think>
+Step 1: A is west of B.
+X-Extraction: A < B
+X-Affected Component: A < B
+Conflict Status: X=no; Y=no
+
+Step 2: A is south of E.
+Y-Extraction: A < E
+Y-Affected Component: A < E
+Conflict Status: X=no; Y=no
+
+Step 3: B is southwest of C.
+X-Extraction: B < C
+Y-Extraction: B < C
+X-Affected Component: A < B < C
+Y-Affected Component: B < C
+Conflict Status: X=no; Y=no
+
+Step 4: E is south of F.
+Y-Extraction: E < F
+Y-Affected Component: A < E < F
+Conflict Status: X=no; Y=no
+
+Step 5: C is west of D.
+X-Extraction: C < D
+X-Affected Component: A < B < C < D
+Conflict Status: X=no; Y=no
+
+Step 6: F is southwest of G.
+X-Extraction: F < G
+Y-Extraction: F < G
+X-Affected Component: F < G
+Y-Affected Component: A < E < F < G
+Conflict Status: X=no; Y=no
+
+Step 7: D is west of J.
+X-Extraction: D < J
+X-Affected Component: A < B < C < D < J
+Conflict Status: X=no; Y=no
+
+Step 8: G is south of J.
+Y-Extraction: G < J
+Y-Affected Component: A < E < F < G < J
+Conflict Status: X=no; Y=no
+
+Step 9: H is north of B.
+Y-Extraction: B < H
+Y-Affected Component: B < {C, H}
+Conflict Status: X=no; Y=no
+
+Step 10: K is southwest of L.
+X-Extraction: K < L
+Y-Extraction: K < L
+X-Affected Component: K < L
+Y-Affected Component: K < L
+Conflict Status: X=no; Y=no
+
+Complete State:
+Final X-State: A < B < C < D < J; F < G; K < L
+Final Y-State: A < E < F < G < J; B < C; B < H; K < L
+
+Final Deduction:
+X-proof: A < B < C < D < J -> J is east of A.
+Y-proof: A < E < F < G < J -> J is north of A.
+Composition: east + north = Northeast.
+</think>
+Answer: A
+```
+
+Both traces reach the same proof and answer. Full-state repeatedly copies every
+known relation. Delta-state shows local updates and reconstructs the complete
+state once at the end. The difference becomes substantial on long problems.
