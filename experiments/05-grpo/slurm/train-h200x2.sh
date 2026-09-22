@@ -19,7 +19,7 @@ cd "$SLURM_SUBMIT_DIR"
 source "${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")" && pwd)}/slurm/lib/pin-srun-cpus.sh"
 
 cd finetune
-srun uv sync --extra vllm
+srun uv sync
 
 DATA_2K=../spatial_grpo_data_2k.jsonl
 DATA_4K=../spatial_grpo_data.jsonl

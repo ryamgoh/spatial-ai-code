@@ -44,7 +44,7 @@ if [[ "${CUDA_VISIBLE_DEVICES-}" == *MIG-* || "${CUDA_VISIBLE_DEVICES-}" == *GPU
 fi
 
 cd finetune
-srun uv sync --extra vllm || exit 1
+srun uv sync || exit 1
 cd "$SLURM_SUBMIT_DIR"
 if [[ $(CUDA_VISIBLE_DEVICES=0,1 uv run python -c 'import torch; print(torch.cuda.device_count())') -lt 2 ]]; then
   echo "Need two distinct H200 devices"
