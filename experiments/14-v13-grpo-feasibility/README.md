@@ -41,8 +41,12 @@ or learned reward model is used.
 ## Calibration gate
 
 Before training, 48 seeded prompts receive four stochastic SFT-policy rollouts
-each on the inference H200. GRPO starts only if:
+each on the inference H200. Calibration uses the same compact delta-state
+instruction as the GRPO pool, a larger 8,192-token context, a 6,144-token
+completion cap, and a 1.1 repetition penalty so the model has enough room to
+finish with a final answer. GRPO starts only if:
 
+- at least 60% of rollouts produce a parseable final `Answer:` line;
 - rollout pass rate is between 15% and 90%;
 - at least 15% of prompt groups contain both correct and incorrect rollouts;
 - at least four groups are not uniformly correct.

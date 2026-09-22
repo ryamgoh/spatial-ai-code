@@ -55,7 +55,7 @@ if ! has_adapter "$SFT_ADAPTER"; then
   exit 1
 fi
 
-if [[ ! -s "$TRAIN" || ! -s "$HOLDOUT" || ! -s "$MANIFEST" ]]; then
+if [[ "${FORCE_DATA:-0}" == "1" || ! -s "$TRAIN" || ! -s "$HOLDOUT" || ! -s "$MANIFEST" ]]; then
   uv run --no-project python "$EXP/scripts/make_rl_pool.py" || exit 1
 fi
 uv run --no-project python "$EXP/scripts/make_rl_pool.py" --validate-only || exit 1

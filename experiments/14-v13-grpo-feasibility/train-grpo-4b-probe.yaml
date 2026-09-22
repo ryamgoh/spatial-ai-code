@@ -56,9 +56,10 @@ trl:
   beta: 0.04
   epsilon: 0.2
   num_generations: 4
-  max_completion_length: 4096
+  max_completion_length: 6144
   temperature: 0.7
   top_p: 0.95
+  repetition_penalty: 1.1
   use_vllm: true
   vllm_mode: server
   vllm_lora_sync: true
@@ -78,5 +79,5 @@ vllm:
   tensor_parallel_size: 1
   gpu_memory_utilization: 0.80
   dtype: auto
-  max_model_len: 6144
+  max_model_len: 8192
   enforce_eager: true

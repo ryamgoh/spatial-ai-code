@@ -34,8 +34,11 @@ VERSION = "v14-v13-grpo-feasibility-v1"
 EXPECTED_TRAIN = 680
 EXPECTED_EVAL = 300
 ANSWER_LINE = (
-    "\n\nAfter your reasoning, end with a final line exactly like "
-    "`Answer: A`, `Answer: A, C`, or `Answer: E`."
+    "\n\nUse compact delta-state reasoning. For each premise, track only the "
+    "new X/Y extraction, the affected component, and whether a global conflict "
+    "is present. Do not rewrite the complete map after every premise. After "
+    "your reasoning, close with </think> and end with exactly one final line "
+    "like `Answer: A`, `Answer: A, C`, or `Answer: E`."
 )
 
 

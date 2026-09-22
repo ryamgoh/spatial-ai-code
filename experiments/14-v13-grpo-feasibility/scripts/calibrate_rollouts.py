@@ -37,8 +37,9 @@ def main() -> None:
     parser.add_argument("--n-prompts", type=int, default=48)
     parser.add_argument("--n-generations", type=int, default=4)
     parser.add_argument("--seed", type=int, default=14002)
-    parser.add_argument("--max-model-len", type=int, default=6144)
-    parser.add_argument("--max-tokens", type=int, default=4096)
+    parser.add_argument("--max-model-len", type=int, default=8192)
+    parser.add_argument("--max-tokens", type=int, default=6144)
+    parser.add_argument("--repetition-penalty", type=float, default=1.1)
     args = parser.parse_args()
 
     from transformers import AutoTokenizer
@@ -66,22 +67,27 @@ def main() -> None:
         n=args.n_generations,
         temperature=0.7,
         top_p=0.95,
+        repetition_penalty=args.repetition_penalty,
         max_tokens=args.max_tokens,
         seed=args.seed,
     )
     outputs = llm.generate(prompts, params)
 
     details = []
-    total_correct = total_rollouts = mixed_groups = all_correct = all_wrong = 0
+    total_correct = total_rollouts = parseable_rollouts = 0
+    mixed_groups = all_correct = all_wrong = 0
     cell_totals: Counter = Counter()
     cell_correct: Counter = Counter()
     for row, output in zip(selected, outputs, strict=True):
         gold = letters(row["oracle_option"])
         completions = [candidate.text for candidate in output.outputs]
-        correctness = [predicted(text) == gold for text in completions]
+        predictions = [predicted(text) for text in completions]
+        correctness = [prediction == gold for prediction in predictions]
         correct = sum(correctness)
+        parseable = sum(bool(prediction) for prediction in predictions)
         total_correct += correct
         total_rollouts += len(correctness)
+        parseable_rollouts += parseable
         mixed_groups += int(0 < correct < len(correctness))
         all_correct += int(correct == len(correctness))
         all_wrong += int(correct == 0)
@@ -93,16 +99,19 @@ def main() -> None:
                 "generation_cell": cell,
                 "oracle_option": row["oracle_option"],
                 "correct_rollouts": correct,
+                "parseable_rollouts": parseable,
                 "num_rollouts": len(correctness),
-                "predictions": [sorted(predicted(text)) for text in completions],
+                "predictions": [sorted(prediction) for prediction in predictions],
                 "completions": completions,
             }
         )
 
     groups = len(selected)
     pass_rate = total_correct / total_rollouts if total_rollouts else 0.0
+    parseable_rate = parseable_rollouts / total_rollouts if total_rollouts else 0.0
     mixed_rate = mixed_groups / groups if groups else 0.0
     checks = {
+        "at least 60% of rollouts have a parseable final answer": parseable_rate >= 0.60,
         "rollout pass rate is between 15% and 90%": 0.15 <= pass_rate <= 0.90,
         "at least 15% of prompt groups have mixed rewards": mixed_rate >= 0.15,
         "at least 4 prompt groups are not all correct": groups - all_correct >= 4,
@@ -112,6 +121,7 @@ def main() -> None:
         "num_prompts": groups,
         "generations_per_prompt": args.n_generations,
         "pass_rate": pass_rate,
+        "parseable_rate": parseable_rate,
         "mixed_group_rate": mixed_rate,
         "mixed_groups": mixed_groups,
         "all_correct_groups": all_correct,

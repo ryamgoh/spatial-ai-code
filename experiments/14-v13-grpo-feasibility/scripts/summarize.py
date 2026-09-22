@@ -129,6 +129,7 @@ def summarize(results_dir: Path, calibration: Path) -> str:
         "",
         "## Pre-training rollout calibration",
         "",
+        f"- Parseable rate: {100 * calibration_data.get('parseable_rate', 0):.1f}%",
         f"- Pass rate: {100 * calibration_data.get('pass_rate', 0):.1f}%",
         f"- Mixed-reward groups: {calibration_data.get('mixed_groups', 0)}/{calibration_data.get('num_prompts', 0)}",
         f"- Calibration gate: {'PASS' if calibration_data.get('go') else 'FAIL'}",
