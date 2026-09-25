@@ -116,6 +116,40 @@ This result indicates that repeated full-state serialization created an
 artificial long-context reasoning bottleneck. Delta-state traces are now the
 default representation.
 
+### How the evaluation sets were built
+
+The trace ablation used two frozen, solver-generated evaluation suites. Neither
+suite contains the model's target reasoning trace at evaluation time; the model
+receives the question and must generate its own reasoning and final answer.
+
+**V13 diagnostic (2,256 questions).** This suite combines:
+
+- 720 semantic controls: all 12 question subtypes in diagonal, cardinal, and
+  mixed-relation worlds;
+- 696 structural questions: independent X/Y proofs at depths 1–5, with no
+  distractor, disconnected distractors, or query-branch distractors; and
+- 840 consistency questions: closed loops paired with open-chain controls
+  across direction, which-object, and count questions.
+
+**V13.1 breakpoint (1,224 questions).** This harder suite contains:
+
+- 504 long-proof questions at depths 6, 8, and 10, including equal and unequal
+  X/Y depths and heavier disconnected or query-branch interference;
+- 360 inconsistent closed-loop questions at lengths 6, 8, and 10; and
+- 360 structurally matched open-chain controls.
+
+Every generated question was reparsed and answered by the V13 symbolic solver.
+The builder rejected duplicate prompts, duplicate premise worlds, and any prompt
+or world overlapping the earlier diagnostic, probe, or 6K training/validation
+sets. The V13.1 suite was then frozen and used unchanged for both models. Their
+evaluation configurations differed only in the LoRA adapter path.
+
+There is one limitation. The V13.1 failure categories informed the later 8K
+training curriculum, although its exact prompts and worlds remained excluded
+from training. V13.1 is therefore a frozen development benchmark for the
+full-versus-delta comparison, not a completely untouched final test. A future
+replication should use new seeds and a separately designed final holdout.
+
 ## Experiment 14: Preparing GRPO
 
 Experiment 14 asks whether outcome-only GRPO can improve hard spatial problems
@@ -387,7 +421,11 @@ Y proof: A < E < F < G < J
 
 The diagonal statements also create secondary state: `B < C` on Y and `F < G`
 on X. `B < H` is a branch attached to the query graph, while `K < L` is a
-disconnected distractor. The answer is **A. Northeast**.
+disconnected distractor. The answer is **A. Northeast**. This small example is
+mainly illustrative: because most updates extend one of the main proof chains,
+its delta trace is only moderately shorter. The measured advantage appears on
+larger examples containing several accumulated components and long repeated
+states.
 
 #### Full-state reasoning
 
@@ -534,5 +572,12 @@ Answer: A
 ```
 
 Both traces reach the same proof and answer. Full-state repeatedly copies every
-known relation. Delta-state shows local updates and reconstructs the complete
-state once at the end. The difference becomes substantial on long problems.
+known relation. Delta-state avoids copying components untouched by the current
+premise and reconstructs the complete state once at the end.
+
+The saving should not be inferred from this short display alone. Across the
+actual matched 8K training set, delta-state used **84.7% as many characters** as
+full-state. The larger improvement was in the long tail: p95 length fell from
+4,371 to 3,135 tokens, and examples above 4,096 tokens fell from 769 to 38. The
+benefit is therefore primarily avoiding repeated large states in difficult
+examples, not making every short trace visibly smaller.
