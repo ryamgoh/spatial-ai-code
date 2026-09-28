@@ -4819,6 +4819,7 @@ dependencies = [
     { name = "torchvision" },
     { name = "typer" },
     { name = "vllm" },
+    { name = "z3-solver" },
 ]
 
 [package.metadata]
@@ -4831,6 +4832,7 @@ requires-dist = [
     { name = "torchvision", specifier = "==0.28.0" },
     { name = "typer", specifier = ">=0.12" },
     { name = "vllm", specifier = "==0.28.0" },
+    { name = "z3-solver", specifier = ">=4.15,<5" },
 ]
 
 [[package]]

@@ -12,6 +12,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "typer>=0.12",
     "outlines>=1.2.9",
+    "z3-solver>=4.15,<5",
 ]
 
 # Last PyPI axolotl is 0.18.0 (2026-07-17): torch<=2.12.1, trl==1.8.0,
