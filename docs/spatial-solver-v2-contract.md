@@ -1,0 +1,398 @@
+# Spatial solver V2 semantic contract
+
+V2 is an experimental exact-direction solver. It does not replace or change
+the V13 dataset contract.
+
+## Module seams
+
+V2 separates spatial reasoning from dataset concerns:
+
+```text
+dataset row or synthetic spec
+    -> adapter
+    -> SpatialProblem
+    -> SpatialSolverV2
+    -> QueryAnalysis
+    -> grading, audit reporting, or map rendering
+```
+
+- `spatial_solver_v2.py` owns the spatial theory, model search, and coordinate
+  witnesses. It accepts structured problems only.
+- `spatial_text_v2.py` adapts the current prompt grammar into a
+  `SpatialProblem` and returns options separately.
+- `spatial_grading_v2.py` applies answer policy and option-menu semantics to an
+  existing query analysis.
+- `spatialeval_adapter_v2.py` converts original SpatialEval rows, preserves
+  their oracle metadata, and classifies the oracle against the model set.
+
+The core solver has no knowledge of JSONL rows, chat messages, prompt wording,
+option letters, oracle labels, or dataset-specific answer policy. A future
+synthetic generator and the implemented SpatialEval adapter both produce the same
+`SpatialProblem` interface.
+
+`SpatialProblem.query` selects `DirectionQuery`, `WhichQuery`, or `CountQuery`.
+Each query carries its own candidates. A direction query defaults to all eight
+exact directions, while Which/Count carry a set of exact directions describing
+the requested spatial region. This is structured query input, not a dataset
+mode inside the solver.
+
+The implemented SpatialEval adapter reports `exact-match`,
+`underdetermined-oracle-possible`, `oracle-overinclusive`,
+`oracle-contradicted`, `partial-overlap`, `inconsistent`, or `error`. Its
+`SpatialEvalAudit.analysis.witnesses` provides the maps needed to substantiate
+each possible answer. It never changes the original oracle or silently selects
+the witness that happens to match it.
+
+SpatialEval preparation is ordinal-only. The adapter accepts exact Northeast,
+Northwest, Southeast, and Southwest premises, rejects cardinal/coarse/negated
+premises, and sets those four directions as candidates for DirectionQuery.
+SpatialEval Which/Count questions may use all eight compass labels. Cardinal
+Which/Count labels are exact cardinal predicates; the solver remains compass-8
+and permits axis equality in their witness maps.
+
+Conceptually:
+
+```python
+SpatialProblem(
+    objects=objects,
+    premise=And(parsed_constraints),
+    query=DirectionQuery(
+        target=target,
+        reference=reference,
+        candidate_directions=frozenset({NE, NW, SE, SW}),
+    ),
+)
+```
+
+A future generic synthetic preparer can omit a DirectionQuery candidate set and
+receive the all-eight default.
+
+### File-level use cases
+
+- Use `spatial_solver_v2.py` when the caller already has structured objects,
+  formulas, and a query.
+- Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
+- Use `spatial_grading_v2.py` only after semantic analysis, when an option menu
+  and answer policy must be applied.
+- Use `spatialeval_adapter_v2.py` to preserve original SpatialEval oracle
+  metadata while comparing it with the solver-derived model set.
+- Use `test_spatial_solver_v2.py` as the executable semantic contract before
+  changing the solver or building proof rendering.
+
+## Motivation: text must determine its own answer
+
+The failure mode this model is intended to prevent is using a hidden grid as
+the source of truth for a text-only question. A generator can construct a
+complete grid, observe that `A` is northeast of `B`, and then render premises
+that reveal only that `A` is northward of `B`. The hidden grid has one answer,
+but the visible text permits three:
+
+```text
+hidden grid:       A is Northeast of B
+visible evidence:  A is Northward of B
+text possibilities: Northwest, North, Northeast
+```
+
+An image can expose the missing X relationship. A text-only example cannot use
+that hidden information as its gold label. V2 therefore treats the rendered
+premises, rather than generator coordinates, as authoritative.
+
+## World model
+
+For every pair of distinct objects, the X relationship is exactly one of
+`West`, `Equal`, or `East`, and the Y relationship is exactly one of `South`,
+`Equal`, or `North`. Two distinct objects may share one coordinate but may not
+share both. The eight remaining products are the exact compass directions:
+
+| Direction | X | Y |
+|---|---|---|
+| North | Equal | North |
+| Northeast | East | North |
+| East | East | Equal |
+| Southeast | East | South |
+| South | Equal | South |
+| Southwest | West | South |
+| West | West | Equal |
+| Northwest | West | North |
+
+Axis equality is transitive. Strict comparisons are transitive after equality
+classes are merged. A strict cycle, a strict comparison inside an equality
+class, or equality on both axes makes the premise set inconsistent.
+
+## Premises
+
+`RelationConstraint` is the atomic spatial proposition. `Not`, `And`, `Or`,
+`Implies`, and `Iff` form a propositionally complete structured formula AST.
+The text adapter maps the eight compass words to atomic constraints and combines
+all rendered statements with `And`. It additionally accepts `Northward`,
+`Eastward`, `Southward`, and `Westward` as coarse atomic domains. For example:
+
+```text
+East      = {East}
+Eastward  = {Northeast, East, Southeast}
+not East  = every exact direction except East
+not NE    = every exact direction except Northeast
+```
+
+Negation is set complement over the eight exact directions. Missing evidence is
+not negation. Both `A is not Northeast of B` and the generator-style
+`A is not to the Northeast of B` are accepted.
+
+Structured synthetic callers may build formulas directly:
+
+```python
+premise = And((
+    Or((
+        RelationConstraint("A", "B", {NE}),
+        RelationConstraint("A", "B", {NW}),
+    )),
+    Not(RelationConstraint("A", "B", {NE})),
+))
+```
+
+`Implies(P, Q)` and `Iff(P, Q)` are encoded with their ordinary Boolean
+semantics. The original SpatialEval adapter deliberately uses only `And` of
+positive singleton ordinal atoms; it does not expose the richer syntax in the
+original dataset.
+
+## Inference
+
+The solver asks whether each exact query direction occurs in at least one model
+that satisfies all premises. It first applies sound path-consistency propagation
+over pairwise direction sets. The production backend then encodes the remaining
+domains as integer X/Y constraints and performs one incremental Z3 check per
+candidate query direction. Thus it preserves correlations such as
+`not Northeast` rather than reducing them to independent X and Y facts.
+
+`SpatialSolverV2(backend="auto")` uses Z3 when `z3-solver` is installed and
+otherwise falls back to the dependency-free exhaustive reference backend.
+Callers generating large datasets should request `backend="z3"` explicitly so
+a missing dependency fails closed instead of silently selecting slower search.
+The reference backend exists for small cases and differential correctness tests.
+
+The core V2 interface supports pairwise direction queries only. Invalid
+structured problems and Z3 timeouts fail closed. Unsupported question families,
+unknown query objects, and unparsed premises are rejected by the text adapter.
+The reference engine remains exponential in unresolved negated or coarse
+premises; the Z3 backend is the supported path for larger workloads.
+
+### What a unique answer means
+
+Let `P` denote all rendered premises and let `D` be one of the eight exact
+directions. V2 includes `D` in the query result exactly when this formula has a
+model:
+
+```text
+P AND D(target, reference)
+```
+
+The answer is uniquely `D` when:
+
+```text
+P AND D                            is satisfiable
+P AND every other direction D'    is unsatisfiable
+```
+
+Equivalently, `possible_directions` contains exactly one element. This means
+that every coordinate map satisfying the text agrees on the queried direction.
+It does not mean that the complete coordinate map is unique.
+
+For example, all of these witnesses give the same Northeast answer:
+
+```text
+B=(0, 0),   A=(1, 1)
+B=(4, 2),   A=(9, 7)
+B=(-5, 3),  A=(20, 100)
+```
+
+The coordinate values vary, but `xA > xB` and `yA > yB` are invariant.
+
+Missing evidence must remain distinct from explicit negation. If the only fact
+is `A is Northward of B`, valid witnesses may place A northwest, north, or
+northeast of B. Rendering one arbitrarily selected witness would reveal a
+direction that the text does not entail.
+
+## Text-first map construction
+
+A text-and-image generator should use this order:
+
+```text
+choose the intended answer and structural difficulty
+    -> construct a SpatialProblem
+    -> solve the structured problem
+    -> render textual constraints
+    -> parse the rendered text back through its adapter
+    -> solve the reparsed SpatialProblem
+    -> require one possible direction, equal to the intended answer
+    -> obtain any satisfying coordinate witness
+    -> normalize its coordinates to compact integer ranks
+    -> render the map
+```
+
+The acceptance condition is:
+
+```python
+analysis.consistent and analysis.possible_directions == (desired_direction,)
+```
+
+Checking only membership is insufficient:
+
+```python
+desired_direction in analysis.possible_directions  # ambiguous examples pass
+```
+
+Once the singleton condition holds, arbitrary choices for unconstrained parts
+of the witness cannot change the query answer. They may change irrelevant map
+details, which is acceptable for a single-question example.
+
+### Constructing canonical coordinates
+
+For exact positive constraints, merge equality classes on each axis, build the
+strict-order DAG between those classes, and assign integer ranks in a
+deterministic topological order. For example:
+
+```text
+X order: A < B < C
+X ranks: A=0, B=1, C=2
+```
+
+Objects in the same equality class receive the same rank. The X and Y axes are
+ranked independently, and no two distinct objects may receive both the same X
+and the same Y value.
+
+Negated and coarse premises contain disjunctions, so they do not always produce
+one order DAG directly. In those cases, use a satisfying Z3 model to choose a
+valid realization, then replace its arbitrary integer values with sorted compact
+ranks while preserving `<`, `=`, and `>`.
+
+The public `DirectionAnalysis` result reports consistency, possible query directions,
+the selected engine, one convenience witness, and one witness for every
+possible answer. A generator can use the convenience witness directly after
+checking that the answer is unique:
+
+```python
+parsed = SpatialTextAdapter().parse(prompt)
+analysis = SpatialSolverV2(backend="z3").analyze(parsed.problem)
+if analysis.consistent and analysis.possible_directions == (desired_direction,):
+    render(analysis.coordinates)
+```
+
+`analysis.coordinates` maps each object name to an `(x, y)` integer pair. Each
+axis uses consecutive ranks beginning at zero, while required equality classes
+retain the same rank. It is the first witness in direction order.
+
+`analysis.witnesses` maps every possible direction to a coordinate assignment
+that produces that direction while satisfying the same premises:
+
+```python
+for direction, coordinates in analysis.witnesses.items():
+    render_counterexample(direction, coordinates)
+```
+
+This supports constructive ambiguity diagnostics. If the benchmark oracle is
+Northeast but `witnesses` contains both Northeast and Northwest, the two maps
+demonstrate that the visible text does not entail the oracle. Inconsistent and
+invalid problems return no convenience witness and an empty witness mapping.
+
+### Samples that may be rendered
+
+For a paired text-and-image dataset:
+
+- A singleton direction is safe to render.
+- Multiple possible directions must be rejected or given additional premises
+  for ordinary training data. For benchmark audits, retain them and render the
+  per-direction witnesses as constructive counterexamples.
+- An inconsistent premise set has no witness and must be rejected.
+- A `Cannot be determined` text question should not be paired with a concrete
+  image if both modalities are expected to have the same answer; the image will
+  necessarily resolve some of the textual ambiguity.
+- If several questions share one image, uniqueness must be checked separately
+  for every query.
+
+The resulting map is therefore arbitrary, but its answer is not.
+
+## Completeness boundary
+
+Within its supported language, V2 does not depend on a hand-written collection
+of forward-chaining rules. Exact directions, coarse half-planes, their
+negations, arbitrary finite Boolean combinations, equality, transitive
+consequences, disjunctive elimination, inverse relations, and contradictions
+are represented directly as Boolean integer constraints. Z3 checks the complete
+set of models for each possible query direction.
+
+This does not cover unrestricted spatial language. V2 currently excludes
+quantifiers, distance, adjacency, betweenness, nearest-object questions, and
+three-object orientation. It supports Direction, Which, and Count projections
+over finite named entities, but does not yet return a human-readable proof or
+unsatisfiable core.
+
+## Query families
+
+- `DirectionQuery` returns every satisfiable exact direction and one witness per
+  direction.
+- `WhichQuery` returns possible entities, entailed entities, and one witness per
+  possible entity. Exact-set grading returns `Cannot be determined` when any
+  candidate is contingent.
+- `CountQuery` uses one correlated cardinality expression across all candidates.
+  It returns every satisfiable count and one witness per count; it does not
+  naively count individually possible entities.
+
+Which/Count direction domains may contain any subset of the eight exact compass
+directions. This lets adapters express either exact regions (`{North}`) or
+coarse regions (`{Northwest, North, Northeast}`) without dataset logic in the
+solver.
+
+## Dataset scale
+
+There is no existing repository-wide maximum of 30 entities. The default V13
+entity pool contains 20 names, the challenge pool contains 48, and Experiment
+14 includes 32-entity worlds. A new generator may choose a cap of 30, but it
+should be an explicit generation-policy limit rather than a solver axiom.
+
+## Option grading
+
+`SpatialSolverV2.analyze()` is grading-policy neutral: it always returns the
+complete model set through `possible_directions` and `witnesses`. The separate
+grading module requires an explicit interpretation when a caller does not want
+the default:
+
+```python
+parsed = SpatialTextAdapter().parse(prompt)
+analysis = solver.analyze(parsed.problem)
+
+grade(analysis, parsed.options, AnswerPolicy.POSSIBILITY_SET)
+grade(analysis, parsed.options, AnswerPolicy.SINGLE_EXACT)
+```
+
+`POSSIBILITY_SET` is the compatibility default. It interprets the question as
+asking which directions remain possible:
+
+- One possible direction selects that direction.
+- Multiple possible directions select all corresponding options when the menu
+  represents the complete set.
+- If any possible direction is absent from the menu, select `Cannot be
+  determined`; returning only the listed subset would invent evidence.
+
+`SINGLE_EXACT` interprets the question as asking for one entailed direction:
+
+- One possible direction selects that direction.
+- Multiple possible directions select `Cannot be determined`, even if all are
+  listed.
+
+Under both policies, a unique direction absent from the menu selects `None of
+the Options`, while an inconsistent premise set selects `Cannot be determined`.
+The `Grade.status` field preserves why the displayed answer was selected:
+
+| Status | Meaning |
+|---|---|
+| `entailed` | One direction is forced and listed |
+| `possibility-set` | Multiple possibilities were returned under set semantics |
+| `ambiguous` | Single-exact semantics found multiple possible directions |
+| `incomplete-menu` | The menu cannot represent the full possibility set |
+| `missing-option` | One direction is forced but absent from the menu |
+| `inconsistent` | No coordinate model satisfies the premises |
+| `error` | Parsing, dependency, timeout, or option failure |
+
+The policy should come from dataset metadata or generation intent, not be
+guessed from incidental wording. An audit can compare the same prompt under
+both policies while retaining the same policy-neutral model analysis.
