@@ -8,7 +8,7 @@ one domain model and one gold-label contract.
 | `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
 | `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
-| `spatial_explanation_renderers_v2.py` | Coordinate-free axiomatic and symbolic training traces | SFT trace ablations |
+| `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Option menus plus single-exact/possibility-set policy | Dataset-specific evaluation |
@@ -43,6 +43,6 @@ dataset-policy knowledge. New generators should construct `SpatialProblem`
 directly, render text above that seam, parse the rendered text back through an
 adapter, and verify the reparsed problem before emitting a row. They can pass
 the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
-`render_training_trace` with either `TraceStyle.AXIOMATIC` or
-`TraceStyle.SYMBOLIC`. Coordinate witnesses belong only in structured audit
-metadata or `render_audit_explanation`, never in an SFT reasoning target.
+`render_training_trace` with `TraceFormat.NATURAL` or `TraceFormat.SYMBOLIC`
+and an independent `StateMode`. Coordinate witnesses belong only in structured
+audit metadata or `render_audit_explanation`, never in an SFT reasoning target.

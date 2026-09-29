@@ -4,9 +4,12 @@ V2 keeps this representation as one side of an explicit trace ablation. Both
 V2 formats are rendered from the same `SpatialProblem` and structured
 explanation:
 
-- `TraceStyle.AXIOMATIC` uses coordinate-free natural-language axioms.
-- `TraceStyle.SYMBOLIC` uses coordinate-free `X[...]`, `Y[...]`, and ordered
+- `TraceFormat.NATURAL` uses coordinate-free natural-language reasoning.
+- `TraceFormat.SYMBOLIC` uses coordinate-free `X[...]`, `Y[...]`, and ordered
   states such as `A < B < C`.
+
+The independent `StateMode` selects `FINAL_ONLY`, `DELTA`, or `FULL`. This
+produces a two-by-three ablation without changing the underlying proof.
 
 Normalized coordinate models are audit witnesses only. They are never emitted
 by either training trace. Training traces live in

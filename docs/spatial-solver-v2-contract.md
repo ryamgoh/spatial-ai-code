@@ -20,8 +20,9 @@ dataset row or synthetic spec
   witnesses. It accepts structured problems only.
 - `spatial_explanations_v2.py` classifies individual claims, extracts readable
   axis proofs where possible, and records typed evidence without parsing text.
-- `spatial_explanation_renderers_v2.py` renders that evidence as either an
-  axiomatic training trace or a symbolic axis-chain trace.
+- `spatial_explanation_renderers_v2.py` renders that evidence as either a
+  natural-language trace or a symbolic axis-chain trace, with an independent
+  state-update schedule.
 - `spatial_audit_rendering_v2.py` is the only renderer that formats coordinate
   witnesses.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
@@ -358,14 +359,22 @@ prompt parser.
 
 Training and audit output are deliberately separate:
 
-- `render_training_trace(..., TraceStyle.AXIOMATIC)` emits natural-language
-  premise decomposition, axis reasoning, candidate classifications, and
-  correlated count cases.
-- `render_training_trace(..., TraceStyle.SYMBOLIC)` emits the same proof as
+- `TraceFormat.NATURAL` emits premise decomposition, axis reasoning, candidate
+  classifications, and correlated count cases in natural language.
+- `TraceFormat.SYMBOLIC` emits the same proof as
   compact `X[...]`, `Y[...]`, `X-State`, `Y-State`, direction-domain, and member-
   set symbols. This preserves the original Chain-of-Symbols ablation style.
+- `StateMode.FINAL_ONLY` prints premise extraction followed by one final state.
+- `StateMode.DELTA` prints only newly entailed direct or transitive facts after
+  each premise, followed by one final state.
+- `StateMode.FULL` prints the complete entailed state after every premise.
 - `render_audit_explanation(...)` may include normalized coordinate witnesses.
   It is for diagnostics and must not be used as an SFT reasoning target.
+
+Incremental axis states apply to positive conjunctions of exact relations—the
+original SpatialEval statement grammar. A general Boolean premise is rendered
+as one formula because `OR`, `IF`, and `IFF` may require branched proof states
+rather than one monotonically growing pair of axis graphs.
 
 Both training styles are coordinate-free by contract. Coordinate witnesses
 remain inside the structured explanation so an auditor can establish that an
@@ -382,10 +391,17 @@ row = {
     "prompt": prompt_renderer.render(problem),
     "answer": answer_renderer.render(analysis, policy),
     "proof": explanation_to_dict(explanation),
-    "explanation": render_training_trace(problem, explanation, trace_style, labels),
+    "explanation": render_training_trace(
+        problem,
+        explanation,
+        trace_format=trace_format,
+        state_mode=state_mode,
+        labels=labels,
+    ),
     "metadata": {
         "answer_policy": policy.value,
-        "trace_style": trace_style.value,
+        "trace_format": trace_format.value,
+        "state_mode": state_mode.value,
         "audit_witnesses": analysis.witnesses,
         "seed": seed,
     },
