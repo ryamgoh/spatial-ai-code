@@ -232,6 +232,26 @@ def _menu_error(
     )
 
 
+def _none_visible_answer(
+    resolution: AnswerResolution,
+    options: Mapping[str, str],
+    none_of_options: frozenset[str],
+) -> MenuAnswer:
+    if none_of_options:
+        return MenuAnswer(
+            resolution,
+            none_of_options,
+            "none-of-options",
+            dict(options),
+        )
+    return _menu_error(
+        resolution,
+        options,
+        "no-match",
+        "no possible answer is visible and the menu has no none-of-options option",
+    )
+
+
 def encode_menu_answer(
     resolution: AnswerResolution,
     options: Mapping[str, str],
@@ -295,34 +315,10 @@ def encode_menu_answer(
     missing = tuple(value for value in resolution.values if value not in listed)
     if resolution.mode is AnswerMode.VISIBLE_POSSIBLE:
         if not selected:
-            if none_of_options:
-                return MenuAnswer(
-                    resolution,
-                    none_of_options,
-                    "none-of-options",
-                    dict(options),
-                )
-            return _menu_error(
-                resolution,
-                options,
-                "no-match",
-                "no possible answer is visible and the menu has no none-of-options option",
-            )
+            return _none_visible_answer(resolution, options, none_of_options)
     elif resolution.mode is AnswerMode.ALL_POSSIBLE and missing:
         if not selected:
-            if none_of_options:
-                return MenuAnswer(
-                    resolution,
-                    none_of_options,
-                    "none-of-options",
-                    dict(options),
-                )
-            return _menu_error(
-                resolution,
-                options,
-                "no-match",
-                "no possible answer is visible and the menu has no none-of-options option",
-            )
+            return _none_visible_answer(resolution, options, none_of_options)
         if undetermined:
             return MenuAnswer(
                 resolution,
