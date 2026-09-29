@@ -496,13 +496,3 @@ class SpatialExplainerV2:
             tuple(cases),
             analysis.engine,
         )
-
-
-def render_explanation(
-    explanation: QueryExplanation,
-    labels: dict[str, str] | None = None,
-) -> str:
-    """Compatibility alias for the coordinate-bearing audit renderer."""
-    from spatial_explanation_renderers_v2 import render_audit_explanation
-
-    return render_audit_explanation(explanation, labels)

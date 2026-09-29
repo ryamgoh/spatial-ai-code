@@ -21,7 +21,6 @@ from spatial_explanations_v2 import (
     SpatialExplainerV2,
     WhichExplanation,
     explanation_to_dict,
-    render_explanation,
 )
 from spatial_solver_v2 import (
     And,
@@ -227,7 +226,7 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
     )
 
     explanation = SpatialExplainerV2().explain(problem)
-    rendered = render_explanation(
+    rendered = render_audit_explanation(
         explanation,
         {"obj_0": "Bakery", "obj_1": "Library"},
     )
