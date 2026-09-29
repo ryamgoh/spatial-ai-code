@@ -387,8 +387,8 @@ A synthetic generator should therefore construct once and render later:
 problem = build_structured_problem(seed)
 analysis = solver.analyze(problem)
 explanation = explainer.explain(problem, analysis)
-resolution = resolve_answer(analysis, answer_semantics)
-menu_answer = encode_menu_answer(resolution, options, selection_mode)
+resolution = resolve_answer(analysis, answer_mode)
+menu_answer = encode_menu_answer(resolution, options)
 
 row = {
     "prompt": prompt_renderer.render(problem),
@@ -402,8 +402,7 @@ row = {
         labels=labels,
     ),
     "metadata": {
-        "answer_semantics": answer_semantics.value,
-        "selection_mode": selection_mode.value,
+        "answer_mode": answer_mode.value,
         "trace_format": trace_format.value,
         "state_mode": state_mode.value,
         "audit_witnesses": analysis.witnesses,
@@ -415,8 +414,8 @@ row = {
 For exact-answer generation, the generation policy rejects inconsistent or
 ambiguous analyses before rendering. For ambiguity datasets and benchmark
 audits, it retains the alternative witnesses as constructive counterexamples.
-Prompt text, menus, answer semantics, selection mode, and generator metadata remain outside both
-the solver and explanation modules.
+Prompt text, menus, answer mode, and generator metadata remain outside both the
+solver and explanation modules.
 
 ## Completeness boundary
 
@@ -468,54 +467,44 @@ two explicit operations:
 parsed = SpatialTextAdapter().parse(prompt)
 analysis = solver.analyze(parsed.problem)
 
-resolution = resolve_answer(analysis, AnswerSemantics.EXACT)
-menu_answer = encode_menu_answer(
-    resolution,
-    parsed.options,
-    SelectionMode.SINGLE_SELECT,
-)
+resolution = resolve_answer(analysis, AnswerMode.SINGLE)
+menu_answer = encode_menu_answer(resolution, parsed.options)
 ```
 
-`AnswerSemantics` controls what the question asks:
+`AnswerMode` defines the complete question contract:
 
-- `EXACT` requests one invariant answer value. Direction and Count values are
-  scalar; a Which value is an object set and may contain several objects.
-- `ALL_POSSIBLE` requests the complete set of possible directions, members, or
-  counts.
+- `SINGLE` requires exactly one invariant answer. Multiple possible Direction
+  values, Count values, or Which objects resolve to `Cannot be determined`.
+- `ALL_POSSIBLE` returns every possible value and requires the menu to
+  represent the complete set. If no possible value is visible, it can select an
+  explicit `None of the Options`; if only some possible values are visible, it
+  selects `Cannot be determined`.
+- `VISIBLE_POSSIBLE` returns every possible value present in the menu and
+  deliberately ignores possibilities that were not offered.
 
-`SelectionMode` independently describes the menu:
-
-- `SINGLE_SELECT` permits one selected option.
-- `MULTI_SELECT` permits one or more selected options.
-
-Original SpatialEval uses `EXACT` plus `SINGLE_SELECT` for Direction, singular
-Which, and Count. A generic plural Which query may use `EXACT` plus
-`MULTI_SELECT`: the one invariant answer is a set even when that set contains
-multiple objects.
-
-`ALL_POSSIBLE` never silently falls back when a possible value is missing. An
-incomplete menu is an encoding error. Likewise, a result containing multiple
-values cannot be encoded by a single-select menu. `Cannot be determined` is a
-semantic result of ambiguous `EXACT` resolution, not a generic fallback.
+Original SpatialEval uses `SINGLE` for Direction, singular Which, and Count.
+`Cannot be determined` is a semantic result of ambiguous `SINGLE` resolution and
+an explicit menu-coverage result for partially represented `ALL_POSSIBLE`
+answers; it is not used for `VISIBLE_POSSIBLE`.
 
 The two result types preserve where a failure occurred:
 
 | Status | Meaning |
 |---|---|
-| Resolution `exact` | One invariant scalar or set-valued answer exists |
+| Resolution `exact` | One invariant answer exists under `SINGLE` |
 | Resolution `possibilities` | All possible values were requested |
-| Resolution `ambiguous` | Exact semantics found no invariant answer |
+| Resolution `ambiguous` | `SINGLE` found no unique invariant answer |
 | Menu `incomplete-menu` | A required value has no menu representation |
-| Menu `selection-mismatch` | The answer needs more selections than permitted |
-| Menu `undetermined` | An ambiguous exact answer mapped to an explicit option |
+| Menu `undetermined` | An ambiguous single answer mapped to an explicit option |
+| Menu `none-of-options` | No visible ordinary option is selected |
 | `inconsistent` | No coordinate model satisfies the premises; generation fails |
 
-`score_response` compares predicted and expected letter sets using exact-set
-equality. It also reports precision, recall, F1, and Jaccard for diagnostics;
+`score_response` requires equality of the complete predicted and expected
+letter sets. It also reports precision, recall, F1, and Jaccard for diagnostics;
 those partial metrics do not redefine correctness.
 
-With original SpatialEval configured as `EXACT` plus `SINGLE_SELECT`, the
-current 1,500-row audit has no adapter failures:
+With original SpatialEval configured as `SINGLE`, the current 1,500-row audit
+has no adapter failures:
 
 | Query | Exact oracle | Oracle possible but underdetermined |
 |---|---:|---:|

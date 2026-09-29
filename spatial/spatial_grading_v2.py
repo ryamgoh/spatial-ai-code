@@ -29,18 +29,12 @@ _NONE_OF_OPTIONS = {
 }
 
 
-class AnswerSemantics(str, Enum):
-    """Meaning of the requested answer, independent of its menu encoding."""
+class AnswerMode(str, Enum):
+    """Complete answer contract for a question and its option menu."""
 
-    EXACT = "exact"
+    SINGLE = "single"
     ALL_POSSIBLE = "all-possible"
-
-
-class SelectionMode(str, Enum):
-    """Number of ordinary menu options that a response may select."""
-
-    SINGLE_SELECT = "single-select"
-    MULTI_SELECT = "multi-select"
+    VISIBLE_POSSIBLE = "visible-possible"
 
 
 class ResolutionStatus(str, Enum):
@@ -55,7 +49,7 @@ class ResolutionStatus(str, Enum):
 @dataclass(frozen=True)
 class AnswerResolution:
     analysis: QueryAnalysis
-    semantics: AnswerSemantics
+    mode: AnswerMode
     status: ResolutionStatus
     values: tuple[AnswerValue, ...] = ()
     error: str | None = None
@@ -72,7 +66,6 @@ class AnswerResolution:
 @dataclass(frozen=True)
 class MenuAnswer:
     resolution: AnswerResolution
-    selection_mode: SelectionMode
     letters: frozenset[str] = frozenset()
     status: str = ""
     options: dict[str, str] = field(default_factory=dict)
@@ -111,12 +104,13 @@ def _possible_values(analysis: QueryAnalysis) -> tuple[AnswerValue, ...]:
     return analysis.possible_counts
 
 
-def _exact_values(analysis: QueryAnalysis) -> tuple[AnswerValue, ...] | None:
+def _single_value(analysis: QueryAnalysis) -> tuple[AnswerValue, ...] | None:
     possible = _possible_values(analysis)
     if isinstance(analysis, WhichAnalysis):
         return (
             analysis.entailed_entities
-            if set(possible) == set(analysis.entailed_entities)
+            if len(analysis.entailed_entities) == 1
+            and set(possible) == set(analysis.entailed_entities)
             else None
         )
     return possible if len(possible) == 1 else None
@@ -124,57 +118,51 @@ def _exact_values(analysis: QueryAnalysis) -> tuple[AnswerValue, ...] | None:
 
 def resolve_answer(
     analysis: QueryAnalysis,
-    semantics: AnswerSemantics | str,
+    mode: AnswerMode | str,
 ) -> AnswerResolution:
     """Resolve a query without consulting option labels or menu cardinality."""
-    semantics = AnswerSemantics(semantics)
+    mode = AnswerMode(mode)
     if analysis.error:
         return AnswerResolution(
             analysis,
-            semantics,
+            mode,
             ResolutionStatus.ERROR,
             error=analysis.error,
         )
     if not analysis.consistent:
         return AnswerResolution(
             analysis,
-            semantics,
+            mode,
             ResolutionStatus.INCONSISTENT,
             error="premises are inconsistent",
         )
 
     possible = _possible_values(analysis)
-    exact = _exact_values(analysis)
-    if semantics is AnswerSemantics.EXACT:
-        if exact is not None:
-            return AnswerResolution(
-                analysis,
-                semantics,
-                ResolutionStatus.EXACT,
-                exact,
-            )
-        if not possible:
-            return AnswerResolution(
-                analysis,
-                semantics,
-                ResolutionStatus.NO_MATCH,
-            )
-        return AnswerResolution(
-            analysis,
-            semantics,
-            ResolutionStatus.AMBIGUOUS,
-        )
-
     if not possible:
         return AnswerResolution(
             analysis,
-            semantics,
+            mode,
             ResolutionStatus.NO_MATCH,
         )
+    if mode is AnswerMode.SINGLE:
+        single = _single_value(analysis)
+        if single is not None:
+            return AnswerResolution(
+                analysis,
+                mode,
+                ResolutionStatus.EXACT,
+                single,
+            )
+        return AnswerResolution(
+            analysis,
+            mode,
+            ResolutionStatus.AMBIGUOUS,
+        )
+
     return AnswerResolution(
         analysis,
-        semantics,
-        ResolutionStatus.EXACT if exact is not None else ResolutionStatus.POSSIBILITIES,
+        mode,
+        ResolutionStatus.POSSIBILITIES,
         possible,
     )
 
@@ -232,14 +220,12 @@ def _listed_values(
 
 def _menu_error(
     resolution: AnswerResolution,
-    selection_mode: SelectionMode,
     options: Mapping[str, str],
     status: str,
     error: str,
 ) -> MenuAnswer:
     return MenuAnswer(
         resolution,
-        selection_mode,
         status=status,
         options=dict(options),
         error=error,
@@ -249,14 +235,11 @@ def _menu_error(
 def encode_menu_answer(
     resolution: AnswerResolution,
     options: Mapping[str, str],
-    selection_mode: SelectionMode | str,
 ) -> MenuAnswer:
     """Encode a resolved semantic answer without silently dropping values."""
-    selection_mode = SelectionMode(selection_mode)
     if not options:
         return _menu_error(
             resolution,
-            selection_mode,
             options,
             "error",
             "no options found",
@@ -266,7 +249,6 @@ def encode_menu_answer(
     if resolution.status is ResolutionStatus.ERROR:
         return _menu_error(
             resolution,
-            selection_mode,
             options,
             "error",
             resolution.error or "semantic resolution failed",
@@ -274,7 +256,6 @@ def encode_menu_answer(
     if resolution.status is ResolutionStatus.INCONSISTENT:
         return _menu_error(
             resolution,
-            selection_mode,
             options,
             "inconsistent",
             resolution.error or "premises are inconsistent",
@@ -283,14 +264,12 @@ def encode_menu_answer(
         if not undetermined:
             return _menu_error(
                 resolution,
-                selection_mode,
                 options,
                 "ambiguous",
                 "menu has no undetermined option",
             )
         return MenuAnswer(
             resolution,
-            selection_mode,
             undetermined,
             "undetermined",
             dict(options),
@@ -300,14 +279,12 @@ def encode_menu_answer(
         if not none_of_options:
             return _menu_error(
                 resolution,
-                selection_mode,
                 options,
                 "no-match",
                 "menu has no none-of-options option",
             )
         return MenuAnswer(
             resolution,
-            selection_mode,
             none_of_options,
             "none-of-options",
             dict(options),
@@ -316,16 +293,57 @@ def encode_menu_answer(
     listed = _listed_values(resolution.analysis, options)
     selected = {listed[value] for value in resolution.values if value in listed}
     missing = tuple(value for value in resolution.values if value not in listed)
-    if missing:
-        if (
-            resolution.semantics is AnswerSemantics.EXACT
-            and len(resolution.values) == 1
-            and not selected
-            and none_of_options
-        ):
+    if resolution.mode is AnswerMode.VISIBLE_POSSIBLE:
+        if not selected:
+            if none_of_options:
+                return MenuAnswer(
+                    resolution,
+                    none_of_options,
+                    "none-of-options",
+                    dict(options),
+                )
+            return _menu_error(
+                resolution,
+                options,
+                "no-match",
+                "no possible answer is visible and the menu has no none-of-options option",
+            )
+    elif resolution.mode is AnswerMode.ALL_POSSIBLE and missing:
+        if not selected:
+            if none_of_options:
+                return MenuAnswer(
+                    resolution,
+                    none_of_options,
+                    "none-of-options",
+                    dict(options),
+                )
+            return _menu_error(
+                resolution,
+                options,
+                "no-match",
+                "no possible answer is visible and the menu has no none-of-options option",
+            )
+        if undetermined:
             return MenuAnswer(
                 resolution,
-                selection_mode,
+                undetermined,
+                "incomplete-menu",
+                dict(options),
+            )
+        rendered = ", ".join(
+            value.value if isinstance(value, Direction) else str(value)
+            for value in missing
+        )
+        return _menu_error(
+            resolution,
+            options,
+            "incomplete-menu",
+            f"menu is missing possible answer: {rendered}",
+        )
+    elif missing:
+        if resolution.mode is AnswerMode.SINGLE and not selected and none_of_options:
+            return MenuAnswer(
+                resolution,
                 none_of_options,
                 "none-of-options",
                 dict(options),
@@ -336,22 +354,12 @@ def encode_menu_answer(
         )
         return _menu_error(
             resolution,
-            selection_mode,
             options,
             "incomplete-menu",
             f"menu is missing possible answer: {rendered}",
         )
-    if selection_mode is SelectionMode.SINGLE_SELECT and len(selected) != 1:
-        return _menu_error(
-            resolution,
-            selection_mode,
-            options,
-            "selection-mismatch",
-            f"single-select menu cannot encode {len(selected)} answers",
-        )
     return MenuAnswer(
         resolution,
-        selection_mode,
         frozenset(selected),
         resolution.status.value,
         dict(options),
@@ -382,7 +390,7 @@ def score_response(
     return ResponseScore(
         predicted,
         gold,
-        expected.selection_mode is SelectionMode.MULTI_SELECT or len(predicted) <= 1,
+        expected.resolution.mode is not AnswerMode.SINGLE or len(predicted) <= 1,
         predicted == gold,
         precision,
         recall,

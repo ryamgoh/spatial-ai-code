@@ -8,10 +8,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from spatial_grading_v2 import (
-    AnswerSemantics,
+    AnswerMode,
     MenuAnswer,
     ResolutionStatus,
-    SelectionMode,
     encode_menu_answer,
     resolve_answer,
 )
@@ -44,8 +43,7 @@ class SpatialEvalCase:
     problem: SpatialProblem
     options: dict[str, str]
     oracle_answers: frozenset[Direction | str | int]
-    answer_semantics: AnswerSemantics
-    selection_mode: SelectionMode
+    answer_mode: AnswerMode
 
 
 @dataclass(frozen=True)
@@ -117,8 +115,7 @@ class SpatialEvalAdapter:
     def parse(
         self,
         row: Mapping[str, Any],
-        answer_semantics: AnswerSemantics | str = AnswerSemantics.EXACT,
-        selection_mode: SelectionMode | str = SelectionMode.SINGLE_SELECT,
+        answer_mode: AnswerMode | str = AnswerMode.SINGLE,
     ) -> SpatialEvalCase:
         text = row.get("text")
         if not isinstance(text, str) or not text.strip():
@@ -153,14 +150,13 @@ class SpatialEvalAdapter:
             problem=problem,
             options=parsed.options,
             oracle_answers=self._oracle_answers(row, parsed.options, query),
-            answer_semantics=AnswerSemantics(answer_semantics),
-            selection_mode=SelectionMode(selection_mode),
+            answer_mode=AnswerMode(answer_mode),
         )
 
 
 def audit(case: SpatialEvalCase, analysis: QueryAnalysis) -> SpatialEvalAudit:
-    resolution = resolve_answer(analysis, case.answer_semantics)
-    menu_answer = encode_menu_answer(resolution, case.options, case.selection_mode)
+    resolution = resolve_answer(analysis, case.answer_mode)
+    menu_answer = encode_menu_answer(resolution, case.options)
     if isinstance(analysis, DirectionAnalysis):
         possible = set(analysis.possible_directions)
     elif isinstance(analysis, WhichAnalysis):

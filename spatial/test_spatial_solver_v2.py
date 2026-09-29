@@ -7,9 +7,8 @@ from itertools import permutations, product
 
 import pytest
 from spatial_grading_v2 import (
-    AnswerSemantics,
+    AnswerMode,
     MenuAnswer,
-    SelectionMode,
     encode_menu_answer,
     resolve_answer,
 )
@@ -121,20 +120,18 @@ def analyze_text(text: str, backend: str | None = None) -> DirectionAnalysis:
 
 def menu_answer_text(
     text: str,
-    answer_semantics: AnswerSemantics = AnswerSemantics.ALL_POSSIBLE,
-    selection_mode: SelectionMode = SelectionMode.MULTI_SELECT,
+    answer_mode: AnswerMode = AnswerMode.ALL_POSSIBLE,
 ) -> MenuAnswer:
     parsed = TEXT_ADAPTER.parse(text)
-    resolution = resolve_answer(SOLVER.analyze(parsed.problem), answer_semantics)
-    return encode_menu_answer(resolution, parsed.options, selection_mode)
+    resolution = resolve_answer(SOLVER.analyze(parsed.problem), answer_mode)
+    return encode_menu_answer(resolution, parsed.options)
 
 
 def solve_text(
     text: str,
-    answer_semantics: AnswerSemantics = AnswerSemantics.ALL_POSSIBLE,
-    selection_mode: SelectionMode = SelectionMode.MULTI_SELECT,
+    answer_mode: AnswerMode = AnswerMode.ALL_POSSIBLE,
 ) -> str:
-    return menu_answer_text(text, answer_semantics, selection_mode).raw
+    return menu_answer_text(text, answer_mode).raw
 
 
 def coordinate_direction(
@@ -284,8 +281,7 @@ def test_spatialeval_adapter_reports_constructive_ambiguity() -> None:
     result = audit(case, SOLVER.analyze(case.problem))
 
     assert result.status == "underdetermined-oracle-possible"
-    assert result.case.answer_semantics is AnswerSemantics.EXACT
-    assert result.case.selection_mode is SelectionMode.SINGLE_SELECT
+    assert result.case.answer_mode is AnswerMode.SINGLE
     assert result.menu_answer.status == "ambiguous"
     assert result.menu_answer.raw == "Error: menu has no undetermined option"
     assert set(result.analysis.witnesses) == {
@@ -397,14 +393,12 @@ def test_which_query_distinguishes_possible_and_entailed_entities(
     assert analysis.contingent_entities == ("C",)
     assert analysis.impossible_entities == ("D",)
     exact = encode_menu_answer(
-        resolve_answer(analysis, AnswerSemantics.EXACT),
+        resolve_answer(analysis, AnswerMode.SINGLE),
         parsed.options,
-        SelectionMode.SINGLE_SELECT,
     )
     possible = encode_menu_answer(
-        resolve_answer(analysis, AnswerSemantics.ALL_POSSIBLE),
+        resolve_answer(analysis, AnswerMode.ALL_POSSIBLE),
         parsed.options,
-        SelectionMode.MULTI_SELECT,
     )
     assert exact.raw == "E"
     assert possible.raw == "A,B"
@@ -426,14 +420,12 @@ def test_count_query_returns_possible_correlated_counts(backend: str) -> None:
     assert isinstance(analysis, CountAnalysis)
     assert analysis.possible_counts == (1, 2)
     exact = encode_menu_answer(
-        resolve_answer(analysis, AnswerSemantics.EXACT),
+        resolve_answer(analysis, AnswerMode.SINGLE),
         parsed.options,
-        SelectionMode.SINGLE_SELECT,
     )
     possible = encode_menu_answer(
-        resolve_answer(analysis, AnswerSemantics.ALL_POSSIBLE),
+        resolve_answer(analysis, AnswerMode.ALL_POSSIBLE),
         parsed.options,
-        SelectionMode.MULTI_SELECT,
     )
     assert exact.raw == "E"
     assert possible.raw == "B,C"
@@ -496,41 +488,41 @@ def test_coarse_eastward_plus_not_northeast_leaves_east_or_southeast() -> None:
     assert solve_text(text) == "C,D"
 
 
-def test_answer_semantics_distinguishes_all_possible_from_exact() -> None:
+def test_answer_mode_distinguishes_multi_complete_from_single() -> None:
     text = prompt(["A is to the Eastward of B."])
 
     possible_set = menu_answer_text(
         text,
-        AnswerSemantics.ALL_POSSIBLE,
-        SelectionMode.MULTI_SELECT,
+        AnswerMode.ALL_POSSIBLE,
     )
     single_exact = menu_answer_text(
         text,
-        AnswerSemantics.EXACT,
-        SelectionMode.SINGLE_SELECT,
+        AnswerMode.SINGLE,
     )
 
     assert possible_set.raw == "B,C,D"
     assert possible_set.status == "possibilities"
-    assert possible_set.resolution.semantics is AnswerSemantics.ALL_POSSIBLE
+    assert possible_set.resolution.mode is AnswerMode.ALL_POSSIBLE
     assert single_exact.raw == "I"
     assert single_exact.status == "undetermined"
-    assert single_exact.resolution.semantics is AnswerSemantics.EXACT
+    assert single_exact.resolution.mode is AnswerMode.SINGLE
 
 
 @pytest.mark.parametrize(
-    "answer_semantics",
-    [AnswerSemantics.ALL_POSSIBLE, AnswerSemantics.EXACT],
+    "answer_mode",
+    [AnswerMode.ALL_POSSIBLE, AnswerMode.SINGLE],
 )
-def test_unique_answer_is_the_same_under_both_semantics(
-    answer_semantics: AnswerSemantics,
+def test_unique_answer_is_the_same_under_single_and_multi_complete(
+    answer_mode: AnswerMode,
 ) -> None:
     text = prompt(["A is to the East of B."])
 
-    result = menu_answer_text(text, answer_semantics, SelectionMode.SINGLE_SELECT)
+    result = menu_answer_text(text, answer_mode)
 
     assert result.raw == "C"
-    assert result.status == "exact"
+    assert result.status == (
+        "exact" if answer_mode is AnswerMode.SINGLE else "possibilities"
+    )
 
 
 def test_atomic_negation_can_expose_a_transitive_contradiction() -> None:
@@ -591,7 +583,9 @@ def test_missing_information_is_not_treated_as_negation() -> None:
     assert solve_text(text) == "A,B,H"
 
 
-def test_partial_option_menu_fails_instead_of_dropping_a_possible_answer() -> None:
+def test_partial_multi_complete_menu_uses_undetermined_without_dropping_values() -> (
+    None
+):
     text = prompt(["A is to the Northward of B."])
     text = text.replace(
         ", B. Northeast, C. East, D. Southeast, E. South, F. Southwest, "
@@ -600,7 +594,7 @@ def test_partial_option_menu_fails_instead_of_dropping_a_possible_answer() -> No
     )
 
     result = menu_answer_text(text)
-    assert result.raw == "Error: menu is missing possible answer: Northeast, Northwest"
+    assert result.raw == "I"
     assert result.status == "incomplete-menu"
 
 
