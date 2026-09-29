@@ -64,6 +64,19 @@ def direction_signs(direction: Direction) -> tuple[int, int]:
     return _DIRECTION_SIGNS[direction]
 
 
+def direction_between(
+    subject: tuple[int, int], reference: tuple[int, int]
+) -> Direction:
+    """Return the exact direction between two distinct coordinate pairs."""
+    signs = (
+        (subject[0] > reference[0]) - (subject[0] < reference[0]),
+        (subject[1] > reference[1]) - (subject[1] < reference[1]),
+    )
+    if signs == (0, 0):
+        raise ValueError("distinct objects cannot share both coordinates")
+    return _SIGNS_DIRECTION[signs]
+
+
 def _compose_signs(first: int, second: int) -> frozenset[int]:
     if first == 0:
         return frozenset({second})
@@ -180,7 +193,7 @@ class CountQuery:
 SpatialQuery = DirectionQuery | WhichQuery | CountQuery
 
 
-def membership_constraint(
+def _membership_constraint(
     candidate: str, query: WhichQuery | CountQuery
 ) -> RelationConstraint:
     """Return the spatial claim tested for one Which/Count candidate."""
@@ -720,7 +733,7 @@ class _ReferenceEngine:
         entailed: list[str] = []
         witnesses: dict[str, dict[str, tuple[int, int]]] = {}
         for candidate in query.candidates:
-            predicate = membership_constraint(candidate, query)
+            predicate = _membership_constraint(candidate, query)
             witness = self._find_formula_witness(
                 objects,
                 And((premise, predicate)),
@@ -749,7 +762,7 @@ class _ReferenceEngine:
         ):
             return None
         predicates = {
-            candidate: membership_constraint(candidate, query)
+            candidate: _membership_constraint(candidate, query)
             for candidate in query.candidates
         }
         witnesses: dict[int, dict[str, tuple[int, int]]] = {}

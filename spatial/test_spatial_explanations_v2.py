@@ -3,8 +3,15 @@
 from __future__ import annotations
 
 import json
+import re
+from pathlib import Path
 
 import pytest
+from spatial_explanation_renderers_v2 import (
+    TraceStyle,
+    render_audit_explanation,
+    render_training_trace,
+)
 from spatial_explanations_v2 import (
     Axis,
     AxisRelation,
@@ -28,6 +35,8 @@ from spatial_solver_v2 import (
     SpatialSolverV2,
     WhichQuery,
 )
+from spatial_text_v2 import SpatialTextAdapter
+from spatialeval_adapter_v2 import SpatialEvalAdapter
 
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:
@@ -173,6 +182,10 @@ def test_which_explanation_classifies_each_candidate() -> None:
         for membership in explanation.memberships
         if membership.candidate == "C"
     )
+    assert contingent.possible_directions == (
+        Direction.NORTHEAST,
+        Direction.NORTHWEST,
+    )
     assert contingent.evidence.witness is not None
     assert contingent.evidence.counterexample is not None
 
@@ -199,6 +212,7 @@ def test_count_explanation_preserves_correlated_non_contiguous_counts() -> None:
         ClaimStatus.IMPOSSIBLE,
         ClaimStatus.CONTINGENT,
     ]
+    assert [case.members for case in explanation.counts] == [(), (), ("A", "B")]
     assert all(
         membership.evidence.status is ClaimStatus.CONTINGENT
         for membership in explanation.memberships
@@ -227,3 +241,75 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
     assert serialized["cases"][0]["direction"] == "North"
     assert serialized["cases"][0]["evidence"]["negation_unsatisfiable"] is True
     json.dumps(serialized)
+
+
+def test_training_trace_styles_share_proof_without_coordinates() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B", "C"),
+        premise=And(
+            (
+                atom("A", Direction.NORTHEAST, "B"),
+                atom("B", Direction.NORTH, "C"),
+            )
+        ),
+        query=DirectionQuery("A", "C"),
+    )
+    explanation = SpatialExplainerV2().explain(problem)
+
+    axiomatic = render_training_trace(problem, explanation, TraceStyle.AXIOMATIC)
+    symbolic = render_training_trace(problem, explanation, TraceStyle.SYMBOLIC)
+
+    assert "X-axis decomposition: A is east of B." in axiomatic
+    assert "Possible directions: Northeast." in axiomatic
+    assert "X-State: [B = C] < A" in symbolic
+    assert "X-Query: C < A" in symbolic
+    assert "Direction-Domain: {Northeast}" in symbolic
+    assert " < " not in axiomatic
+    assert "X-State:" not in axiomatic
+    assert re.search(r"=\(-?\d+,\s*-?\d+\)", axiomatic) is None
+    assert re.search(r"=\(-?\d+,\s*-?\d+\)", symbolic) is None
+
+
+@pytest.mark.parametrize(
+    ("row_id", "expected_axiomatic", "expected_symbolic"),
+    [
+        (
+            "spatialmap.tqa.2003.0",
+            "Possible directions: Northeast, Northwest.",
+            "Direction-Domain: {Northeast, Northwest}",
+        ),
+        (
+            "spatialmap.tqa.2000.1",
+            "Contingent members: Narwhal's Novelties, Police Supply Store.",
+            "Entailed-Members: {}",
+        ),
+        (
+            "spatialmap.tqa.2001.2",
+            "One jointly realizable case contains Tremor Toys, Wolf's Wardrobe, giving count 2.",
+            "Count-Domain: {0, 1, 2}",
+        ),
+    ],
+)
+def test_spatialeval_training_traces_are_coordinate_free(
+    row_id: str,
+    expected_axiomatic: str,
+    expected_symbolic: str,
+) -> None:
+    dataset = Path(__file__).parents[1] / "data" / "spatialeval_org.jsonl"
+    row = next(
+        row
+        for line in dataset.read_text().splitlines()
+        if (row := json.loads(line))["id"] == row_id
+    )
+    problem = SpatialEvalAdapter(SpatialTextAdapter()).parse(row).problem
+    explanation = SpatialExplainerV2().explain(problem)
+
+    axiomatic = render_training_trace(problem, explanation, TraceStyle.AXIOMATIC)
+    symbolic = render_training_trace(problem, explanation, TraceStyle.SYMBOLIC)
+    audit = render_audit_explanation(explanation)
+
+    assert expected_axiomatic in axiomatic
+    assert expected_symbolic in symbolic
+    assert re.search(r"=\(-?\d+,\s*-?\d+\)", axiomatic) is None
+    assert re.search(r"=\(-?\d+,\s*-?\d+\)", symbolic) is None
+    assert re.search(r"=\(-?\d+,\s*-?\d+\)", audit) is not None

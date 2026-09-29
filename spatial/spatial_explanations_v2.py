@@ -26,8 +26,8 @@ from spatial_solver_v2 import (
     WhichAnalysis,
     WhichQuery,
     conjunctive_atoms,
+    direction_between,
     direction_signs,
-    membership_constraint,
 )
 
 Coordinates = dict[str, tuple[int, int]]
@@ -103,6 +103,7 @@ class DirectionExplanation:
 class MembershipExplanation:
     candidate: str
     evidence: ClaimEvidence
+    possible_directions: tuple[Direction, ...]
 
 
 @dataclass(frozen=True)
@@ -117,6 +118,7 @@ class WhichExplanation:
 class CountCase:
     count: int
     status: ClaimStatus
+    members: tuple[str, ...] = ()
     witness: Coordinates | None = None
 
 
@@ -379,13 +381,68 @@ class SpatialExplainerV2:
         problem: SpatialProblem,
         query: WhichQuery | CountQuery,
     ) -> tuple[MembershipExplanation, ...]:
-        return tuple(
-            MembershipExplanation(
-                candidate,
-                self._evidence(problem, membership_constraint(candidate, query)),
+        memberships = []
+        for candidate in query.candidates:
+            direction_problem = SpatialProblem(
+                problem.objects,
+                problem.premise,
+                DirectionQuery(candidate, query.reference),
             )
-            for candidate in query.candidates
-        )
+            direction_analysis = self._solver.analyze(direction_problem)
+            assert isinstance(direction_analysis, DirectionAnalysis)
+            if direction_analysis.error:
+                raise RuntimeError(direction_analysis.error)
+
+            possible_directions = direction_analysis.possible_directions
+            matching = tuple(
+                direction
+                for direction in possible_directions
+                if direction in query.directions
+            )
+            nonmatching = tuple(
+                direction
+                for direction in possible_directions
+                if direction not in query.directions
+            )
+            status = _claim_status(
+                direction_analysis.consistent,
+                bool(matching),
+                direction_analysis.consistent and not nonmatching,
+            )
+            requested = (
+                next(iter(query.directions)) if len(query.directions) == 1 else None
+            )
+            memberships.append(
+                MembershipExplanation(
+                    candidate,
+                    ClaimEvidence(
+                        status=status,
+                        witness=(
+                            direction_analysis.witnesses[matching[0]]
+                            if matching
+                            else None
+                        ),
+                        counterexample=(
+                            direction_analysis.witnesses[nonmatching[0]]
+                            if nonmatching
+                            else None
+                        ),
+                        axis_proof=(
+                            _axis_proof(
+                                problem,
+                                candidate,
+                                query.reference,
+                                requested,
+                            )
+                            if status is ClaimStatus.ENTAILED and requested is not None
+                            else None
+                        ),
+                        negation_unsatisfiable=status is ClaimStatus.ENTAILED,
+                    ),
+                    possible_directions,
+                )
+            )
+        return tuple(memberships)
 
     def _explain_which(
         self,
@@ -420,7 +477,18 @@ class SpatialExplainerV2:
                 status = ClaimStatus.ENTAILED
             else:
                 status = ClaimStatus.CONTINGENT
-            cases.append(CountCase(count, status, analysis.witnesses.get(count)))
+            witness = analysis.witnesses.get(count)
+            members = (
+                tuple(
+                    candidate
+                    for candidate in query.candidates
+                    if direction_between(witness[candidate], witness[query.reference])
+                    in query.directions
+                )
+                if witness is not None
+                else ()
+            )
+            cases.append(CountCase(count, status, members, witness))
         return CountExplanation(
             query.reference,
             query.directions,
@@ -430,127 +498,11 @@ class SpatialExplainerV2:
         )
 
 
-def _label(value: str, labels: Mapping[str, str]) -> str:
-    return labels.get(value, value)
-
-
-def _render_directions(directions: frozenset[Direction]) -> str:
-    return "/".join(
-        direction.value for direction in Direction if direction in directions
-    )
-
-
-def _render_coordinates(
-    coordinates: Coordinates,
-    labels: Mapping[str, str],
-) -> str:
-    return ", ".join(
-        f"{_label(obj, labels)}=({x}, {y})" for obj, (x, y) in coordinates.items()
-    )
-
-
-def _render_axis(derivation: AxisDerivation, labels: Mapping[str, str]) -> str:
-    path = " -> ".join(_label(obj, labels) for obj in derivation.path)
-    premises = ", ".join(str(index + 1) for index in derivation.premise_indices)
-    subject = _label(derivation.subject, labels)
-    reference = _label(derivation.reference, labels)
-    return (
-        f"On the {derivation.axis.value}-axis, premises {premises} give path "
-        f"{path}; therefore {subject}.{derivation.axis.value} "
-        f"{derivation.relation.value} {reference}.{derivation.axis.value}."
-    )
-
-
-def _render_evidence(
-    subject: str,
-    relation: str,
-    reference: str,
-    evidence: ClaimEvidence,
-    labels: Mapping[str, str],
-) -> list[str]:
-    claim = f"{_label(subject, labels)} is {relation} of {_label(reference, labels)}"
-    lines = [f"{claim}: {evidence.status.value}."]
-    if evidence.axis_proof is not None:
-        lines.extend(
-            (
-                _render_axis(evidence.axis_proof.x, labels),
-                _render_axis(evidence.axis_proof.y, labels),
-                f"Combining both axes gives {evidence.axis_proof.direction.value}.",
-            )
-        )
-    elif evidence.negation_unsatisfiable:
-        lines.append("Its negation is inconsistent with the premises.")
-    if evidence.witness is not None and evidence.status is ClaimStatus.CONTINGENT:
-        lines.append(
-            f"Satisfying witness: {_render_coordinates(evidence.witness, labels)}."
-        )
-    if (
-        evidence.counterexample is not None
-        and evidence.status is ClaimStatus.CONTINGENT
-    ):
-        lines.append(
-            f"Counterexample witness: {_render_coordinates(evidence.counterexample, labels)}."
-        )
-    return lines
-
-
 def render_explanation(
     explanation: QueryExplanation,
-    labels: Mapping[str, str] | None = None,
+    labels: dict[str, str] | None = None,
 ) -> str:
-    """Render a structured explanation without assuming a dataset format."""
-    labels = labels or {}
-    lines: list[str] = []
-    if isinstance(explanation, DirectionExplanation):
-        for case in explanation.cases:
-            if case.evidence.status is ClaimStatus.IMPOSSIBLE:
-                continue
-            lines.extend(
-                _render_evidence(
-                    explanation.target,
-                    case.direction.value,
-                    explanation.reference,
-                    case.evidence,
-                    labels,
-                )
-            )
-        impossible = [
-            case.direction.value
-            for case in explanation.cases
-            if case.evidence.status is ClaimStatus.IMPOSSIBLE
-        ]
-        if impossible:
-            lines.append("Impossible alternatives: " + ", ".join(impossible) + ".")
-    elif isinstance(explanation, WhichExplanation):
-        relation = _render_directions(explanation.directions)
-        for membership in explanation.memberships:
-            lines.extend(
-                _render_evidence(
-                    membership.candidate,
-                    relation,
-                    explanation.reference,
-                    membership.evidence,
-                    labels,
-                )
-            )
-    else:
-        possible = explanation.possible_counts
-        lines.append("Possible counts: " + ", ".join(map(str, possible)) + ".")
-        for case in explanation.counts:
-            if case.witness is not None:
-                lines.append(
-                    f"Count {case.count} witness: "
-                    f"{_render_coordinates(case.witness, labels)}."
-                )
-        relation = _render_directions(explanation.directions)
-        for membership in explanation.memberships:
-            lines.extend(
-                _render_evidence(
-                    membership.candidate,
-                    relation,
-                    explanation.reference,
-                    membership.evidence,
-                    labels,
-                )
-            )
-    return "\n".join(lines)
+    """Compatibility alias for the coordinate-bearing audit renderer."""
+    from spatial_explanation_renderers_v2 import render_audit_explanation
+
+    return render_audit_explanation(explanation, labels)

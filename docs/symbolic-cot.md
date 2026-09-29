@@ -1,5 +1,16 @@
 # Symbolic chain-of-thought for SpatialMap
 
+V2 keeps this representation as one side of an explicit trace ablation. Both
+V2 formats are rendered from the same `SpatialProblem` and structured
+explanation:
+
+- `TraceStyle.AXIOMATIC` uses coordinate-free natural-language axioms.
+- `TraceStyle.SYMBOLIC` uses coordinate-free `X[...]`, `Y[...]`, and ordered
+  states such as `A < B < C`.
+
+Normalized coordinate models are audit witnesses only. They are never emitted
+by either training trace. See `spatial/spatial_explanation_renderers_v2.py`.
+
 Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.

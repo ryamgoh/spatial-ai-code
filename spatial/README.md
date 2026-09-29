@@ -7,7 +7,8 @@ one domain model and one gold-label contract.
 |---|---|---|
 | `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
-| `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, ambiguity witnesses, and deterministic text rendering | Generators and audit reports |
+| `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
+| `spatial_explanation_renderers_v2.py` | Coordinate-free axiomatic/symbolic training traces and coordinate-bearing audit reports | SFT ablations and audits |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Option menus plus single-exact/possibility-set policy | Dataset-specific evaluation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
@@ -40,6 +41,7 @@ The V2 core intentionally has no JSONL, prompt, option-letter, oracle, or
 dataset-policy knowledge. New generators should construct `SpatialProblem`
 directly, render text above that seam, parse the rendered text back through an
 adapter, and verify the reparsed problem before emitting a row. They can pass
-the same problem to `SpatialExplainerV2` and serialize either its typed evidence
-or the output of `render_explanation`; explanations are derived from the
-structured problem rather than reparsed prompt text.
+the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
+`render_training_trace` with either `TraceStyle.AXIOMATIC` or
+`TraceStyle.SYMBOLIC`. Coordinate witnesses belong only in structured audit
+metadata or `render_audit_explanation`, never in an SFT reasoning target.

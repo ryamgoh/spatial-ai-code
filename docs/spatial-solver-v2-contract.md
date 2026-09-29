@@ -19,7 +19,9 @@ dataset row or synthetic spec
 - `spatial_solver_v2.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
 - `spatial_explanations_v2.py` classifies individual claims, extracts readable
-  axis proofs where possible, and renders typed evidence without parsing text.
+  axis proofs where possible, and records typed evidence without parsing text.
+- `spatial_explanation_renderers_v2.py` renders that evidence either as an
+  axiomatic training trace, a symbolic axis-chain trace, or an audit report.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
 - `spatial_grading_v2.py` applies answer policy and option-menu semantics to an
@@ -74,7 +76,9 @@ receive the all-eight default.
 - Use `spatial_solver_v2.py` when the caller already has structured objects,
   formulas, and a query.
 - Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when a
-  generator or audit needs machine-readable evidence or deterministic prose.
+  generator or audit needs machine-readable evidence.
+- Use `spatial_explanation_renderers_v2.py` to choose a training-trace ablation
+  or produce a coordinate-bearing audit report.
 - Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
 - Use `spatial_grading_v2.py` only after semantic analysis, when an option menu
   and answer policy must be applied.
@@ -345,9 +349,24 @@ transitive paths, and recombines the two derived comparisons. Arbitrary
 propositional formulas remain explainable through satisfying witnesses and the
 unsatisfiability of a negated claim even when no simple axis path exists.
 
-The structured explanation is authoritative. `render_explanation` is only a
-deterministic prose renderer and accepts an optional mapping from opaque object
-IDs to display labels. It has no dataset schema or prompt parser.
+The structured explanation is authoritative. Renderers accept an optional
+mapping from opaque object IDs to display labels and have no dataset schema or
+prompt parser.
+
+Training and audit output are deliberately separate:
+
+- `render_training_trace(..., TraceStyle.AXIOMATIC)` emits natural-language
+  premise decomposition, axis reasoning, candidate classifications, and
+  correlated count cases.
+- `render_training_trace(..., TraceStyle.SYMBOLIC)` emits the same proof as
+  compact `X[...]`, `Y[...]`, `X-State`, `Y-State`, direction-domain, and member-
+  set symbols. This preserves the original Chain-of-Symbols ablation style.
+- `render_audit_explanation(...)` may include normalized coordinate witnesses.
+  It is for diagnostics and must not be used as an SFT reasoning target.
+
+Both training styles are coordinate-free by contract. Coordinate witnesses
+remain inside the structured explanation so an auditor can establish that an
+alternative world exists without teaching the model to invent a hidden map.
 
 A synthetic generator should therefore construct once and render later:
 
@@ -360,9 +379,13 @@ row = {
     "prompt": prompt_renderer.render(problem),
     "answer": answer_renderer.render(analysis, policy),
     "proof": explanation_to_dict(explanation),
-    "explanation": render_explanation(explanation, labels),
-    "witnesses": analysis.witnesses,
-    "metadata": {"answer_policy": policy.value, "seed": seed},
+    "explanation": render_training_trace(problem, explanation, trace_style, labels),
+    "metadata": {
+        "answer_policy": policy.value,
+        "trace_style": trace_style.value,
+        "audit_witnesses": analysis.witnesses,
+        "seed": seed,
+    },
 }
 ```
 
