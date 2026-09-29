@@ -7,10 +7,12 @@ one domain model and one gold-label contract.
 |---|---|---|
 | `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
+| `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, ambiguity witnesses, and deterministic text rendering | Generators and audit reports |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Option menus plus single-exact/possibility-set policy | Dataset-specific evaluation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
 | `test_spatial_solver_v2.py` | Core, adapter, policy, witness, and differential contracts | Local/CI verification |
+| `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
 
 Legacy generators remain separate:
 
@@ -37,4 +39,7 @@ Run the domain tests from the repository root:
 The V2 core intentionally has no JSONL, prompt, option-letter, oracle, or
 dataset-policy knowledge. New generators should construct `SpatialProblem`
 directly, render text above that seam, parse the rendered text back through an
-adapter, and verify the reparsed problem before emitting a row.
+adapter, and verify the reparsed problem before emitting a row. They can pass
+the same problem to `SpatialExplainerV2` and serialize either its typed evidence
+or the output of `render_explanation`; explanations are derived from the
+structured problem rather than reparsed prompt text.

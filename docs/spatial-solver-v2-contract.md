@@ -13,11 +13,13 @@ dataset row or synthetic spec
     -> SpatialProblem
     -> SpatialSolverV2
     -> QueryAnalysis
-    -> grading, audit reporting, or map rendering
+    -> grading, structured explanation, audit reporting, or map rendering
 ```
 
 - `spatial_solver_v2.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
+- `spatial_explanations_v2.py` classifies individual claims, extracts readable
+  axis proofs where possible, and renders typed evidence without parsing text.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
 - `spatial_grading_v2.py` applies answer policy and option-menu semantics to an
@@ -71,6 +73,8 @@ receive the all-eight default.
 
 - Use `spatial_solver_v2.py` when the caller already has structured objects,
   formulas, and a query.
+- Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when a
+  generator or audit needs machine-readable evidence or deterministic prose.
 - Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
 - Use `spatial_grading_v2.py` only after semantic analysis, when an option menu
   and answer policy must be applied.
@@ -78,6 +82,8 @@ receive the all-eight default.
   metadata while comparing it with the solver-derived model set.
 - Use `test_spatial_solver_v2.py` as the executable semantic contract before
   changing the solver or building proof rendering.
+- Use `test_spatial_explanations_v2.py` as the executable claim-evidence and
+  explanation contract.
 
 ## Motivation: text must determine its own answer
 
@@ -311,6 +317,61 @@ For a paired text-and-image dataset:
 
 The resulting map is therefore arbitrary, but its answer is not.
 
+## Structured explanations
+
+`SpatialSolverV2.assess(problem, claim)` is the semantic interface used by the
+explanation layer. It checks both `premise AND claim` and `premise AND NOT
+claim` and returns:
+
+- a satisfying coordinate witness when the claim is possible;
+- a counterexample coordinate witness when the claim is not entailed;
+- whether the premise is consistent; and
+- whether the claim is possible and entailed.
+
+The two checks distinguish the four relevant states without consulting an
+answer menu or oracle:
+
+| Claim | Negation | Status |
+|---|---|---|
+| satisfiable | unsatisfiable | entailed |
+| satisfiable | satisfiable | contingent |
+| unsatisfiable | satisfiable | impossible |
+| unsatisfiable | unsatisfiable | inconsistent premise |
+
+`SpatialExplainerV2.explain(problem, analysis)` converts these semantic results
+into typed Direction, Which, or Count evidence. For positive conjunctions of
+exact relations, it also decomposes directions onto the X and Y axes, finds
+transitive paths, and recombines the two derived comparisons. Arbitrary
+propositional formulas remain explainable through satisfying witnesses and the
+unsatisfiability of a negated claim even when no simple axis path exists.
+
+The structured explanation is authoritative. `render_explanation` is only a
+deterministic prose renderer and accepts an optional mapping from opaque object
+IDs to display labels. It has no dataset schema or prompt parser.
+
+A synthetic generator should therefore construct once and render later:
+
+```python
+problem = build_structured_problem(seed)
+analysis = solver.analyze(problem)
+explanation = explainer.explain(problem, analysis)
+
+row = {
+    "prompt": prompt_renderer.render(problem),
+    "answer": answer_renderer.render(analysis, policy),
+    "proof": explanation_to_dict(explanation),
+    "explanation": render_explanation(explanation, labels),
+    "witnesses": analysis.witnesses,
+    "metadata": {"answer_policy": policy.value, "seed": seed},
+}
+```
+
+For exact-answer generation, the generation policy rejects inconsistent or
+ambiguous analyses before rendering. For ambiguity datasets and benchmark
+audits, it retains the alternative witnesses as constructive counterexamples.
+Prompt text, menus, answer policy, and generator metadata remain outside both
+the solver and explanation modules.
+
 ## Completeness boundary
 
 Within its supported language, V2 does not depend on a hand-written collection
@@ -323,8 +384,10 @@ set of models for each possible query direction.
 This does not cover unrestricted spatial language. V2 currently excludes
 quantifiers, distance, adjacency, betweenness, nearest-object questions, and
 three-object orientation. It supports Direction, Which, and Count projections
-over finite named entities, but does not yet return a human-readable proof or
-unsatisfiable core.
+over finite named entities. Its explanation layer provides axis-path proofs for
+exact positive conjunctions and solver-backed possibility/entailment evidence
+for arbitrary supported formulas. It does not yet expose a low-level Z3
+unsatisfiable core for arbitrary propositional proofs.
 
 ## Query families
 

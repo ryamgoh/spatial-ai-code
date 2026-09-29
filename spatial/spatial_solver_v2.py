@@ -319,6 +319,19 @@ class CountAnalysis:
 QueryAnalysis = DirectionAnalysis | WhichAnalysis | CountAnalysis
 
 
+@dataclass(frozen=True)
+class ClaimAnalysis:
+    """Model-theoretic status of one formula under a problem's premise."""
+
+    consistent: bool
+    possible: bool = False
+    entailed: bool = False
+    witness: dict[str, tuple[int, int]] | None = None
+    counterexample: dict[str, tuple[int, int]] | None = None
+    engine: str = ""
+    error: str | None = None
+
+
 class _UnionFind:
     def __init__(self, values: tuple[str, ...]) -> None:
         self.parent = {value: value for value in values}
@@ -370,6 +383,12 @@ class _ConstraintEngine(Protocol):
         premise: SpatialFormula,
         query: CountQuery,
     ) -> dict[int, dict[str, tuple[int, int]]] | None: ...
+
+    def satisfy(
+        self,
+        objects: tuple[str, ...],
+        formula: SpatialFormula,
+    ) -> dict[str, tuple[int, int]] | None: ...
 
 
 def _canonical_constraints(
@@ -755,6 +774,18 @@ class _ReferenceEngine:
                 witnesses[count] = witness
         return witnesses
 
+    def satisfy(
+        self,
+        objects: tuple[str, ...],
+        formula: SpatialFormula,
+    ) -> dict[str, tuple[int, int]] | None:
+        return self._find_formula_witness(
+            objects,
+            formula,
+            objects[0],
+            objects[1],
+        )
+
 
 class _Z3Engine:
     """Incremental SMT engine for larger disjunctive worlds."""
@@ -986,6 +1017,19 @@ class _Z3Engine:
             solver.pop()
         return witnesses
 
+    def satisfy(
+        self,
+        objects: tuple[str, ...],
+        formula: SpatialFormula,
+    ) -> dict[str, tuple[int, int]] | None:
+        built = self._build_solver(objects, formula)
+        if built is None:
+            return None
+        solver, x, y = built
+        if not self._check(solver):
+            return None
+        return self._normalize_coordinates(objects, solver.model(), x, y)
+
 
 class SpatialSolverV2:
     """Analyze structured eight-direction problems without dataset knowledge."""
@@ -1035,6 +1079,38 @@ class SpatialSolverV2:
                 engine=self._engine.name,
                 error=error,
             )
+
+    def assess(self, problem: SpatialProblem, claim: SpatialFormula) -> ClaimAnalysis:
+        """Classify a formula under ``problem.premise`` and retain both models."""
+        if not isinstance(problem, SpatialProblem):
+            raise TypeError("assess expects a SpatialProblem")
+        if not isinstance(claim, SpatialFormula):
+            raise TypeError("assess expects a SpatialFormula claim")
+
+        # Reuse SpatialProblem's formula and object-reference validation. The query is
+        # immaterial to claim assessment but is already a valid part of the problem.
+        SpatialProblem(problem.objects, And((problem.premise, claim)), problem.query)
+        try:
+            witness = self._engine.satisfy(
+                problem.objects,
+                And((problem.premise, claim)),
+            )
+            counterexample = self._engine.satisfy(
+                problem.objects,
+                And((problem.premise, Not(claim))),
+            )
+        except RuntimeError as exc:
+            return ClaimAnalysis(False, engine=self._engine.name, error=str(exc))
+
+        consistent = witness is not None or counterexample is not None
+        return ClaimAnalysis(
+            consistent=consistent,
+            possible=witness is not None,
+            entailed=consistent and counterexample is None,
+            witness=witness,
+            counterexample=counterexample,
+            engine=self._engine.name,
+        )
 
     def _analyze_direction(
         self, problem: SpatialProblem, query: DirectionQuery
