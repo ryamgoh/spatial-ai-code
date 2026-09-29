@@ -27,13 +27,13 @@ dataset row or synthetic spec
   witnesses.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
-- `spatial_grading_v2.py` applies answer policy and option-menu semantics to an
-  existing query analysis.
+- `spatial_grading_v2.py` resolves answer semantics, encodes menu selections,
+  and scores predicted letter sets against an existing query analysis.
 - `spatialeval_adapter_v2.py` converts original SpatialEval rows, preserves
   their oracle metadata, and classifies the oracle against the model set.
 
 The core solver has no knowledge of JSONL rows, chat messages, prompt wording,
-option letters, oracle labels, or dataset-specific answer policy. A future
+option letters, oracle labels, or dataset-specific answer semantics. A future
 synthetic generator and the implemented SpatialEval adapter both produce the same
 `SpatialProblem` interface.
 
@@ -44,8 +44,9 @@ the requested spatial region. This is structured query input, not a dataset
 mode inside the solver.
 
 The implemented SpatialEval adapter reports `exact-match`,
-`underdetermined-oracle-possible`, `oracle-overinclusive`,
-`oracle-contradicted`, `partial-overlap`, `inconsistent`, or `error`. Its
+`underdetermined-oracle-possible`, `oracle-underinclusive`,
+`oracle-overinclusive`, `oracle-contradicted`, `partial-overlap`,
+`inconsistent`, or `error`. Its
 `SpatialEvalAudit.analysis.witnesses` provides the maps needed to substantiate
 each possible answer. It never changes the original oracle or silently selects
 the witness that happens to match it.
@@ -84,8 +85,8 @@ receive the all-eight default.
   without exposing coordinates.
 - Use `spatial_audit_rendering_v2.py` only for coordinate-bearing diagnostics.
 - Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
-- Use `spatial_grading_v2.py` only after semantic analysis, when an option menu
-  and answer policy must be applied.
+- Use `spatial_grading_v2.py` after semantic analysis to resolve answer
+  semantics, encode an option menu, or score a model response.
 - Use `spatialeval_adapter_v2.py` to preserve original SpatialEval oracle
   metadata while comparing it with the solver-derived model set.
 - Use `test_spatial_solver_v2.py` as the executable semantic contract before
@@ -386,10 +387,12 @@ A synthetic generator should therefore construct once and render later:
 problem = build_structured_problem(seed)
 analysis = solver.analyze(problem)
 explanation = explainer.explain(problem, analysis)
+resolution = resolve_answer(analysis, answer_semantics)
+menu_answer = encode_menu_answer(resolution, options, selection_mode)
 
 row = {
     "prompt": prompt_renderer.render(problem),
-    "answer": answer_renderer.render(analysis, policy),
+    "answer": menu_answer.raw,
     "proof": explanation_to_dict(explanation),
     "explanation": render_training_trace(
         problem,
@@ -399,7 +402,8 @@ row = {
         labels=labels,
     ),
     "metadata": {
-        "answer_policy": policy.value,
+        "answer_semantics": answer_semantics.value,
+        "selection_mode": selection_mode.value,
         "trace_format": trace_format.value,
         "state_mode": state_mode.value,
         "audit_witnesses": analysis.witnesses,
@@ -411,7 +415,7 @@ row = {
 For exact-answer generation, the generation policy rejects inconsistent or
 ambiguous analyses before rendering. For ambiguity datasets and benchmark
 audits, it retains the alternative witnesses as constructive counterexamples.
-Prompt text, menus, answer policy, and generator metadata remain outside both
+Prompt text, menus, answer semantics, selection mode, and generator metadata remain outside both
 the solver and explanation modules.
 
 ## Completeness boundary
@@ -457,47 +461,68 @@ should be an explicit generation-policy limit rather than a solver axiom.
 ## Option grading
 
 `SpatialSolverV2.analyze()` is grading-policy neutral: it always returns the
-complete model set through `possible_directions` and `witnesses`. The separate
-grading module requires an explicit interpretation when a caller does not want
-the default:
+complete model set through its query-specific analysis. Answering is split into
+two explicit operations:
 
 ```python
 parsed = SpatialTextAdapter().parse(prompt)
 analysis = solver.analyze(parsed.problem)
 
-grade(analysis, parsed.options, AnswerPolicy.POSSIBILITY_SET)
-grade(analysis, parsed.options, AnswerPolicy.SINGLE_EXACT)
+resolution = resolve_answer(analysis, AnswerSemantics.EXACT)
+menu_answer = encode_menu_answer(
+    resolution,
+    parsed.options,
+    SelectionMode.SINGLE_SELECT,
+)
 ```
 
-`POSSIBILITY_SET` is the compatibility default. It interprets the question as
-asking which directions remain possible:
+`AnswerSemantics` controls what the question asks:
 
-- One possible direction selects that direction.
-- Multiple possible directions select all corresponding options when the menu
-  represents the complete set.
-- If any possible direction is absent from the menu, select `Cannot be
-  determined`; returning only the listed subset would invent evidence.
+- `EXACT` requests one invariant answer value. Direction and Count values are
+  scalar; a Which value is an object set and may contain several objects.
+- `ALL_POSSIBLE` requests the complete set of possible directions, members, or
+  counts.
 
-`SINGLE_EXACT` interprets the question as asking for one entailed direction:
+`SelectionMode` independently describes the menu:
 
-- One possible direction selects that direction.
-- Multiple possible directions select `Cannot be determined`, even if all are
-  listed.
+- `SINGLE_SELECT` permits one selected option.
+- `MULTI_SELECT` permits one or more selected options.
 
-Under both policies, a unique direction absent from the menu selects `None of
-the Options`, while an inconsistent premise set selects `Cannot be determined`.
-The `Grade.status` field preserves why the displayed answer was selected:
+Original SpatialEval uses `EXACT` plus `SINGLE_SELECT` for Direction, singular
+Which, and Count. A generic plural Which query may use `EXACT` plus
+`MULTI_SELECT`: the one invariant answer is a set even when that set contains
+multiple objects.
+
+`ALL_POSSIBLE` never silently falls back when a possible value is missing. An
+incomplete menu is an encoding error. Likewise, a result containing multiple
+values cannot be encoded by a single-select menu. `Cannot be determined` is a
+semantic result of ambiguous `EXACT` resolution, not a generic fallback.
+
+The two result types preserve where a failure occurred:
 
 | Status | Meaning |
 |---|---|
-| `entailed` | One direction is forced and listed |
-| `possibility-set` | Multiple possibilities were returned under set semantics |
-| `ambiguous` | Single-exact semantics found multiple possible directions |
-| `incomplete-menu` | The menu cannot represent the full possibility set |
-| `missing-option` | One direction is forced but absent from the menu |
-| `inconsistent` | No coordinate model satisfies the premises |
-| `error` | Parsing, dependency, timeout, or option failure |
+| Resolution `exact` | One invariant scalar or set-valued answer exists |
+| Resolution `possibilities` | All possible values were requested |
+| Resolution `ambiguous` | Exact semantics found no invariant answer |
+| Menu `incomplete-menu` | A required value has no menu representation |
+| Menu `selection-mismatch` | The answer needs more selections than permitted |
+| Menu `undetermined` | An ambiguous exact answer mapped to an explicit option |
+| `inconsistent` | No coordinate model satisfies the premises; generation fails |
 
-The policy should come from dataset metadata or generation intent, not be
-guessed from incidental wording. An audit can compare the same prompt under
-both policies while retaining the same policy-neutral model analysis.
+`score_response` compares predicted and expected letter sets using exact-set
+equality. It also reports precision, recall, F1, and Jaccard for diagnostics;
+those partial metrics do not redefine correctness.
+
+With original SpatialEval configured as `EXACT` plus `SINGLE_SELECT`, the
+current 1,500-row audit has no adapter failures:
+
+| Query | Exact oracle | Oracle possible but underdetermined |
+|---|---:|---:|
+| Direction | 332 | 168 |
+| Which | 140 | 360 |
+| Count | 195 | 305 |
+
+The Which exact count requires the oracle object to be entailed and every other
+menu object to be impossible. A singleton `possible_entities` result is not an
+exact answer when that entity is absent in another valid world.

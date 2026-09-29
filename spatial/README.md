@@ -11,9 +11,10 @@ one domain model and one gold-label contract.
 | `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
-| `spatial_grading_v2.py` | Option menus plus single-exact/possibility-set policy | Dataset-specific evaluation |
+| `spatial_grading_v2.py` | Semantic resolution, menu encoding, and exact-set response scoring | Dataset-specific evaluation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
 | `test_spatial_solver_v2.py` | Core, adapter, policy, witness, and differential contracts | Local/CI verification |
+| `test_spatial_grading_v2.py` | Answer semantics, menu cardinality, and exact-set scoring contracts | Local/CI verification |
 | `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
 
 Legacy generators remain separate:

@@ -7,7 +7,14 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from spatial_grading_v2 import AnswerPolicy, Grade, grade
+from spatial_grading_v2 import (
+    AnswerSemantics,
+    MenuAnswer,
+    ResolutionStatus,
+    SelectionMode,
+    encode_menu_answer,
+    resolve_answer,
+)
 from spatial_solver_v2 import (
     And,
     Direction,
@@ -37,14 +44,15 @@ class SpatialEvalCase:
     problem: SpatialProblem
     options: dict[str, str]
     oracle_answers: frozenset[Direction | str | int]
-    answer_policy: AnswerPolicy
+    answer_semantics: AnswerSemantics
+    selection_mode: SelectionMode
 
 
 @dataclass(frozen=True)
 class SpatialEvalAudit:
     case: SpatialEvalCase
     analysis: QueryAnalysis
-    grade: Grade
+    menu_answer: MenuAnswer
     status: str
 
 
@@ -109,7 +117,8 @@ class SpatialEvalAdapter:
     def parse(
         self,
         row: Mapping[str, Any],
-        answer_policy: AnswerPolicy | str = AnswerPolicy.SINGLE_EXACT,
+        answer_semantics: AnswerSemantics | str = AnswerSemantics.EXACT,
+        selection_mode: SelectionMode | str = SelectionMode.SINGLE_SELECT,
     ) -> SpatialEvalCase:
         text = row.get("text")
         if not isinstance(text, str) or not text.strip():
@@ -144,12 +153,14 @@ class SpatialEvalAdapter:
             problem=problem,
             options=parsed.options,
             oracle_answers=self._oracle_answers(row, parsed.options, query),
-            answer_policy=AnswerPolicy(answer_policy),
+            answer_semantics=AnswerSemantics(answer_semantics),
+            selection_mode=SelectionMode(selection_mode),
         )
 
 
 def audit(case: SpatialEvalCase, analysis: QueryAnalysis) -> SpatialEvalAudit:
-    result = grade(analysis, case.options, case.answer_policy)
+    resolution = resolve_answer(analysis, case.answer_semantics)
+    menu_answer = encode_menu_answer(resolution, case.options, case.selection_mode)
     if isinstance(analysis, DirectionAnalysis):
         possible = set(analysis.possible_directions)
     elif isinstance(analysis, WhichAnalysis):
@@ -161,14 +172,27 @@ def audit(case: SpatialEvalCase, analysis: QueryAnalysis) -> SpatialEvalAudit:
         status = "error"
     elif not analysis.consistent:
         status = "inconsistent"
-    elif oracle == possible:
-        status = "exact-match"
-    elif oracle < possible:
-        status = "underdetermined-oracle-possible"
-    elif possible < oracle:
-        status = "oracle-overinclusive"
-    elif oracle.isdisjoint(possible):
-        status = "oracle-contradicted"
     else:
-        status = "partial-overlap"
-    return SpatialEvalAudit(case, analysis, result, status)
+        resolution = menu_answer.resolution
+        expected = set(resolution.values)
+        if resolution.status is ResolutionStatus.AMBIGUOUS:
+            expected = possible
+            if oracle <= expected:
+                status = "underdetermined-oracle-possible"
+            elif expected < oracle:
+                status = "oracle-overinclusive"
+            elif oracle.isdisjoint(expected):
+                status = "oracle-contradicted"
+            else:
+                status = "partial-overlap"
+        elif oracle == expected:
+            status = "exact-match"
+        elif oracle < expected:
+            status = "oracle-underinclusive"
+        elif expected < oracle:
+            status = "oracle-overinclusive"
+        elif oracle.isdisjoint(expected):
+            status = "oracle-contradicted"
+        else:
+            status = "partial-overlap"
+    return SpatialEvalAudit(case, analysis, menu_answer, status)
