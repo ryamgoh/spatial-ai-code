@@ -26,20 +26,11 @@ from spatial_solver_v2 import (
     WhichAnalysis,
     WhichQuery,
     conjunctive_atoms,
+    direction_signs,
+    membership_constraint,
 )
 
 Coordinates = dict[str, tuple[int, int]]
-
-_DIRECTION_SIGNS: dict[Direction, tuple[int, int]] = {
-    Direction.NORTH: (0, 1),
-    Direction.NORTHEAST: (1, 1),
-    Direction.EAST: (1, 0),
-    Direction.SOUTHEAST: (1, -1),
-    Direction.SOUTH: (0, -1),
-    Direction.SOUTHWEST: (-1, -1),
-    Direction.WEST: (-1, 0),
-    Direction.NORTHWEST: (-1, 1),
-}
 
 
 class ClaimStatus(str, Enum):
@@ -184,10 +175,6 @@ def _claim_status(consistent: bool, possible: bool, entailed: bool) -> ClaimStat
     return ClaimStatus.IMPOSSIBLE
 
 
-def _membership(candidate: str, query: WhichQuery | CountQuery) -> RelationConstraint:
-    return RelationConstraint(candidate, query.reference, query.directions)
-
-
 @dataclass(frozen=True)
 class _Edge:
     destination: str
@@ -207,7 +194,7 @@ def _axis_adjacency(
     adjacency = {obj: [] for obj in problem.objects}
     for premise_index, atom in enumerate(atoms):
         direction = next(iter(atom.allowed))
-        sign = _DIRECTION_SIGNS[direction][axis_index]
+        sign = direction_signs(direction)[axis_index]
         if sign == 0:
             adjacency[atom.subject].append(_Edge(atom.reference, False, premise_index))
             adjacency[atom.reference].append(_Edge(atom.subject, False, premise_index))
@@ -293,7 +280,7 @@ def _axis_proof(
     reference: str,
     direction: Direction,
 ) -> AxisProof | None:
-    x_sign, y_sign = _DIRECTION_SIGNS[direction]
+    x_sign, y_sign = direction_signs(direction)
     x = _axis_path(problem, Axis.X, subject, reference, x_sign)
     y = _axis_path(problem, Axis.Y, subject, reference, y_sign)
     if x is None or y is None:
@@ -395,7 +382,7 @@ class SpatialExplainerV2:
         return tuple(
             MembershipExplanation(
                 candidate,
-                self._evidence(problem, _membership(candidate, query)),
+                self._evidence(problem, membership_constraint(candidate, query)),
             )
             for candidate in query.candidates
         )
@@ -423,27 +410,22 @@ class SpatialExplainerV2:
         assert isinstance(query, CountQuery)
         possible = set(analysis.possible_counts)
         unique = len(possible) == 1
-        cases = tuple(
-            CountCase(
-                count,
-                (
-                    ClaimStatus.ENTAILED
-                    if count in possible and unique
-                    else ClaimStatus.CONTINGENT
-                    if count in possible
-                    else ClaimStatus.IMPOSSIBLE
-                    if analysis.consistent
-                    else ClaimStatus.INCONSISTENT
-                ),
-                analysis.witnesses.get(count),
-            )
-            for count in range(len(query.candidates) + 1)
-        )
+        cases = []
+        for count in range(len(query.candidates) + 1):
+            if not analysis.consistent:
+                status = ClaimStatus.INCONSISTENT
+            elif count not in possible:
+                status = ClaimStatus.IMPOSSIBLE
+            elif unique:
+                status = ClaimStatus.ENTAILED
+            else:
+                status = ClaimStatus.CONTINGENT
+            cases.append(CountCase(count, status, analysis.witnesses.get(count)))
         return CountExplanation(
             query.reference,
             query.directions,
             self._membership_explanations(problem, query),
-            cases,
+            tuple(cases),
             analysis.engine,
         )
 

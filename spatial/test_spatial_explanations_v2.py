@@ -225,4 +225,5 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
     serialized = explanation_to_dict(explanation)
     assert serialized["type"] == "DirectionExplanation"
     assert serialized["cases"][0]["direction"] == "North"
+    assert serialized["cases"][0]["evidence"]["negation_unsatisfiable"] is True
     json.dumps(serialized)

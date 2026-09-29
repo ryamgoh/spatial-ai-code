@@ -59,6 +59,11 @@ _OPPOSITE = {
 }
 
 
+def direction_signs(direction: Direction) -> tuple[int, int]:
+    """Return the X/Y comparison signs that define an exact direction."""
+    return _DIRECTION_SIGNS[direction]
+
+
 def _compose_signs(first: int, second: int) -> frozenset[int]:
     if first == 0:
         return frozenset({second})
@@ -175,9 +180,10 @@ class CountQuery:
 SpatialQuery = DirectionQuery | WhichQuery | CountQuery
 
 
-def _membership_constraint(
+def membership_constraint(
     candidate: str, query: WhichQuery | CountQuery
 ) -> RelationConstraint:
+    """Return the spatial claim tested for one Which/Count candidate."""
     return RelationConstraint(candidate, query.reference, query.directions)
 
 
@@ -714,7 +720,7 @@ class _ReferenceEngine:
         entailed: list[str] = []
         witnesses: dict[str, dict[str, tuple[int, int]]] = {}
         for candidate in query.candidates:
-            predicate = _membership_constraint(candidate, query)
+            predicate = membership_constraint(candidate, query)
             witness = self._find_formula_witness(
                 objects,
                 And((premise, predicate)),
@@ -743,7 +749,7 @@ class _ReferenceEngine:
         ):
             return None
         predicates = {
-            candidate: _membership_constraint(candidate, query)
+            candidate: membership_constraint(candidate, query)
             for candidate in query.candidates
         }
         witnesses: dict[int, dict[str, tuple[int, int]]] = {}
