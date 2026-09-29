@@ -9,7 +9,9 @@ explanation:
   states such as `A < B < C`.
 
 Normalized coordinate models are audit witnesses only. They are never emitted
-by either training trace. See `spatial/spatial_explanation_renderers_v2.py`.
+by either training trace. Training traces live in
+`spatial/spatial_explanation_renderers_v2.py`; coordinate reports live in
+`spatial/spatial_audit_rendering_v2.py`.
 
 Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
 

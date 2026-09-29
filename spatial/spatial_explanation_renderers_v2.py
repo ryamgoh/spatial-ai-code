@@ -1,16 +1,12 @@
-"""Coordinate-free training traces and coordinate-bearing audit reports."""
+"""Coordinate-free natural-language and symbolic training traces."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
 from enum import Enum
 
 from spatial_explanations_v2 import (
-    AxisDerivation,
-    AxisProof,
-    ClaimEvidence,
     ClaimStatus,
-    Coordinates,
     CountExplanation,
     DirectionExplanation,
     MembershipExplanation,
@@ -44,7 +40,7 @@ def _label(value: str, labels: Mapping[str, str]) -> str:
     return labels.get(value, value)
 
 
-def _directions(directions) -> str:
+def _directions(directions: Collection[Direction]) -> str:
     return ", ".join(
         direction.value for direction in Direction if direction in directions
     )
@@ -147,22 +143,19 @@ def _has_path(adjacency: dict[str, set[str]], start: str, end: str) -> bool:
 
 
 def _axis_state(
-    problem: SpatialProblem,
+    objects: tuple[str, ...],
+    atoms: tuple[RelationConstraint, ...],
     axis_index: int,
     labels: Mapping[str, str],
-) -> str | None:
-    atoms = conjunctive_atoms(problem.premise)
-    if atoms is None or any(len(atom.allowed) != 1 for atom in atoms):
-        return None
-
-    equality = _UnionFind(problem.objects)
+) -> str:
+    equality = _UnionFind(objects)
     for atom in atoms:
         direction = next(iter(atom.allowed))
         if direction_signs(direction)[axis_index] == 0:
             equality.union(atom.subject, atom.reference)
 
     classes: dict[str, list[str]] = {}
-    for obj in problem.objects:
+    for obj in objects:
         classes.setdefault(equality.find(obj), []).append(obj)
     adjacency = {root: set() for root in classes}
     for atom in atoms:
@@ -291,8 +284,8 @@ def _premise_lines(
         else:
             lines.append(f"P{index}: {relation} => X[{x_fact}], Y[{y_fact}]")
 
-    x_state = _axis_state(problem, 0, labels)
-    y_state = _axis_state(problem, 1, labels)
+    x_state = _axis_state(problem.objects, atoms, 0, labels)
+    y_state = _axis_state(problem.objects, atoms, 1, labels)
     if style is TraceStyle.AXIOMATIC:
         lines.extend(
             (
@@ -495,121 +488,4 @@ def render_training_trace(
         lines.extend(_count_lines(explanation, labels, style))
     else:
         raise TypeError("explanation type does not match the problem query")
-    return "\n".join(lines)
-
-
-def _render_coordinates(
-    coordinates: Coordinates,
-    labels: Mapping[str, str],
-) -> str:
-    return ", ".join(
-        f"{_label(obj, labels)}=({x}, {y})" for obj, (x, y) in coordinates.items()
-    )
-
-
-def _render_axis(derivation: AxisDerivation, labels: Mapping[str, str]) -> str:
-    path = " -> ".join(_label(obj, labels) for obj in derivation.path)
-    premises = ", ".join(str(index + 1) for index in derivation.premise_indices)
-    subject = _label(derivation.subject, labels)
-    reference = _label(derivation.reference, labels)
-    return (
-        f"On the {derivation.axis.value}-axis, premises {premises} give path "
-        f"{path}; therefore {subject}.{derivation.axis.value} "
-        f"{derivation.relation.value} {reference}.{derivation.axis.value}."
-    )
-
-
-def _render_audit_evidence(
-    subject: str,
-    relation: str,
-    reference: str,
-    evidence: ClaimEvidence,
-    labels: Mapping[str, str],
-) -> list[str]:
-    claim = f"{_label(subject, labels)} is {relation} of {_label(reference, labels)}"
-    lines = [f"{claim}: {evidence.status.value}."]
-    proof: AxisProof | None = evidence.axis_proof
-    if proof is not None:
-        lines.extend(
-            (
-                _render_axis(proof.x, labels),
-                _render_axis(proof.y, labels),
-                f"Combining both axes gives {proof.direction.value}.",
-            )
-        )
-    elif evidence.negation_unsatisfiable:
-        lines.append("Its negation is inconsistent with the premises.")
-    if evidence.witness is not None and evidence.status is ClaimStatus.CONTINGENT:
-        lines.append(
-            f"Satisfying witness: {_render_coordinates(evidence.witness, labels)}."
-        )
-    if (
-        evidence.counterexample is not None
-        and evidence.status is ClaimStatus.CONTINGENT
-    ):
-        lines.append(
-            f"Counterexample witness: {_render_coordinates(evidence.counterexample, labels)}."
-        )
-    return lines
-
-
-def render_audit_explanation(
-    explanation: QueryExplanation,
-    labels: Mapping[str, str] | None = None,
-) -> str:
-    """Render coordinate witnesses for audits; do not use this as SFT CoT."""
-    labels = labels or {}
-    lines: list[str] = []
-    if isinstance(explanation, DirectionExplanation):
-        for case in explanation.cases:
-            if case.evidence.status is ClaimStatus.IMPOSSIBLE:
-                continue
-            lines.extend(
-                _render_audit_evidence(
-                    explanation.target,
-                    case.direction.value,
-                    explanation.reference,
-                    case.evidence,
-                    labels,
-                )
-            )
-        impossible = [
-            case.direction.value
-            for case in explanation.cases
-            if case.evidence.status is ClaimStatus.IMPOSSIBLE
-        ]
-        if impossible:
-            lines.append("Impossible alternatives: " + ", ".join(impossible) + ".")
-    elif isinstance(explanation, WhichExplanation):
-        relation = _directions(explanation.directions)
-        for membership in explanation.memberships:
-            lines.extend(
-                _render_audit_evidence(
-                    membership.candidate,
-                    relation,
-                    explanation.reference,
-                    membership.evidence,
-                    labels,
-                )
-            )
-    else:
-        lines.append(
-            "Possible counts: " + ", ".join(map(str, explanation.possible_counts)) + "."
-        )
-        for case in explanation.counts:
-            if case.witness is not None:
-                lines.append(
-                    f"Count {case.count} witness: {_render_coordinates(case.witness, labels)}."
-                )
-        relation = _directions(explanation.directions)
-        for membership in explanation.memberships:
-            lines.extend(
-                _render_audit_evidence(
-                    membership.candidate,
-                    relation,
-                    explanation.reference,
-                    membership.evidence,
-                    labels,
-                )
-            )
     return "\n".join(lines)

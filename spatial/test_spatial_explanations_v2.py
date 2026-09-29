@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import json
 import re
+from functools import cache
 from pathlib import Path
 
 import pytest
+from spatial_audit_rendering_v2 import render_audit_explanation
 from spatial_explanation_renderers_v2 import (
     TraceStyle,
-    render_audit_explanation,
     render_training_trace,
 )
 from spatial_explanations_v2 import (
@@ -40,6 +41,22 @@ from spatialeval_adapter_v2 import SpatialEvalAdapter
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:
     return RelationConstraint(subject, reference, frozenset({direction}))
+
+
+@cache
+def spatialeval_rows() -> dict[str, dict]:
+    dataset = Path(__file__).parents[1] / "data" / "spatialeval_org.jsonl"
+    selected_ids = {
+        "spatialmap.tqa.2003.0",
+        "spatialmap.tqa.2000.1",
+        "spatialmap.tqa.2001.2",
+    }
+    rows = {}
+    for line in dataset.read_text().splitlines():
+        row = json.loads(line)
+        if row["id"] in selected_ids:
+            rows[row["id"]] = row
+    return rows
 
 
 @pytest.mark.parametrize("backend", ["reference", "z3"])
@@ -294,12 +311,7 @@ def test_spatialeval_training_traces_are_coordinate_free(
     expected_axiomatic: str,
     expected_symbolic: str,
 ) -> None:
-    dataset = Path(__file__).parents[1] / "data" / "spatialeval_org.jsonl"
-    row = next(
-        row
-        for line in dataset.read_text().splitlines()
-        if (row := json.loads(line))["id"] == row_id
-    )
+    row = spatialeval_rows()[row_id]
     problem = SpatialEvalAdapter(SpatialTextAdapter()).parse(row).problem
     explanation = SpatialExplainerV2().explain(problem)
 

@@ -8,7 +8,8 @@ one domain model and one gold-label contract.
 | `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
 | `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
-| `spatial_explanation_renderers_v2.py` | Coordinate-free axiomatic/symbolic training traces and coordinate-bearing audit reports | SFT ablations and audits |
+| `spatial_explanation_renderers_v2.py` | Coordinate-free axiomatic and symbolic training traces | SFT trace ablations |
+| `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Option menus plus single-exact/possibility-set policy | Dataset-specific evaluation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |

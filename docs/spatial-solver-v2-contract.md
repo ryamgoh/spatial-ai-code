@@ -20,8 +20,10 @@ dataset row or synthetic spec
   witnesses. It accepts structured problems only.
 - `spatial_explanations_v2.py` classifies individual claims, extracts readable
   axis proofs where possible, and records typed evidence without parsing text.
-- `spatial_explanation_renderers_v2.py` renders that evidence either as an
-  axiomatic training trace, a symbolic axis-chain trace, or an audit report.
+- `spatial_explanation_renderers_v2.py` renders that evidence as either an
+  axiomatic training trace or a symbolic axis-chain trace.
+- `spatial_audit_rendering_v2.py` is the only renderer that formats coordinate
+  witnesses.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
 - `spatial_grading_v2.py` applies answer policy and option-menu semantics to an
@@ -78,7 +80,8 @@ receive the all-eight default.
 - Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when a
   generator or audit needs machine-readable evidence.
 - Use `spatial_explanation_renderers_v2.py` to choose a training-trace ablation
-  or produce a coordinate-bearing audit report.
+  without exposing coordinates.
+- Use `spatial_audit_rendering_v2.py` only for coordinate-bearing diagnostics.
 - Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
 - Use `spatial_grading_v2.py` only after semantic analysis, when an option menu
   and answer policy must be applied.
