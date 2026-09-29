@@ -86,37 +86,6 @@ def _formula_text(formula: SpatialFormula, labels: Mapping[str, str]) -> str:
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
 
-def _axis_fact(
-    atom: RelationConstraint,
-    axis_index: int,
-    labels: Mapping[str, str],
-) -> str:
-    direction = next(iter(atom.allowed))
-    sign = direction_signs(direction)[axis_index]
-    subject = _label(atom.subject, labels)
-    reference = _label(atom.reference, labels)
-    if sign < 0:
-        return f"{subject} < {reference}"
-    if sign > 0:
-        return f"{reference} < {subject}"
-    return f"{subject} = {reference}"
-
-
-def _natural_axis_fact(
-    atom: RelationConstraint,
-    axis_index: int,
-    labels: Mapping[str, str],
-) -> str:
-    direction = next(iter(atom.allowed))
-    sign = direction_signs(direction)[axis_index]
-    subject = _label(atom.subject, labels)
-    reference = _label(atom.reference, labels)
-    if sign == 0:
-        axis = "X" if axis_index == 0 else "Y"
-        return f"{subject} and {reference} have the same {axis} coordinate"
-    return f"{subject} is {_axis_word(axis_index, sign)} of {reference}"
-
-
 class _UnionFind:
     def __init__(self, values: tuple[str, ...]) -> None:
         self.parent = {value: value for value in values}
@@ -149,33 +118,36 @@ class _AxisSnapshot:
     paths: tuple[tuple[tuple[str, ...], ...], ...]
 
 
+def _direct_axis_fact(atom: RelationConstraint, axis_index: int) -> _AxisFact:
+    sign = direction_signs(next(iter(atom.allowed)))[axis_index]
+    if sign < 0:
+        return _AxisFact(atom.subject, "<", atom.reference)
+    if sign > 0:
+        return _AxisFact(atom.reference, "<", atom.subject)
+    first, second = sorted((atom.subject, atom.reference))
+    return _AxisFact(first, "=", second)
+
+
 def _axis_snapshot(
     objects: tuple[str, ...],
     atoms: tuple[RelationConstraint, ...],
     axis_index: int,
 ) -> _AxisSnapshot:
+    direct_facts = tuple(_direct_axis_fact(atom, axis_index) for atom in atoms)
     equality = _UnionFind(objects)
-    for atom in atoms:
-        direction = next(iter(atom.allowed))
-        if direction_signs(direction)[axis_index] == 0:
-            equality.union(atom.subject, atom.reference)
+    for fact in direct_facts:
+        if fact.relation == "=":
+            equality.union(fact.lower, fact.higher)
 
     classes: dict[str, list[str]] = {}
     for obj in objects:
         classes.setdefault(equality.find(obj), []).append(obj)
     adjacency = {root: set() for root in classes}
-    for atom in atoms:
-        direction = next(iter(atom.allowed))
-        sign = direction_signs(direction)[axis_index]
-        if sign == 0:
+    for fact in direct_facts:
+        if fact.relation == "=":
             continue
-        lower, higher = (
-            (atom.subject, atom.reference)
-            if sign < 0
-            else (atom.reference, atom.subject)
-        )
-        lower_root = equality.find(lower)
-        higher_root = equality.find(higher)
+        lower_root = equality.find(fact.lower)
+        higher_root = equality.find(fact.higher)
         if lower_root != higher_root:
             adjacency[lower_root].add(higher_root)
 
@@ -315,6 +287,7 @@ def _render_axis_fact(
     axis_index: int,
     labels: Mapping[str, str],
     trace_format: TraceFormat,
+    describe_higher: bool = False,
 ) -> str:
     lower = _label(fact.lower, labels)
     higher = _label(fact.higher, labels)
@@ -323,6 +296,9 @@ def _render_axis_fact(
     if fact.relation == "=":
         axis = "X" if axis_index == 0 else "Y"
         return f"{lower} and {higher} have the same {axis} coordinate"
+    if describe_higher:
+        direction = "east" if axis_index == 0 else "north"
+        return f"{higher} is {direction} of {lower}"
     direction = "west" if axis_index == 0 else "south"
     return f"{lower} is {direction} of {higher}"
 
@@ -373,73 +349,87 @@ def _premise_lines(
         return [f"Premise formula: {_formula_text(problem.premise, labels)}."]
 
     lines: list[str] = []
-    previous_x = _axis_snapshot(problem.objects, (), 0)
-    previous_y = _axis_snapshot(problem.objects, (), 1)
-    if state_mode is not StateMode.FINAL_ONLY:
-        lines.append(
-            "Initial: X={}, Y={}"
-            if trace_format is TraceFormat.SYMBOLIC
-            else "Initially, no axis relations have been processed."
-        )
-
-    for index, atom in enumerate(atoms, 1):
-        relation = _relation_text(atom, labels)
-        if state_mode is StateMode.FINAL_ONLY and trace_format is TraceFormat.NATURAL:
-            lines.extend(
-                (
-                    f"Premise {index}: {relation}.",
-                    f"  X-axis decomposition: {_natural_axis_fact(atom, 0, labels)}.",
-                    f"  Y-axis decomposition: {_natural_axis_fact(atom, 1, labels)}.",
-                )
+    if state_mode is StateMode.FINAL_ONLY:
+        for index, atom in enumerate(atoms, 1):
+            relation = _relation_text(atom, labels)
+            x_fact = _render_axis_fact(
+                _direct_axis_fact(atom, 0),
+                0,
+                labels,
+                trace_format,
+                describe_higher=trace_format is TraceFormat.NATURAL,
             )
-        elif state_mode is StateMode.FINAL_ONLY:
-            lines.append(
-                f"P{index}: {relation} => "
-                f"X[{_axis_fact(atom, 0, labels)}], "
-                f"Y[{_axis_fact(atom, 1, labels)}]"
+            y_fact = _render_axis_fact(
+                _direct_axis_fact(atom, 1),
+                1,
+                labels,
+                trace_format,
+                describe_higher=trace_format is TraceFormat.NATURAL,
             )
-        else:
-            lines.append(
-                f"P{index}: {relation}"
-                if trace_format is TraceFormat.SYMBOLIC
-                else f"Premise {index}: {relation}."
-            )
-            current_atoms = atoms[:index]
-            current_x = _axis_snapshot(problem.objects, current_atoms, 0)
-            current_y = _axis_snapshot(problem.objects, current_atoms, 1)
-            if state_mode is StateMode.DELTA:
+            if trace_format is TraceFormat.NATURAL:
                 lines.extend(
                     (
-                        _delta_line(
-                            0,
-                            current_x.facts - previous_x.facts,
-                            labels,
-                            trace_format,
-                        ),
-                        _delta_line(
-                            1,
-                            current_y.facts - previous_y.facts,
-                            labels,
-                            trace_format,
-                        ),
+                        f"Premise {index}: {relation}.",
+                        f"  X-axis decomposition: {x_fact}.",
+                        f"  Y-axis decomposition: {y_fact}.",
                     )
                 )
             else:
-                suffix = (
-                    f" after P{index}"
-                    if trace_format is TraceFormat.SYMBOLIC
-                    else f" after premise {index}"
-                )
-                lines.extend(
-                    _state_lines(current_x, current_y, labels, trace_format, suffix)
-                )
-            previous_x, previous_y = current_x, current_y
+                lines.append(f"P{index}: {relation} => X[{x_fact}], Y[{y_fact}]")
+        final_x = _axis_snapshot(problem.objects, atoms, 0)
+        final_y = _axis_snapshot(problem.objects, atoms, 1)
+        lines.extend(_state_lines(final_x, final_y, labels, trace_format))
+        return lines
 
-    final_x = _axis_snapshot(problem.objects, atoms, 0)
-    final_y = _axis_snapshot(problem.objects, atoms, 1)
-    if state_mode in {StateMode.FINAL_ONLY, StateMode.DELTA}:
-        suffix = "" if state_mode is StateMode.FINAL_ONLY else " (final)"
-        lines.extend(_state_lines(final_x, final_y, labels, trace_format, suffix))
+    lines.append(
+        "Initial: X={}, Y={}"
+        if trace_format is TraceFormat.SYMBOLIC
+        else "Initially, no axis relations have been processed."
+    )
+    previous_x = _axis_snapshot(problem.objects, (), 0)
+    previous_y = _axis_snapshot(problem.objects, (), 1)
+    for index, atom in enumerate(atoms, 1):
+        relation = _relation_text(atom, labels)
+        lines.append(
+            f"P{index}: {relation}"
+            if trace_format is TraceFormat.SYMBOLIC
+            else f"Premise {index}: {relation}."
+        )
+        current_atoms = atoms[:index]
+        current_x = _axis_snapshot(problem.objects, current_atoms, 0)
+        current_y = _axis_snapshot(problem.objects, current_atoms, 1)
+        if state_mode is StateMode.DELTA:
+            lines.extend(
+                (
+                    _delta_line(
+                        0,
+                        current_x.facts - previous_x.facts,
+                        labels,
+                        trace_format,
+                    ),
+                    _delta_line(
+                        1,
+                        current_y.facts - previous_y.facts,
+                        labels,
+                        trace_format,
+                    ),
+                )
+            )
+        else:
+            suffix = (
+                f" after P{index}"
+                if trace_format is TraceFormat.SYMBOLIC
+                else f" after premise {index}"
+            )
+            lines.extend(
+                _state_lines(current_x, current_y, labels, trace_format, suffix)
+            )
+        previous_x, previous_y = current_x, current_y
+
+    if state_mode is StateMode.DELTA:
+        lines.extend(
+            _state_lines(previous_x, previous_y, labels, trace_format, " (final)")
+        )
     return lines
 
 
