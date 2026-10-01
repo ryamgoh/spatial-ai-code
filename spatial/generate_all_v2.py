@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-import random
 from dataclasses import dataclass, fields
 from enum import Enum
 from itertools import product
@@ -21,7 +19,7 @@ from spatial_generation_v2 import (
 )
 from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
-from spatial_workload_manifest_v2 import build_workload_manifest
+from spatial_workload_manifest_v2 import workload_output_paths, write_workload
 
 app = typer.Typer(add_completion=False)
 EnumType = TypeVar("EnumType", bound=Enum)
@@ -108,17 +106,6 @@ def _enum_values(
     return tuple(known[value.lower()] for value in requested)
 
 
-def _output_paths(output_file: str | Path) -> tuple[Path, Path, Path]:
-    path = Path(output_file)
-    suffix = path.suffix or ".jsonl"
-    base = path.with_suffix("") if path.suffix else path
-    return (
-        base.with_name(base.name + "_train").with_suffix(suffix),
-        base.with_name(base.name + "_test").with_suffix(suffix),
-        base.with_name(base.name + "_manifest").with_suffix(".json"),
-    )
-
-
 def generate_workload(
     output_file: str | Path,
     spec: WorkloadSpec,
@@ -190,26 +177,13 @@ def generate_workload(
                     ]
                 )
 
-    random.Random(spec.seed).shuffle(row_groups)
-    test_size = int(len(row_groups) * spec.test_split)
-    test_rows = [row for group in row_groups[:test_size] for row in group]
-    train_rows = [row for group in row_groups[test_size:] for row in group]
-    expected_variants = tuple(product(spec.trace_formats, spec.state_modes))
-    manifest = build_workload_manifest(
-        train_rows,
-        test_rows,
-        expected_trace_variants=expected_variants,
-    )
-    manifest["generation"] = spec.manifest_config()
-    train_path, test_path, manifest_path = _output_paths(output_file)
-    train_path.parent.mkdir(parents=True, exist_ok=True)
-    for path, selected in ((train_path, train_rows), (test_path, test_rows)):
-        with path.open("w", encoding="utf-8") as handle:
-            for row in selected:
-                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    train_path, test_path, _manifest_path = write_workload(
+        output_file,
+        row_groups,
+        test_split=spec.test_split,
+        seed=spec.seed,
+        expected_trace_variants=tuple(product(spec.trace_formats, spec.state_modes)),
+        manifest_metadata={"generation": spec.manifest_config()},
     )
     return train_path, test_path
 
@@ -292,7 +266,7 @@ def main(
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(f"train: {train_path}")
     typer.echo(f"test: {test_path}")
-    typer.echo(f"manifest: {_output_paths(out)[2]}")
+    typer.echo(f"manifest: {workload_output_paths(out)[2]}")
 
 
 if __name__ == "__main__":

@@ -15,10 +15,15 @@ one domain model and one gold-label contract.
 | `spatial_generation_v2.py` | Policy-driven problem, menu, trace, and audit construction with mandatory round-trip validation | V2 synthetic workloads |
 | `generate_all_v2.py` | Balanced JSONL workload CLI over V2 policy cells | SFT train/test generation |
 | `spatial_workload_manifest_v2.py` | Distribution summaries, paired-variant checks, and split-leakage validation | V2 workload generation and audit |
+| `spatial_matrix_v2.py` | Strict YAML matrix parsing and paired ablation expansion | Reproducible multi-cell experiments |
+| `generate_matrix_v2.py` | Thin CLI for a V2 experiment matrix | Pilot and full dataset generation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
 | `test_spatial_solver_v2.py` | Core, adapter, answer semantics, witness, and differential contracts | Local/CI verification |
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
 | `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
+| `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
+| `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
+| `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
 
 Legacy generators remain separate:
 
@@ -39,7 +44,7 @@ unchanged.
 
 Run the domain tests from the repository root:
 
-    uv run --python 3.12 --no-project --with pytest --with typer --with z3-solver \
+    uv run --python 3.12 --no-project --with pytest --with typer --with pyyaml --with z3-solver \
       pytest spatial -q
 
 The V2 core intentionally has no JSONL, prompt, option-letter, oracle, or
@@ -73,6 +78,16 @@ Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
 duplicating the CLI's individual settings.
 The manifest includes generation acceptance rate and rejection reasons so
 expensive policy cells are visible before scaling the workload.
+
+For a heterogeneous ablation, use the checked-in matrix example:
+
+    uv run --python 3.12 --no-project --with typer --with pyyaml --with z3-solver \
+      python spatial/generate_matrix_v2.py \
+      experiments/spatial-v2-ablation.example.yaml \
+      --out data/spatial_v2_ablation.jsonl
+
+See `docs/spatial-v2-matrix.md` for the matrix contract and exact row-count
+semantics.
 
 For a transitive Direction workload, use a single compatible policy cell:
 

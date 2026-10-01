@@ -281,6 +281,37 @@ def test_trace_variants_share_one_base_problem_and_have_distinct_ids() -> None:
     assert first["messages"][2] != second["messages"][2]
 
 
+def test_answer_mode_variants_share_one_solved_problem() -> None:
+    generator = SpatialGeneratorV2(seed=1745)
+    sample = generator.generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=AnswerMode.SINGLE,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            ambiguity_size=2,
+            num_entities=6,
+            num_premises=5,
+        )
+    )
+    complete = generator.with_answer_mode(
+        sample,
+        AnswerMode.ALL_POSSIBLE,
+        MenuCoverage.FULL,
+    )
+    visible = generator.with_answer_mode(
+        sample,
+        AnswerMode.VISIBLE_POSSIBLE,
+        MenuCoverage.PARTIAL,
+    )
+
+    rows = [variant.as_sft_row() for variant in (sample, complete, visible)]
+    assert len({row["metadata"]["base_id"] for row in rows}) == 1
+    assert len({row["id"] for row in rows}) == 3
+    assert all(variant.problem == sample.problem for variant in (complete, visible))
+    assert complete.resolution.values == sample.analysis.possible_directions
+    assert 0 < len(visible.menu_answer.letters) < len(complete.menu_answer.letters)
+
+
 @pytest.mark.parametrize("trace_format", tuple(TraceFormat))
 @pytest.mark.parametrize("state_mode", tuple(StateMode))
 def test_training_rows_never_contain_coordinate_witnesses(

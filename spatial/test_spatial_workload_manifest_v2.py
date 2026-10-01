@@ -12,7 +12,13 @@ from spatial_grading_v2 import AnswerMode
 from spatial_workload_manifest_v2 import build_workload_manifest
 
 
-def _row(row_id: str, base_id: str, prompt: str, trace_format: str) -> dict:
+def _row(
+    row_id: str,
+    base_id: str,
+    prompt: str,
+    trace_format: str,
+    answer_mode: str = "single",
+) -> dict:
     return {
         "id": row_id,
         "messages": [
@@ -24,7 +30,7 @@ def _row(row_id: str, base_id: str, prompt: str, trace_format: str) -> dict:
             "base_id": base_id,
             "query_kind": "direction",
             "query_direction": None,
-            "answer_mode": "single",
+            "answer_mode": answer_mode,
             "semantic_shape": "unique",
             "menu_coverage": "full",
             "trace_format": trace_format,
@@ -89,6 +95,28 @@ def test_manifest_rejects_cross_split_base_or_prompt_leakage() -> None:
 
     with pytest.raises(ValueError, match="cross-split base IDs"):
         build_workload_manifest(train, test)
+
+
+def test_manifest_rejects_incomplete_answer_trace_product() -> None:
+    rows = [_row("single-natural", "base-1", "prompt", "natural")]
+
+    with pytest.raises(ValueError, match="incomplete answer/trace variants"):
+        build_workload_manifest(
+            rows,
+            [],
+            expected_trace_variants=((TraceFormat.NATURAL, StateMode.DELTA),),
+            expected_variants_by_base={
+                "base-1": {
+                    (AnswerMode.SINGLE, "full", TraceFormat.NATURAL, StateMode.DELTA),
+                    (
+                        AnswerMode.ALL_POSSIBLE,
+                        "full",
+                        TraceFormat.NATURAL,
+                        StateMode.DELTA,
+                    ),
+                }
+            },
+        )
 
 
 def test_manifest_reports_rejection_efficiency_per_base_problem() -> None:

@@ -396,8 +396,9 @@ class GeneratedSpatialSample:
         )
         row: dict[str, Any] = {
             "id": (
-                f"{self.base_id}-{self.policy.trace_format.value}-"
-                f"{self.policy.state_mode.value}"
+                f"{self.base_id}-{self.policy.answer_mode.value}-"
+                f"{self.policy.menu_coverage.value}-"
+                f"{self.policy.trace_format.value}-{self.policy.state_mode.value}"
             ),
             "messages": [
                 {"role": "system", "content": _system_prompt(self.policy.answer_mode)},
@@ -630,6 +631,48 @@ class SpatialGeneratorV2:
         raise RuntimeError(
             f"could not satisfy generation policy after {max_attempts} attempts; "
             f"rejections: {summary}"
+        )
+
+    def with_answer_mode(
+        self,
+        sample: GeneratedSpatialSample,
+        answer_mode: AnswerMode | str,
+        menu_coverage: MenuCoverage | str,
+    ) -> GeneratedSpatialSample:
+        """Render another answer contract for an already solved base problem."""
+        policy = replace(
+            sample.policy,
+            answer_mode=AnswerMode(answer_mode),
+            menu_coverage=MenuCoverage(menu_coverage),
+        )
+        resolution = resolve_answer(sample.analysis, policy.answer_mode)
+        options = self._menu(policy, sample.analysis, resolution)
+        menu_answer = encode_menu_answer(resolution, options)
+        if not menu_answer.is_resolved:
+            raise ValueError(menu_answer.error or "answer variant menu was unresolved")
+        prompt = self._prompt(sample.problem, options, policy.answer_mode)
+        self._verify_round_trip(
+            sample.problem,
+            options,
+            prompt,
+            policy,
+            menu_answer,
+        )
+        trace = _render_trace(
+            sample.problem,
+            sample.explanation,
+            resolution,
+            menu_answer,
+            policy,
+        )
+        return replace(
+            sample,
+            options=options,
+            resolution=resolution,
+            menu_answer=menu_answer,
+            prompt=prompt,
+            trace=trace,
+            policy=policy,
         )
 
     def _generate_candidate(

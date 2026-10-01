@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
+import random
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 
@@ -50,11 +53,24 @@ def _user_prompt(row: Mapping[str, Any]) -> str:
     )
 
 
+def workload_output_paths(output_file: str | Path) -> tuple[Path, Path, Path]:
+    path = Path(output_file)
+    suffix = path.suffix or ".jsonl"
+    base = path.with_suffix("") if path.suffix else path
+    return (
+        base.with_name(base.name + "_train").with_suffix(suffix),
+        base.with_name(base.name + "_test").with_suffix(suffix),
+        base.with_name(base.name + "_manifest").with_suffix(".json"),
+    )
+
+
 def build_workload_manifest(
     train_rows: Sequence[Mapping[str, Any]],
     test_rows: Sequence[Mapping[str, Any]],
     *,
     expected_trace_variants: Iterable[tuple[Any, Any]] | None = None,
+    expected_variants_by_base: Mapping[str, Iterable[tuple[Any, Any, Any, Any]]]
+    | None = None,
 ) -> dict[str, Any]:
     """Validate a split workload and return a JSON-compatible manifest."""
     train_rows = tuple(train_rows)
@@ -79,6 +95,7 @@ def build_workload_manifest(
 
     prompt_bases: dict[str, set[str]] = defaultdict(set)
     variants_by_base: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    row_variants_by_base: dict[str, set[tuple[str, str, str, str]]] = defaultdict(set)
     rows_by_base: dict[str, Mapping[str, Any]] = {}
     for row in rows:
         metadata = row["metadata"]
@@ -87,6 +104,14 @@ def build_workload_manifest(
         rows_by_base.setdefault(base_id, row)
         variants_by_base[base_id].add(
             (str(metadata["trace_format"]), str(metadata["state_mode"]))
+        )
+        row_variants_by_base[base_id].add(
+            (
+                str(metadata["answer_mode"]),
+                str(metadata["menu_coverage"]),
+                str(metadata["trace_format"]),
+                str(metadata["state_mode"]),
+            )
         )
     if any(len(base_ids) != 1 for base_ids in prompt_bases.values()):
         raise ValueError("duplicate prompts belong to different base IDs")
@@ -106,13 +131,36 @@ def build_workload_manifest(
             raise ValueError(
                 "incomplete trace variants for base IDs: " + ", ".join(incomplete)
             )
+    if expected_variants_by_base is not None:
+        expected_by_base = {
+            base_id: {tuple(_value(item) for item in variant) for variant in variants}
+            for base_id, variants in expected_variants_by_base.items()
+        }
+        if set(expected_by_base) != set(row_variants_by_base):
+            raise ValueError(
+                "expected variant base IDs do not match generated base IDs"
+            )
+        incomplete = sorted(
+            base_id
+            for base_id, variants in row_variants_by_base.items()
+            if variants != expected_by_base[base_id]
+        )
+        if incomplete:
+            raise ValueError(
+                "incomplete answer/trace variants for base IDs: "
+                + ", ".join(incomplete)
+            )
 
     base_distribution_fields = (
+        "matrix_cell",
         "query_kind",
         "query_direction",
         "target_direction",
-        "answer_mode",
         "semantic_shape",
+    )
+    answer_distribution_fields = (
+        "matrix_answer_variant",
+        "answer_mode",
         "menu_coverage",
         "menu_status",
     )
@@ -156,6 +204,7 @@ def build_workload_manifest(
             "test": len(test_base_ids),
         },
         "trace_distributions": _distributions(rows, trace_distribution_fields),
+        "answer_distributions": _distributions(rows, answer_distribution_fields),
         "base_distributions": _distributions(base_rows, base_distribution_fields),
         "split_base_distributions": {
             "train": _distributions(train_base_rows, base_distribution_fields),
@@ -180,5 +229,49 @@ def build_workload_manifest(
         "trace_variants_per_base": dict(
             sorted(Counter(len(value) for value in variants_by_base.values()).items())
         ),
+        "answer_variants_per_base": dict(
+            sorted(
+                Counter(
+                    len({variant[:2] for variant in variants})
+                    for variants in row_variants_by_base.values()
+                ).items()
+            )
+        ),
         "validation": {"status": "passed"},
     }
+
+
+def write_workload(
+    output_file: str | Path,
+    row_groups: list[list[dict]],
+    *,
+    test_split: float,
+    seed: int,
+    expected_trace_variants: Iterable[tuple[Any, Any]],
+    manifest_metadata: dict[str, Any],
+    expected_variants_by_base: Mapping[str, Iterable[tuple[Any, Any, Any, Any]]]
+    | None = None,
+) -> tuple[Path, Path, Path]:
+    """Validate, split, and write already-generated base-problem groups."""
+    random.Random(seed).shuffle(row_groups)
+    test_size = int(len(row_groups) * test_split)
+    test_rows = [row for group in row_groups[:test_size] for row in group]
+    train_rows = [row for group in row_groups[test_size:] for row in group]
+    manifest = build_workload_manifest(
+        train_rows,
+        test_rows,
+        expected_trace_variants=expected_trace_variants,
+        expected_variants_by_base=expected_variants_by_base,
+    )
+    manifest.update(manifest_metadata)
+    train_path, test_path, manifest_path = workload_output_paths(output_file)
+    train_path.parent.mkdir(parents=True, exist_ok=True)
+    for path, selected in ((train_path, train_rows), (test_path, test_rows)):
+        with path.open("w", encoding="utf-8") as handle:
+            for row in selected:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return train_path, test_path, manifest_path

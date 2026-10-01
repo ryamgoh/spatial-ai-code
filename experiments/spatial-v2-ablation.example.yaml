@@ -1,0 +1,102 @@
+version: 1
+seed: 42
+test_split: 0.2
+include_audit: false
+
+defaults:
+  max_attempts_per_sample: 2000
+  omit_direct_query_relation: true
+
+variants:
+  answers:
+    - name: single
+      mode: single
+      menu_coverage: full
+    - name: complete
+      mode: all-possible
+      menu_coverage: full
+    - name: visible-full
+      mode: visible-possible
+      menu_coverage: full
+    - name: visible-partial
+      mode: visible-possible
+      menu_coverage: partial
+  traces:
+    - format: natural
+      state_mode: delta
+    - format: symbolic
+      state_mode: delta
+
+cells:
+  - name: direction-depth-2
+    count: 100
+    query_kind: direction
+    semantic_shape: unique
+    depth: 2
+    num_entities: 6
+    num_premises: 7
+    distractor_premises: 5
+    target_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-full]
+
+  - name: direction-depth-5
+    count: 100
+    query_kind: direction
+    semantic_shape: unique
+    depth: 5
+    num_entities: 10
+    num_premises: 12
+    target_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-full]
+
+  - name: which-depth-2
+    count: 100
+    query_kind: which
+    semantic_shape: unique
+    depth: 2
+    num_entities: 7
+    num_premises: 10
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-full]
+
+  - name: count-depth-2
+    count: 100
+    query_kind: count
+    semantic_shape: unique
+    depth: 2
+    num_entities: 7
+    num_premises: 10
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-full]
+
+  - name: direction-ambiguity-2
+    count: 50
+    query_kind: direction
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+    omit_direct_query_relation: false
+    answer_variants: [single, complete, visible-partial]
+
+  - name: which-ambiguity-2
+    count: 50
+    query_kind: which
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+    omit_direct_query_relation: false
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-partial]
+
+  - name: count-ambiguity-2
+    count: 50
+    query_kind: count
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+    omit_direct_query_relation: false
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+    answer_variants: [single, complete, visible-partial]

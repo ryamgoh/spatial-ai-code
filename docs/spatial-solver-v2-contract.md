@@ -603,3 +603,18 @@ and base-level difficulty histograms. Base-level reporting prevents paired
 trace variants from double-counting the underlying problem distribution.
 The manifest also reports total candidate attempts, rejected candidates,
 acceptance rate, maximum rejections before acceptance, and rejection reasons.
+
+## Ablation matrices
+
+`spatial/spatial_matrix_v2.py` parses a strict versioned YAML experiment matrix.
+Named cells set exact base-problem counts and structural controls. Named answer
+variants and trace variants are expanded from each accepted base problem, so
+changing answer semantics or trace representation does not silently change the
+underlying map. Cells may select only the answer variants compatible with their
+semantics—for example, partial visible menus on ambiguous cells but full menus
+on unique cells.
+
+The matrix runner records the requested and generated base count for every
+cell. It passes each expected answer/trace Cartesian product to the workload
+validator, keeps the entire `base_id` group in one split, and stores the parsed
+matrix in the combined manifest for reproducibility.
