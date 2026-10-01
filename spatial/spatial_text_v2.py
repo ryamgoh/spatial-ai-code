@@ -39,6 +39,11 @@ _WHICH_QUERY_RE = re.compile(
     rf"Which objects? (?:is|are) in the ({_RELATION_PATTERN}) of (.+?)\?",
     re.IGNORECASE,
 )
+_WHICH_MAP_QUERY_RE = re.compile(
+    rf"Which objects? in the map (?:is|are) in the "
+    rf"({_RELATION_PATTERN}) of (.+?)\?",
+    re.IGNORECASE,
+)
 _COUNT_QUERY_RE = re.compile(
     rf"How many objects are in the ({_RELATION_PATTERN}) of (.+?)\?",
     re.IGNORECASE,
@@ -147,7 +152,8 @@ class SpatialTextAdapter:
 
         options = self._parse_options(question_part)
         direction_query = _DIRECTION_QUERY_RE.search(question_part)
-        which_query = _WHICH_QUERY_RE.search(question_part)
+        which_map_query = _WHICH_MAP_QUERY_RE.search(question_part)
+        which_query = which_map_query or _WHICH_QUERY_RE.search(question_part)
         count_query = _COUNT_QUERY_RE.search(question_part)
         if direction_query:
             query = DirectionQuery(
@@ -156,12 +162,15 @@ class SpatialTextAdapter:
             )
         elif which_query:
             reference = _strip_the(which_query.group(2))
-            candidates = tuple(
-                candidate
-                for value in options.values()
-                if (candidate := _strip_the(value)) in objects
-                and candidate != reference
-            )
+            if which_map_query:
+                candidates = tuple(sorted(objects - {reference}))
+            else:
+                candidates = tuple(
+                    candidate
+                    for value in options.values()
+                    if (candidate := _strip_the(value)) in objects
+                    and candidate != reference
+                )
             query = WhichQuery(
                 directions=_relation_set(which_query.group(1)),
                 reference=reference,

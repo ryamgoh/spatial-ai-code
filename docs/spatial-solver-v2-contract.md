@@ -515,3 +515,47 @@ has no adapter failures:
 The Which exact count requires the oracle object to be entailed and every other
 menu object to be impossible. A singleton `possible_entities` result is not an
 exact answer when that entity is absent in another valid world.
+
+## V2 generation pipeline
+
+`spatial/spatial_generation_v2.py` keeps synthetic-data policy above the
+solver. A `GenerationPolicy` chooses the query family, answer mode, semantic
+shape, menu coverage, trace format, state schedule, entity count, and premise
+count. The solver sees only the resulting `SpatialProblem`.
+
+Each accepted item follows one fail-closed path:
+
+1. Sample distinct audit coordinates and derive true compass-8 premises.
+2. Construct a Direction, Which, or Count query over the structured objects.
+3. Analyze the complete model set with `SpatialSolverV2`.
+4. Reject candidates that do not match the requested `unique`, `ambiguous`, or
+   `no-match` semantic shape.
+5. Resolve `SINGLE`, `ALL_POSSIBLE`, or `VISIBLE_POSSIBLE`, then construct the
+   requested full, partial, or zero-coverage menu.
+6. Render the question, parse it back through `SpatialTextAdapter`, re-solve
+   it, and require the problem, options, resolution, menu status, and gold
+   letters to match.
+7. Render coordinate-free Natural CoT or Symbolic CoS. Coordinates and
+   coordinate-bearing evidence remain available only as audit metadata. The
+   trace ends with an explicit answer-mode and menu-selection deduction so the
+   option letters follow from the proved semantic domain.
+
+For V2 Which questions, the wording says "object in the map" and the adapter
+therefore treats every non-reference map object as a candidate, including
+objects omitted from the menu. This lets `ALL_POSSIBLE` detect a hidden valid
+object instead of silently redefining the candidate set to displayed choices.
+Original SpatialEval wording retains its existing option-scoped parsing.
+
+The reporting roles remain distinct:
+
+| Mode | Reporting role |
+|---|---|
+| `SINGLE` | Primary strict metric for original SpatialEval |
+| `ALL_POSSIBLE` | Strict complete-ambiguity metric |
+| `VISIBLE_POSSIBLE` | Loose menu-conditioned diagnostic; never headline accuracy |
+
+`spatial/generate_all_v2.py` crosses requested policy dimensions into balanced
+cells, assigns deterministic unique IDs, shuffles deterministically, and writes
+train/test JSONL splits. Which and Count cells can additionally be balanced
+across all eight query directions. Its entity limit is 30 because that is the
+current name pool, not because the solver has a 30-object axiom.

@@ -16,6 +16,13 @@ by either training trace. Training traces live in
 `spatial/spatial_explanation_renderers_v2.py`; coordinate reports live in
 `spatial/spatial_audit_rendering_v2.py`.
 
+The V2 generator exposes trace format and state mode as independent policy
+dimensions. `delta` is the default workload setting: it emits only newly
+established axis facts after each premise while preserving the same final
+semantic proof. Every generated prompt is reparsed and re-solved before either
+trace is rendered, so the Natural-vs-Symbolic ablation uses the same structured
+problem and gold-answer contract.
+
 Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.

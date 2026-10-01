@@ -12,6 +12,8 @@ one domain model and one gold-label contract.
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
+| `spatial_generation_v2.py` | Policy-driven problem, menu, trace, and audit construction with mandatory round-trip validation | V2 synthetic workloads |
+| `generate_all_v2.py` | Balanced JSONL workload CLI over V2 policy cells | SFT train/test generation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
 | `test_spatial_solver_v2.py` | Core, adapter, answer semantics, witness, and differential contracts | Local/CI verification |
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
@@ -47,3 +49,20 @@ the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
 `render_training_trace` with `TraceFormat.NATURAL` or `TraceFormat.SYMBOLIC`
 and an independent `StateMode`. Coordinate witnesses belong only in structured
 audit metadata or `render_audit_explanation`, never in an SFT reasoning target.
+
+Generate a balanced V2 workload with:
+
+    uv run --python 3.12 --no-project --with typer --with z3-solver \
+      python spatial/generate_all_v2.py \
+      --out data/spatial_v2.jsonl \
+      --samples-per-cell 100 \
+      --query-kinds direction,which,count \
+      --answer-modes single \
+      --semantic-shapes unique,ambiguous \
+      --query-directions north,northeast,east,southeast,south,southwest,west,northwest \
+      --trace-formats natural,symbolic \
+      --state-modes delta
+
+This writes `data/spatial_v2_train.jsonl` and
+`data/spatial_v2_test.jsonl`. Coordinate-bearing audit metadata is excluded by
+default. `--include-audit` is for diagnostic artifacts, not training data.
