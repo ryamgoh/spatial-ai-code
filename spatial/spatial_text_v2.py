@@ -36,12 +36,8 @@ _DIRECTION_QUERY_RE = re.compile(
     r"In which direction is (.+?) relative to (.+?)\?", re.IGNORECASE
 )
 _WHICH_QUERY_RE = re.compile(
-    rf"Which objects? (?:is|are) in the ({_RELATION_PATTERN}) of (.+?)\?",
-    re.IGNORECASE,
-)
-_WHICH_MAP_QUERY_RE = re.compile(
-    rf"Which objects? in the map (?:is|are) in the "
-    rf"({_RELATION_PATTERN}) of (.+?)\?",
+    rf"Which objects?(?P<map_scope> in the map)? (?:is|are) in the "
+    rf"(?P<relation>{_RELATION_PATTERN}) of (?P<reference>.+?)\?",
     re.IGNORECASE,
 )
 _COUNT_QUERY_RE = re.compile(
@@ -152,8 +148,7 @@ class SpatialTextAdapter:
 
         options = self._parse_options(question_part)
         direction_query = _DIRECTION_QUERY_RE.search(question_part)
-        which_map_query = _WHICH_MAP_QUERY_RE.search(question_part)
-        which_query = which_map_query or _WHICH_QUERY_RE.search(question_part)
+        which_query = _WHICH_QUERY_RE.search(question_part)
         count_query = _COUNT_QUERY_RE.search(question_part)
         if direction_query:
             query = DirectionQuery(
@@ -161,8 +156,8 @@ class SpatialTextAdapter:
                 reference=_strip_the(direction_query.group(2)),
             )
         elif which_query:
-            reference = _strip_the(which_query.group(2))
-            if which_map_query:
+            reference = _strip_the(which_query.group("reference"))
+            if which_query.group("map_scope"):
                 candidates = tuple(sorted(objects - {reference}))
             else:
                 candidates = tuple(
@@ -172,7 +167,7 @@ class SpatialTextAdapter:
                     and candidate != reference
                 )
             query = WhichQuery(
-                directions=_relation_set(which_query.group(1)),
+                directions=_relation_set(which_query.group("relation")),
                 reference=reference,
                 candidates=candidates,
             )

@@ -113,7 +113,7 @@ class GenerationPolicy:
     state_mode: StateMode = StateMode.DELTA
     num_entities: int = 6
     num_premises: int = 7
-    max_ordinary_options: int = 4
+    ordinary_option_target: int = 4
     query_direction: Direction | None = None
 
     def __post_init__(self) -> None:
@@ -132,8 +132,8 @@ class GenerationPolicy:
             raise ValueError(
                 "num_premises must connect every entity and cannot exceed all pairs"
             )
-        if not 1 <= self.max_ordinary_options <= len(ascii_uppercase) - 1:
-            raise ValueError("max_ordinary_options must be between 1 and 25")
+        if not 1 <= self.ordinary_option_target <= len(ascii_uppercase) - 1:
+            raise ValueError("ordinary_option_target must be between 1 and 25")
         if self.query_kind is QueryKind.DIRECTION and self.query_direction is not None:
             raise ValueError("query_direction applies only to Which and Count queries")
         if (
@@ -478,7 +478,7 @@ class SpatialGeneratorV2:
 
         distractors = [value for value in universe if value not in possible]
         self._random.shuffle(distractors)
-        ordinary_target = max(policy.max_ordinary_options, len(visible))
+        ordinary_target = max(policy.ordinary_option_target, len(visible))
         visible.extend(distractors[: max(0, ordinary_target - len(visible))])
         self._random.shuffle(visible)
         rendered = [_render_value(value) for value in visible]
@@ -492,7 +492,7 @@ class SpatialGeneratorV2:
             rendered.append("None of the Options")
         if len(rendered) > len(ascii_uppercase):
             raise _RetryGeneration("menu exceeds available option letters")
-        return dict(zip(ascii_uppercase, rendered, strict=False))
+        return dict(zip(ascii_uppercase, rendered))
 
     @staticmethod
     def _prompt(

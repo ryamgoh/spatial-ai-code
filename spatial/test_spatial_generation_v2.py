@@ -14,8 +14,14 @@ from spatial_generation_v2 import (
     SemanticShape,
     SpatialGeneratorV2,
 )
-from spatial_grading_v2 import AnswerMode
-from spatial_solver_v2 import CountQuery, Direction, DirectionQuery, WhichQuery
+from spatial_grading_v2 import AnswerMode, encode_menu_answer, resolve_answer
+from spatial_solver_v2 import (
+    CountQuery,
+    Direction,
+    DirectionQuery,
+    SpatialSolverV2,
+    WhichQuery,
+)
 from spatial_text_v2 import SpatialTextAdapter
 from typer.testing import CliRunner
 
@@ -134,6 +140,30 @@ def test_zero_visible_possible_menu_maps_to_none_of_options() -> None:
     assert sample.menu_answer.status == "none-of-options"
     assert "None of the Options" in sample.options.values()
     assert "The menu result is none-of-options" in sample.trace
+
+
+def test_map_scoped_which_keeps_hidden_objects_in_candidate_universe() -> None:
+    prompt = (
+        "Consider a map with multiple locations:\n\n"
+        "A is to the Northeast of R. B is to the Northwest of R. "
+        "C is to the Southwest of R.\n\n"
+        "Question: Select the complete set of possible answers. "
+        "Which object in the map is in the Northeast of R? "
+        "Available options: A. B, B. C, C. None of the Options"
+    )
+
+    parsed = SpatialTextAdapter().parse(prompt)
+    analysis = SpatialSolverV2().analyze(parsed.problem)
+    answer = encode_menu_answer(
+        resolve_answer(analysis, AnswerMode.ALL_POSSIBLE),
+        parsed.options,
+    )
+
+    assert isinstance(parsed.problem.query, WhichQuery)
+    assert parsed.problem.query.candidates == ("A", "B", "C")
+    assert analysis.possible_entities == ("A",)
+    assert answer.status == "none-of-options"
+    assert answer.raw == "C"
 
 
 def test_generator_is_deterministic_per_seed_and_policy() -> None:

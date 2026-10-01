@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+from enum import Enum
 from itertools import product
 from pathlib import Path
 from typing import TypeVar
@@ -21,7 +22,7 @@ from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
 
 app = typer.Typer(add_completion=False)
-EnumType = TypeVar("EnumType")
+EnumType = TypeVar("EnumType", bound=Enum)
 
 
 def _enum_values(
