@@ -557,5 +557,38 @@ The reporting roles remain distinct:
 `spatial/generate_all_v2.py` crosses requested policy dimensions into balanced
 cells, assigns deterministic unique IDs, shuffles deterministically, and writes
 train/test JSONL splits. Which and Count cells can additionally be balanced
-across all eight query directions. Its entity limit is 30 because that is the
-current name pool, not because the solver has a 30-object axiom.
+across all eight query directions, while Direction cells can be balanced across
+all eight target answers. Its entity limit is 30 because that is the current
+name pool, not because the solver has a 30-object axiom.
+
+### Measured difficulty controls
+
+Difficulty labels come from the accepted structured explanation, not from the
+generator's intended construction. `GenerationPolicy` can require:
+
+- omission of a direct query-answer relation;
+- minimum and maximum X/Y proof depth for Direction;
+- minimum and maximum positive-membership depth for Which and Count;
+- disjoint X-axis and Y-axis supporting premises;
+- an exact number of possible answers for ambiguous questions; and
+- for Direction, an exact number of premises outside the retained proof
+  support.
+
+Candidates are rejected when the measured proof fails a requested constraint.
+For Count, membership-depth controls require at least one positively entailed
+member; a unique count caused only by correlated contingent memberships does
+not falsely receive a positive proof-depth label.
+
+### Paired trace variants and manifests
+
+Natural/Symbolic and state-schedule variants are rendered from the same
+`GeneratedSpatialSample`. They share a `base_id`, prompt, problem, options, and
+gold answer, while retaining distinct row IDs. Variant groups are split as a
+unit, preventing the same problem from appearing in both train and test.
+
+Every CLI run also writes a `*_manifest.json`. The manifest validates unique
+row IDs, verified round trips, complete trace-variant groups, one base ID per
+prompt, and the absence of base-ID or prompt leakage across splits. It reports
+row distributions, base-problem distributions, split distributions, and
+base-level difficulty histograms. Base-level reporting prevents paired trace
+variants from double-counting the underlying problem distribution.

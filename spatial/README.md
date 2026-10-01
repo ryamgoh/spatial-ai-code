@@ -14,6 +14,7 @@ one domain model and one gold-label contract.
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
 | `spatial_generation_v2.py` | Policy-driven problem, menu, trace, and audit construction with mandatory round-trip validation | V2 synthetic workloads |
 | `generate_all_v2.py` | Balanced JSONL workload CLI over V2 policy cells | SFT train/test generation |
+| `spatial_workload_manifest_v2.py` | Distribution summaries, paired-variant checks, and split-leakage validation | V2 workload generation and audit |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
 | `test_spatial_solver_v2.py` | Core, adapter, answer semantics, witness, and differential contracts | Local/CI verification |
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
@@ -60,9 +61,28 @@ Generate a balanced V2 workload with:
       --answer-modes single \
       --semantic-shapes unique,ambiguous \
       --query-directions north,northeast,east,southeast,south,southwest,west,northwest \
+      --target-directions north,northeast,east,southeast,south,southwest,west,northwest \
       --trace-formats natural,symbolic \
       --state-modes delta
 
-This writes `data/spatial_v2_train.jsonl` and
-`data/spatial_v2_test.jsonl`. Coordinate-bearing audit metadata is excluded by
+This writes `data/spatial_v2_train.jsonl`, `data/spatial_v2_test.jsonl`, and
+`data/spatial_v2_manifest.json`. Natural/Symbolic variants of one base problem
+stay in the same split. Coordinate-bearing audit metadata is excluded by
 default. `--include-audit` is for diagnostic artifacts, not training data.
+
+For a transitive Direction workload, use a single compatible policy cell:
+
+    uv run --python 3.12 --no-project --with typer --with z3-solver \
+      python spatial/generate_all_v2.py \
+      --out data/spatial_v2_depth.jsonl \
+      --query-kinds direction \
+      --semantic-shapes unique \
+      --omit-direct-query-relation \
+      --min-axis-depth 2 \
+      --max-axis-depth 4 \
+      --distractor-premises 3
+
+Which and Count use `--min-membership-depth` and
+`--max-membership-depth`. Exact ambiguity buckets use `--ambiguity-size` with
+`--semantic-shapes ambiguous`. Incompatible cross-products fail instead of
+silently weakening a requested constraint.

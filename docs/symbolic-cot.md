@@ -23,6 +23,11 @@ semantic proof. Every generated prompt is reparsed and re-solved before either
 trace is rendered, so the Natural-vs-Symbolic ablation uses the same structured
 problem and gold-answer contract.
 
+Workload generation pairs requested trace variants on the same `base_id` and
+keeps the complete group in one data split. This makes trace format the changed
+variable in an ablation instead of generating a different random map for each
+format.
+
 Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.
