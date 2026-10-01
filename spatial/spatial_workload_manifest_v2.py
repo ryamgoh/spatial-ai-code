@@ -130,6 +130,16 @@ def build_workload_manifest(
         "num_distractor_premises",
     )
     base_rows = tuple(rows_by_base.values())
+    rejection_reasons: Counter[str] = Counter()
+    rejected_candidates = 0
+    for row in base_rows:
+        metadata = row["metadata"]
+        attempt = int(metadata.get("attempt", 0))
+        rejection_counts = metadata.get("rejection_counts", {})
+        if sum(rejection_counts.values()) != attempt:
+            raise ValueError("rejection counts do not match accepted attempt")
+        rejected_candidates += attempt
+        rejection_reasons.update(rejection_counts)
     train_base_rows = tuple(
         row for base_id, row in rows_by_base.items() if base_id in train_base_ids
     )
@@ -152,6 +162,21 @@ def build_workload_manifest(
             "test": _distributions(test_base_rows, base_distribution_fields),
         },
         "difficulty": _distributions(base_rows, difficulty_fields, difficulty=True),
+        "generation_efficiency": {
+            "accepted_base_problems": len(base_rows),
+            "rejected_candidates": rejected_candidates,
+            "total_candidate_attempts": len(base_rows) + rejected_candidates,
+            "acceptance_rate": (
+                len(base_rows) / (len(base_rows) + rejected_candidates)
+                if base_rows
+                else 0.0
+            ),
+            "max_rejections_before_accept": max(
+                (int(row["metadata"].get("attempt", 0)) for row in base_rows),
+                default=0,
+            ),
+            "rejection_reasons": dict(sorted(rejection_reasons.items())),
+        },
         "trace_variants_per_base": dict(
             sorted(Counter(len(value) for value in variants_by_base.values()).items())
         ),

@@ -9,8 +9,10 @@ may be emitted.  Coordinates are retained only as audit witnesses.
 from __future__ import annotations
 
 import random
+from collections import Counter
 from dataclasses import dataclass, replace
 from enum import Enum
+from itertools import combinations, pairwise
 from string import ascii_uppercase
 from typing import Any
 
@@ -38,6 +40,7 @@ from spatial_grading_v2 import (
 )
 from spatial_solver_v2 import (
     And,
+    CountAnalysis,
     CountQuery,
     Direction,
     DirectionAnalysis,
@@ -85,6 +88,7 @@ ENTITY_NAMES = (
     "Veterinary Clinic",
     "Zoo",
 )
+_DIRECTION_BY_SIGNS = {direction_signs(value): value for value in Direction}
 
 
 class QueryKind(str, Enum):
@@ -225,6 +229,7 @@ class GenerationPolicy:
                 raise ValueError("independent axes require a proof depth of at least 2")
         self._validate_ambiguity_control()
         self._validate_distractor_control()
+        self._validate_feasibility()
         if self.omit_direct_query_relation and self.num_entities < 3:
             raise ValueError(
                 "omitting the direct query relation requires three entities"
@@ -234,6 +239,16 @@ class GenerationPolicy:
         if self.ambiguity_size is not None:
             if self.ambiguity_size < 2:
                 raise ValueError("ambiguity_size must be at least 2")
+            maximum = {
+                QueryKind.DIRECTION: len(Direction),
+                QueryKind.WHICH: self.num_entities - 1,
+                QueryKind.COUNT: self.num_entities,
+            }[self.query_kind]
+            if self.ambiguity_size > maximum:
+                raise ValueError(
+                    f"ambiguity_size can be at most {maximum} for "
+                    f"{self.query_kind.value}"
+                )
             if self.semantic_shape is not SemanticShape.AMBIGUOUS:
                 raise ValueError("ambiguity_size requires ambiguous semantics")
 
@@ -242,6 +257,29 @@ class GenerationPolicy:
             raise ValueError("distractor_premises must be within the premise count")
         if self.distractor_premises and self.query_kind is not QueryKind.DIRECTION:
             raise ValueError("distractor controls currently require a Direction proof")
+
+    def _validate_feasibility(self) -> None:
+        maximum_depth = min(self.num_entities - 1, self.num_premises)
+        requested_depth = (
+            self.min_axis_depth
+            if self.query_kind is QueryKind.DIRECTION
+            else self.min_membership_depth
+        )
+        if requested_depth > maximum_depth:
+            raise ValueError("premise and entity budgets cannot satisfy proof depth")
+
+        maximum_pairs = self.num_entities * (self.num_entities - 1) // 2
+        protects_a_pair = (
+            self.query_kind is QueryKind.DIRECTION and self.omit_direct_query_relation
+        ) or self.min_membership_depth > 1
+        if protects_a_pair and self.num_premises >= maximum_pairs:
+            raise ValueError("premise budget cannot satisfy direct-relation omission")
+
+        minimum_support = requested_depth * (2 if self.require_independent_axes else 1)
+        if self.distractor_premises + minimum_support > self.num_premises:
+            raise ValueError(
+                "premise budget cannot satisfy proof and distractor counts"
+            )
 
 
 def _answer_values(analysis: QueryAnalysis) -> tuple[Direction | str | int, ...]:
@@ -325,6 +363,7 @@ class GeneratedSpatialSample:
     attempt: int
     generation_witness: dict[str, tuple[int, int]]
     difficulty: dict[str, Any]
+    rejection_counts: dict[str, int]
 
     @property
     def base_id(self) -> str:
@@ -370,6 +409,7 @@ class GeneratedSpatialSample:
                 "seed": self.seed,
                 "sample_index": self.sample_index,
                 "attempt": self.attempt,
+                "rejection_counts": dict(sorted(self.rejection_counts.items())),
                 "query_kind": self.policy.query_kind.value,
                 "query_direction": query_direction,
                 "target_direction": target_direction,
@@ -571,16 +611,23 @@ class SpatialGeneratorV2:
         if max_attempts <= 0:
             raise ValueError("max_attempts must be positive")
         last_reason = "no candidate was constructed"
+        rejections: Counter[str] = Counter()
         for attempt in range(max_attempts):
             try:
                 sample = self._generate_candidate(policy, attempt)
                 self._emitted += 1
-                return sample
+                return replace(
+                    sample, rejection_counts=dict(sorted(rejections.items()))
+                )
             except _RetryGeneration as exc:
                 last_reason = str(exc)
+                rejections[last_reason] += 1
+        summary = ", ".join(
+            f"{reason}={count}" for reason, count in sorted(rejections.items())
+        )
         raise RuntimeError(
             f"could not satisfy generation policy after {max_attempts} attempts: "
-            f"{last_reason}"
+            f"{last_reason}; rejections: {summary}"
         )
 
     def _generate_candidate(
@@ -589,10 +636,19 @@ class SpatialGeneratorV2:
         attempt: int,
     ) -> GeneratedSpatialSample:
         objects = tuple(sorted(self._random.sample(ENTITY_NAMES, policy.num_entities)))
-        coordinates = self._coordinates(objects)
-        query = self._query(policy, objects, coordinates)
-        premise = self._premise(policy, objects, coordinates, query)
-        problem = SpatialProblem(objects, premise, query)
+        controlled_direction = self._uses_controlled_direction(policy)
+        controlled_membership = self._uses_controlled_membership(policy)
+        if controlled_direction:
+            problem = self._controlled_direction_problem(policy, objects)
+            coordinates: dict[str, tuple[int, int]] = {}
+        elif controlled_membership:
+            problem = self._controlled_membership_problem(policy, objects)
+            coordinates = {}
+        else:
+            coordinates = self._coordinates(objects)
+            query = self._query(policy, objects, coordinates)
+            premise = self._premise(policy, objects, coordinates, query)
+            problem = SpatialProblem(objects, premise, query)
         analysis = self._solver.analyze(problem)
         if analysis.error or not analysis.consistent:
             raise _RetryGeneration(
@@ -604,6 +660,12 @@ class SpatialGeneratorV2:
         difficulty = _difficulty(problem, analysis, explanation)
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
+        if controlled_direction:
+            assert isinstance(analysis, DirectionAnalysis)
+            coordinates = analysis.coordinates or {}
+        elif controlled_membership:
+            assert isinstance(analysis, (WhichAnalysis, CountAnalysis))
+            coordinates = next(iter(analysis.witnesses.values()), {})
 
         resolution = resolve_answer(analysis, policy.answer_mode)
         options = self._menu(policy, analysis, resolution)
@@ -635,7 +697,221 @@ class SpatialGeneratorV2:
             attempt,
             coordinates,
             difficulty,
+            {},
         )
+
+    @staticmethod
+    def _uses_controlled_direction(policy: GenerationPolicy) -> bool:
+        requested = policy.query_kind is QueryKind.DIRECTION and (
+            policy.omit_direct_query_relation
+            or policy.min_axis_depth > 1
+            or policy.require_independent_axes
+            or bool(policy.distractor_premises)
+        )
+        if not requested:
+            return False
+        try:
+            x_depth, y_depth = SpatialGeneratorV2._controlled_depths(policy)
+        except _RetryGeneration:
+            return False
+        proof_nodes = (
+            x_depth + y_depth if policy.require_independent_axes else x_depth + 1
+        )
+        extras = policy.num_entities - proof_nodes
+        filler = policy.num_premises - (
+            x_depth + y_depth if policy.require_independent_axes else x_depth
+        )
+        filler_capacity = extras * (extras + 1) // 2
+        return extras >= 0 and 0 <= filler <= filler_capacity
+
+    def _controlled_direction_problem(
+        self,
+        policy: GenerationPolicy,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        direction = policy.target_direction or self._random.choice(list(Direction))
+        x_depth, y_depth = self._controlled_depths(policy)
+        shuffled = list(objects)
+        self._random.shuffle(shuffled)
+        reference, target = shuffled[:2]
+        cursor = 2
+
+        if policy.require_independent_axes:
+            x_internal = shuffled[cursor : cursor + x_depth - 1]
+            cursor += x_depth - 1
+            y_internal = shuffled[cursor : cursor + y_depth - 1]
+            cursor += y_depth - 1
+            relations = [
+                *self._axis_path_relations(
+                    [reference, *x_internal, target], direction, axis=0
+                ),
+                *self._axis_path_relations(
+                    [reference, *y_internal, target], direction, axis=1
+                ),
+            ]
+        else:
+            internal = shuffled[cursor : cursor + x_depth - 1]
+            cursor += x_depth - 1
+            nodes = [reference, *internal, target]
+            relations = [
+                RelationConstraint(
+                    subject,
+                    previous,
+                    frozenset({direction}),
+                )
+                for previous, subject in pairwise(nodes)
+            ]
+
+        extras = shuffled[cursor:]
+        filler_count = policy.num_premises - len(relations)
+        filler_pairs = list(combinations((reference, *extras), 2))
+        if filler_count > len(filler_pairs):
+            raise _RetryGeneration("not enough isolated pairs for distractor premises")
+        relations.extend(
+            RelationConstraint(higher, lower, frozenset({Direction.NORTHEAST}))
+            for lower, higher in filler_pairs[:filler_count]
+        )
+        self._random.shuffle(relations)
+        return SpatialProblem(
+            objects,
+            And(tuple(relations)),
+            DirectionQuery(target, reference),
+        )
+
+    @staticmethod
+    def _uses_controlled_membership(policy: GenerationPolicy) -> bool:
+        if (
+            policy.query_kind not in {QueryKind.WHICH, QueryKind.COUNT}
+            or policy.semantic_shape is not SemanticShape.UNIQUE
+            or policy.min_membership_depth <= 1
+        ):
+            return False
+        depth = policy.min_membership_depth
+        proof_nodes = 2 * depth
+        extras = policy.num_entities - proof_nodes
+        filler = policy.num_premises - policy.num_entities
+        return extras >= 0 and 0 <= filler <= extras * (extras - 1) // 2
+
+    def _controlled_membership_problem(
+        self,
+        policy: GenerationPolicy,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        direction = policy.query_direction or self._random.choice(list(Direction))
+        depth = policy.min_membership_depth
+        shuffled = list(objects)
+        self._random.shuffle(shuffled)
+        reference, target = shuffled[:2]
+        cursor = 2
+        x_internal = shuffled[cursor : cursor + depth - 1]
+        cursor += depth - 1
+        y_internal = shuffled[cursor : cursor + depth - 1]
+        cursor += depth - 1
+        extras = shuffled[cursor:]
+
+        relations = [
+            *self._axis_path_relations(
+                [reference, *x_internal, target],
+                direction,
+                axis=0,
+                avoid_target_prefix=True,
+            ),
+            *self._axis_path_relations(
+                [reference, *y_internal, target],
+                direction,
+                axis=1,
+                avoid_target_prefix=True,
+            ),
+        ]
+        nonmember_direction = next(
+            candidate
+            for candidate in (
+                Direction.NORTHEAST,
+                Direction.SOUTHEAST,
+                Direction.SOUTHWEST,
+                Direction.NORTHWEST,
+            )
+            if candidate is not direction
+        )
+        relations.extend(
+            RelationConstraint(
+                candidate,
+                reference,
+                frozenset({nonmember_direction}),
+            )
+            for candidate in extras
+        )
+        filler_count = policy.num_premises - len(relations)
+        filler_pairs = list(combinations(extras, 2))
+        relations.extend(
+            RelationConstraint(higher, lower, frozenset({nonmember_direction}))
+            for lower, higher in filler_pairs[:filler_count]
+        )
+        self._random.shuffle(relations)
+        direction_set = frozenset({direction})
+        candidates = tuple(obj for obj in objects if obj != reference)
+        query = (
+            WhichQuery(direction_set, reference, candidates)
+            if policy.query_kind is QueryKind.WHICH
+            else CountQuery(direction_set, reference, candidates)
+        )
+        return SpatialProblem(objects, And(tuple(relations)), query)
+
+    @staticmethod
+    def _controlled_depths(policy: GenerationPolicy) -> tuple[int, int]:
+        support = (
+            policy.num_premises - policy.distractor_premises
+            if policy.distractor_premises
+            else None
+        )
+        if not policy.require_independent_axes:
+            depth = support or policy.min_axis_depth
+            if policy.max_axis_depth is not None and depth > policy.max_axis_depth:
+                raise _RetryGeneration("proof and distractor depths are incompatible")
+            return depth, depth
+
+        if support is None:
+            return policy.min_axis_depth, policy.min_axis_depth
+        maximum = policy.max_axis_depth or support
+        for x_depth in range(policy.min_axis_depth, maximum + 1):
+            y_depth = support - x_depth
+            if policy.min_axis_depth <= y_depth <= maximum:
+                return x_depth, y_depth
+        raise _RetryGeneration(
+            "independent proof and distractor depths are incompatible"
+        )
+
+    @staticmethod
+    def _axis_path_relations(
+        nodes: list[str],
+        direction: Direction,
+        *,
+        axis: int,
+        avoid_target_prefix: bool = False,
+    ) -> list[RelationConstraint]:
+        fixed_sign = direction_signs(direction)[axis]
+        free_sign = direction_signs(direction)[1 - axis]
+        if avoid_target_prefix:
+            prefix_sign = -free_sign if free_sign else 1
+            free_components = [
+                *([prefix_sign] * (len(nodes) - 2)),
+                -prefix_sign,
+            ]
+        else:
+            free_components = [1, -1, *([free_sign] * (len(nodes) - 3))]
+        signs = (
+            [(fixed_sign, component) for component in free_components]
+            if axis == 0
+            else [(component, fixed_sign) for component in free_components]
+        )
+        return [
+            RelationConstraint(
+                subject,
+                previous,
+                frozenset({_DIRECTION_BY_SIGNS[sign]}),
+            )
+            for (previous, subject), sign in zip(pairwise(nodes), signs)
+        ]
 
     def _coordinates(self, objects: tuple[str, ...]) -> dict[str, tuple[int, int]]:
         radius = max(2, len(objects) // 2)
@@ -883,11 +1159,19 @@ class SpatialGeneratorV2:
         answer_mode: AnswerMode,
     ) -> str:
         assert isinstance(problem.premise, And)
-        premises = " ".join(
+        atoms = problem.premise.operands
+        premise_text = [
             f"{atom.subject} is to the {next(iter(atom.allowed)).value} of "
             f"{atom.reference}."
-            for atom in problem.premise.operands
+            for atom in atoms
+        ]
+        mentioned = {name for atom in atoms for name in (atom.subject, atom.reference)}
+        premise_text.extend(
+            f"{name} is in the map."
+            for name in problem.objects
+            if name not in mentioned
         )
+        premises = " ".join(premise_text)
         instruction = {
             AnswerMode.SINGLE: "Select exactly one answer.",
             AnswerMode.ALL_POSSIBLE: "Select the complete set of possible answers.",

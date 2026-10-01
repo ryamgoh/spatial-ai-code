@@ -143,6 +143,27 @@ def test_direction_policy_can_require_independent_axis_support() -> None:
     assert sample.difficulty["axes_independent"] is True
 
 
+def test_controlled_direction_proofs_are_constructed_without_rejection() -> None:
+    generator = SpatialGeneratorV2(seed=1724)
+
+    for direction in Direction:
+        sample = generator.generate(
+            GenerationPolicy(
+                query_kind=QueryKind.DIRECTION,
+                target_direction=direction,
+                semantic_shape=SemanticShape.UNIQUE,
+                num_entities=6,
+                num_premises=7,
+                omit_direct_query_relation=True,
+                min_axis_depth=2,
+                max_axis_depth=4,
+                distractor_premises=5,
+            )
+        )
+        assert sample.attempt == 0
+        assert sample.rejection_counts == {}
+
+
 @pytest.mark.parametrize(
     ("query_kind", "size", "seed"),
     [
@@ -198,6 +219,29 @@ def test_membership_queries_can_require_transitive_positive_proofs(
         for proof in difficulty["membership_proofs"]
         for axis in ("x_depth", "y_depth")
     )
+
+
+@pytest.mark.parametrize("query_kind", (QueryKind.WHICH, QueryKind.COUNT))
+def test_controlled_membership_proofs_are_constructed_without_rejection(
+    query_kind: QueryKind,
+) -> None:
+    generator = SpatialGeneratorV2(seed=1732)
+
+    for direction in Direction:
+        sample = generator.generate(
+            GenerationPolicy(
+                query_kind=query_kind,
+                query_direction=direction,
+                semantic_shape=SemanticShape.UNIQUE,
+                num_entities=7,
+                num_premises=10,
+                omit_direct_query_relation=True,
+                min_membership_depth=2,
+                max_membership_depth=4,
+            )
+        )
+        assert sample.attempt == 0
+        assert sample.rejection_counts == {}
 
 
 def test_policy_can_require_exact_number_of_non_supporting_premises() -> None:
@@ -359,6 +403,78 @@ def test_policy_rejects_impossible_partial_singleton_contract() -> None:
 def test_policy_rejects_incompatible_difficulty_controls(overrides: dict) -> None:
     with pytest.raises(ValueError):
         GenerationPolicy(**overrides)
+
+
+def test_policy_rejects_impossible_ambiguity_size_before_sampling() -> None:
+    with pytest.raises(ValueError, match="at most 8"):
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            ambiguity_size=9,
+        )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {
+            "semantic_shape": SemanticShape.UNIQUE,
+            "num_entities": 5,
+            "num_premises": 4,
+            "min_axis_depth": 5,
+        },
+        {
+            "semantic_shape": SemanticShape.UNIQUE,
+            "num_entities": 3,
+            "num_premises": 3,
+            "omit_direct_query_relation": True,
+        },
+        {
+            "semantic_shape": SemanticShape.UNIQUE,
+            "num_entities": 6,
+            "num_premises": 7,
+            "min_axis_depth": 3,
+            "require_independent_axes": True,
+            "distractor_premises": 2,
+        },
+    ],
+)
+def test_policy_rejects_structurally_impossible_proof_budgets(
+    overrides: dict,
+) -> None:
+    with pytest.raises(ValueError, match="cannot satisfy"):
+        GenerationPolicy(**overrides)
+
+
+def test_generator_records_rejection_reasons_before_acceptance() -> None:
+    policy = GenerationPolicy(
+        query_kind=QueryKind.WHICH,
+        semantic_shape=SemanticShape.AMBIGUOUS,
+        ambiguity_size=2,
+        num_entities=6,
+        num_premises=5,
+    )
+
+    sample = SpatialGeneratorV2(seed=1745).generate(policy, max_attempts=10)
+
+    assert sample.attempt > 0
+    assert sum(sample.rejection_counts.values()) == sample.attempt
+    assert sample.as_sft_row()["metadata"]["rejection_counts"] == {
+        key: sample.rejection_counts[key] for key in sorted(sample.rejection_counts)
+    }
+
+
+def test_generator_failure_reports_rejection_breakdown() -> None:
+    policy = GenerationPolicy(
+        query_kind=QueryKind.WHICH,
+        semantic_shape=SemanticShape.AMBIGUOUS,
+        ambiguity_size=2,
+        num_entities=6,
+        num_premises=5,
+    )
+
+    with pytest.raises(RuntimeError, match=r"rejections: .+=1"):
+        SpatialGeneratorV2(seed=1745).generate(policy, max_attempts=1)
 
 
 def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -> None:

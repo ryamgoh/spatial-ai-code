@@ -71,6 +71,8 @@ stay in the same split. Coordinate-bearing audit metadata is excluded by
 default. `--include-audit` is for diagnostic artifacts, not training data.
 Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
 duplicating the CLI's individual settings.
+The manifest includes generation acceptance rate and rejection reasons so
+expensive policy cells are visible before scaling the workload.
 
 For a transitive Direction workload, use a single compatible policy cell:
 
@@ -82,9 +84,13 @@ For a transitive Direction workload, use a single compatible policy cell:
       --omit-direct-query-relation \
       --min-axis-depth 2 \
       --max-axis-depth 4 \
-      --distractor-premises 3
+      --distractor-premises 5
 
 Which and Count use `--min-membership-depth` and
 `--max-membership-depth`. Exact ambiguity buckets use `--ambiguity-size` with
 `--semantic-shapes ambiguous`. Incompatible cross-products fail instead of
 silently weakening a requested constraint.
+
+A practical depth-2 Which/Count pilot uses seven entities and ten premises;
+that layout is constructed directly for all eight query directions rather than
+found through expensive rejection sampling.

@@ -579,6 +579,15 @@ For Count, membership-depth controls require at least one positively entailed
 member; a unique count caused only by correlated contingent memberships does
 not falsely receive a positive proof-depth label.
 
+Impossible ambiguity sizes and proof/premise budgets fail during policy
+validation. Feasible but selective cells retain rejection counts by reason on
+each accepted base problem. If the attempt budget is exhausted, the exception
+includes the complete rejection histogram instead of only the final failure.
+Standard controlled Direction and positive-membership cells use constructive
+proof skeletons, avoiding rejection sampling when their premise budgets can be
+filled without shortening the requested proof. Other valid combinations fall
+back to measured rejection sampling and remain visible in the efficiency data.
+
 ### Paired trace variants and manifests
 
 Natural/Symbolic and state-schedule variants are rendered from the same
@@ -592,3 +601,5 @@ prompt, and the absence of base-ID or prompt leakage across splits. It reports
 trace-variant distributions, overall and per-split base-problem distributions,
 and base-level difficulty histograms. Base-level reporting prevents paired
 trace variants from double-counting the underlying problem distribution.
+The manifest also reports total candidate attempts, rejected candidates,
+acceptance rate, maximum rejections before acceptance, and rejection reasons.

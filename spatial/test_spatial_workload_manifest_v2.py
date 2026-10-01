@@ -32,6 +32,8 @@ def _row(row_id: str, base_id: str, prompt: str, trace_format: str) -> dict:
             "menu_status": "exact",
             "possible_values": ["North"],
             "round_trip_verified": True,
+            "attempt": 0,
+            "rejection_counts": {},
             "difficulty": {
                 "x_depth": 2,
                 "y_depth": 3,
@@ -70,6 +72,14 @@ def test_manifest_reports_distributions_and_paired_variants() -> None:
     }
     assert manifest["base_distributions"]["query_kind"] == {"direction": 2}
     assert manifest["difficulty"]["x_depth"] == {"2": 2}
+    assert manifest["generation_efficiency"] == {
+        "acceptance_rate": 1.0,
+        "accepted_base_problems": 2,
+        "max_rejections_before_accept": 0,
+        "rejected_candidates": 0,
+        "rejection_reasons": {},
+        "total_candidate_attempts": 2,
+    }
     assert manifest["validation"]["status"] == "passed"
 
 
@@ -79,6 +89,29 @@ def test_manifest_rejects_cross_split_base_or_prompt_leakage() -> None:
 
     with pytest.raises(ValueError, match="cross-split base IDs"):
         build_workload_manifest(train, test)
+
+
+def test_manifest_reports_rejection_efficiency_per_base_problem() -> None:
+    row = _row("base-1", "base-1", "prompt", "natural")
+    row["metadata"]["attempt"] = 2
+    row["metadata"]["rejection_counts"] = {
+        "semantic shape did not match": 1,
+        "difficulty controls did not match": 1,
+    }
+
+    manifest = build_workload_manifest([row], [])
+
+    assert manifest["generation_efficiency"] == {
+        "acceptance_rate": 1 / 3,
+        "accepted_base_problems": 1,
+        "max_rejections_before_accept": 2,
+        "rejected_candidates": 2,
+        "rejection_reasons": {
+            "difficulty controls did not match": 1,
+            "semantic shape did not match": 1,
+        },
+        "total_candidate_attempts": 3,
+    }
 
 
 def test_generator_writes_a_valid_manifest_next_to_splits(tmp_path) -> None:
