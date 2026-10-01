@@ -123,11 +123,11 @@ def render_audit_explanation(
         lines.append(
             "Possible counts: " + ", ".join(map(str, explanation.possible_counts)) + "."
         )
-        for case in explanation.counts:
-            if case.witness is not None:
-                lines.append(
-                    f"Count {case.count} witness: {_render_coordinates(case.witness, labels)}."
-                )
+        lines.extend(
+            f"Count {case.count} witness: {_render_coordinates(case.witness, labels)}."
+            for case in explanation.counts
+            if case.witness is not None
+        )
         relation = _directions(explanation.directions)
         for membership in explanation.memberships:
             lines.extend(
