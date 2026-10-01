@@ -302,27 +302,31 @@ def _coordinate_payload(
 
 def _opposite(direction: Direction) -> Direction:
     x_sign, y_sign = direction_signs(direction)
-    return next(
-        candidate
-        for candidate in Direction
-        if direction_signs(candidate) == (-x_sign, -y_sign)
-    )
+    return _DIRECTION_BY_SIGNS[(-x_sign, -y_sign)]
+
+
+def _exact_relation(
+    subject: str,
+    direction: Direction,
+    reference: str,
+) -> RelationConstraint:
+    return RelationConstraint(subject, reference, frozenset({direction}))
 
 
 def _has_direct_membership_fact(problem: SpatialProblem) -> bool:
     query = problem.query
     if not isinstance(query, (WhichQuery, CountQuery)):
         return False
+    candidates = set(query.candidates)
     for atom in problem.premise.operands:
-        for candidate in query.candidates:
-            if atom.subject == candidate and atom.reference == query.reference:
-                allowed = atom.allowed
-            elif atom.subject == query.reference and atom.reference == candidate:
-                allowed = frozenset(_opposite(direction) for direction in atom.allowed)
-            else:
-                continue
-            if allowed <= query.directions:
-                return True
+        if atom.reference == query.reference and atom.subject in candidates:
+            allowed = atom.allowed
+        elif atom.subject == query.reference and atom.reference in candidates:
+            allowed = frozenset(_opposite(direction) for direction in atom.allowed)
+        else:
+            continue
+        if allowed <= query.directions:
+            return True
     return False
 
 
@@ -610,7 +614,6 @@ class SpatialGeneratorV2:
     ) -> GeneratedSpatialSample:
         if max_attempts <= 0:
             raise ValueError("max_attempts must be positive")
-        last_reason = "no candidate was constructed"
         rejections: Counter[str] = Counter()
         for attempt in range(max_attempts):
             try:
@@ -620,14 +623,13 @@ class SpatialGeneratorV2:
                     sample, rejection_counts=dict(sorted(rejections.items()))
                 )
             except _RetryGeneration as exc:
-                last_reason = str(exc)
-                rejections[last_reason] += 1
+                rejections[str(exc)] += 1
         summary = ", ".join(
             f"{reason}={count}" for reason, count in sorted(rejections.items())
         )
         raise RuntimeError(
-            f"could not satisfy generation policy after {max_attempts} attempts: "
-            f"{last_reason}; rejections: {summary}"
+            f"could not satisfy generation policy after {max_attempts} attempts; "
+            f"rejections: {summary}"
         )
 
     def _generate_candidate(
@@ -737,28 +739,20 @@ class SpatialGeneratorV2:
         cursor = 2
 
         if policy.require_independent_axes:
-            x_internal = shuffled[cursor : cursor + x_depth - 1]
-            cursor += x_depth - 1
-            y_internal = shuffled[cursor : cursor + y_depth - 1]
-            cursor += y_depth - 1
-            relations = [
-                *self._axis_path_relations(
-                    [reference, *x_internal, target], direction, axis=0
-                ),
-                *self._axis_path_relations(
-                    [reference, *y_internal, target], direction, axis=1
-                ),
-            ]
+            relations, cursor = self._independent_axis_relations(
+                shuffled,
+                reference,
+                target,
+                direction,
+                x_depth,
+                y_depth,
+            )
         else:
             internal = shuffled[cursor : cursor + x_depth - 1]
             cursor += x_depth - 1
             nodes = [reference, *internal, target]
             relations = [
-                RelationConstraint(
-                    subject,
-                    previous,
-                    frozenset({direction}),
-                )
+                _exact_relation(subject, direction, previous)
                 for previous, subject in pairwise(nodes)
             ]
 
@@ -768,7 +762,7 @@ class SpatialGeneratorV2:
         if filler_count > len(filler_pairs):
             raise _RetryGeneration("not enough isolated pairs for distractor premises")
         relations.extend(
-            RelationConstraint(higher, lower, frozenset({Direction.NORTHEAST}))
+            _exact_relation(higher, Direction.NORTHEAST, lower)
             for lower, higher in filler_pairs[:filler_count]
         )
         self._random.shuffle(relations)
@@ -802,27 +796,16 @@ class SpatialGeneratorV2:
         shuffled = list(objects)
         self._random.shuffle(shuffled)
         reference, target = shuffled[:2]
-        cursor = 2
-        x_internal = shuffled[cursor : cursor + depth - 1]
-        cursor += depth - 1
-        y_internal = shuffled[cursor : cursor + depth - 1]
-        cursor += depth - 1
+        relations, cursor = self._independent_axis_relations(
+            shuffled,
+            reference,
+            target,
+            direction,
+            depth,
+            depth,
+            avoid_target_prefix=True,
+        )
         extras = shuffled[cursor:]
-
-        relations = [
-            *self._axis_path_relations(
-                [reference, *x_internal, target],
-                direction,
-                axis=0,
-                avoid_target_prefix=True,
-            ),
-            *self._axis_path_relations(
-                [reference, *y_internal, target],
-                direction,
-                axis=1,
-                avoid_target_prefix=True,
-            ),
-        ]
         nonmember_direction = next(
             candidate
             for candidate in (
@@ -834,17 +817,13 @@ class SpatialGeneratorV2:
             if candidate is not direction
         )
         relations.extend(
-            RelationConstraint(
-                candidate,
-                reference,
-                frozenset({nonmember_direction}),
-            )
+            _exact_relation(candidate, nonmember_direction, reference)
             for candidate in extras
         )
         filler_count = policy.num_premises - len(relations)
         filler_pairs = list(combinations(extras, 2))
         relations.extend(
-            RelationConstraint(higher, lower, frozenset({nonmember_direction}))
+            _exact_relation(higher, nonmember_direction, lower)
             for lower, higher in filler_pairs[:filler_count]
         )
         self._random.shuffle(relations)
@@ -881,6 +860,38 @@ class SpatialGeneratorV2:
             "independent proof and distractor depths are incompatible"
         )
 
+    def _independent_axis_relations(
+        self,
+        objects: list[str],
+        reference: str,
+        target: str,
+        direction: Direction,
+        x_depth: int,
+        y_depth: int,
+        *,
+        avoid_target_prefix: bool = False,
+    ) -> tuple[list[RelationConstraint], int]:
+        cursor = 2
+        x_internal = objects[cursor : cursor + x_depth - 1]
+        cursor += x_depth - 1
+        y_internal = objects[cursor : cursor + y_depth - 1]
+        cursor += y_depth - 1
+        relations = [
+            *self._axis_path_relations(
+                [reference, *x_internal, target],
+                direction,
+                axis=0,
+                avoid_target_prefix=avoid_target_prefix,
+            ),
+            *self._axis_path_relations(
+                [reference, *y_internal, target],
+                direction,
+                axis=1,
+                avoid_target_prefix=avoid_target_prefix,
+            ),
+        ]
+        return relations, cursor
+
     @staticmethod
     def _axis_path_relations(
         nodes: list[str],
@@ -905,11 +916,7 @@ class SpatialGeneratorV2:
             else [(component, fixed_sign) for component in free_components]
         )
         return [
-            RelationConstraint(
-                subject,
-                previous,
-                frozenset({_DIRECTION_BY_SIGNS[sign]}),
-            )
+            _exact_relation(subject, _DIRECTION_BY_SIGNS[sign], previous)
             for (previous, subject), sign in zip(pairwise(nodes), signs)
         ]
 
@@ -1053,12 +1060,10 @@ class SpatialGeneratorV2:
         self._random.shuffle(remaining)
         pairs.extend(remaining[: policy.num_premises - len(pairs)])
         atoms = tuple(
-            RelationConstraint(
+            _exact_relation(
                 subject,
+                direction_between(coordinates[subject], coordinates[reference]),
                 reference,
-                frozenset(
-                    {direction_between(coordinates[subject], coordinates[reference])}
-                ),
             )
             for subject, reference in pairs
         )
