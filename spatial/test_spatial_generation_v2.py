@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 import pytest
-from generate_all_v2 import app, generate_workload
+from generate_all_v2 import WorkloadSpec, app, generate_workload
 from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import (
     GenerationPolicy,
@@ -364,15 +364,17 @@ def test_policy_rejects_incompatible_difficulty_controls(overrides: dict) -> Non
 def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -> None:
     train_path, test_path = generate_workload(
         tmp_path / "workload.jsonl",
-        samples_per_cell=2,
-        query_kinds=(QueryKind.DIRECTION, QueryKind.COUNT),
-        answer_modes=(AnswerMode.SINGLE,),
-        semantic_shapes=(SemanticShape.UNIQUE,),
-        menu_coverages=(MenuCoverage.FULL,),
-        trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
-        state_modes=(StateMode.DELTA,),
-        test_split=0.25,
-        seed=1713,
+        WorkloadSpec(
+            samples_per_cell=2,
+            query_kinds=(QueryKind.DIRECTION, QueryKind.COUNT),
+            answer_modes=(AnswerMode.SINGLE,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            menu_coverages=(MenuCoverage.FULL,),
+            trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
+            state_modes=(StateMode.DELTA,),
+            test_split=0.25,
+            seed=1713,
+        ),
     )
 
     rows = [
@@ -426,19 +428,26 @@ def test_cli_rejects_unknown_policy_dimensions(tmp_path) -> None:
     assert "unknown query kinds: teleport" in result.output
 
 
+def test_workload_spec_rejects_empty_dimensions() -> None:
+    with pytest.raises(ValueError, match="empty workload dimensions: query kind"):
+        WorkloadSpec(query_kinds=())
+
+
 def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:
     train_path, _ = generate_workload(
         tmp_path / "directions.jsonl",
-        samples_per_cell=1,
-        query_kinds=(QueryKind.WHICH,),
-        answer_modes=(AnswerMode.SINGLE,),
-        semantic_shapes=(SemanticShape.UNIQUE,),
-        menu_coverages=(MenuCoverage.FULL,),
-        trace_formats=(TraceFormat.NATURAL,),
-        state_modes=(StateMode.DELTA,),
-        query_directions=(Direction.NORTH, Direction.SOUTHWEST),
-        test_split=0,
-        seed=1715,
+        WorkloadSpec(
+            samples_per_cell=1,
+            query_kinds=(QueryKind.WHICH,),
+            answer_modes=(AnswerMode.SINGLE,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            menu_coverages=(MenuCoverage.FULL,),
+            trace_formats=(TraceFormat.NATURAL,),
+            state_modes=(StateMode.DELTA,),
+            query_directions=(Direction.NORTH, Direction.SOUTHWEST),
+            test_split=0,
+            seed=1715,
+        ),
     )
 
     rows = [json.loads(line) for line in train_path.read_text().splitlines()]
@@ -451,16 +460,18 @@ def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:
 def test_workload_can_balance_direction_answers(tmp_path) -> None:
     train_path, _ = generate_workload(
         tmp_path / "answers.jsonl",
-        samples_per_cell=1,
-        query_kinds=(QueryKind.DIRECTION,),
-        answer_modes=(AnswerMode.SINGLE,),
-        semantic_shapes=(SemanticShape.UNIQUE,),
-        menu_coverages=(MenuCoverage.FULL,),
-        trace_formats=(TraceFormat.NATURAL,),
-        state_modes=(StateMode.DELTA,),
-        target_directions=(Direction.EAST, Direction.NORTHWEST),
-        test_split=0,
-        seed=1741,
+        WorkloadSpec(
+            samples_per_cell=1,
+            query_kinds=(QueryKind.DIRECTION,),
+            answer_modes=(AnswerMode.SINGLE,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            menu_coverages=(MenuCoverage.FULL,),
+            trace_formats=(TraceFormat.NATURAL,),
+            state_modes=(StateMode.DELTA,),
+            target_directions=(Direction.EAST, Direction.NORTHWEST),
+            test_split=0,
+            seed=1741,
+        ),
     )
 
     rows = [json.loads(line) for line in train_path.read_text().splitlines()]

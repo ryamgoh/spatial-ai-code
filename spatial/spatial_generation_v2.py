@@ -106,6 +106,13 @@ class MenuCoverage(str, Enum):
     ZERO = "zero"
 
 
+def _validate_depth_range(name: str, minimum: int, maximum: int | None) -> None:
+    if minimum < 1:
+        raise ValueError(f"min_{name}_depth must be positive")
+    if maximum is not None and maximum < minimum:
+        raise ValueError(f"max_{name}_depth cannot be below min_{name}_depth")
+
+
 @dataclass(frozen=True)
 class GenerationPolicy:
     """Dataset policy; none of these controls belong to the solver."""
@@ -131,6 +138,12 @@ class GenerationPolicy:
     distractor_premises: int = 0
 
     def __post_init__(self) -> None:
+        self._normalize_enums()
+        self._validate_size()
+        self._validate_answer_contract()
+        self._validate_difficulty()
+
+    def _normalize_enums(self) -> None:
         object.__setattr__(self, "query_kind", QueryKind(self.query_kind))
         object.__setattr__(self, "answer_mode", AnswerMode(self.answer_mode))
         object.__setattr__(self, "semantic_shape", SemanticShape(self.semantic_shape))
@@ -143,6 +156,8 @@ class GenerationPolicy:
             object.__setattr__(
                 self, "target_direction", Direction(self.target_direction)
             )
+
+    def _validate_size(self) -> None:
         if not 2 <= self.num_entities <= len(ENTITY_NAMES):
             raise ValueError(f"num_entities must be between 2 and {len(ENTITY_NAMES)}")
         maximum_pairs = self.num_entities * (self.num_entities - 1) // 2
@@ -152,6 +167,8 @@ class GenerationPolicy:
             )
         if not 1 <= self.ordinary_option_target <= len(ascii_uppercase) - 1:
             raise ValueError("ordinary_option_target must be between 1 and 25")
+
+    def _validate_answer_contract(self) -> None:
         if self.query_kind is QueryKind.DIRECTION and self.query_direction is not None:
             raise ValueError("query_direction applies only to Which and Count queries")
         if (
@@ -174,24 +191,30 @@ class GenerationPolicy:
             QueryKind.COUNT,
         }:
             raise ValueError("no-match is only realizable for Which queries")
-        if self.min_axis_depth < 1:
-            raise ValueError("min_axis_depth must be positive")
-        if (
-            self.max_axis_depth is not None
-            and self.max_axis_depth < self.min_axis_depth
-        ):
-            raise ValueError("max_axis_depth cannot be below min_axis_depth")
-        if self.query_kind is not QueryKind.DIRECTION and (
-            self.min_axis_depth > 1 or self.max_axis_depth is not None
-        ):
+
+    def _validate_difficulty(self) -> None:
+        _validate_depth_range("axis", self.min_axis_depth, self.max_axis_depth)
+        _validate_depth_range(
+            "membership",
+            self.min_membership_depth,
+            self.max_membership_depth,
+        )
+        axis_controlled = self.min_axis_depth > 1 or self.max_axis_depth is not None
+        membership_controlled = (
+            self.min_membership_depth > 1 or self.max_membership_depth is not None
+        )
+        if self.query_kind is not QueryKind.DIRECTION and axis_controlled:
             raise ValueError("axis depth controls apply only to Direction queries")
         if (
             self.omit_direct_query_relation
-            or self.min_axis_depth > 1
-            or self.max_axis_depth is not None
+            or axis_controlled
+            or membership_controlled
             or self.require_independent_axes
-        ) and (self.semantic_shape is not SemanticShape.UNIQUE):
+            or self.distractor_premises
+        ) and self.semantic_shape is not SemanticShape.UNIQUE:
             raise ValueError("proof controls require unique semantics")
+        if self.query_kind is QueryKind.DIRECTION and membership_controlled:
+            raise ValueError("membership depth controls apply only to Which or Count")
         if self.require_independent_axes:
             relevant_depth = (
                 self.min_axis_depth
@@ -200,43 +223,25 @@ class GenerationPolicy:
             )
             if relevant_depth < 2:
                 raise ValueError("independent axes require a proof depth of at least 2")
+        self._validate_ambiguity_control()
+        self._validate_distractor_control()
+        if self.omit_direct_query_relation and self.num_entities < 3:
+            raise ValueError(
+                "omitting the direct query relation requires three entities"
+            )
+
+    def _validate_ambiguity_control(self) -> None:
         if self.ambiguity_size is not None:
             if self.ambiguity_size < 2:
                 raise ValueError("ambiguity_size must be at least 2")
             if self.semantic_shape is not SemanticShape.AMBIGUOUS:
                 raise ValueError("ambiguity_size requires ambiguous semantics")
-        if self.min_membership_depth < 1:
-            raise ValueError("min_membership_depth must be positive")
-        if (
-            self.max_membership_depth is not None
-            and self.max_membership_depth < self.min_membership_depth
-        ):
-            raise ValueError(
-                "max_membership_depth cannot be below min_membership_depth"
-            )
-        if (
-            self.min_membership_depth > 1 or self.max_membership_depth is not None
-        ) and (
-            self.query_kind is QueryKind.DIRECTION
-            or self.semantic_shape is not SemanticShape.UNIQUE
-        ):
-            raise ValueError(
-                "membership depth controls require unique Which or Count semantics"
-            )
-        if self.query_kind is QueryKind.DIRECTION and (
-            self.min_membership_depth > 1 or self.max_membership_depth is not None
-        ):
-            raise ValueError("membership depth controls apply only to Which or Count")
+
+    def _validate_distractor_control(self) -> None:
         if not 0 <= self.distractor_premises <= self.num_premises:
             raise ValueError("distractor_premises must be within the premise count")
-        if self.distractor_premises and self.semantic_shape is not SemanticShape.UNIQUE:
-            raise ValueError("distractor controls require unique semantics")
         if self.distractor_premises and self.query_kind is not QueryKind.DIRECTION:
             raise ValueError("distractor controls currently require a Direction proof")
-        if self.omit_direct_query_relation and self.num_entities < 3:
-            raise ValueError(
-                "omitting the direct query relation requires three entities"
-            )
 
 
 def _answer_values(analysis: QueryAnalysis) -> tuple[Direction | str | int, ...]:
@@ -281,6 +286,27 @@ def _has_direct_membership_fact(problem: SpatialProblem) -> bool:
             if allowed <= query.directions:
                 return True
     return False
+
+
+def _render_trace(
+    problem: SpatialProblem,
+    explanation: QueryExplanation,
+    resolution: AnswerResolution,
+    menu_answer: MenuAnswer,
+    policy: GenerationPolicy,
+) -> str:
+    reasoning = render_training_trace(
+        problem,
+        explanation,
+        policy.trace_format,
+        policy.state_mode,
+    )
+    decision = _render_answer_decision(
+        resolution,
+        menu_answer,
+        policy.trace_format,
+    )
+    return f"{reasoning}\n{decision}"
 
 
 @dataclass(frozen=True)
@@ -362,21 +388,6 @@ class GeneratedSpatialSample:
                 "oracle_letters": sorted(self.menu_answer.letters),
                 "solver_engine": self.analysis.engine,
                 "round_trip_verified": True,
-                "difficulty_policy": {
-                    "omit_direct_query_relation": self.policy.omit_direct_query_relation,
-                    "target_direction": (
-                        self.policy.target_direction.value
-                        if self.policy.target_direction is not None
-                        else None
-                    ),
-                    "min_axis_depth": self.policy.min_axis_depth,
-                    "max_axis_depth": self.policy.max_axis_depth,
-                    "require_independent_axes": self.policy.require_independent_axes,
-                    "ambiguity_size": self.policy.ambiguity_size,
-                    "min_membership_depth": self.policy.min_membership_depth,
-                    "max_membership_depth": self.policy.max_membership_depth,
-                    "distractor_premises": self.policy.distractor_premises,
-                },
                 "difficulty": self.difficulty,
             },
         }
@@ -397,16 +408,12 @@ class GeneratedSpatialSample:
             trace_format=trace_format,
             state_mode=state_mode,
         )
-        trace = render_training_trace(
+        trace = _render_trace(
             self.problem,
             self.explanation,
-            trace_format,
-            state_mode,
-        )
-        trace += "\n" + _render_answer_decision(
             self.resolution,
             self.menu_answer,
-            trace_format,
+            policy,
         )
         return replace(self, policy=policy, trace=trace)
 
@@ -498,38 +505,45 @@ def _difficulty_matches(
     policy: GenerationPolicy,
     difficulty: dict[str, Any],
 ) -> bool:
-    if policy.omit_direct_query_relation and difficulty["direct_query_relation"]:
-        return False
-    if policy.require_independent_axes and not difficulty["axes_independent"]:
-        return False
     if (
-        policy.ambiguity_size is not None
-        and difficulty["possibility_count"] != policy.ambiguity_size
-    ):
-        return False
-    if (
-        policy.distractor_premises
-        and difficulty["num_distractor_premises"] != policy.distractor_premises
+        (policy.omit_direct_query_relation and difficulty["direct_query_relation"])
+        or (policy.require_independent_axes and not difficulty["axes_independent"])
+        or (
+            policy.ambiguity_size is not None
+            and difficulty["possibility_count"] != policy.ambiguity_size
+        )
+        or (
+            policy.distractor_premises
+            and difficulty["num_distractor_premises"] != policy.distractor_premises
+        )
     ):
         return False
     if policy.min_membership_depth > 1 or policy.max_membership_depth is not None:
         proofs = difficulty["membership_proofs"]
-        if not proofs:
-            return False
         depths = [proof[axis] for proof in proofs for axis in ("x_depth", "y_depth")]
-        if any(depth < policy.min_membership_depth for depth in depths):
-            return False
-        if policy.max_membership_depth is not None and any(
-            depth > policy.max_membership_depth for depth in depths
+        if not _depths_match(
+            depths,
+            policy.min_membership_depth,
+            policy.max_membership_depth,
         ):
             return False
     if policy.min_axis_depth == 1 and policy.max_axis_depth is None:
         return True
-    depths = (difficulty["x_depth"], difficulty["y_depth"])
-    if any(depth is None or depth < policy.min_axis_depth for depth in depths):
-        return False
-    return policy.max_axis_depth is None or all(
-        depth <= policy.max_axis_depth for depth in depths
+    return _depths_match(
+        (difficulty["x_depth"], difficulty["y_depth"]),
+        policy.min_axis_depth,
+        policy.max_axis_depth,
+    )
+
+
+def _depths_match(
+    depths: list[int] | tuple[int | None, ...],
+    minimum: int,
+    maximum: int | None,
+) -> bool:
+    return bool(depths) and all(
+        depth is not None and depth >= minimum and (maximum is None or depth <= maximum)
+        for depth in depths
     )
 
 
@@ -599,16 +613,12 @@ class SpatialGeneratorV2:
 
         prompt = self._prompt(problem, options, policy.answer_mode)
         self._verify_round_trip(problem, options, prompt, policy, menu_answer)
-        trace = render_training_trace(
+        trace = _render_trace(
             problem,
             explanation,
-            policy.trace_format,
-            policy.state_mode,
-        )
-        trace += "\n" + _render_answer_decision(
             resolution,
             menu_answer,
-            policy.trace_format,
+            policy,
         )
         return GeneratedSpatialSample(
             problem,

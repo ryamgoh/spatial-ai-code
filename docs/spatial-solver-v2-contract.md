@@ -589,6 +589,6 @@ unit, preventing the same problem from appearing in both train and test.
 Every CLI run also writes a `*_manifest.json`. The manifest validates unique
 row IDs, verified round trips, complete trace-variant groups, one base ID per
 prompt, and the absence of base-ID or prompt leakage across splits. It reports
-row distributions, base-problem distributions, split distributions, and
-base-level difficulty histograms. Base-level reporting prevents paired trace
-variants from double-counting the underlying problem distribution.
+trace-variant distributions, overall and per-split base-problem distributions,
+and base-level difficulty histograms. Base-level reporting prevents paired
+trace variants from double-counting the underlying problem distribution.

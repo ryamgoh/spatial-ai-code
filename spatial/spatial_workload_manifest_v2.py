@@ -28,16 +28,26 @@ def _difficulty_distribution(
     return dict(sorted(counts.items()))
 
 
+def _distributions(
+    rows: Sequence[Mapping[str, Any]],
+    fields: Iterable[str],
+    *,
+    difficulty: bool = False,
+) -> dict[str, dict[str, int]]:
+    if not rows:
+        return {}
+    summarize = _difficulty_distribution if difficulty else _distribution
+    distributions = {field: summarize(rows, field) for field in fields}
+    empty = {"none": len(rows)}
+    return {field: counts for field, counts in distributions.items() if counts != empty}
+
+
 def _user_prompt(row: Mapping[str, Any]) -> str:
     return next(
         str(message["content"])
         for message in row["messages"]
         if message.get("role") == "user"
     )
-
-
-def _variant(value: tuple[Any, Any]) -> tuple[str, str]:
-    return _value(value[0]), _value(value[1])
 
 
 def build_workload_manifest(
@@ -82,7 +92,7 @@ def build_workload_manifest(
         raise ValueError("duplicate prompts belong to different base IDs")
 
     expected = (
-        {_variant(value) for value in expected_trace_variants}
+        {(_value(first), _value(second)) for first, second in expected_trace_variants}
         if expected_trace_variants is not None
         else None
     )
@@ -97,17 +107,16 @@ def build_workload_manifest(
                 "incomplete trace variants for base IDs: " + ", ".join(incomplete)
             )
 
-    distribution_fields = (
+    base_distribution_fields = (
         "query_kind",
         "query_direction",
         "target_direction",
         "answer_mode",
         "semantic_shape",
         "menu_coverage",
-        "trace_format",
-        "state_mode",
         "menu_status",
     )
+    trace_distribution_fields = ("trace_format", "state_mode")
     difficulty_fields = (
         "possibility_count",
         "direct_query_relation",
@@ -121,10 +130,11 @@ def build_workload_manifest(
         "num_distractor_premises",
     )
     base_rows = tuple(rows_by_base.values())
-    base_distribution_fields = tuple(
-        field
-        for field in distribution_fields
-        if field not in {"trace_format", "state_mode"}
+    train_base_rows = tuple(
+        row for base_id, row in rows_by_base.items() if base_id in train_base_ids
+    )
+    test_base_rows = tuple(
+        row for base_id, row in rows_by_base.items() if base_id in test_base_ids
     )
     return {
         "schema": "spatial-v2-workload-manifest",
@@ -135,33 +145,15 @@ def build_workload_manifest(
             "train": len(train_base_ids),
             "test": len(test_base_ids),
         },
-        "distributions": {
-            field: _distribution(rows, field) for field in distribution_fields
+        "trace_distributions": _distributions(rows, trace_distribution_fields),
+        "base_distributions": _distributions(base_rows, base_distribution_fields),
+        "split_base_distributions": {
+            "train": _distributions(train_base_rows, base_distribution_fields),
+            "test": _distributions(test_base_rows, base_distribution_fields),
         },
-        "base_distributions": {
-            field: _distribution(base_rows, field) for field in base_distribution_fields
-        },
-        "split_distributions": {
-            "train": {
-                field: _distribution(train_rows, field) for field in distribution_fields
-            },
-            "test": {
-                field: _distribution(test_rows, field) for field in distribution_fields
-            },
-        },
-        "difficulty": {
-            field: _difficulty_distribution(base_rows, field)
-            for field in difficulty_fields
-        },
+        "difficulty": _distributions(base_rows, difficulty_fields, difficulty=True),
         "trace_variants_per_base": dict(
             sorted(Counter(len(value) for value in variants_by_base.values()).items())
         ),
-        "validation": {
-            "status": "passed",
-            "duplicate_row_ids": 0,
-            "cross_split_base_ids": 0,
-            "cross_split_prompts": 0,
-            "duplicate_prompt_base_ids": 0,
-            "incomplete_trace_variant_groups": 0,
-        },
+        "validation": {"status": "passed"},
     }

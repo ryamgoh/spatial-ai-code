@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 import pytest
-from generate_all_v2 import generate_workload
+from generate_all_v2 import WorkloadSpec, generate_workload
 from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import QueryKind, SemanticShape
 from spatial_grading_v2 import AnswerMode
@@ -64,7 +64,7 @@ def test_manifest_reports_distributions_and_paired_variants() -> None:
     assert manifest["total_rows"] == 4
     assert manifest["base_problems"] == 2
     assert manifest["splits"] == {"train": 2, "test": 2}
-    assert manifest["distributions"]["trace_format"] == {
+    assert manifest["trace_distributions"]["trace_format"] == {
         "natural": 2,
         "symbolic": 2,
     }
@@ -84,14 +84,16 @@ def test_manifest_rejects_cross_split_base_or_prompt_leakage() -> None:
 def test_generator_writes_a_valid_manifest_next_to_splits(tmp_path) -> None:
     train_path, test_path = generate_workload(
         tmp_path / "manifested.jsonl",
-        samples_per_cell=2,
-        query_kinds=(QueryKind.DIRECTION,),
-        answer_modes=(AnswerMode.SINGLE,),
-        semantic_shapes=(SemanticShape.UNIQUE,),
-        trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
-        state_modes=(StateMode.DELTA,),
-        test_split=0.5,
-        seed=1737,
+        WorkloadSpec(
+            samples_per_cell=2,
+            query_kinds=(QueryKind.DIRECTION,),
+            answer_modes=(AnswerMode.SINGLE,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
+            state_modes=(StateMode.DELTA,),
+            test_split=0.5,
+            seed=1737,
+        ),
     )
 
     manifest_path = tmp_path / "manifested_manifest.json"
@@ -106,19 +108,21 @@ def test_generator_writes_a_valid_manifest_next_to_splits(tmp_path) -> None:
 def test_workload_forwards_proof_controls_into_manifest(tmp_path) -> None:
     generate_workload(
         tmp_path / "controlled.jsonl",
-        samples_per_cell=1,
-        query_kinds=(QueryKind.DIRECTION,),
-        answer_modes=(AnswerMode.SINGLE,),
-        semantic_shapes=(SemanticShape.UNIQUE,),
-        trace_formats=(TraceFormat.SYMBOLIC,),
-        state_modes=(StateMode.DELTA,),
-        num_entities=7,
-        num_premises=8,
-        omit_direct_query_relation=True,
-        min_axis_depth=2,
-        max_axis_depth=4,
-        test_split=0,
-        seed=1721,
+        WorkloadSpec(
+            samples_per_cell=1,
+            query_kinds=(QueryKind.DIRECTION,),
+            answer_modes=(AnswerMode.SINGLE,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            trace_formats=(TraceFormat.SYMBOLIC,),
+            state_modes=(StateMode.DELTA,),
+            num_entities=7,
+            num_premises=8,
+            omit_direct_query_relation=True,
+            min_axis_depth=2,
+            max_axis_depth=4,
+            test_split=0,
+            seed=1721,
+        ),
     )
 
     manifest = json.loads((tmp_path / "controlled_manifest.json").read_text())

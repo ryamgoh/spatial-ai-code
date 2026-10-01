@@ -69,6 +69,8 @@ This writes `data/spatial_v2_train.jsonl`, `data/spatial_v2_test.jsonl`, and
 `data/spatial_v2_manifest.json`. Natural/Symbolic variants of one base problem
 stay in the same split. Coordinate-bearing audit metadata is excluded by
 default. `--include-audit` is for diagnostic artifacts, not training data.
+Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
+duplicating the CLI's individual settings.
 
 For a transitive Direction workload, use a single compatible policy cell:
 
