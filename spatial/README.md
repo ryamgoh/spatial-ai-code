@@ -78,6 +78,7 @@ Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
 duplicating the CLI's individual settings.
 The manifest includes generation acceptance rate and rejection reasons so
 expensive policy cells are visible before scaling the workload.
+The workload CLI also fails on existing outputs unless `--replace` is passed.
 
 For a heterogeneous ablation, use the checked-in matrix example:
 
@@ -87,7 +88,9 @@ For a heterogeneous ablation, use the checked-in matrix example:
       --out data/spatial_v2_ablation.jsonl
 
 See `docs/spatial-v2-matrix.md` for the matrix contract and exact row-count
-semantics.
+semantics. Matrix runs also create `*_views/by_variant` and `*_views/by_cell`
+train/test pairs that can be passed directly to trainers and evaluators.
+Existing matrix outputs are preserved unless `--replace` is explicitly passed.
 
 For a transitive Direction workload, use a single compatible policy cell:
 

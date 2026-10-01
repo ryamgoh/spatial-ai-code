@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 import pytest
 from generate_all_v2 import WorkloadSpec, app, generate_workload
@@ -578,6 +579,24 @@ def test_cli_rejects_unknown_policy_dimensions(tmp_path) -> None:
 def test_workload_spec_rejects_empty_dimensions() -> None:
     with pytest.raises(ValueError, match="empty workload dimensions: query kind"):
         WorkloadSpec(query_kinds=())
+
+
+def test_workload_requires_explicit_replace_for_existing_outputs(tmp_path) -> None:
+    output = tmp_path / "replace.jsonl"
+    spec = WorkloadSpec(
+        samples_per_cell=1,
+        query_kinds=(QueryKind.DIRECTION,),
+        semantic_shapes=(SemanticShape.UNIQUE,),
+        trace_formats=(TraceFormat.NATURAL,),
+        target_directions=(Direction.NORTH,),
+        test_split=0,
+    )
+    generate_workload(output, spec)
+
+    with pytest.raises(FileExistsError, match="use replace"):
+        generate_workload(output, spec)
+
+    generate_workload(output, replace(spec, replace=True))
 
 
 def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:

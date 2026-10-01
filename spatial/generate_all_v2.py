@@ -19,7 +19,12 @@ from spatial_generation_v2 import (
 )
 from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
-from spatial_workload_manifest_v2 import workload_output_paths, write_workload
+from spatial_workload_manifest_v2 import (
+    check_output_paths,
+    remove_output_paths,
+    workload_output_paths,
+    write_workload,
+)
 
 app = typer.Typer(add_completion=False)
 EnumType = TypeVar("EnumType", bound=Enum)
@@ -53,6 +58,7 @@ class WorkloadSpec:
     test_split: float = 0.2
     seed: int = 42
     include_audit: bool = False
+    replace: bool = False
 
     def __post_init__(self) -> None:
         if self.samples_per_cell < 0:
@@ -111,6 +117,8 @@ def generate_workload(
     spec: WorkloadSpec,
 ) -> tuple[Path, Path]:
     """Generate each requested policy cell equally, then shuffle and split."""
+    output_paths = workload_output_paths(output_file)
+    check_output_paths(output_paths, replace=spec.replace)
     generator = SpatialGeneratorV2(seed=spec.seed)
     row_groups: list[list[dict]] = []
     for dimensions in product(
@@ -177,6 +185,8 @@ def generate_workload(
                     ]
                 )
 
+    if spec.replace:
+        remove_output_paths(output_paths)
     train_path, test_path, _manifest_path = write_workload(
         output_file,
         row_groups,
@@ -223,6 +233,9 @@ def main(
         False,
         help="Include coordinate-bearing audit metadata. Never enable for SFT data.",
     ),
+    replace: bool = typer.Option(
+        False, help="Replace this workload's existing outputs."
+    ),
 ) -> None:
     """Write balanced train/test workloads over the requested policy cells."""
     try:
@@ -260,6 +273,7 @@ def main(
                 test_split=test_split,
                 seed=seed,
                 include_audit=include_audit,
+                replace=replace,
             ),
         )
     except (RuntimeError, ValueError) as exc:

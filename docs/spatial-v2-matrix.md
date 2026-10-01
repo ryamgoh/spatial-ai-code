@@ -13,7 +13,29 @@ uv run --python 3.12 --no-project --with typer --with pyyaml --with z3-solver \
   --out data/spatial_v2_ablation.jsonl
 ```
 
-This writes `_train.jsonl`, `_test.jsonl`, and `_manifest.json` artifacts.
+Generation fails if any master output or view directory already exists. Pass
+`--replace` to explicitly replace only the files and view directory derived
+from that output base path.
+
+This writes master `_train.jsonl`, `_test.jsonl`, and `_manifest.json`
+artifacts, plus directly usable views:
+
+```text
+spatial_v2_ablation_views/
+├── by_variant/
+│   ├── single__natural__delta_train.jsonl
+│   ├── single__natural__delta_test.jsonl
+│   ├── complete__symbolic__delta_train.jsonl
+│   └── complete__symbolic__delta_test.jsonl
+└── by_cell/
+    └── direction-depth-2/
+        ├── single__natural__delta_train.jsonl
+        └── single__natural__delta_test.jsonl
+```
+
+Use `by_variant` to train one representation over the selected problem mix.
+Use `by_cell` for an exact depth, question-family, or semantic-condition run.
+No filtering script is required.
 
 ## Contract
 
@@ -68,7 +90,8 @@ for ambiguous cells. This permits one matrix to compare:
 Every answer variant is crossed with every selected trace variant on the same
 `base_id`. The complete group remains in one train/test split. The manifest
 checks the requested Cartesian product and reports exact generated counts per
-cell.
+cell. It also records every materialized view's paths and row counts, together
+with fingerprints of the shared train and test base-ID sets.
 
 Unknown fields, duplicate names, incompatible policies, incomplete variant
 groups, duplicate rows, and cross-split leakage are errors. They are never

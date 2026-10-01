@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import shutil
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from enum import Enum
@@ -62,6 +63,26 @@ def workload_output_paths(output_file: str | Path) -> tuple[Path, Path, Path]:
         base.with_name(base.name + "_test").with_suffix(suffix),
         base.with_name(base.name + "_manifest").with_suffix(".json"),
     )
+
+
+def check_output_paths(paths: Iterable[Path], *, replace: bool) -> None:
+    """Fail on existing generated outputs unless replacement is authorized."""
+    paths = tuple(paths)
+    existing = [path for path in paths if path.exists() or path.is_symlink()]
+    if existing and not replace:
+        rendered = ", ".join(str(path) for path in existing)
+        raise FileExistsError(f"output already exists: {rendered}; use replace")
+
+
+def remove_output_paths(paths: Iterable[Path]) -> None:
+    """Remove only exact output paths after replacement has been authorized."""
+    for path in paths:
+        if not path.exists() and not path.is_symlink():
+            continue
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
 
 
 def build_workload_manifest(

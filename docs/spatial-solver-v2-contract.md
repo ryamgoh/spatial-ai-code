@@ -618,3 +618,9 @@ The matrix runner records the requested and generated base count for every
 cell. It passes each expected answer/trace Cartesian product to the workload
 validator, keeps the entire `base_id` group in one split, and stores the parsed
 matrix in the combined manifest for reproducibility.
+
+After validating the master train/test pair, the runner materializes two sets
+of trainer-ready views: an aggregate view per answer/trace variant and a finer
+view per matrix cell and answer/trace variant. All views inherit the master
+base-ID split. Their paths, row counts, and split fingerprints are recorded in
+the manifest.

@@ -144,13 +144,29 @@ def test_matrix_parser_rejects_unknown_cell_answer_variant(tmp_path) -> None:
         load_experiment_matrix(path)
 
 
+def test_matrix_names_cannot_escape_the_output_directory(tmp_path) -> None:
+    path = tmp_path / "unsafe-name.yaml"
+    path.write_text(MATRIX_YAML.replace("direction-depth-2", "../escape"))
+
+    with pytest.raises(ValueError, match="cell name must start"):
+        load_experiment_matrix(path)
+
+
 def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
     matrix_path = tmp_path / "matrix.yaml"
     matrix_path.write_text(MATRIX_YAML)
+    stale = tmp_path / "pilot_views" / "by_variant" / "stale_train.jsonl"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("stale\n")
+
+    with pytest.raises(FileExistsError, match="use replace"):
+        generate_matrix(matrix_path, tmp_path / "pilot.jsonl")
+    assert stale.exists()
 
     train_path, test_path, manifest_path = generate_matrix(
         matrix_path,
         tmp_path / "pilot.jsonl",
+        replace=True,
     )
 
     rows = [
@@ -178,12 +194,38 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
     assert manifest["matrix"]["requested_base_problems"] == 4
     assert manifest["matrix"]["generated_rows"] == 24
     assert manifest["matrix"]["cells"] == {"direction-depth-2": 4}
+    assert not stale.exists()
     assert manifest["base_distributions"]["matrix_cell"] == {"direction-depth-2": 4}
     assert manifest["answer_distributions"]["matrix_answer_variant"] == {
         "complete": 8,
         "single": 8,
         "visible": 8,
     }
+    views = manifest["views"]
+    assert views["split_fingerprint"]["train"] != views["split_fingerprint"]["test"]
+    variant = views["by_variant"]["single__natural__delta"]
+    assert variant["train_rows"] == 3
+    assert variant["test_rows"] == 1
+    assert (tmp_path / variant["train"]).exists()
+    assert (tmp_path / variant["test"]).exists()
+    variant_rows = [
+        json.loads(line)
+        for split in ("train", "test")
+        for line in (tmp_path / variant[split]).read_text().splitlines()
+    ]
+    assert {
+        (
+            row["metadata"]["matrix_answer_variant"],
+            row["metadata"]["trace_format"],
+            row["metadata"]["state_mode"],
+        )
+        for row in variant_rows
+    } == {("single", "natural", "delta")}
+    cell_variant = views["by_cell"]["direction-depth-2"]["single__natural__delta"]
+    assert cell_variant["train_rows"] == 3
+    assert cell_variant["test_rows"] == 1
+    assert (tmp_path / cell_variant["train"]).exists()
+    assert (tmp_path / cell_variant["test"]).exists()
 
 
 def test_matrix_cli_writes_all_artifacts(tmp_path) -> None:

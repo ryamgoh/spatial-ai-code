@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+import re
 from dataclasses import asdict, dataclass
 from enum import Enum
 from itertools import product
@@ -19,7 +22,12 @@ from spatial_generation_v2 import (
 )
 from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
-from spatial_workload_manifest_v2 import write_workload
+from spatial_workload_manifest_v2 import (
+    check_output_paths,
+    remove_output_paths,
+    workload_output_paths,
+    write_workload,
+)
 
 EnumValue = TypeVar("EnumValue")
 _ROOT_KEYS = {
@@ -49,6 +57,7 @@ _CELL_KEYS = {
     "answer_variants",
 }
 _DEFAULT_KEYS = _CELL_KEYS - {"name", "count", "query_kind", "semantic_shape"}
+_SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 @dataclass(frozen=True)
@@ -137,6 +146,16 @@ def _directions(value: Any, field: str) -> tuple[Direction, ...] | None:
     return tuple(_enum(item, Direction, field) for item in _sequence(value, field))
 
 
+def _name(value: Any, field: str) -> str:
+    name = str(value or "").strip()
+    if not _SAFE_NAME.fullmatch(name):
+        raise ValueError(
+            f"{field} must start with an alphanumeric character and contain only "
+            "letters, numbers, dots, underscores, or hyphens"
+        )
+    return name
+
+
 def _answer_variants(raw: dict[str, Any]) -> tuple[AnswerVariant, ...]:
     items = _sequence(raw.get("answers"), "variants.answers")
     variants = []
@@ -151,7 +170,10 @@ def _answer_variants(raw: dict[str, Any]) -> tuple[AnswerVariant, ...]:
         coverage = _enum(
             item.get("menu_coverage", "full"), MenuCoverage, "menu coverage"
         )
-        name = str(item.get("name") or f"{mode.value}:{coverage.value}")
+        name = _name(
+            item.get("name") or f"{mode.value}-{coverage.value}",
+            "answer variant name",
+        )
         variants.append(AnswerVariant(name, mode, coverage))
     if len({variant.name for variant in variants}) != len(variants):
         raise ValueError("duplicate answer variant names")
@@ -188,9 +210,7 @@ def _cell(raw: dict[str, Any], defaults: dict[str, Any]) -> MatrixCell:
     if unknown:
         raise ValueError("unknown cell keys: " + ", ".join(sorted(unknown)))
     values = {**defaults, **raw}
-    name = str(values.get("name", "")).strip()
-    if not name:
-        raise ValueError("cell name is required")
+    name = _name(values.get("name"), "cell name")
     count = int(values.get("count", 0))
     if count <= 0:
         raise ValueError(f"cell {name} count must be positive")
@@ -386,9 +406,13 @@ def _validate_matrix_cells(matrix: ExperimentMatrix) -> None:
 def generate_matrix(
     matrix_path: str | Path,
     output_file: str | Path,
+    *,
+    replace: bool = False,
 ) -> tuple[Path, Path, Path]:
     """Generate all requested matrix cells and their paired variants."""
     matrix = load_experiment_matrix(matrix_path)
+    output_paths = (*workload_output_paths(output_file), _view_root(output_file))
+    check_output_paths(output_paths, replace=replace)
     generator = SpatialGeneratorV2(matrix.seed)
     row_groups: list[list[dict]] = []
     cell_counts: dict[str, int] = {}
@@ -456,7 +480,9 @@ def generate_matrix(
             "cells": cell_counts,
         }
     )
-    return write_workload(
+    if replace:
+        remove_output_paths(output_paths)
+    paths = write_workload(
         output_file,
         row_groups,
         test_split=matrix.test_split,
@@ -464,4 +490,100 @@ def generate_matrix(
         expected_trace_variants=trace_variants,
         expected_variants_by_base=expected_variants_by_base,
         manifest_metadata={"matrix": matrix_config},
+    )
+    _materialize_views(*paths, _view_root(output_file))
+    return paths
+
+
+def _view_root(output_file: str | Path) -> Path:
+    path = Path(output_file)
+    base = path.with_suffix("") if path.suffix else path
+    return base.with_name(base.name + "_views")
+
+
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
+def _write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def _variant_key(row: dict[str, Any]) -> str:
+    metadata = row["metadata"]
+    return "__".join(
+        (
+            metadata["matrix_answer_variant"],
+            metadata["trace_format"],
+            metadata["state_mode"],
+        )
+    )
+
+
+def _split_fingerprint(rows: list[dict[str, Any]]) -> str:
+    base_ids = "\n".join(sorted({row["metadata"]["base_id"] for row in rows}))
+    return hashlib.sha256(base_ids.encode()).hexdigest()
+
+
+def _materialize_views(
+    train_path: Path,
+    test_path: Path,
+    manifest_path: Path,
+    view_root: Path,
+) -> None:
+    splits = {"train": _read_jsonl(train_path), "test": _read_jsonl(test_path)}
+    by_variant: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    by_cell: dict[str, dict[str, dict[str, list[dict[str, Any]]]]] = {}
+    for split, rows in splits.items():
+        for row in rows:
+            variant = _variant_key(row)
+            cell = row["metadata"]["matrix_cell"]
+            by_variant.setdefault(variant, {"train": [], "test": []})[split].append(row)
+            by_cell.setdefault(cell, {}).setdefault(variant, {"train": [], "test": []})[
+                split
+            ].append(row)
+
+    def write_views(
+        directory: Path,
+        groups: dict[str, dict[str, list[dict[str, Any]]]],
+    ) -> dict[str, dict[str, Any]]:
+        outputs = {}
+        for name, rows_by_split in sorted(groups.items()):
+            paths = {
+                split: directory / f"{name}_{split}.jsonl"
+                for split in ("train", "test")
+            }
+            for split, path in paths.items():
+                _write_jsonl(path, rows_by_split[split])
+            outputs[name] = {
+                "train": str(paths["train"].relative_to(manifest_path.parent)),
+                "test": str(paths["test"].relative_to(manifest_path.parent)),
+                "train_rows": len(rows_by_split["train"]),
+                "test_rows": len(rows_by_split["test"]),
+            }
+        return outputs
+
+    views = {
+        "root": str(view_root.relative_to(manifest_path.parent)),
+        "split_fingerprint": {
+            split: _split_fingerprint(rows) for split, rows in splits.items()
+        },
+        "by_variant": write_views(view_root / "by_variant", by_variant),
+        "by_cell": {
+            cell: write_views(view_root / "by_cell" / cell, groups)
+            for cell, groups in sorted(by_cell.items())
+        },
+    }
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["views"] = views
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
