@@ -1,0 +1,76 @@
+version: 1
+seed: 1515
+test_split: 0.2
+include_audit: false
+
+defaults:
+  max_attempts_per_sample: 2000
+
+variants:
+  answers:
+    - name: single
+      mode: single
+      menu_coverage: full
+  traces:
+    - format: natural
+      state_mode: delta
+    - format: symbolic
+      state_mode: delta
+
+cells:
+  - name: direction-depth-2
+    count: 20
+    query_kind: direction
+    semantic_shape: unique
+    depth: 2
+    num_entities: 6
+    num_premises: 7
+    omit_direct_query_relation: true
+    distractor_premises: 5
+    target_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+
+  - name: which-depth-2
+    count: 20
+    query_kind: which
+    semantic_shape: unique
+    depth: 2
+    num_entities: 7
+    num_premises: 10
+    omit_direct_query_relation: true
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+
+  - name: count-depth-2
+    count: 20
+    query_kind: count
+    semantic_shape: unique
+    depth: 2
+    num_entities: 7
+    num_premises: 10
+    omit_direct_query_relation: true
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+
+  - name: direction-ambiguity-2
+    count: 10
+    query_kind: direction
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+
+  - name: which-ambiguity-2
+    count: 10
+    query_kind: which
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
+
+  - name: count-ambiguity-2
+    count: 10
+    query_kind: count
+    semantic_shape: ambiguous
+    ambiguity_size: 2
+    num_entities: 6
+    num_premises: 5
+    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]

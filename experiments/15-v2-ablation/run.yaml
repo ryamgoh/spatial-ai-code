@@ -1,0 +1,51 @@
+version: 1
+name: v2-trace-pilot
+matrix: matrix.yaml
+data_output: data/spatial_v2_pilot.jsonl
+base_model: Qwen/Qwen3.5-4B
+retention_task: spatial_eval_v6_spatialmap
+
+train:
+  template: templates/train.yaml
+  overrides:
+    learning_rate: 0.00005
+    num_epochs: 2
+
+eval:
+  template: templates/eval.yaml
+  task_template: templates/task.yaml
+  overrides:
+    model_args:
+      max_thinking_tokens: 2048
+
+arms:
+  - name: single-natural
+    view: single__natural__delta
+  - name: single-symbolic
+    view: single__symbolic__delta
+
+resources:
+  generate:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 8
+    memory: 64G
+    time: "03:00:00"
+  train:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 16
+    memory: 128G
+    time: "03:00:00"
+  eval:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 16
+    memory: 128G
+    time: "03:00:00"
+  summarize:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 4
+    memory: 16G
+    time: "00:30:00"

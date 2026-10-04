@@ -4,6 +4,13 @@ The local development machine does not have Slurm. These scripts are validated
 locally and submitted only after the repository is available on the Slurm
 server. A local `sbatch: command not found` error is therefore expected.
 
+Experiment 15 also provides a Python dependency submitter. Its `--dry-run`
+mode is local-safe; normal submission must run from the repository root on the
+Slurm login server:
+
+    uv run --no-project --with typer --with pyyaml python experiments/15-v2-ablation/submit.py --dry-run
+    uv run --no-project --with typer --with pyyaml python experiments/15-v2-ablation/submit.py
+
 Submit experiment launchers directly from the repository root with:
 
     sbatch experiments/<experiment>/slurm/<launcher>.sh

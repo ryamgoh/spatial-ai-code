@@ -1,0 +1,17 @@
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  lora_path: null
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 8192
+  choices: []
+include_path: null
+tasks: []
+apply_chat_template: true
+system_instruction: "Solve the spatial reasoning problem from the stated relations. Follow the question's answer contract and end with Answer: followed by the exact option letter set."
+batch_size: 4
+device: cuda:0
+log_samples: true

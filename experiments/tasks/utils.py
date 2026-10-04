@@ -1,7 +1,5 @@
 import random
 import re
-import os
-import sys
 
 
 def process_docs_local_train(dataset):
@@ -130,6 +128,42 @@ def process_docs_v6_sft(dataset):
                         p.strip() for p in match.group(1).split(",") if p.strip()
                     )
         return {"text": user_content, "oracle_option": oracle}
+
+    return dataset.map(convert)
+
+
+def process_docs_v2_sft(dataset):
+    """Spatial V2 chat rows → lm-eval docs using solver-authored metadata gold."""
+
+    def convert(doc):
+        user_content = next(
+            (
+                str(message.get("content") or "")
+                for message in doc.get("messages") or []
+                if message.get("role") == "user"
+            ),
+            "",
+        )
+        metadata = dict(doc.get("metadata") or {})
+        letters = [
+            str(letter).strip().upper()
+            for letter in metadata.get("oracle_letters") or []
+            if str(letter).strip()
+        ]
+        if not letters or any(
+            len(letter) != 1 or letter not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            for letter in letters
+        ):
+            raise ValueError("Spatial V2 row has invalid metadata.oracle_letters")
+        return {
+            "text": user_content,
+            "oracle_option": ",".join(letters),
+            "matrix_cell": str(metadata.get("matrix_cell") or ""),
+            "answer_mode": str(metadata.get("answer_mode") or ""),
+            "trace_format": str(metadata.get("trace_format") or ""),
+            "state_mode": str(metadata.get("state_mode") or ""),
+            "difficulty": dict(metadata.get("difficulty") or {}),
+        }
 
     return dataset.map(convert)
 
@@ -372,26 +406,16 @@ def strict_acc(items):
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
     target = items[0]
-    correct_answers = {
-        t for t in re.split(r"[,;| ]+", str(target).upper()) if t in "ABCDE"
-    }
+    correct_answers = _answer_letter_set(target)
 
     filtered_resps = items[1][0]
     if not filtered_resps and not isinstance(filtered_resps, list):
         return 0.0
-    predictions = {
-        t for t in re.split(r"[,;| ]+", str(filtered_resps).upper()) if t in "ABCDE"
-    }
+    predictions = _answer_letter_set(filtered_resps)
     if not predictions:
         return 0.0
 
-    # give 1 point if all correct answer is included in prediction
-    if correct_answers == predictions:
-        score = 1
-    else:
-        score = 0
-
-    return score
+    return 1 if correct_answers == predictions else 0
 
 
 def loose_acc(items):
@@ -401,23 +425,21 @@ def loose_acc(items):
     - items[1] (filtered_resps): list like ["A", "B", "C", "D"]
     """
     target = items[0]
-    correct_answers = {
-        t for t in re.split(r"[,;| ]+", str(target).upper()) if t in "ABCDE"
-    }
+    correct_answers = _answer_letter_set(target)
 
     filtered_resps = items[1][0]
     if not filtered_resps and not isinstance(filtered_resps, list):
         return 0.0
-    predictions = {
-        t for t in re.split(r"[,;| ]+", str(filtered_resps).upper()) if t in "ABCDE"
-    }
+    predictions = _answer_letter_set(filtered_resps)
     if not predictions:
         return 0.0
 
-    # give 1 point if all correct answer is included in prediction
-    if correct_answers.issubset(predictions):
-        score = 1
-    else:
-        score = 0
+    return 1 if correct_answers.issubset(predictions) else 0
 
-    return score
+
+def _answer_letter_set(value):
+    return {
+        token
+        for token in re.split(r"[,;| ]+", str(value).upper())
+        if len(token) == 1 and "A" <= token <= "Z"
+    }
