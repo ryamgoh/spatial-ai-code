@@ -227,7 +227,8 @@ def test_generic_slurm_jobs_have_valid_bash_syntax() -> None:
         "summarize.sh",
         "train.sh",
     ]
-    subprocess.run(["bash", "-n", *map(str, jobs)], check=True)
+    common = Path(__file__).with_name("jobs") / "common.bash"
+    subprocess.run(["bash", "-n", *map(str, jobs), str(common)], check=True)
 
 
 def test_summary_reports_partial_arm_completion(tmp_path) -> None:

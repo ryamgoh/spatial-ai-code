@@ -621,7 +621,7 @@ def submit_experiment(
                 repo_root,
                 scripts / "generate.sh",
                 spec.resources["generate"],
-                job_name=f"v2-gen-{run_id}",
+                job_name=f"{spec.name}-generate",
                 log_dir=logs,
                 exports={
                     "MATRIX": str(spec.matrix),
@@ -642,7 +642,7 @@ def submit_experiment(
                 repo_root,
                 scripts / "train.sh",
                 spec.resources["train"],
-                job_name=f"v2-train-{arm.name}",
+                job_name=f"{spec.name}-train-{arm.name}",
                 log_dir=logs,
                 dependency=train_dependency,
                 exports={
@@ -660,7 +660,7 @@ def submit_experiment(
                 repo_root,
                 scripts / "eval.sh",
                 spec.resources["eval"],
-                job_name=f"v2-eval-{arm.name}",
+                job_name=f"{spec.name}-eval-{arm.name}",
                 log_dir=logs,
                 dependency=f"afterok:{train_job}",
                 exports={
@@ -683,7 +683,7 @@ def submit_experiment(
             repo_root,
             scripts / "summarize.sh",
             spec.resources["summarize"],
-            job_name=f"v2-summary-{run_id}",
+            job_name=f"{spec.name}-summary",
             log_dir=logs,
             dependency=summary_dependency,
             exports={"RUN_DIR": str(prepared.run_dir)},
