@@ -8,7 +8,6 @@ retention_task: spatial_eval_v6_spatialmap
 train:
   template: templates/train.yaml
   overrides:
-    learning_rate: 0.00005
     num_epochs: 2
 
 eval:
