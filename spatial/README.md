@@ -11,6 +11,8 @@ one domain model and one gold-label contract.
 | `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
 | `spatial_proofs_v2.py` | Typed Direction proof certificates, deterministic construction, replay checking, and serialization | Proof-first SpatialEntail generation |
 | `spatial_proof_renderers_v2.py` | Natural and Symbolic views of one checked proof certificate | Proof-first SFT traces |
+| `spatial_model_certificates_v2.py` | Constructive model, countermodel, and contingency validation without Z3 | Possibility and non-entailment evidence |
+| `spatial_model_certificate_renderers_v2.py` | Natural and Symbolic views of checked constructive evidence | Ambiguity and audit traces |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
@@ -26,6 +28,7 @@ one domain model and one gold-label contract.
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
 | `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
 | `test_spatial_proofs_v2.py` | Proof construction, compact certificates, mutation rejection, and paired rendering | Local/CI verification |
+| `test_spatial_model_certificates_v2.py` | Formula, coordinate, contingency, corruption, and rendering contracts | Local/CI verification |
 | `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
 | `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
 | `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
@@ -73,8 +76,12 @@ contradiction. Scoped assumptions, contradiction closure, explosion, and
 complete case splits support branched proofs while rejecting cross-branch
 dependencies. Boolean-derived atoms feed the same axis rules as direct spatial
 premises. The module is not wired behind a fallback to the post-hoc training
-renderer: ambiguity/model certificates, Which, and Count must be implemented
-before proof-first workload generation is enabled for those shapes.
+renderer. `SpatialModelCertificate` independently checks constructive witnesses
+and countermodels against the complete premise formula; a
+`ContingencyCertificate` requires both sides for the same claim. These
+certificates establish possibility and non-entailment, not completeness of an
+answer set. Candidate-set completeness, Which, and Count certificates must be
+implemented before proof-first workload generation is enabled for those shapes.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 

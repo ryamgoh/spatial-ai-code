@@ -78,6 +78,20 @@ def _formula_text(
     raise TypeError(f"unsupported proof formula: {type(formula).__name__}")
 
 
+def render_formula(
+    formula: SpatialFormula,
+    trace_format: TraceFormat | str,
+    labels: Mapping[str, str] | None = None,
+) -> str:
+    """Render a structured formula consistently across proof artifacts."""
+    trace_format = TraceFormat(trace_format)
+    return _formula_text(
+        formula,
+        labels or {},
+        symbolic=trace_format is TraceFormat.SYMBOLIC,
+    )
+
+
 def _axis_text(fact: AxisFact, labels: Mapping[str, str]) -> str:
     subject = _label(fact.subject, labels)
     reference = _label(fact.reference, labels)

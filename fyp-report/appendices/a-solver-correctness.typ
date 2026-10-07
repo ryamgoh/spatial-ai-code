@@ -335,6 +335,34 @@ rule applications. This reduces correlated implementation risk but is not a
 formally verified trusted kernel. Theorem 3 establishes the intended calculus;
 tests establish only that the Python implementation conforms on covered cases.
 
+#heading(level: 2, numbering: none)[Constructive Model Certificates]
+
+A proof certificate establishes that a claim follows from the premises. A model
+certificate establishes a different fact: that one concrete spatial world
+exists. It contains one integer coordinate pair for every problem object, a
+formula $A$, and an expected truth value. The checker requires unique object
+names, exact object coverage, integer coordinates, no co-location, satisfaction
+of the complete premise formula $P$, and the declared truth value of $A$.
+
+#heading(level: 2, numbering: none)[Proposition 4: Model-Certificate Correctness]
+
+If the model checker accepts coordinates $M$ with expected value `true`, then
+$M$ denotes a spatial world satisfying $P and A$. If it accepts expected value
+`false`, then $M$ denotes a spatial world satisfying $P and not A$.
+
+_Proof._ Exact object coverage and the no-co-location check make the coordinate
+assignment a valid spatial interpretation. Relation atoms are evaluated by the
+sign pair of the two assigned coordinates. The checker then evaluates `NOT`,
+`AND`, `OR`, implication, and equivalence recursively using their ordinary truth
+conditions. Acceptance therefore directly witnesses the corresponding
+conjunction. $square$
+
+A contingency certificate contains both an accepted supporting model for
+$P and A$ and an accepted countermodel for $P and not A$, using the same problem
+and claim. It proves that $A$ is possible but not entailed. One or two models do
+not prove that an answer set is complete; impossible candidates still require a
+closed proof or an independent unsatisfiability decision.
+
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 
 #assurance-case <solver-assurance-case>
@@ -343,8 +371,9 @@ The implementation is tested separately from the mathematical argument. The
 current evidence includes bounded coordinate-model enumeration, reference--Z3
 differential cases, targeted Boolean and query tests, returned-witness
 revalidation, parser round trips, fail-closed error handling, proof-certificate
-mutation tests, and branch-isolation tests. These tests support conformance on
-covered cases but do not formally verify the Python implementation.
+mutation tests, branch-isolation tests, and corrupted-model rejection tests.
+These tests support conformance on covered cases but do not formally verify the
+Python implementation.
 
 The argument does not cover unrestricted English, omitted parser semantics,
 distance, adjacency, betweenness, navigation, quantification, or

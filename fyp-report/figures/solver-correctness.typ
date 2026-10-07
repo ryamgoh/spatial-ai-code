@@ -69,7 +69,7 @@
 
       node((0, 0), diagram-panel(
         [Deductive obligations],
-        [Finite representation equivalence \ Truth preservation \ Encoding and query correctness \ Propagation safety \ Certificate soundness],
+        [Finite representation equivalence \ Truth preservation \ Encoding and query correctness \ Propagation safety \ Proof and model certificate soundness],
         width: 52mm,
         fill: contract-fill,
       ), name: <deduction>),
@@ -82,7 +82,7 @@
 
       node((0, 1), diagram-panel(
         [Semantic guarantees],
-        [Encoding sound and complete \ Certificate calculus sound],
+        [Encoding sound and complete \ Proof and model certificates sound],
         width: 52mm,
         fill: core-fill,
       ), name: <encoding-theorem>),

@@ -35,8 +35,9 @@ reconstruction of a hidden source map.
     [Problem contract], [Represent locations, propositional premises, and one typed query.],
     [Reasoning core], [Compute consistency, possibility, entailment, counts, and witnesses.],
     [Answer policy], [Turn semantic results into single-answer or set-valued decisions.],
-    [Proof layer], [Build replayable certificates and render matched Natural or Symbolic traces.],
-    [Audit layer], [Validate and retain coordinate witnesses and provenance.],
+    [Proof layer], [Build replayable derivations and render matched Natural or Symbolic traces.],
+    [Model-certificate layer], [Validate constructive witnesses, countermodels, and contingency evidence.],
+    [Audit layer], [Retain checked evidence and source provenance.],
     [Pipeline coordinator], [Run the stages in order and write validated artifacts.],
   ),
   caption: [Logical module boundaries in the V2 architecture.],
@@ -45,8 +46,9 @@ reconstruction of a hidden source map.
 The implementation maps these responsibilities to `spatial_text_v2.py` and
 `spatialeval_adapter_v2.py` for reading; `spatial_solver_v2.py` for the shared
 contract and reasoning core; `spatial_grading_v2.py` for answer policy and menu
-encoding; `spatial_proofs_v2.py` and its renderer for checked certificates;
-`spatial_explanations_v2.py` for current audit evidence; and
+encoding; `spatial_proofs_v2.py` and its renderer for checked derivations;
+`spatial_model_certificates_v2.py` for constructive evidence;
+`spatial_explanations_v2.py` for current audit compatibility; and
 `audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
 
 == End-to-End Lifecycle
