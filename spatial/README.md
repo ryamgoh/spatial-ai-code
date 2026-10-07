@@ -18,7 +18,9 @@ one domain model and one gold-label contract.
 | `spatial_matrix_v2.py` | Strict YAML matrix parsing and paired ablation expansion | Reproducible multi-cell experiments |
 | `generate_matrix_v2.py` | Thin CLI for a V2 experiment matrix | Pilot and full dataset generation |
 | `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
+| `audit_spatialeval_v2.py` | Deterministic full audit, witness validation, and SpatialMap-TQA-Corr derivation | Part I benchmark audit |
 | `test_spatial_solver_v2.py` | Core, adapter, answer semantics, witness, and differential contracts | Local/CI verification |
+| `test_audit_spatialeval_v2.py` | Source preservation, correction, determinism, and overwrite contracts | Part I audit verification |
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
 | `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
 | `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
@@ -55,6 +57,18 @@ the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
 `render_training_trace` with `TraceFormat.NATURAL` or `TraceFormat.SYMBOLIC`
 and an independent `StateMode`. Coordinate witnesses belong only in structured
 audit metadata or `render_audit_explanation`, never in an SFT reasoning target.
+
+Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
+
+    uv --system-certs run --python 3.12 --no-project --with typer --with z3-solver \
+      python spatial/audit_spatialeval_v2.py \
+      --input data/spatialeval_org.jsonl \
+      --output-dir results/part1-spatialeval-audit
+
+The command writes the row-level audit, corrected 1,500-row dataset, and a
+summary containing input/output hashes. Existing outputs are preserved unless
+`--replace` is explicit. The corrected dataset adds `E. Cannot be determined`
+but excludes coordinate witnesses; witnesses remain in the audit artifact.
 
 Generate a balanced V2 workload with:
 

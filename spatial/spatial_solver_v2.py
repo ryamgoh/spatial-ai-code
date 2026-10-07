@@ -846,7 +846,10 @@ class _Z3Engine:
                         formula.reference,
                         direction,
                     )
-                    for direction in formula.allowed
+                    for direction in sorted(
+                        formula.allowed,
+                        key=lambda item: item.value,
+                    )
                 )
             )
         if isinstance(formula, Not):
@@ -911,7 +914,7 @@ class _Z3Engine:
         x = {obj: z3.Int(f"x_{index}") for index, obj in enumerate(objects)}
         y = {obj: z3.Int(f"y_{index}") for index, obj in enumerate(objects)}
         solver = z3.Solver()
-        solver.set(timeout=self.timeout_ms)
+        solver.set(timeout=self.timeout_ms, random_seed=0)
         for index, first in enumerate(objects):
             for second in objects[index + 1 :]:
                 solver.add(z3.Or(x[first] != x[second], y[first] != y[second]))
@@ -926,7 +929,10 @@ class _Z3Engine:
                             constraint.reference,
                             direction,
                         )
-                        for direction in constraint.allowed
+                        for direction in sorted(
+                            constraint.allowed,
+                            key=lambda item: item.value,
+                        )
                     )
                 )
             )
