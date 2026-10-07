@@ -35,7 +35,7 @@ reconstruction of a hidden source map.
     [Problem contract], [Represent locations, propositional premises, and one typed query.],
     [Reasoning core], [Compute consistency, possibility, entailment, counts, and witnesses.],
     [Answer policy], [Turn semantic results into single-answer or set-valued decisions.],
-    [Explanation layer], [Build typed evidence and coordinate-free training traces.],
+    [Proof layer], [Build replayable certificates and render matched Natural or Symbolic traces.],
     [Audit layer], [Validate and retain coordinate witnesses and provenance.],
     [Pipeline coordinator], [Run the stages in order and write validated artifacts.],
   ),
@@ -44,8 +44,9 @@ reconstruction of a hidden source map.
 
 The implementation maps these responsibilities to `spatial_text_v2.py` and
 `spatialeval_adapter_v2.py` for reading; `spatial_solver_v2.py` for the shared
-contract and reasoning core; `spatial_grading_v2.py` for answer policy and
-menu encoding; `spatial_explanations_v2.py` and its renderers for evidence; and
+contract and reasoning core; `spatial_grading_v2.py` for answer policy and menu
+encoding; `spatial_proofs_v2.py` and its renderer for checked certificates;
+`spatial_explanations_v2.py` for current audit evidence; and
 `audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
 
 == End-to-End Lifecycle
@@ -60,7 +61,7 @@ produce the same typed semantic analysis.
 
 The output path deliberately branches only after semantic analysis. Answer
 policy can map the result into a single answer or a set-valued answer. The
-explanation layer can produce coordinate-free training traces. The audit layer
+proof layer can produce coordinate-free training traces. The audit layer
 can retain witness coordinates and provenance for researcher inspection. This
 separation prevents audit-only coordinates from leaking into supervised
 training targets.
@@ -131,9 +132,13 @@ parses that rendered prompt back into a second `SpatialProblem`, and solves it
 again. A row is emitted only when the round trip preserves both the structured
 problem and its answer.
 
-The explanation layer renders Natural or Symbolic reasoning from typed evidence.
-Training rows exclude coordinate witnesses by default. Coordinates can be added
-only as separate audit metadata for diagnostic use.
+The target SpatialEntail path renders Natural or Symbolic reasoning from one
+replayable certificate. The proof-first generator migration is incomplete:
+Direction certificates support spatial chains and bounded Boolean case proofs,
+while ambiguity, Which, and Count certificates remain to be implemented before
+the post-hoc training renderer is removed. Training rows exclude coordinate
+witnesses by default. Coordinates can be added only as separate audit metadata
+for diagnostic use.
 
 == Failure and Output Contracts
 

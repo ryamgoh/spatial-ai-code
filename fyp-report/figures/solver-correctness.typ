@@ -61,7 +61,7 @@
 #let assurance-case = figure(
   align(center)[
     #diagram(
-      spacing: (12mm, 8mm),
+      spacing: (12mm, 12mm),
       edge-stroke: .65pt + diagram-border,
       label-size: 7.5pt,
       label-sep: 3pt,
@@ -69,20 +69,20 @@
 
       node((0, 0), diagram-panel(
         [Deductive obligations],
-        [Finite representation equivalence \ Truth preservation \ Encoding correctness \ Query correctness \ Propagation safety],
+        [Finite representation equivalence \ Truth preservation \ Encoding and query correctness \ Propagation safety \ Certificate soundness],
         width: 52mm,
         fill: contract-fill,
       ), name: <deduction>),
       node((1, 0), diagram-panel(
         [Implementation evidence],
-        [Bounded world enumeration \ Reference--Z3 comparisons \ Witness revalidation \ Parser round trips \ Fail-closed errors],
+        [Bounded world enumeration \ Reference--Z3 comparisons \ Witness revalidation \ Parser round trips \ Proof mutation and branch-isolation tests \ Fail-closed errors],
         width: 52mm,
         fill: explanation-fill,
       ), name: <evidence>),
 
       node((0, 1), diagram-panel(
-        [Encoding theorem],
-        [Sound and complete \ relative to the declared ontology],
+        [Semantic guarantees],
+        [Encoding sound and complete \ Certificate calculus sound],
         width: 52mm,
         fill: core-fill,
       ), name: <encoding-theorem>),
@@ -97,7 +97,7 @@
 
       node((0.5, 2), diagram-panel(
         [Qualified claim],
-        [Solver-backed analysis \ within the supported domain \ Z3 as a trusted decision procedure],
+        [Solver-backed analysis and checked proofs \ within the supported domain \ Z3 remains a trusted decision procedure],
         width: 65mm,
         fill: answer-fill,
       ), name: <qualified>),

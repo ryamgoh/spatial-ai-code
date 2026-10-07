@@ -66,10 +66,15 @@ The proof-first seam is the replacement path for training explanations.
 Direction problems, constructs a typed certificate without consulting Z3, and
 replays every premise, decomposition, inversion, transitivity, and recomposition
 step through `check_direction_proof`. `render_direction_proof` produces Natural
-or Symbolic text from that same certificate. It is not wired behind a fallback
-to the post-hoc training renderer: Boolean branching, ambiguity certificates,
-Which, and Count must be implemented before proof-first workload generation is
-enabled for those shapes.
+or Symbolic text from that same certificate. The certificate checker also
+supports conjunction introduction/elimination, modus ponens, disjunctive
+syllogism, biconditional elimination, double negation, and explicit
+contradiction. Scoped assumptions, contradiction closure, explosion, and
+complete case splits support branched proofs while rejecting cross-branch
+dependencies. Boolean-derived atoms feed the same axis rules as direct spatial
+premises. The module is not wired behind a fallback to the post-hoc training
+renderer: ambiguity/model certificates, Which, and Count must be implemented
+before proof-first workload generation is enabled for those shapes.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 

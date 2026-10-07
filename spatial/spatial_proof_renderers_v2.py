@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_proofs_v2 import (
     AxisFact,
+    Contradiction,
     DirectionClaim,
     DirectionProofCertificate,
     OrderRelation,
@@ -14,7 +15,15 @@ from spatial_proofs_v2 import (
     ProofRule,
     check_direction_proof,
 )
-from spatial_solver_v2 import RelationConstraint
+from spatial_solver_v2 import (
+    And,
+    Iff,
+    Implies,
+    Not,
+    Or,
+    RelationConstraint,
+    SpatialFormula,
+)
 
 
 def _label(value: str, labels: Mapping[str, str]) -> str:
@@ -30,6 +39,43 @@ def _direction_atom(
         f"{_label(atom.subject, labels)} is {direction.value} of "
         f"{_label(atom.reference, labels)}"
     )
+
+
+def _formula_text(
+    formula: SpatialFormula,
+    labels: Mapping[str, str],
+    *,
+    symbolic: bool,
+) -> str:
+    if isinstance(formula, RelationConstraint):
+        if symbolic:
+            direction = next(iter(formula.allowed)).name
+            return (
+                f"DIR_{direction}({_label(formula.subject, labels)},"
+                f"{_label(formula.reference, labels)})"
+            )
+        return _direction_atom(formula, labels)
+    if isinstance(formula, Not):
+        operand = _formula_text(formula.operand, labels, symbolic=symbolic)
+        return f"NOT ({operand})" if symbolic else f"not ({operand})"
+    if isinstance(formula, (And, Or)):
+        if symbolic:
+            operator = " AND " if isinstance(formula, And) else " OR "
+        else:
+            operator = " and " if isinstance(formula, And) else " or "
+        return operator.join(
+            f"({_formula_text(operand, labels, symbolic=symbolic)})"
+            for operand in formula.operands
+        )
+    if isinstance(formula, Implies):
+        left = _formula_text(formula.antecedent, labels, symbolic=symbolic)
+        right = _formula_text(formula.consequent, labels, symbolic=symbolic)
+        return f"({left}) -> ({right})" if symbolic else f"if {left}, then {right}"
+    if isinstance(formula, Iff):
+        left = _formula_text(formula.left, labels, symbolic=symbolic)
+        right = _formula_text(formula.right, labels, symbolic=symbolic)
+        return f"({left}) <-> ({right})" if symbolic else f"{left} exactly when {right}"
+    raise TypeError(f"unsupported proof formula: {type(formula).__name__}")
 
 
 def _axis_text(fact: AxisFact, labels: Mapping[str, str]) -> str:
@@ -60,53 +106,92 @@ def _claim_text(claim: DirectionClaim, labels: Mapping[str, str]) -> str:
 
 def _natural_step(step, labels: Mapping[str, str]) -> str:
     conclusion = step.conclusion
+    scope = f"[{step.branch}] " if step.branch is not None else ""
     if step.rule is ProofRule.PREMISE:
-        assert isinstance(conclusion, RelationConstraint)
+        assert isinstance(conclusion, SpatialFormula)
         assert step.premise_index is not None
-        return f"{step.id}: {_direction_atom(conclusion, labels)}."
+        return f"{step.id}: {_formula_text(conclusion, labels, symbolic=False)}."
+    if step.rule is ProofRule.ASSUMPTION:
+        assert isinstance(conclusion, SpatialFormula)
+        return (
+            f"{scope}{step.id}: Assume "
+            f"{_formula_text(conclusion, labels, symbolic=False)} from {step.inputs[0]}."
+        )
+    if step.rule in {
+        ProofRule.AND_ELIMINATION,
+        ProofRule.AND_INTRODUCTION,
+        ProofRule.MODUS_PONENS,
+        ProofRule.DISJUNCTIVE_SYLLOGISM,
+        ProofRule.IFF_ELIMINATION,
+        ProofRule.DOUBLE_NEGATION,
+    }:
+        assert isinstance(conclusion, SpatialFormula)
+        dependencies = " and ".join(step.inputs)
+        rule = step.rule.value.replace("-", " ")
+        return (
+            f"{scope}{step.id}: From {dependencies} by {rule}, "
+            f"{_formula_text(conclusion, labels, symbolic=False)}."
+        )
+    if step.rule is ProofRule.CONTRADICTION:
+        assert isinstance(conclusion, Contradiction)
+        return f"{scope}{step.id}: {step.inputs[0]} and {step.inputs[1]} contradict."
+    if step.rule is ProofRule.EXPLOSION:
+        assert isinstance(conclusion, SpatialFormula)
+        return (
+            f"{scope}{step.id}: Branch {step.branch} is closed by {step.inputs[0]}, "
+            f"so {_formula_text(conclusion, labels, symbolic=False)} follows in that case."
+        )
+    if step.rule is ProofRule.CASE_SPLIT:
+        assert isinstance(conclusion, SpatialFormula)
+        branches = ", ".join(step.inputs[1:])
+        return (
+            f"{step.id}: Every case from {step.inputs[0]} concludes "
+            f"{_formula_text(conclusion, labels, symbolic=False)} via {branches}."
+        )
     if step.rule is ProofRule.DIRECTION_DECOMPOSITION:
         assert isinstance(conclusion, AxisFact)
         return (
-            f"{step.id}: From {step.inputs[0]} on the "
+            f"{scope}{step.id}: From {step.inputs[0]} on the "
             f"{conclusion.axis.value.upper()}-axis, {_axis_text(conclusion, labels)}."
         )
     if step.rule is ProofRule.AXIS_INVERSION:
         assert isinstance(conclusion, AxisFact)
-        return f"{step.id}: Equivalently, {_axis_text(conclusion, labels)}."
+        return f"{scope}{step.id}: Equivalently, {_axis_text(conclusion, labels)}."
     if step.rule is ProofRule.AXIS_TRANSITIVITY:
         assert isinstance(conclusion, AxisFact)
         return (
-            f"{step.id}: By {conclusion.axis.value.upper()}-axis transitivity from "
+            f"{scope}{step.id}: By {conclusion.axis.value.upper()}-axis transitivity from "
             f"{step.inputs[0]} and {step.inputs[1]}, {_axis_text(conclusion, labels)}."
         )
     assert step.rule is ProofRule.DIRECTION_RECOMPOSITION
     assert isinstance(conclusion, DirectionClaim)
     return (
-        f"{step.id}: Combining the X and Y conclusions gives "
+        f"{scope}{step.id}: Combining the X and Y conclusions gives "
         f"{_claim_text(conclusion, labels)}."
     )
 
 
 def _symbolic_step(step, labels: Mapping[str, str]) -> str:
     conclusion = step.conclusion
-    if isinstance(conclusion, RelationConstraint):
-        direction = next(iter(conclusion.allowed)).name
-        rendered = (
-            f"DIR_{direction}({_label(conclusion.subject, labels)},"
-            f"{_label(conclusion.reference, labels)})"
-        )
+    if isinstance(conclusion, SpatialFormula):
+        rendered = _formula_text(conclusion, labels, symbolic=True)
     elif isinstance(conclusion, AxisFact):
         rendered = _axis_symbol(conclusion, labels)
-    else:
+    elif isinstance(conclusion, DirectionClaim):
         rendered = (
             f"DIR_{conclusion.direction.name}({_label(conclusion.subject, labels)},"
             f"{_label(conclusion.reference, labels)})"
         )
+    else:
+        assert isinstance(conclusion, Contradiction)
+        rendered = "CONTRADICTION"
     if step.rule is ProofRule.PREMISE:
         annotation = f"premise {step.premise_index + 1}"
     else:
         dependencies = ",".join(step.inputs)
         annotation = f"{step.rule.value} {dependencies}".rstrip()
+    if step.branch is not None:
+        annotation = f"branch={step.branch}; {annotation}"
     return f"{step.id}: {rendered}    [{annotation}]"
 
 

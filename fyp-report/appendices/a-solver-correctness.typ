@@ -191,6 +191,150 @@ intersection is therefore safe. The solver still asserts the propagated
 constraints, $"NC"_L$, and the full Boolean translation $E(P)$; propagation is
 only a pruning optimisation and is not relied upon for completeness.
 
+#heading(level: 2, numbering: none)[Proof Certificate Calculus]
+
+The SMT encoding decides model-theoretic truth, but a training trace requires a
+separate derivation object. This work therefore uses a typed proof certificate.
+Each step has a unique identifier, a rule name, an ordered list of dependencies,
+and one conclusion. Premise steps additionally identify their source premise.
+Derived steps may occur in the global scope or inside one explicitly named case
+branch. Natural and Symbolic traces are deterministic renderings of this same
+object.
+
+Let $Gamma$ denote the visible premise formulas of one `SpatialProblem`. The
+judgement $Gamma tack.r phi$ means that formula $phi$ has a checked derivation
+from $Gamma$. The propositional meaning of the connectives and the general
+notions of sound inference and proof follow Russell and Norvig
+@russellNorvig2020aima[Sections 7.4--7.5]. The particular certificate schema and
+spatial rules below are defined by this work.
+
+#heading(level: 3, numbering: none)[Boolean rules]
+
+The checker currently admits the following propositional rule schemas.
+
+#figure(
+  table(
+    columns: (auto, 1fr),
+    inset: (x: 6pt, y: 5pt),
+    table.header([*Rule*], [*Checked schema*]),
+    [Premise], [$phi in Gamma$ permits $Gamma tack.r phi$.],
+    [`AND` elimination], [$Gamma tack.r phi and psi$ permits either conjunct.],
+    [`AND` introduction], [$Gamma tack.r phi$ and $Gamma tack.r psi$ permit $Gamma tack.r phi and psi$.],
+    [Modus ponens], [$Gamma tack.r phi$ and $Gamma tack.r phi arrow.r psi$ permit $Gamma tack.r psi$.],
+    [Disjunctive syllogism], [$Gamma tack.r phi or psi$ and $Gamma tack.r not psi$ permit $Gamma tack.r phi$.],
+    [`IFF` elimination], [$Gamma tack.r phi <=> psi$ together with either side permits the other.],
+    [Double negation], [$Gamma tack.r not not phi$ permits $Gamma tack.r phi$.],
+    [Contradiction], [$Gamma tack.r phi$ and $Gamma tack.r not phi$ close the current branch.],
+  ),
+  caption: [Core non-branching rules in the proof certificate calculus. The
+    implementation generalises conjunction and disjunction to finite operand
+    lists.],
+) <certificate-boolean-rules>
+
+These rules are truth preserving under the ordinary propositional truth
+conditions. For example, no model can make $phi$, $phi arrow.r psi$, and
+$not psi$ true simultaneously, which establishes Modus Ponens. Likewise, a
+model satisfying $phi or psi$ and $not psi$ must satisfy $phi$, which establishes
+disjunctive syllogism. The remaining schemas follow immediately from the truth
+conditions of conjunction, equivalence, and negation.
+
+#heading(level: 3, numbering: none)[Branches and case analysis]
+
+An assumption step may select one operand of a cited disjunction and must carry
+a branch identifier. A step within that branch may depend only on global steps
+or earlier steps with the same identifier. It cannot depend on another branch.
+If a branch derives both $phi$ and $not phi$, it records a contradiction. Since
+the branch has no satisfying model, an explosion step may derive the common case
+conclusion inside that closed branch.
+
+For a finite disjunction $or.big_i phi_i$, case split applies the schema
+
+$
+  frac(
+    Gamma tack.r or.big_i phi_i quad
+    (Gamma, phi_i tack.r psi) " for every " i,
+    Gamma tack.r psi,
+  ).
+$
+
+The checker requires one distinct scoped result for every disjunct, verifies
+that every branch concludes the same $psi$, and only then returns $psi$ to the
+global scope. These conditions prevent assumptions or intermediate results from
+leaking between cases.
+
+#heading(level: 3, numbering: none)[Spatial rules]
+
+An exact direction atom $R_D(a,b)$ decomposes into the X and Y comparisons in
+@solver-direction-table. Reversing an axis fact reverses `<` and `>`, while `=`
+is symmetric. Axis transitivity admits exactly the deterministic compositions
+
+$
+  "=" circle "<" = "<",
+  quad
+  "<" circle "=" = "<",
+  quad
+  "<" circle "<" = "<",
+  quad
+  "=" circle "=" = "=",
+$
+
+and their `>` analogues. Opposing strict signs are not accepted as a derived
+comparison because their composition is not uniquely determined. Finally, one
+checked X fact and one checked Y fact about the same ordered pair may be
+recomposed into $R_D(a,b)$ exactly when their sign pair is the row assigned to
+$D$ in @solver-direction-table. The checker also permits the equivalent reversed
+orientation and negates its comparison sign before recomposition.
+
+#heading(level: 2, numbering: none)[Theorem 3: Certificate Soundness]
+
+Let $C$ be a Direction proof certificate accepted by the replay checker for
+premises $Gamma$ and query pair $(a,b)$. If its final step concludes
+$R_D(a,b)$, then
+
+$
+  Gamma |= R_D(a,b).
+$
+
+_Proof._ Proceed by induction over the checked step order. A premise step is in
+$Gamma$ by its validated index. Each Boolean step preserves truth by the schemas
+in @certificate-boolean-rules. A scoped assumption is used only within its
+branch. If all branches of a cited disjunction derive the same conclusion, every
+model satisfying that disjunction satisfies the conclusion in its corresponding
+case; a contradictory branch has no model and is therefore vacuous. Branch
+isolation prevents any assumption from escaping except through this checked case
+rule.
+
+For spatial steps, direction decomposition follows from the definition of
+$R_D$; inversion follows from reversing an ordered comparison; and the admitted
+axis compositions follow from transitivity of `<` and substitution through `=`.
+Direction recomposition is sound because the eight non-zero sign pairs form the
+partition in @solver-direction-table. Thus every accepted step is true in every
+spatial world satisfying its available premises and branch assumptions. The
+global final step is therefore true in every world satisfying $Gamma$.
+$square$
+
+The theorem does not require $Gamma$ to be consistent: under classical
+semantics an inconsistent premise set has no models. Operationally, the pipeline
+checks consistency separately and does not emit an ordinary answer for an
+inconsistent problem.
+
+#heading(level: 3, numbering: none)[Scope of the claim]
+
+The certificate calculus is claimed to be sound, not complete. The current
+automatic builder constructs certificates only for exact positive-conjunction
+Direction problems. The checker supports the additional Boolean and branch
+rules above when a proof-first constructor supplies those steps, but there may
+be semantically entailed formulas for which this rule set or search procedure
+finds no certificate. Absence of a certificate is therefore not evidence of
+non-entailment; the SMT oracle remains the complete semantic decision procedure
+within the declared encoding.
+
+The replay checker does not call Z3. It shares the formula types and direction
+sign table with the solver, then independently validates local dependencies and
+rule applications. This reduces correlated implementation risk but is not a
+formally verified trusted kernel. Theorem 3 establishes the intended calculus;
+tests establish only that the Python implementation conforms on covered cases.
+
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 
 #assurance-case <solver-assurance-case>
@@ -198,9 +342,9 @@ only a pruning optimisation and is not relied upon for completeness.
 The implementation is tested separately from the mathematical argument. The
 current evidence includes bounded coordinate-model enumeration, reference--Z3
 differential cases, targeted Boolean and query tests, returned-witness
-revalidation, parser round trips, and fail-closed error handling. These tests
-support conformance on covered cases but do not formally verify the Python
-implementation.
+revalidation, parser round trips, fail-closed error handling, proof-certificate
+mutation tests, and branch-isolation tests. These tests support conformance on
+covered cases but do not formally verify the Python implementation.
 
 The argument does not cover unrestricted English, omitted parser semantics,
 distance, adjacency, betweenness, navigation, quantification, or

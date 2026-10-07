@@ -1,10 +1,11 @@
 """Replayable proof certificates for SpatialEntail V2 problems.
 
-This module is deliberately independent of the SMT implementation.  It builds
-and checks typed derivations from the structured premises themselves.  The
-initial proof language covers exact positive-conjunction Direction problems;
-Boolean branching, ambiguous certificates, Which, and Count are explicit
-future extensions rather than solver-status fallbacks.
+This module is deliberately independent of the SMT implementation. It builds
+and checks typed derivations from the structured premises themselves. The
+automatic builder covers exact positive-conjunction Direction problems; the
+checker additionally supports bounded Boolean and case-split proofs. Ambiguous
+certificates, Which, and Count remain explicit future extensions rather than
+solver-status fallbacks.
 """
 
 from __future__ import annotations
@@ -16,11 +17,16 @@ from enum import Enum
 from typing import Any
 
 from spatial_solver_v2 import (
+    And,
     Direction,
     DirectionQuery,
+    Iff,
+    Implies,
+    Not,
+    Or,
     RelationConstraint,
+    SpatialFormula,
     SpatialProblem,
-    conjunctive_atoms,
     direction_signs,
 )
 
@@ -35,6 +41,16 @@ class ProofCheckError(ValueError):
 
 class ProofRule(str, Enum):
     PREMISE = "premise"
+    ASSUMPTION = "assumption"
+    AND_ELIMINATION = "and-elimination"
+    AND_INTRODUCTION = "and-introduction"
+    MODUS_PONENS = "modus-ponens"
+    DISJUNCTIVE_SYLLOGISM = "disjunctive-syllogism"
+    IFF_ELIMINATION = "iff-elimination"
+    DOUBLE_NEGATION = "double-negation"
+    CONTRADICTION = "contradiction"
+    EXPLOSION = "explosion"
+    CASE_SPLIT = "case-split"
     DIRECTION_DECOMPOSITION = "direction-decomposition"
     AXIS_INVERSION = "axis-inversion"
     AXIS_TRANSITIVITY = "axis-transitivity"
@@ -67,7 +83,12 @@ class DirectionClaim:
     reference: str
 
 
-ProofConclusion = RelationConstraint | AxisFact | DirectionClaim
+@dataclass(frozen=True)
+class Contradiction:
+    """A branch contains both a formula and its explicit negation."""
+
+
+ProofConclusion = SpatialFormula | AxisFact | DirectionClaim | Contradiction
 
 
 @dataclass(frozen=True)
@@ -77,6 +98,7 @@ class ProofStep:
     conclusion: ProofConclusion
     inputs: tuple[str, ...] = ()
     premise_index: int | None = None
+    branch: str | None = None
 
 
 @dataclass(frozen=True)
@@ -187,27 +209,215 @@ def _reachable_step_ids(certificate: DirectionProofCertificate) -> frozenset[str
     return frozenset(reachable)
 
 
+def _top_level_premises(formula: SpatialFormula) -> tuple[SpatialFormula, ...]:
+    return formula.operands if isinstance(formula, And) else (formula,)
+
+
+def _positive_and_negative(
+    first: SpatialFormula,
+    second: SpatialFormula,
+) -> tuple[SpatialFormula, Not] | None:
+    if isinstance(first, Not) and first.operand == second:
+        return second, first
+    if isinstance(second, Not) and second.operand == first:
+        return first, second
+    return None
+
+
 def _check_step(
     step: ProofStep,
     previous: Mapping[str, ProofStep],
-    atoms: tuple[RelationConstraint, ...],
+    premises: tuple[SpatialFormula, ...],
 ) -> None:
     inputs = tuple(previous.get(step_id) for step_id in step.inputs)
     if any(item is None for item in inputs):
         raise ProofCheckError(f"{step.id} depends on an unknown or later step")
     resolved_inputs = tuple(item for item in inputs if item is not None)
 
+    if step.rule is not ProofRule.CASE_SPLIT:
+        if step.branch is None and any(
+            item.branch is not None for item in resolved_inputs
+        ):
+            raise ProofCheckError(f"{step.id} leaks a branch result into global scope")
+        if step.branch is not None and any(
+            item.branch not in {None, step.branch} for item in resolved_inputs
+        ):
+            raise ProofCheckError(f"{step.id} depends on another proof branch")
+
     if step.rule is ProofRule.PREMISE:
-        if step.inputs or step.premise_index is None:
+        if step.inputs or step.premise_index is None or step.branch is not None:
             raise ProofCheckError(f"{step.id} is not a valid premise step")
-        if not 0 <= step.premise_index < len(atoms):
+        if not 0 <= step.premise_index < len(premises):
             raise ProofCheckError(f"{step.id} has an invalid premise index")
-        if step.conclusion != atoms[step.premise_index]:
+        if step.conclusion != premises[step.premise_index]:
             raise ProofCheckError(f"{step.id} does not match its indexed premise")
         return
 
     if step.premise_index is not None:
         raise ProofCheckError(f"{step.id} assigns a premise index to a derived step")
+
+    input_formulas = tuple(
+        item.conclusion
+        for item in resolved_inputs
+        if isinstance(item.conclusion, SpatialFormula)
+    )
+
+    if step.rule is ProofRule.ASSUMPTION:
+        if (
+            step.branch is None
+            or len(input_formulas) != 1
+            or not isinstance(input_formulas[0], Or)
+        ):
+            raise ProofCheckError(f"{step.id} is not a scoped disjunct assumption")
+        if step.conclusion not in input_formulas[0].operands:
+            raise ProofCheckError(f"{step.id} assumes no disjunct from its source")
+        return
+
+    if step.rule is ProofRule.AND_ELIMINATION:
+        if len(input_formulas) != 1 or not isinstance(input_formulas[0], And):
+            raise ProofCheckError(f"{step.id} must eliminate one conjunction")
+        if step.conclusion not in input_formulas[0].operands:
+            raise ProofCheckError(f"{step.id} concludes a non-conjunct")
+        return
+
+    if step.rule is ProofRule.AND_INTRODUCTION:
+        if len(input_formulas) != len(resolved_inputs) or not input_formulas:
+            raise ProofCheckError(f"{step.id} must combine formula inputs")
+        if step.conclusion != And(input_formulas):
+            raise ProofCheckError(f"{step.id} constructs the wrong conjunction")
+        return
+
+    if step.rule is ProofRule.MODUS_PONENS:
+        if len(input_formulas) != 2:
+            raise ProofCheckError(f"{step.id} requires an implication and antecedent")
+        implication = next(
+            (formula for formula in input_formulas if isinstance(formula, Implies)),
+            None,
+        )
+        if implication is None:
+            raise ProofCheckError(f"{step.id} has no implication input")
+        antecedents = tuple(
+            formula for formula in input_formulas if formula is not implication
+        )
+        if (
+            antecedents != (implication.antecedent,)
+            or step.conclusion != implication.consequent
+        ):
+            raise ProofCheckError(f"{step.id} is not a valid modus ponens step")
+        return
+
+    if step.rule is ProofRule.DISJUNCTIVE_SYLLOGISM:
+        if len(input_formulas) != 2:
+            raise ProofCheckError(f"{step.id} requires a disjunction and negation")
+        disjunction = next(
+            (formula for formula in input_formulas if isinstance(formula, Or)),
+            None,
+        )
+        negation = next(
+            (formula for formula in input_formulas if isinstance(formula, Not)),
+            None,
+        )
+        if disjunction is None or negation is None:
+            raise ProofCheckError(f"{step.id} lacks a disjunction or negation")
+        if negation.operand not in disjunction.operands:
+            raise ProofCheckError(f"{step.id} negates no disjunct")
+        remaining = tuple(
+            operand for operand in disjunction.operands if operand != negation.operand
+        )
+        expected: SpatialFormula = (
+            remaining[0] if len(remaining) == 1 else Or(remaining)
+        )
+        if not remaining or step.conclusion != expected:
+            raise ProofCheckError(f"{step.id} concludes the wrong remaining disjunct")
+        return
+
+    if step.rule is ProofRule.IFF_ELIMINATION:
+        if len(input_formulas) != 2:
+            raise ProofCheckError(f"{step.id} requires an equivalence and one side")
+        equivalence = next(
+            (formula for formula in input_formulas if isinstance(formula, Iff)),
+            None,
+        )
+        if equivalence is None:
+            raise ProofCheckError(f"{step.id} has no equivalence input")
+        known = next(
+            formula for formula in input_formulas if formula is not equivalence
+        )
+        if known == equivalence.left:
+            expected = equivalence.right
+        elif known == equivalence.right:
+            expected = equivalence.left
+        else:
+            raise ProofCheckError(f"{step.id} proves neither side of the equivalence")
+        if step.conclusion != expected:
+            raise ProofCheckError(f"{step.id} concludes the wrong equivalent formula")
+        return
+
+    if step.rule is ProofRule.DOUBLE_NEGATION:
+        if (
+            len(input_formulas) != 1
+            or not isinstance(input_formulas[0], Not)
+            or not isinstance(input_formulas[0].operand, Not)
+            or step.conclusion != input_formulas[0].operand.operand
+        ):
+            raise ProofCheckError(f"{step.id} is not a valid double-negation step")
+        return
+
+    if step.rule is ProofRule.CONTRADICTION:
+        if (
+            len(input_formulas) != 2
+            or _positive_and_negative(*input_formulas) is None
+            or not isinstance(step.conclusion, Contradiction)
+        ):
+            raise ProofCheckError(f"{step.id} is not an explicit contradiction")
+        return
+
+    if step.rule is ProofRule.EXPLOSION:
+        if (
+            len(resolved_inputs) != 1
+            or not isinstance(resolved_inputs[0].conclusion, Contradiction)
+            or not isinstance(step.conclusion, SpatialFormula)
+            or step.branch is None
+        ):
+            raise ProofCheckError(f"{step.id} must derive a formula in a closed branch")
+        return
+
+    if step.rule is ProofRule.CASE_SPLIT:
+        if step.branch is not None or len(resolved_inputs) < 3:
+            raise ProofCheckError(f"{step.id} is not a global case-split conclusion")
+        source = resolved_inputs[0]
+        if not isinstance(source.conclusion, Or) or source.branch is not None:
+            raise ProofCheckError(f"{step.id} must split one global disjunction")
+        branch_results = resolved_inputs[1:]
+        branches = tuple(item.branch for item in branch_results)
+        if any(branch is None for branch in branches) or len(set(branches)) != len(
+            branches
+        ):
+            raise ProofCheckError(f"{step.id} must use distinct scoped branch results")
+        if not isinstance(step.conclusion, SpatialFormula) or any(
+            item.conclusion != step.conclusion for item in branch_results
+        ):
+            raise ProofCheckError(f"{step.id} branches do not prove one conclusion")
+        assumptions = tuple(
+            item
+            for item in previous.values()
+            if item.rule is ProofRule.ASSUMPTION
+            and item.branch in branches
+            and item.inputs == (source.id,)
+        )
+        assumptions_by_branch: dict[str, ProofStep] = {}
+        for assumption in assumptions:
+            assert assumption.branch is not None
+            if assumption.branch in assumptions_by_branch:
+                raise ProofCheckError(
+                    f"{step.id} has duplicate assumptions for one branch"
+                )
+            assumptions_by_branch[assumption.branch] = assumption
+        if set(assumptions_by_branch) != set(branches) or {
+            item.conclusion for item in assumptions_by_branch.values()
+        } != set(source.conclusion.operands):
+            raise ProofCheckError(f"{step.id} does not cover every disjunct")
+        return
 
     if step.rule is ProofRule.DIRECTION_DECOMPOSITION:
         if len(resolved_inputs) != 1 or not isinstance(
@@ -279,17 +489,13 @@ def check_direction_proof(certificate: DirectionProofCertificate) -> None:
     query = problem.query
     if not isinstance(query, DirectionQuery):
         raise ProofCheckError("Direction certificates require a DirectionQuery")
-    atoms = conjunctive_atoms(problem.premise)
-    if atoms is None or any(len(atom.allowed) != 1 for atom in atoms):
-        raise ProofCheckError(
-            "Direction certificates currently require exact positive conjunctions"
-        )
+    premises = _top_level_premises(problem.premise)
 
     previous: dict[str, ProofStep] = {}
     for step in certificate.steps:
         if not step.id or step.id in previous:
             raise ProofCheckError("proof step identifiers must be non-empty and unique")
-        _check_step(step, previous, atoms)
+        _check_step(step, previous, premises)
         previous[step.id] = step
 
     if certificate.conclusion_step not in previous:
@@ -481,11 +687,17 @@ def build_direction_proof(
         raise ProofConstructionError(
             "proof construction currently supports DirectionQuery"
         )
-    atoms = conjunctive_atoms(problem.premise)
-    if atoms is None or any(len(atom.allowed) != 1 for atom in atoms):
+    premises = _top_level_premises(problem.premise)
+    if any(
+        not isinstance(premise, RelationConstraint) or len(premise.allowed) != 1
+        for premise in premises
+    ):
         raise ProofConstructionError(
             "proof construction currently requires exact positive conjunctions"
         )
+    atoms = tuple(
+        premise for premise in premises if isinstance(premise, RelationConstraint)
+    )
 
     steps: list[ProofStep] = []
     for premise_index, atom in enumerate(atoms):
