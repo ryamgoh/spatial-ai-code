@@ -224,7 +224,7 @@ finetune/outputs/
 experiments/**/models/
 
 # Typst build output
-/report.pdf
+/fyp-report/report.pdf
 
 # Exp 12 v12 generated data (regenerable from seed 52 via the Exp 12 baseline launcher / make_v12_data.py)
 data/spatial_sft_v12_*.jsonl

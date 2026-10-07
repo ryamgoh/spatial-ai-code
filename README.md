@@ -10,6 +10,8 @@ LM Evaluation Harness with a custom one- or two-stage vLLM backend.
 | --- | --- |
 | data/ | Versioned source and evaluation datasets |
 | spatial/ | Spatial solver, synthetic generators, and contract tests |
+| fyp-report/ | Buildable Typst dissertation project and official format reference |
+| docs/ | Working research notes, source annotations, and experiment plans |
 | finetune/ | Axolotl training, model merging, and reward functions |
 | eval/ | Evaluation backend and dataset cleaners |
 | experiments/<id>/ | One experiment's configs, notes, scripts, logs, and results |
@@ -21,6 +23,13 @@ LM Evaluation Harness with a custom one- or two-stage vLLM backend.
 
 The detailed experiment index and path conventions are in
 [experiments/README.md](experiments/README.md).
+
+The dissertation is built from the repository root with:
+
+    typst compile fyp-report/report.typ
+
+This writes `fyp-report/report.pdf`. The NUS formatting reference is stored in
+`fyp-report/reference/`.
 
 ## Setup
 
