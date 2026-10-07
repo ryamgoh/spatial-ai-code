@@ -10,10 +10,12 @@ from spatial_proofs_v2 import (
     Contradiction,
     DirectionClaim,
     DirectionProofCertificate,
+    DirectionRefutationCertificate,
     OrderRelation,
     ProofAxis,
     ProofRule,
     check_direction_proof,
+    check_direction_refutation,
 )
 from spatial_solver_v2 import (
     And,
@@ -131,6 +133,12 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
             f"{scope}{step.id}: Assume "
             f"{_formula_text(conclusion, labels, symbolic=False)} from {step.inputs[0]}."
         )
+    if step.rule is ProofRule.REFUTATION_ASSUMPTION:
+        assert isinstance(conclusion, SpatialFormula)
+        return (
+            f"{scope}{step.id}: Assume for contradiction that "
+            f"{_formula_text(conclusion, labels, symbolic=False)}."
+        )
     if step.rule in {
         ProofRule.AND_ELIMINATION,
         ProofRule.AND_INTRODUCTION,
@@ -177,6 +185,12 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
             f"{scope}{step.id}: By {conclusion.axis.value.upper()}-axis transitivity from "
             f"{step.inputs[0]} and {step.inputs[1]}, {_axis_text(conclusion, labels)}."
         )
+    if step.rule is ProofRule.AXIS_CONTRADICTION:
+        assert isinstance(conclusion, Contradiction)
+        return (
+            f"{scope}{step.id}: {step.inputs[0]} and {step.inputs[1]} assign "
+            "different relations to the same axis pair, so the assumption is impossible."
+        )
     assert step.rule is ProofRule.DIRECTION_RECOMPOSITION
     assert isinstance(conclusion, DirectionClaim)
     return (
@@ -222,3 +236,26 @@ def render_direction_proof(
         return "\n".join(_symbolic_step(step, labels) for step in certificate.steps)
 
     return "\n".join(_natural_step(step, labels) for step in certificate.steps)
+
+
+def render_direction_refutation(
+    certificate: DirectionRefutationCertificate,
+    trace_format: TraceFormat | str,
+    labels: Mapping[str, str] | None = None,
+) -> str:
+    """Render one checked contradiction for an impossible candidate."""
+    check_direction_refutation(certificate)
+    trace_format = TraceFormat(trace_format)
+    labels = labels or {}
+    lines = (
+        [_symbolic_step(step, labels) for step in certificate.steps]
+        if trace_format is TraceFormat.SYMBOLIC
+        else [_natural_step(step, labels) for step in certificate.steps]
+    )
+    claim = render_formula(certificate.claim, trace_format, labels)
+    lines.append(
+        f"Impossible: {claim}"
+        if trace_format is TraceFormat.SYMBOLIC
+        else f"Therefore {claim} is impossible."
+    )
+    return "\n".join(lines)

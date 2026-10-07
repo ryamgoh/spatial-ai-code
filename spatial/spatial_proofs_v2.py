@@ -4,8 +4,8 @@ This module is deliberately independent of the SMT implementation. It builds
 and checks typed derivations from the structured premises themselves. The
 automatic builder covers exact positive-conjunction Direction problems; the
 checker additionally supports bounded Boolean and case-split proofs. Ambiguous
-certificates, Which, and Count remain explicit future extensions rather than
-solver-status fallbacks.
+Direction answer sets are assembled by the answer-certificate layer; Which and
+Count remain explicit future extensions rather than solver-status fallbacks.
 """
 
 from __future__ import annotations
@@ -42,6 +42,7 @@ class ProofCheckError(ValueError):
 class ProofRule(str, Enum):
     PREMISE = "premise"
     ASSUMPTION = "assumption"
+    REFUTATION_ASSUMPTION = "refutation-assumption"
     AND_ELIMINATION = "and-elimination"
     AND_INTRODUCTION = "and-introduction"
     MODUS_PONENS = "modus-ponens"
@@ -54,6 +55,7 @@ class ProofRule(str, Enum):
     DIRECTION_DECOMPOSITION = "direction-decomposition"
     AXIS_INVERSION = "axis-inversion"
     AXIS_TRANSITIVITY = "axis-transitivity"
+    AXIS_CONTRADICTION = "axis-contradiction"
     DIRECTION_RECOMPOSITION = "direction-recomposition"
 
 
@@ -119,14 +121,20 @@ class DirectionProofCertificate:
 
     @property
     def support_premise_indices(self) -> tuple[int, ...]:
-        reachable = _reachable_step_ids(self)
-        return tuple(
-            sorted(
-                step.premise_index
-                for step in self.steps
-                if step.id in reachable and step.premise_index is not None
-            )
-        )
+        return _support_premise_indices(self.steps, self.conclusion_step)
+
+
+@dataclass(frozen=True)
+class DirectionRefutationCertificate:
+    problem: SpatialProblem
+    claim: RelationConstraint
+    steps: tuple[ProofStep, ...]
+    assumption_step: str
+    contradiction_step: str
+
+    @property
+    def support_premise_indices(self) -> tuple[int, ...]:
+        return _support_premise_indices(self.steps, self.contradiction_step)
 
 
 def _relation_from_sign(sign: int) -> OrderRelation:
@@ -193,10 +201,13 @@ def _compose_facts(first: AxisFact, second: AxisFact) -> AxisFact | None:
     return AxisFact(first.axis, first.subject, relation, second.reference)
 
 
-def _reachable_step_ids(certificate: DirectionProofCertificate) -> frozenset[str]:
-    steps = {step.id: step for step in certificate.steps}
+def _reachable_step_ids(
+    proof_steps: tuple[ProofStep, ...],
+    conclusion_step: str,
+) -> frozenset[str]:
+    steps = {step.id: step for step in proof_steps}
     reachable: set[str] = set()
-    frontier = [certificate.conclusion_step]
+    frontier = [conclusion_step]
     while frontier:
         step_id = frontier.pop()
         if step_id in reachable:
@@ -207,6 +218,20 @@ def _reachable_step_ids(certificate: DirectionProofCertificate) -> frozenset[str
         reachable.add(step_id)
         frontier.extend(step.inputs)
     return frozenset(reachable)
+
+
+def _support_premise_indices(
+    proof_steps: tuple[ProofStep, ...],
+    conclusion_step: str,
+) -> tuple[int, ...]:
+    reachable = _reachable_step_ids(proof_steps, conclusion_step)
+    return tuple(
+        sorted(
+            step.premise_index
+            for step in proof_steps
+            if step.id in reachable and step.premise_index is not None
+        )
+    )
 
 
 def _top_level_premises(formula: SpatialFormula) -> tuple[SpatialFormula, ...]:
@@ -271,6 +296,15 @@ def _check_step(
             raise ProofCheckError(f"{step.id} is not a scoped disjunct assumption")
         if step.conclusion not in input_formulas[0].operands:
             raise ProofCheckError(f"{step.id} assumes no disjunct from its source")
+        return
+
+    if step.rule is ProofRule.REFUTATION_ASSUMPTION:
+        if (
+            step.branch is None
+            or step.inputs
+            or not isinstance(step.conclusion, SpatialFormula)
+        ):
+            raise ProofCheckError(f"{step.id} is not a scoped refutation assumption")
         return
 
     if step.rule is ProofRule.AND_ELIMINATION:
@@ -453,6 +487,31 @@ def _check_step(
             raise ProofCheckError(f"{step.id} has an invalid transitivity step")
         return
 
+    if step.rule is ProofRule.AXIS_CONTRADICTION:
+        if len(resolved_inputs) != 2 or not all(
+            isinstance(item.conclusion, AxisFact) for item in resolved_inputs
+        ):
+            raise ProofCheckError(f"{step.id} must compare two axis facts")
+        first = resolved_inputs[0].conclusion
+        second = resolved_inputs[1].conclusion
+        assert isinstance(first, AxisFact) and isinstance(second, AxisFact)
+        if first.axis is not second.axis or {
+            first.subject,
+            first.reference,
+        } != {second.subject, second.reference}:
+            raise ProofCheckError(f"{step.id} compares different axis pairs")
+        first_sign = _relation_sign(first.relation)
+        second_sign = _relation_sign(second.relation)
+        if first.subject == second.reference:
+            second_sign = -second_sign
+        if (
+            first_sign == second_sign
+            or not isinstance(step.conclusion, Contradiction)
+            or step.branch is None
+        ):
+            raise ProofCheckError(f"{step.id} does not contain an axis contradiction")
+        return
+
     if step.rule is ProofRule.DIRECTION_RECOMPOSITION:
         if len(resolved_inputs) != 2 or not all(
             isinstance(item.conclusion, AxisFact) for item in resolved_inputs
@@ -483,20 +542,27 @@ def _check_step(
     raise ProofCheckError(f"unsupported proof rule: {step.rule}")
 
 
+def _replay_steps(
+    problem: SpatialProblem,
+    steps: tuple[ProofStep, ...],
+) -> dict[str, ProofStep]:
+    premises = _top_level_premises(problem.premise)
+    previous: dict[str, ProofStep] = {}
+    for step in steps:
+        if not step.id or step.id in previous:
+            raise ProofCheckError("proof step identifiers must be non-empty and unique")
+        _check_step(step, previous, premises)
+        previous[step.id] = step
+    return previous
+
+
 def check_direction_proof(certificate: DirectionProofCertificate) -> None:
     """Replay a Direction certificate without consulting an SMT solver."""
     problem = certificate.problem
     query = problem.query
     if not isinstance(query, DirectionQuery):
         raise ProofCheckError("Direction certificates require a DirectionQuery")
-    premises = _top_level_premises(problem.premise)
-
-    previous: dict[str, ProofStep] = {}
-    for step in certificate.steps:
-        if not step.id or step.id in previous:
-            raise ProofCheckError("proof step identifiers must be non-empty and unique")
-        _check_step(step, previous, premises)
-        previous[step.id] = step
+    previous = _replay_steps(problem, certificate.steps)
 
     if certificate.conclusion_step not in previous:
         raise ProofCheckError("conclusion_step does not identify a proof step")
@@ -507,7 +573,43 @@ def check_direction_proof(certificate: DirectionProofCertificate) -> None:
         or conclusion.direction not in query.candidate_directions
     ):
         raise ProofCheckError("proof conclusion does not answer the DirectionQuery")
-    _reachable_step_ids(certificate)
+    _reachable_step_ids(certificate.steps, certificate.conclusion_step)
+
+
+def check_direction_refutation(
+    certificate: DirectionRefutationCertificate,
+) -> None:
+    """Replay a contradiction showing that one Direction candidate is impossible."""
+    problem = certificate.problem
+    query = problem.query
+    claim = certificate.claim
+    if not isinstance(query, DirectionQuery):
+        raise ProofCheckError("Direction refutations require a DirectionQuery")
+    if (
+        claim.subject != query.target
+        or claim.reference != query.reference
+        or len(claim.allowed) != 1
+        or not claim.allowed <= query.candidate_directions
+    ):
+        raise ProofCheckError("refutation claim does not identify one query candidate")
+    steps = _replay_steps(problem, certificate.steps)
+    assumption = steps.get(certificate.assumption_step)
+    if (
+        assumption is None
+        or assumption.rule is not ProofRule.REFUTATION_ASSUMPTION
+        or assumption.conclusion != claim
+    ):
+        raise ProofCheckError("assumption_step does not assume the refuted claim")
+    contradiction = steps.get(certificate.contradiction_step)
+    if contradiction is None or not isinstance(contradiction.conclusion, Contradiction):
+        raise ProofCheckError("contradiction_step does not close the refutation")
+    if contradiction.branch != assumption.branch:
+        raise ProofCheckError(
+            "refutation assumption and contradiction use different scopes"
+        )
+    reachable = _reachable_step_ids(certificate.steps, certificate.contradiction_step)
+    if certificate.assumption_step not in reachable:
+        raise ProofCheckError("contradiction does not depend on the refuted claim")
 
 
 @dataclass(frozen=True)
@@ -677,16 +779,20 @@ def proof_to_dict(certificate: DirectionProofCertificate) -> dict[str, Any]:
     return {"type": type(certificate).__name__, **payload}
 
 
-def build_direction_proof(
+def refutation_to_dict(
+    certificate: DirectionRefutationCertificate,
+) -> dict[str, Any]:
+    """Return a deterministic JSON-compatible refutation representation."""
+    check_direction_refutation(certificate)
+    payload = _serialize(certificate)
+    if not isinstance(payload, dict):
+        raise TypeError("refutation certificate did not serialize to an object")
+    return {"type": type(certificate).__name__, **payload}
+
+
+def _exact_direction_premises(
     problem: SpatialProblem,
-    direction: Direction | None = None,
-) -> DirectionProofCertificate:
-    """Construct and replay a proof for one entailed exact Direction answer."""
-    query = problem.query
-    if not isinstance(query, DirectionQuery):
-        raise ProofConstructionError(
-            "proof construction currently supports DirectionQuery"
-        )
+) -> tuple[RelationConstraint, ...]:
     premises = _top_level_premises(problem.premise)
     if any(
         not isinstance(premise, RelationConstraint) or len(premise.allowed) != 1
@@ -695,12 +801,16 @@ def build_direction_proof(
         raise ProofConstructionError(
             "proof construction currently requires exact positive conjunctions"
         )
-    atoms = tuple(
+    return tuple(
         premise for premise in premises if isinstance(premise, RelationConstraint)
     )
 
+
+def _base_direction_steps(
+    problem: SpatialProblem,
+) -> tuple[list[ProofStep], dict[ProofAxis, dict[str, list[_GraphEdge]]]]:
     steps: list[ProofStep] = []
-    for premise_index, atom in enumerate(atoms):
+    for premise_index, atom in enumerate(_exact_direction_premises(problem)):
         premise_id = f"P{premise_index + 1}"
         steps.append(
             ProofStep(
@@ -711,20 +821,32 @@ def build_direction_proof(
             )
         )
         for axis in ProofAxis:
-            direct = _axis_fact(atom, axis)
             direct_id = f"{premise_id}-{axis.value.upper()}"
             steps.append(
                 ProofStep(
                     direct_id,
                     ProofRule.DIRECTION_DECOMPOSITION,
-                    direct,
+                    _axis_fact(atom, axis),
                     (premise_id,),
                 )
             )
-
     graphs = {
         axis: _proof_graph(problem.objects, tuple(steps), axis) for axis in ProofAxis
     }
+    return steps, graphs
+
+
+def build_direction_proof(
+    problem: SpatialProblem,
+    direction: Direction | None = None,
+) -> DirectionProofCertificate:
+    """Construct and replay a proof for one entailed exact Direction answer."""
+    query = problem.query
+    if not isinstance(query, DirectionQuery):
+        raise ProofConstructionError(
+            "proof construction currently supports DirectionQuery"
+        )
+    steps, graphs = _base_direction_steps(problem)
 
     candidates = [direction] if direction is not None else list(Direction)
     candidates = [item for item in candidates if item in query.candidate_directions]
@@ -774,8 +896,7 @@ def build_direction_proof(
             (x_step, y_step),
         )
     )
-    candidate = DirectionProofCertificate(problem, tuple(steps), conclusion_id)
-    reachable = _reachable_step_ids(candidate)
+    reachable = _reachable_step_ids(tuple(steps), conclusion_id)
     certificate = DirectionProofCertificate(
         problem,
         tuple(step for step in steps if step.id in reachable),
@@ -783,3 +904,85 @@ def build_direction_proof(
     )
     check_direction_proof(certificate)
     return certificate
+
+
+def build_direction_refutation(
+    problem: SpatialProblem,
+    direction: Direction,
+) -> DirectionRefutationCertificate:
+    """Construct an axis contradiction for one impossible Direction candidate."""
+    query = problem.query
+    if not isinstance(query, DirectionQuery):
+        raise ProofConstructionError(
+            "refutation construction currently supports DirectionQuery"
+        )
+    if direction not in query.candidate_directions:
+        raise ProofConstructionError(
+            "refuted direction is outside the query candidates"
+        )
+    steps, graphs = _base_direction_steps(problem)
+    claim = RelationConstraint(
+        query.target,
+        query.reference,
+        frozenset({direction}),
+    )
+    branch = f"refute-{direction.value.lower()}"
+    assumption_id = "A-DIR"
+    steps.append(
+        ProofStep(
+            assumption_id,
+            ProofRule.REFUTATION_ASSUMPTION,
+            claim,
+            branch=branch,
+        )
+    )
+    assumption_axes = {}
+    for axis in ProofAxis:
+        step_id = f"A-{axis.value.upper()}"
+        steps.append(
+            ProofStep(
+                step_id,
+                ProofRule.DIRECTION_DECOMPOSITION,
+                _axis_fact(claim, axis),
+                (assumption_id,),
+                branch=branch,
+            )
+        )
+        assumption_axes[axis] = step_id
+
+    for axis, desired_sign in zip(ProofAxis, direction_signs(direction)):
+        for conflicting_sign in (-1, 0, 1):
+            if conflicting_sign == desired_sign:
+                continue
+            path = _find_axis_path(
+                graphs[axis],
+                query.target,
+                query.reference,
+                conflicting_sign,
+            )
+            if path is None:
+                continue
+            premise_fact = _derive_axis_path(axis, path, steps)
+            contradiction_id = f"C-{axis.value.upper()}"
+            steps.append(
+                ProofStep(
+                    contradiction_id,
+                    ProofRule.AXIS_CONTRADICTION,
+                    Contradiction(),
+                    (premise_fact, assumption_axes[axis]),
+                    branch=branch,
+                )
+            )
+            reachable = _reachable_step_ids(tuple(steps), contradiction_id)
+            certificate = DirectionRefutationCertificate(
+                problem,
+                claim,
+                tuple(step for step in steps if step.id in reachable),
+                assumption_id,
+                contradiction_id,
+            )
+            check_direction_refutation(certificate)
+            return certificate
+    raise ProofConstructionError(
+        f"premises do not refute {direction.value} for the query pair"
+    )

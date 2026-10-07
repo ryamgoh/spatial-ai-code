@@ -335,6 +335,20 @@ rule applications. This reduces correlated implementation risk but is not a
 formally verified trusted kernel. Theorem 3 establishes the intended calculus;
 tests establish only that the Python implementation conforms on covered cases.
 
+#heading(level: 3, numbering: none)[Corollary 3.1: Refutation Soundness]
+
+Let $C_D$ be an accepted refutation certificate whose scoped assumption is
+$R_D(a,b)$ and whose final step is an axis contradiction. Then
+
+$
+  Gamma and R_D(a,b) |= bot,
+$
+
+so $Gamma |= not R_D(a,b)$. The result follows from Theorem 3's step argument:
+the premise-derived axis fact is true in every model of $Gamma$, the assumed
+candidate supplies a different exact comparison on the same axis pair, and
+trichotomy prevents both comparisons from holding in one world.
+
 #heading(level: 2, numbering: none)[Constructive Model Certificates]
 
 A proof certificate establishes that a claim follows from the premises. A model
@@ -362,6 +376,34 @@ $P and A$ and an accepted countermodel for $P and not A$, using the same problem
 and claim. It proves that $A$ is possible but not entailed. One or two models do
 not prove that an answer set is complete; impossible candidates still require a
 closed proof or an independent unsatisfiability decision.
+
+#heading(level: 2, numbering: none)[Complete Direction Answer Sets]
+
+A Direction answer-set certificate enumerates the query's declared candidate
+directions in canonical compass order. Each candidate carries exactly one of:
+
+- an accepted model certificate satisfying $P and R_D(a,b)$; or
+- an accepted refutation certificate showing that $P and R_D(a,b)$ has no
+  spatial model.
+
+Missing candidates, duplicate candidates, evidence for an undeclared direction,
+or a candidate carrying both forms of evidence invalidate the certificate.
+
+#heading(level: 2, numbering: none)[Proposition 5: Answer-Set Completeness]
+
+If a Direction answer-set certificate is accepted, the directions marked by
+model certificates are exactly the possible directions among the declared
+candidates.
+
+_Proof._ Every model-backed candidate is possible by Proposition 4. Every
+refutation-backed candidate is impossible by Corollary 3.1. The coverage check
+partitions the complete declared candidate set into these two classes exactly
+once, so no declared possibility is omitted or duplicated. $square$
+
+This is completeness relative to the query's declared candidate set. A dataset
+adapter that exposes only four ordinal directions is making a narrower contract
+than the generic eight-direction solver; the certificate does not silently add
+directions outside that contract.
 
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 

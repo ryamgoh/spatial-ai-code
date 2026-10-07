@@ -8,7 +8,10 @@ from dataclasses import replace
 
 import pytest
 from spatial_explanation_renderers_v2 import TraceFormat
-from spatial_proof_renderers_v2 import render_direction_proof
+from spatial_proof_renderers_v2 import (
+    render_direction_proof,
+    render_direction_refutation,
+)
 from spatial_proofs_v2 import (
     AxisFact,
     Contradiction,
@@ -21,8 +24,11 @@ from spatial_proofs_v2 import (
     ProofRule,
     ProofStep,
     build_direction_proof,
+    build_direction_refutation,
     check_direction_proof,
+    check_direction_refutation,
     proof_to_dict,
+    refutation_to_dict,
 )
 from spatial_solver_v2 import (
     And,
@@ -113,6 +119,41 @@ def test_direct_certificate_supports_all_eight_directions(direction: Direction) 
     assert proof.support_premise_indices == (0,)
     assert proof.steps[-1].rule is ProofRule.DIRECTION_RECOMPOSITION
     json.dumps(proof_to_dict(proof))
+
+
+@pytest.mark.parametrize("actual", list(Direction))
+def test_refutation_certificate_excludes_every_other_direction(
+    actual: Direction,
+) -> None:
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=atom("A", actual, "B"),
+        query=DirectionQuery("A", "B"),
+    )
+
+    for candidate in Direction:
+        if candidate is actual:
+            continue
+        refutation = build_direction_refutation(problem, candidate)
+        check_direction_refutation(refutation)
+        assert next(iter(refutation.claim.allowed)) is candidate
+        assert refutation.support_premise_indices == (0,)
+        assert "Impossible:" in render_direction_refutation(
+            refutation,
+            TraceFormat.SYMBOLIC,
+        )
+        json.dumps(refutation_to_dict(refutation))
+
+
+def test_refutation_builder_rejects_a_possible_direction() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=atom("A", Direction.NORTHEAST, "B"),
+        query=DirectionQuery("A", "B"),
+    )
+
+    with pytest.raises(ProofConstructionError, match="do not refute Northeast"):
+        build_direction_refutation(problem, Direction.NORTHEAST)
 
 
 def test_transitive_certificate_renders_one_checked_proof_in_two_forms() -> None:
