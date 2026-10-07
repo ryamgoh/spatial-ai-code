@@ -9,6 +9,8 @@ one domain model and one gold-label contract.
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
 | `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
 | `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
+| `spatial_proofs_v2.py` | Typed Direction proof certificates, deterministic construction, replay checking, and serialization | Proof-first SpatialEntail generation |
+| `spatial_proof_renderers_v2.py` | Natural and Symbolic views of one checked proof certificate | Proof-first SFT traces |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
@@ -23,6 +25,7 @@ one domain model and one gold-label contract.
 | `test_audit_spatialeval_v2.py` | Source preservation, correction, determinism, and overwrite contracts | Part I audit verification |
 | `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
 | `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
+| `test_spatial_proofs_v2.py` | Proof construction, compact certificates, mutation rejection, and paired rendering | Local/CI verification |
 | `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
 | `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
 | `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
@@ -57,6 +60,16 @@ the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
 `render_training_trace` with `TraceFormat.NATURAL` or `TraceFormat.SYMBOLIC`
 and an independent `StateMode`. Coordinate witnesses belong only in structured
 audit metadata or `render_audit_explanation`, never in an SFT reasoning target.
+
+The proof-first seam is the replacement path for training explanations.
+`build_direction_proof` currently accepts only exact positive-conjunction
+Direction problems, constructs a typed certificate without consulting Z3, and
+replays every premise, decomposition, inversion, transitivity, and recomposition
+step through `check_direction_proof`. `render_direction_proof` produces Natural
+or Symbolic text from that same certificate. It is not wired behind a fallback
+to the post-hoc training renderer: Boolean branching, ambiguity certificates,
+Which, and Count must be implemented before proof-first workload generation is
+enabled for those shapes.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 
