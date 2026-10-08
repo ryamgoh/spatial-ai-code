@@ -11,6 +11,7 @@ from typing import TypeVar
 import typer
 
 from spatial.v2.generation import (
+    BooleanShape,
     GenerationPolicy,
     MenuCoverage,
     QueryKind,
@@ -42,6 +43,7 @@ class WorkloadSpec:
     )
     menu_coverages: tuple[MenuCoverage, ...] = (MenuCoverage.FULL,)
     trace_formats: tuple[TraceFormat, ...] = tuple(TraceFormat)
+    boolean_shapes: tuple[BooleanShape, ...] = (BooleanShape.ATOMIC,)
     query_directions: tuple[Direction, ...] | None = None
     target_directions: tuple[Direction, ...] | None = None
     num_entities: int = 6
@@ -73,10 +75,18 @@ class WorkloadSpec:
             "semantic shape": self.semantic_shapes,
             "menu coverage": self.menu_coverages,
             "trace format": self.trace_formats,
+            "Boolean shape": self.boolean_shapes,
         }
         empty = [name for name, values in dimensions.items() if not values]
         if empty:
             raise ValueError("empty workload dimensions: " + ", ".join(empty))
+        if any(shape is not BooleanShape.ATOMIC for shape in self.boolean_shapes) and (
+            set(self.query_kinds) != {QueryKind.DIRECTION}
+            or set(self.semantic_shapes) != {SemanticShape.UNIQUE}
+        ):
+            raise ValueError(
+                "non-atomic Boolean shapes require only Direction/unique cells"
+            )
 
     def manifest_config(self) -> dict:
         def serialize(value):
@@ -125,8 +135,9 @@ def generate_workload(
         spec.answer_modes,
         spec.semantic_shapes,
         spec.menu_coverages,
+        spec.boolean_shapes,
     ):
-        query_kind, answer_mode, shape, coverage = dimensions
+        query_kind, answer_mode, shape, coverage, boolean_shape = dimensions
         if (
             query_kind is QueryKind.DIRECTION
             and shape is SemanticShape.UNIQUE
@@ -149,6 +160,7 @@ def generate_workload(
                     semantic_shape=shape,
                     menu_coverage=coverage,
                     trace_format=spec.trace_formats[0],
+                    boolean_shape=boolean_shape,
                     num_entities=spec.num_entities,
                     num_premises=spec.num_premises,
                     query_direction=query_direction,
@@ -203,6 +215,7 @@ def main(
     semantic_shapes: str = typer.Option("unique,ambiguous"),
     menu_coverages: str = typer.Option("full"),
     trace_formats: str = typer.Option("natural,symbolic"),
+    boolean_shapes: str = typer.Option("atomic"),
     query_directions: str = typer.Option(
         "north,northeast,east,southeast,south,southwest,west,northwest",
         help="Balanced Which/Count query directions; ignored for Direction queries.",
@@ -247,6 +260,11 @@ def main(
                     menu_coverages, MenuCoverage, "menu coverages"
                 ),
                 trace_formats=_enum_values(trace_formats, TraceFormat, "trace formats"),
+                boolean_shapes=_enum_values(
+                    boolean_shapes,
+                    BooleanShape,
+                    "Boolean shapes",
+                ),
                 query_directions=_enum_values(
                     query_directions, Direction, "query directions"
                 ),

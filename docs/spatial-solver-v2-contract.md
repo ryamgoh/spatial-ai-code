@@ -516,8 +516,14 @@ exact answer when that entity is absent in another valid world.
 
 `spatial/v2/generation.py` keeps synthetic-data policy above the
 solver. A `GenerationPolicy` chooses the query family, answer mode, semantic
-shape, menu coverage, trace format, entity count, and premise count. The solver
-sees only the resulting `SpatialProblem`.
+shape, Boolean proof shape, menu coverage, trace format, entity count, and
+premise count. The solver sees only the resulting `SpatialProblem`.
+
+The proof-first Boolean shapes are `modus-ponens`, `iff`, `double-negation`,
+`disjunctive-syllogism`, `case-split`, and `nested-case-split`. They currently
+target unique Direction questions. `atomic` retains the ordinary spatial
+generation path. Each Boolean template constructs a logical proof obligation
+before solving; it is not derived from a privileged coordinate answer map.
 
 Each accepted item follows one fail-closed path:
 

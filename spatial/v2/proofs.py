@@ -1376,6 +1376,18 @@ def build_formula_refutation(
     """Construct and replay a contradiction for a supported Boolean claim."""
     steps = _premise_steps(problem)
     _saturate_formula_steps(steps)
+    if isinstance(problem.query, DirectionQuery):
+        for direction in Direction:
+            if direction not in problem.query.candidate_directions:
+                continue
+            _derive_formula(
+                steps,
+                RelationConstraint(
+                    problem.query.target,
+                    problem.query.reference,
+                    frozenset({direction}),
+                ),
+            )
     branch = "refutation"
     assumption_id = "A-REFUTE"
     steps.append(

@@ -9,7 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 from spatial.v2.generate_matrix import app
-from spatial.v2.generation import MenuCoverage, QueryKind, SemanticShape
+from spatial.v2.generation import BooleanShape, MenuCoverage, QueryKind, SemanticShape
 from spatial.v2.grading import AnswerMode
 from spatial.v2.matrix import generate_matrix, load_experiment_matrix
 from spatial.v2.solver import Direction
@@ -89,9 +89,24 @@ def test_matrix_parser_builds_typed_cells_and_variants(tmp_path) -> None:
     assert cell.count == 2
     assert cell.query_kind is QueryKind.DIRECTION
     assert cell.semantic_shape is SemanticShape.UNIQUE
+    assert cell.boolean_shape is BooleanShape.ATOMIC
     assert cell.depth == 2
     assert cell.target_directions == (Direction.NORTH, Direction.SOUTH)
     assert cell.answer_variants == ("single", "complete", "visible")
+
+
+def test_matrix_parser_accepts_boolean_proof_shape(tmp_path) -> None:
+    path = tmp_path / "boolean.yaml"
+    path.write_text(
+        MATRIX_YAML.replace(
+            "depth: 2\n    omit_direct_query_relation: true\n    distractor_premises: 5",
+            "boolean_shape: nested-case-split",
+        )
+    )
+
+    matrix = load_experiment_matrix(path)
+
+    assert matrix.cells[0].boolean_shape is BooleanShape.NESTED_CASE_SPLIT
 
 
 def test_checked_in_ablation_matrix_is_valid() -> None:

@@ -8,10 +8,14 @@ from dataclasses import replace
 import pytest
 from typer.testing import CliRunner
 
-from spatial.v2.answer_certificates import DirectionAnswerSetCertificate
+from spatial.v2.answer_certificates import (
+    DirectionAnswerSetCertificate,
+    DirectionEntailmentCertificate,
+)
 from spatial.v2.count_certificates import CountAnswerSetCertificate
 from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
 from spatial.v2.generation import (
+    BooleanShape,
     GenerationPolicy,
     MenuCoverage,
     QueryKind,
@@ -19,6 +23,7 @@ from spatial.v2.generation import (
     SpatialGeneratorV2,
 )
 from spatial.v2.grading import AnswerMode, encode_menu_answer, resolve_answer
+from spatial.v2.proofs import ProofRule
 from spatial.v2.solver import (
     CountQuery,
     Direction,
@@ -125,6 +130,67 @@ def test_generator_can_target_every_direction_answer() -> None:
         )
         assert sample.analysis.possible_directions == (direction,)
         assert sample.as_sft_row()["metadata"]["target_direction"] == direction.value
+
+
+@pytest.mark.parametrize(
+    ("shape", "rule", "minimum_uses"),
+    [
+        (BooleanShape.MODUS_PONENS, ProofRule.MODUS_PONENS, 1),
+        (BooleanShape.IFF, ProofRule.IFF_ELIMINATION, 1),
+        (BooleanShape.DOUBLE_NEGATION, ProofRule.DOUBLE_NEGATION, 1),
+        (
+            BooleanShape.DISJUNCTIVE_SYLLOGISM,
+            ProofRule.DISJUNCTIVE_SYLLOGISM,
+            1,
+        ),
+        (BooleanShape.CASE_SPLIT, ProofRule.CASE_SPLIT, 1),
+        (BooleanShape.NESTED_CASE_SPLIT, ProofRule.CASE_SPLIT, 2),
+    ],
+)
+@pytest.mark.parametrize("target_direction", list(Direction))
+def test_generator_constructs_proof_first_boolean_curriculum(
+    shape: BooleanShape,
+    rule: ProofRule,
+    minimum_uses: int,
+    target_direction: Direction,
+) -> None:
+    sample = SpatialGeneratorV2(seed=1720).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.UNIQUE,
+            boolean_shape=shape,
+            target_direction=target_direction,
+            num_entities=6,
+            num_premises=7,
+        ),
+        max_attempts=1,
+    )
+
+    possible = next(item for item in sample.certificate.candidates if item.possible)
+    assert isinstance(possible.evidence, DirectionEntailmentCertificate)
+    assert possible.direction is target_direction
+    assert (
+        sum(step.rule is rule for step in possible.evidence.proof.steps) >= minimum_uses
+    )
+    assert SpatialTextAdapter().parse(sample.prompt).problem == sample.problem
+    assert sample.policy.boolean_shape is shape
+    assert len(set(sample.problem.premise.operands)) == len(
+        sample.problem.premise.operands
+    )
+
+
+def test_boolean_curriculum_rejects_non_direction_queries() -> None:
+    with pytest.raises(ValueError, match="require Direction"):
+        GenerationPolicy(
+            query_kind=QueryKind.WHICH,
+            semantic_shape=SemanticShape.UNIQUE,
+            boolean_shape=BooleanShape.MODUS_PONENS,
+        )
+
+
+def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
+    with pytest.raises(ValueError, match="only Direction/unique"):
+        WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))
 
 
 def test_direction_policy_enforces_transitive_axis_depth_without_direct_fact() -> None:
@@ -577,6 +643,35 @@ def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -
     }
     assert train_base_ids.isdisjoint(test_base_ids)
     assert all("audit" not in row for row in rows)
+
+
+def test_workload_emits_each_requested_boolean_shape(tmp_path) -> None:
+    train_path, _ = generate_workload(
+        tmp_path / "boolean.jsonl",
+        WorkloadSpec(
+            samples_per_cell=1,
+            query_kinds=(QueryKind.DIRECTION,),
+            semantic_shapes=(SemanticShape.UNIQUE,),
+            trace_formats=(TraceFormat.SYMBOLIC,),
+            boolean_shapes=(
+                BooleanShape.MODUS_PONENS,
+                BooleanShape.NESTED_CASE_SPLIT,
+            ),
+            target_directions=(Direction.NORTH,),
+            num_entities=6,
+            num_premises=7,
+            test_split=0,
+        ),
+    )
+
+    rows = [json.loads(line) for line in train_path.read_text().splitlines()]
+    assert {row["metadata"]["boolean_shape"] for row in rows} == {
+        "modus-ponens",
+        "nested-case-split",
+    }
+    assert all(
+        "Direction-Domain: {North}" in row["messages"][2]["content"] for row in rows
+    )
 
 
 def test_cli_rejects_unknown_policy_dimensions(tmp_path) -> None:

@@ -39,6 +39,10 @@ from spatial.v2.solver import (
     Direction,
     DirectionAnalysis,
     DirectionQuery,
+    Iff,
+    Implies,
+    Not,
+    Or,
     QueryAnalysis,
     RelationConstraint,
     SpatialProblem,
@@ -109,6 +113,16 @@ class MenuCoverage(str, Enum):
     ZERO = "zero"
 
 
+class BooleanShape(str, Enum):
+    ATOMIC = "atomic"
+    MODUS_PONENS = "modus-ponens"
+    IFF = "iff"
+    DOUBLE_NEGATION = "double-negation"
+    DISJUNCTIVE_SYLLOGISM = "disjunctive-syllogism"
+    CASE_SPLIT = "case-split"
+    NESTED_CASE_SPLIT = "nested-case-split"
+
+
 def _validate_depth_range(name: str, minimum: int, maximum: int | None) -> None:
     if minimum < 1:
         raise ValueError(f"min_{name}_depth must be positive")
@@ -125,6 +139,7 @@ class GenerationPolicy:
     semantic_shape: SemanticShape = SemanticShape.ANY
     menu_coverage: MenuCoverage = MenuCoverage.FULL
     trace_format: TraceFormat = TraceFormat.NATURAL
+    boolean_shape: BooleanShape = BooleanShape.ATOMIC
     num_entities: int = 6
     num_premises: int = 7
     ordinary_option_target: int = 4
@@ -151,6 +166,7 @@ class GenerationPolicy:
         object.__setattr__(self, "semantic_shape", SemanticShape(self.semantic_shape))
         object.__setattr__(self, "menu_coverage", MenuCoverage(self.menu_coverage))
         object.__setattr__(self, "trace_format", TraceFormat(self.trace_format))
+        object.__setattr__(self, "boolean_shape", BooleanShape(self.boolean_shape))
         if self.query_direction is not None:
             object.__setattr__(self, "query_direction", Direction(self.query_direction))
         if self.target_direction is not None:
@@ -194,6 +210,30 @@ class GenerationPolicy:
             raise ValueError("no-match is only realizable for Which queries")
 
     def _validate_difficulty(self) -> None:
+        if self.boolean_shape is not BooleanShape.ATOMIC:
+            if self.query_kind is not QueryKind.DIRECTION:
+                raise ValueError("Boolean proof shapes currently require Direction")
+            if self.semantic_shape not in {SemanticShape.ANY, SemanticShape.UNIQUE}:
+                raise ValueError("Boolean proof shapes require unique semantics")
+            minimum_entities = (
+                6 if self.boolean_shape is BooleanShape.NESTED_CASE_SPLIT else 4
+            )
+            if self.num_entities < minimum_entities:
+                raise ValueError(
+                    f"{self.boolean_shape.value} requires at least "
+                    f"{minimum_entities} entities"
+                )
+            if (
+                self.omit_direct_query_relation
+                or self.min_axis_depth != 1
+                or self.max_axis_depth is not None
+                or self.require_independent_axes
+                or self.distractor_premises
+            ):
+                raise ValueError(
+                    "Boolean proof shapes cannot be combined with axis-depth or "
+                    "distractor controls"
+                )
         _validate_depth_range("axis", self.min_axis_depth, self.max_axis_depth)
         _validate_depth_range(
             "membership",
@@ -395,6 +435,7 @@ class GeneratedSpatialSample:
                 "semantic_shape": self.policy.semantic_shape.value,
                 "menu_coverage": self.policy.menu_coverage.value,
                 "trace_format": self.policy.trace_format.value,
+                "boolean_shape": self.policy.boolean_shape.value,
                 "num_entities": len(self.problem.objects),
                 "num_premises": len(self.problem.premise.operands),
                 "possible_values": [
@@ -568,9 +609,13 @@ class SpatialGeneratorV2:
         attempt: int,
     ) -> GeneratedSpatialSample:
         objects = tuple(sorted(self._random.sample(ENTITY_NAMES, policy.num_entities)))
+        boolean_problem = policy.boolean_shape is not BooleanShape.ATOMIC
         controlled_direction = self._uses_controlled_direction(policy)
         controlled_membership = self._uses_controlled_membership(policy)
-        if controlled_direction:
+        if boolean_problem:
+            problem = self._boolean_problem(policy, objects)
+            coordinates = {}
+        elif controlled_direction:
             problem = self._controlled_direction_problem(policy, objects)
             coordinates: dict[str, tuple[int, int]] = {}
         elif controlled_membership:
@@ -591,7 +636,7 @@ class SpatialGeneratorV2:
         difficulty = measure_difficulty(problem, analysis, self._solver)
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
-        if controlled_direction:
+        if boolean_problem or controlled_direction:
             assert isinstance(analysis, DirectionAnalysis)
             coordinates = analysis.coordinates or {}
         elif controlled_membership:
@@ -634,6 +679,113 @@ class SpatialGeneratorV2:
             coordinates,
             difficulty,
             {},
+        )
+
+    def _boolean_problem(
+        self,
+        policy: GenerationPolicy,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        target, reference, first, second = objects[:4]
+        target_direction = policy.target_direction or self._random.choice(
+            list(Direction)
+        )
+        target_atom = _exact_relation(target, target_direction, reference)
+        premise_atom = _exact_relation(
+            first,
+            self._random.choice(list(Direction)),
+            second,
+        )
+        alternative = _exact_relation(
+            target,
+            self._random.choice(
+                [
+                    direction
+                    for direction in Direction
+                    if direction is not target_direction
+                ]
+            ),
+            reference,
+        )
+        premise_alternative = _exact_relation(
+            first,
+            self._random.choice(
+                [
+                    direction
+                    for direction in Direction
+                    if direction not in premise_atom.allowed
+                ]
+            ),
+            second,
+        )
+
+        if policy.boolean_shape is BooleanShape.MODUS_PONENS:
+            premises = [premise_atom, Implies(premise_atom, target_atom)]
+        elif policy.boolean_shape is BooleanShape.IFF:
+            premises = [premise_atom, Iff(premise_atom, target_atom)]
+        elif policy.boolean_shape is BooleanShape.DOUBLE_NEGATION:
+            premises = [Not(Not(target_atom))]
+        elif policy.boolean_shape is BooleanShape.DISJUNCTIVE_SYLLOGISM:
+            premises = [Or((target_atom, alternative)), Not(alternative)]
+        elif policy.boolean_shape is BooleanShape.CASE_SPLIT:
+            premises = [
+                Or((premise_atom, premise_alternative)),
+                Implies(premise_atom, target_atom),
+                Implies(premise_alternative, target_atom),
+            ]
+        elif policy.boolean_shape is BooleanShape.NESTED_CASE_SPLIT:
+            third, fourth = objects[4:6]
+            nested_left = _exact_relation(
+                third,
+                self._random.choice(list(Direction)),
+                fourth,
+            )
+            nested_right = _exact_relation(
+                third,
+                self._random.choice(
+                    [
+                        direction
+                        for direction in Direction
+                        if direction not in nested_left.allowed
+                    ]
+                ),
+                fourth,
+            )
+            premises = [
+                Or((premise_atom, premise_alternative)),
+                Implies(premise_atom, Or((nested_left, nested_right))),
+                Implies(nested_left, target_atom),
+                Implies(nested_right, target_atom),
+                Implies(premise_alternative, target_atom),
+            ]
+        else:
+            raise ValueError("atomic problems use the ordinary generation path")
+
+        if len(premises) > policy.num_premises:
+            raise _RetryGeneration(
+                f"{policy.boolean_shape.value} requires at least "
+                f"{len(premises)} premises"
+            )
+        filler_pairs = [
+            pair
+            for pair in combinations(objects, 2)
+            if set(pair) != {target, reference}
+        ]
+        for index, (subject, filler_reference) in enumerate(filler_pairs):
+            if len(premises) == policy.num_premises:
+                break
+            filler_atom = _exact_relation(
+                subject,
+                tuple(Direction)[index % len(Direction)],
+                filler_reference,
+            )
+            premises.append(Or((filler_atom, Not(filler_atom))))
+        if len(premises) != policy.num_premises:
+            raise _RetryGeneration("premise budget exceeds Boolean filler capacity")
+        return SpatialProblem(
+            objects,
+            And(tuple(premises)),
+            DirectionQuery(target, reference),
         )
 
     @staticmethod

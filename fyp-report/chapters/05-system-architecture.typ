@@ -147,6 +147,12 @@ parses that rendered prompt back into a second `SpatialProblem`, and solves it
 again. A row is emitted only when the round trip preserves both the structured
 problem and its answer.
 
+Boolean curriculum cells construct a proof schema before semantic validation.
+The implemented schemas cover modus ponens, equivalence elimination, double
+negation, disjunctive syllogism, case split, and bounded nested case split over
+ordinary directional atoms. Thus the target conclusion is fixed by the proof
+obligation rather than selected from a previously sampled coordinate world.
+
 The SpatialEntail generator renders Natural or Symbolic reasoning from one
 replayable certificate. Direction certificates support spatial chains and
 bounded Boolean case proofs; complete Direction, Which, and correlated Count

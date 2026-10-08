@@ -14,6 +14,7 @@ from typing import Any, TypeVar
 import yaml
 
 from spatial.v2.generation import (
+    BooleanShape,
     GenerationPolicy,
     MenuCoverage,
     QueryKind,
@@ -45,6 +46,7 @@ _CELL_KEYS = {
     "count",
     "query_kind",
     "semantic_shape",
+    "boolean_shape",
     "depth",
     "ambiguity_size",
     "num_entities",
@@ -79,6 +81,7 @@ class MatrixCell:
     count: int
     query_kind: QueryKind
     semantic_shape: SemanticShape
+    boolean_shape: BooleanShape
     depth: int | None
     ambiguity_size: int | None
     num_entities: int
@@ -223,6 +226,11 @@ def _cell(raw: dict[str, Any], defaults: dict[str, Any]) -> MatrixCell:
         count=count,
         query_kind=query_kind,
         semantic_shape=semantic_shape,
+        boolean_shape=_enum(
+            values.get("boolean_shape", "atomic"),
+            BooleanShape,
+            "Boolean shape",
+        ),
         depth=depth,
         ambiguity_size=(
             int(values["ambiguity_size"])
@@ -337,6 +345,7 @@ def _policy(
         query_kind=cell.query_kind,
         answer_mode=answer.mode,
         semantic_shape=cell.semantic_shape,
+        boolean_shape=cell.boolean_shape,
         menu_coverage=answer.menu_coverage,
         trace_format=trace.trace_format,
         num_entities=cell.num_entities,

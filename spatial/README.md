@@ -86,6 +86,11 @@ limited by the proof builder's supported fragment.
 training traces are rendered only from that certificate; there is no post-hoc
 explanation fallback or independent state-snapshot mode.
 
+For proof-first Boolean curricula, `BooleanShape` provides `modus-ponens`,
+`iff`, `double-negation`, `disjunctive-syllogism`, `case-split`, and
+`nested-case-split`. These templates construct the proof obligation before
+semantic validation; `atomic` retains ordinary spatial generation.
+
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 
     uv --system-certs run --python 3.12 --no-project --with typer --with z3-solver \
@@ -107,6 +112,7 @@ Generate a balanced V2 workload with:
       --query-kinds direction,which,count \
       --answer-modes single \
       --semantic-shapes unique,ambiguous \
+      --boolean-shapes atomic \
       --query-directions north,northeast,east,southeast,south,southwest,west,northwest \
       --target-directions north,northeast,east,southeast,south,southwest,west,northwest \
       --trace-formats natural,symbolic
@@ -117,6 +123,16 @@ stay in the same split. Coordinate-bearing audit metadata is excluded by
 default. `--include-audit` is for diagnostic artifacts, not training data.
 Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
 duplicating the CLI's individual settings.
+
+Generate the proof-first Boolean curriculum by restricting the workload to
+unique Direction questions and selecting one or more proof shapes:
+
+    python -m spatial.v2.generate_all \
+      --out data/spatial_v2_boolean.jsonl \
+      --query-kinds direction \
+      --semantic-shapes unique \
+      --boolean-shapes modus-ponens,iff,double-negation,disjunctive-syllogism,case-split,nested-case-split
+
 The manifest includes generation acceptance rate and rejection reasons so
 expensive policy cells are visible before scaling the workload.
 The workload CLI also fails on existing outputs unless `--replace` is passed.

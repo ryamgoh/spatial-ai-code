@@ -68,6 +68,15 @@ cells:
     num_premises: 7
     target_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
     answer_variants: [single, complete]
+
+  - name: direction-boolean-cases
+    count: 100
+    query_kind: direction
+    semantic_shape: unique
+    boolean_shape: nested-case-split
+    num_entities: 6
+    num_premises: 7
+    answer_variants: [single]
 ```
 
 `count` applies to every direction value listed by the cell. The example above

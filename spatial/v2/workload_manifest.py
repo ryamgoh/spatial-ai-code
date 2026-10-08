@@ -175,6 +175,7 @@ def build_workload_manifest(
         "query_direction",
         "target_direction",
         "semantic_shape",
+        "boolean_shape",
     )
     answer_distribution_fields = (
         "matrix_answer_variant",
