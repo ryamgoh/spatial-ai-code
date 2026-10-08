@@ -60,6 +60,8 @@ def test_unique_answer_set_covers_all_eight_candidates() -> None:
     )
     assert "Combining the X and Y conclusions" in natural
     assert "supporting model" not in natural
+    assert natural.count("P1:") == 1
+    assert natural.count("mutually exclusive with the proved Northeast") == 7
     assert len(certificate.candidates) == len(Direction)
     assert sum(not item.possible for item in certificate.candidates) == 7
     json.dumps(answer_set_to_dict(certificate))

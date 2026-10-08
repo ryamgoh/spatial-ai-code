@@ -408,6 +408,11 @@ exact directions are possible, their mutual exclusivity makes each contingent;
 if exactly one is possible, exhaustive exclusion of all alternatives plus its
 positive proof makes it the unique entailed direction. $square$
 
+For a unique answer, the renderer prints the positive derivation once and then
+summarises the other exact directions as mutually exclusive exclusions. Their
+individual refutation certificates are still checked before rendering; this
+compression removes repeated proof prefixes without weakening the evidence.
+
 This is completeness relative to the query's declared candidate set. A dataset
 adapter that exposes only four ordinal directions is making a narrower contract
 than the generic eight-direction solver; the certificate does not silently add

@@ -188,6 +188,30 @@ def test_boolean_curriculum_rejects_non_direction_queries() -> None:
         )
 
 
+def test_boolean_curriculum_does_not_construct_premises_from_coordinates(
+    monkeypatch,
+) -> None:
+    generator = SpatialGeneratorV2(seed=1720)
+
+    def reject_world_first_generation(_objects):
+        raise AssertionError("Boolean curriculum requested a privileged world")
+
+    monkeypatch.setattr(generator, "_coordinates", reject_world_first_generation)
+
+    sample = generator.generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.UNIQUE,
+            boolean_shape=BooleanShape.NESTED_CASE_SPLIT,
+            num_entities=6,
+            num_premises=7,
+        ),
+        max_attempts=1,
+    )
+
+    assert sample.analysis.possible_directions
+
+
 def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
     with pytest.raises(ValueError, match="only Direction/unique"):
         WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))

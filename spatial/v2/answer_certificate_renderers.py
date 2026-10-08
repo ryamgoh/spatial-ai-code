@@ -37,6 +37,37 @@ def render_direction_answer_set(
     check_direction_answer_set(certificate)
     trace_format = TraceFormat(trace_format)
     labels = labels or {}
+    if certificate.is_unique:
+        entailed = next(item for item in certificate.candidates if item.entailed)
+        assert isinstance(entailed.evidence, DirectionEntailmentCertificate)
+        lines = [
+            f"{entailed.direction.value}: entailed\n"
+            + render_direction_proof(
+                entailed.evidence.proof,
+                trace_format,
+                labels,
+            )
+        ]
+        for item in certificate.candidates:
+            if item is entailed:
+                continue
+            if trace_format is TraceFormat.SYMBOLIC:
+                lines.append(
+                    f"{item.direction.value}: impossible "
+                    f"[exclusive-with={entailed.direction.value}]"
+                )
+            else:
+                lines.append(
+                    f"{item.direction.value} is impossible because it is mutually "
+                    f"exclusive with the proved {entailed.direction.value} direction."
+                )
+        lines.append(
+            f"Direction-Domain: {{{entailed.direction.value}}}"
+            if trace_format is TraceFormat.SYMBOLIC
+            else f"Therefore the unique direction is {entailed.direction.value}."
+        )
+        return "\n".join(lines)
+
     lines = []
     for item in certificate.candidates:
         if isinstance(item.evidence, DirectionEntailmentCertificate):
@@ -68,8 +99,6 @@ def render_direction_answer_set(
     )
     if trace_format is TraceFormat.SYMBOLIC:
         lines.append(f"Direction-Domain: {{{possible}}}")
-    elif certificate.is_unique:
-        lines.append(f"Therefore the unique direction is {possible}.")
     else:
         lines.append(f"Therefore the possible directions are {possible}.")
     return "\n".join(lines)
