@@ -1,34 +1,29 @@
-# Symbolic chain-of-thought for SpatialMap
+# Symbolic proof traces for SpatialEntail
 
-V2 keeps this representation as one side of an explicit trace ablation. Both
-V2 formats are rendered from the same `SpatialProblem` and structured
-explanation:
+V2 keeps symbolic reasoning as one side of an explicit trace ablation. Both V2
+formats are rendered from the same checked answer certificate:
 
 - `TraceFormat.NATURAL` uses coordinate-free natural-language reasoning.
-- `TraceFormat.SYMBOLIC` uses coordinate-free `X[...]`, `Y[...]`, and ordered
-  states such as `A < B < C`.
+- `TraceFormat.SYMBOLIC` uses coordinate-free formulas, axis comparisons, rule
+  names, and explicit step dependencies.
 
-The independent `StateMode` selects `FINAL_ONLY`, `DELTA`, or `FULL`. This
-produces a two-by-three ablation without changing the underlying proof.
+Normalized coordinate models are audit witnesses only. They are not emitted by
+either training trace. Checked traces live in the proof and answer-certificate
+renderers; coordinate reports live in `spatial/spatial_audit_rendering_v2.py`.
 
-Normalized coordinate models are audit witnesses only. They are never emitted
-by either training trace. Training traces live in
-`spatial/spatial_explanation_renderers_v2.py`; coordinate reports live in
-`spatial/spatial_audit_rendering_v2.py`.
-
-The V2 generator exposes trace format and state mode as independent policy
-dimensions. `delta` is the default workload setting: it emits only newly
-established axis facts after each premise while preserving the same final
-semantic proof. Every generated prompt is reparsed and re-solved before either
-trace is rendered, so the Natural-vs-Symbolic ablation uses the same structured
-problem and gold-answer contract.
+The V2 generator exposes only trace format as a representation dimension. Every
+generated prompt is reparsed and re-solved before either view is rendered, so
+the Natural-vs-Symbolic ablation uses the same structured problem, checked
+certificate, and gold-answer contract.
 
 Workload generation pairs requested trace variants on the same `base_id` and
 keeps the complete group in one data split. This makes trace format the changed
 variable in an ablation instead of generating a different random map for each
 format.
 
-Design note for the SFT traces in `spatial/generate_all_v6.py`. Oracle for the same calculus: `eval/clean_v6.py`. The previous generator (`spatial/generate_all.py`) is frozen.
+The remainder of this document describes the historical V6 state-trace design
+in `spatial/generate_all_v6.py`; it is not the V2 proof-first generation path.
+Its oracle is `eval/clean_v6.py`, and `spatial/generate_all.py` is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.
 

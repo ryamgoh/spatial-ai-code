@@ -7,7 +7,8 @@ from dataclasses import replace
 
 import pytest
 from generate_all_v2 import WorkloadSpec, app, generate_workload
-from spatial_explanation_renderers_v2 import StateMode, TraceFormat
+from spatial_answer_certificates_v2 import DirectionAnswerSetCertificate
+from spatial_count_certificates_v2 import CountAnswerSetCertificate
 from spatial_generation_v2 import (
     GenerationPolicy,
     MenuCoverage,
@@ -24,21 +25,40 @@ from spatial_solver_v2 import (
     WhichQuery,
 )
 from spatial_text_v2 import SpatialTextAdapter
+from spatial_trace_v2 import TraceFormat
+from spatial_which_certificates_v2 import WhichAnswerSetCertificate
 from typer.testing import CliRunner
 
 
 @pytest.mark.parametrize(
-    ("query_kind", "query_type"),
+    ("query_kind", "query_type", "certificate_type", "domain_marker"),
     [
-        (QueryKind.DIRECTION, DirectionQuery),
-        (QueryKind.WHICH, WhichQuery),
-        (QueryKind.COUNT, CountQuery),
+        (
+            QueryKind.DIRECTION,
+            DirectionQuery,
+            DirectionAnswerSetCertificate,
+            "Direction-Domain:",
+        ),
+        (
+            QueryKind.WHICH,
+            WhichQuery,
+            WhichAnswerSetCertificate,
+            "Which-Possible:",
+        ),
+        (
+            QueryKind.COUNT,
+            CountQuery,
+            CountAnswerSetCertificate,
+            "Count-Domain:",
+        ),
     ],
 )
 @pytest.mark.parametrize("answer_mode", tuple(AnswerMode))
 def test_generated_rows_round_trip_for_every_query_and_answer_mode(
     query_kind: QueryKind,
     query_type: type,
+    certificate_type: type,
+    domain_marker: str,
     answer_mode: AnswerMode,
 ) -> None:
     policy = GenerationPolicy(
@@ -52,7 +72,6 @@ def test_generated_rows_round_trip_for_every_query_and_answer_mode(
             None if query_kind is QueryKind.DIRECTION else Direction.NORTH
         ),
         trace_format=TraceFormat.SYMBOLIC,
-        state_mode=StateMode.DELTA,
     )
 
     sample = SpatialGeneratorV2(seed=1701).generate(policy)
@@ -60,6 +79,7 @@ def test_generated_rows_round_trip_for_every_query_and_answer_mode(
     parsed = SpatialTextAdapter().parse(row["messages"][1]["content"])
 
     assert isinstance(parsed.problem.query, query_type)
+    assert isinstance(sample.certificate, certificate_type)
     assert parsed.problem == sample.problem
     assert parsed.options == sample.options
     assert row["metadata"]["answer_mode"] == answer_mode.value
@@ -69,6 +89,7 @@ def test_generated_rows_round_trip_for_every_query_and_answer_mode(
         "Answer: " + ", ".join(sorted(sample.menu_answer.letters))
     )
     assert "Answer-Mode=" in sample.trace
+    assert domain_marker in sample.trace
 
 
 def test_generator_supports_every_compass_direction_for_which_and_count() -> None:
@@ -268,10 +289,9 @@ def test_trace_variants_share_one_base_problem_and_have_distinct_ids() -> None:
             query_kind=QueryKind.DIRECTION,
             semantic_shape=SemanticShape.UNIQUE,
             trace_format=TraceFormat.NATURAL,
-            state_mode=StateMode.DELTA,
         )
     )
-    variant = sample.with_trace(TraceFormat.SYMBOLIC, StateMode.FULL)
+    variant = sample.with_trace(TraceFormat.SYMBOLIC)
 
     first = sample.as_sft_row()
     second = variant.as_sft_row()
@@ -314,17 +334,14 @@ def test_answer_mode_variants_share_one_solved_problem() -> None:
 
 
 @pytest.mark.parametrize("trace_format", tuple(TraceFormat))
-@pytest.mark.parametrize("state_mode", tuple(StateMode))
 def test_training_rows_never_contain_coordinate_witnesses(
     trace_format: TraceFormat,
-    state_mode: StateMode,
 ) -> None:
     sample = SpatialGeneratorV2(seed=1705).generate(
         GenerationPolicy(
             query_kind=QueryKind.DIRECTION,
             semantic_shape=SemanticShape.UNIQUE,
             trace_format=trace_format,
-            state_mode=state_mode,
         )
     )
 
@@ -333,6 +350,7 @@ def test_training_rows_never_contain_coordinate_witnesses(
 
     assert "coordinates" not in serialized.lower()
     assert "generation_witness" in audit
+    assert audit["answer_certificate"]["type"].endswith("AnswerSetCertificate")
     assert set(audit["generation_witness"]) == set(sample.problem.objects)
 
 
@@ -519,7 +537,6 @@ def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -
             semantic_shapes=(SemanticShape.UNIQUE,),
             menu_coverages=(MenuCoverage.FULL,),
             trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
-            state_modes=(StateMode.DELTA,),
             test_split=0.25,
             seed=1713,
         ),
@@ -609,7 +626,6 @@ def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:
             semantic_shapes=(SemanticShape.UNIQUE,),
             menu_coverages=(MenuCoverage.FULL,),
             trace_formats=(TraceFormat.NATURAL,),
-            state_modes=(StateMode.DELTA,),
             query_directions=(Direction.NORTH, Direction.SOUTHWEST),
             test_split=0,
             seed=1715,
@@ -633,7 +649,6 @@ def test_workload_can_balance_direction_answers(tmp_path) -> None:
             semantic_shapes=(SemanticShape.UNIQUE,),
             menu_coverages=(MenuCoverage.FULL,),
             trace_formats=(TraceFormat.NATURAL,),
-            state_modes=(StateMode.DELTA,),
             target_directions=(Direction.EAST, Direction.NORTHWEST),
             test_split=0,
             seed=1741,

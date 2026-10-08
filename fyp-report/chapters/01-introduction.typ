@@ -88,9 +88,9 @@ rendered, parsed back into the formal representation, and solved again.
 
 Finally, the project uses SpatialEntail to compare direct and structured
 prompting, answer-only supervision, Natural reasoning traces, Symbolic
-reasoning traces, and alternative state-update schedules. These comparisons are
-designed to determine whether intermediate reasoning supervision improves
-held-out spatial structure rather than only teaching answer format. A later
+reasoning traces, and proof-structure ablations. These comparisons are designed
+to determine whether intermediate reasoning supervision improves held-out
+spatial structure rather than only teaching answer format. A later
 reinforcement-learning experiment is conditional on the supervised model
 leaving sufficient headroom and producing usable reward variance.
 

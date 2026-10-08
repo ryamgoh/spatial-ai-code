@@ -3,15 +3,23 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import TYPE_CHECKING
 
 from spatial_answer_certificates_v2 import (
     DirectionAnswerSetCertificate,
     check_direction_answer_set,
 )
-from spatial_explanation_renderers_v2 import TraceFormat
+from spatial_count_certificate_renderers_v2 import render_count_answer_set
+from spatial_count_certificates_v2 import CountAnswerSetCertificate
 from spatial_model_certificate_renderers_v2 import render_model_certificate
 from spatial_model_certificates_v2 import SpatialModelCertificate
 from spatial_proof_renderers_v2 import render_direction_refutation
+from spatial_trace_v2 import TraceFormat
+from spatial_which_certificate_renderers_v2 import render_which_answer_set
+from spatial_which_certificates_v2 import WhichAnswerSetCertificate
+
+if TYPE_CHECKING:
+    from spatial_certificate_generation_v2 import AnswerCertificate
 
 
 def render_direction_answer_set(
@@ -54,3 +62,35 @@ def render_direction_answer_set(
     else:
         lines.append(f"Therefore the possible directions are {possible}.")
     return "\n".join(lines)
+
+
+def render_answer_certificate(
+    certificate: AnswerCertificate,
+    trace_format: TraceFormat | str,
+    labels: Mapping[str, str] | None = None,
+    *,
+    include_coordinates: bool = True,
+) -> str:
+    """Render any checked Direction, Which, or Count answer certificate."""
+    if isinstance(certificate, DirectionAnswerSetCertificate):
+        return render_direction_answer_set(
+            certificate,
+            trace_format,
+            labels,
+            include_coordinates=include_coordinates,
+        )
+    if isinstance(certificate, WhichAnswerSetCertificate):
+        return render_which_answer_set(
+            certificate,
+            trace_format,
+            labels,
+            include_coordinates=include_coordinates,
+        )
+    if isinstance(certificate, CountAnswerSetCertificate):
+        return render_count_answer_set(
+            certificate,
+            trace_format,
+            labels,
+            include_coordinates=include_coordinates,
+        )
+    raise TypeError(f"unsupported answer certificate: {type(certificate).__name__}")

@@ -359,7 +359,7 @@ Detailed plans:
 |---|---|---|
 | Formal validation and SpatialEval | Prove and validate the encoding; audit the untouched four-option release; validate counter-witnesses; create a separate five-option correction; compare general, reasoning, and compatible spatially fine-tuned LLMs on original, corrected, entailed-only, and ambiguous-only views | Does formal semantics expose consequential ambiguity and change conclusions about LLM capability? |
 | Benchmark calibration and prompting | Generate a development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, Natural-axis, and Symbolic-axis prompts; then freeze the benchmark | Is the benchmark valid, solvable, non-saturated, and structurally discriminative? |
-| SFT and representation | Compare prompt-matched untuned, answer-only, Natural, and Symbolic models on paired problems; compare Final-only, Delta, and Full state schedules | Do reasoning traces add value beyond task exposure, and which representation works best? |
+| SFT and representation | Compare prompt-matched untuned, answer-only, Natural, and Symbolic models on paired problems backed by the same certificate | Do checked reasoning traces add value beyond task exposure, and which representation works best? |
 | Generalisation, scale, and optional RL | Evaluate held-out structures and corrected-SpatialEval transfer; scale nested SFT data while informative; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains generalise, and does RL add anything beyond supervised optimisation? |
 
 Difficulty is not an end in itself. The benchmark should contain solvable,

@@ -309,9 +309,8 @@ SMT oracle, parser round trip, and differential tests across reasoning backends.
 
 ### 5. Representation contribution
 
-Matched Natural and Symbolic renderings of the same certificate, crossed with
-Final-only, Delta, and Full state schedules without changing the underlying
-problem or answer.
+Matched Natural and Symbolic renderings of the same checked certificate without
+changing the underlying problem or answer.
 
 ### 6. Empirical contribution
 
@@ -355,8 +354,8 @@ At the strongest level:
    Symbolic forms agree exactly.
 4. Models trained with proof-backed traces outperform answer-only controls on
    premise-first and held-out-composition tests, not merely matched templates.
-5. The analysis identifies which representation and state schedule helps, where
-   it fails, and whether any gain transfers to corrected SpatialEval.
+5. The analysis identifies which checked-trace representation helps, where it
+   fails, and whether any gain transfers to corrected SpatialEval.
 
 At the minimum successful level:
 

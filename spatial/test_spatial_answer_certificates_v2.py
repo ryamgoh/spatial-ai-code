@@ -15,7 +15,6 @@ from spatial_answer_certificates_v2 import (
     build_direction_answer_set,
     check_direction_answer_set,
 )
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificates_v2 import SpatialModelCertificate
 from spatial_proofs_v2 import ProofConstructionError
 from spatial_solver_v2 import (
@@ -25,6 +24,7 @@ from spatial_solver_v2 import (
     RelationConstraint,
     SpatialProblem,
 )
+from spatial_trace_v2 import TraceFormat
 
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:

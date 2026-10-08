@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificate_renderers_v2 import (
     render_contingency_certificate,
     render_model_certificate,
@@ -13,6 +12,7 @@ from spatial_proof_renderers_v2 import (
     render_direction_proof,
     render_direction_refutation,
 )
+from spatial_trace_v2 import TraceFormat
 from spatial_which_certificates_v2 import (
     MembershipEntailmentCertificate,
     MembershipImpossibilityCertificate,

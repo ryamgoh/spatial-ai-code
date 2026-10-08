@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificates_v2 import (
     ContingencyCertificate,
     SpatialModelCertificate,
@@ -12,6 +11,7 @@ from spatial_model_certificates_v2 import (
     check_model_certificate,
 )
 from spatial_proof_renderers_v2 import render_formula
+from spatial_trace_v2 import TraceFormat
 
 
 def _coordinates(

@@ -3,17 +3,9 @@
 from __future__ import annotations
 
 import json
-import re
-from functools import cache
-from pathlib import Path
 
 import pytest
 from spatial_audit_rendering_v2 import render_audit_explanation
-from spatial_explanation_renderers_v2 import (
-    StateMode,
-    TraceFormat,
-    render_training_trace,
-)
 from spatial_explanations_v2 import (
     Axis,
     AxisRelation,
@@ -36,28 +28,10 @@ from spatial_solver_v2 import (
     SpatialSolverV2,
     WhichQuery,
 )
-from spatial_text_v2 import SpatialTextAdapter
-from spatialeval_adapter_v2 import SpatialEvalAdapter
 
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:
     return RelationConstraint(subject, reference, frozenset({direction}))
-
-
-@cache
-def spatialeval_rows() -> dict[str, dict]:
-    dataset = Path(__file__).parents[1] / "data" / "spatialeval_org.jsonl"
-    selected_ids = {
-        "spatialmap.tqa.2003.0",
-        "spatialmap.tqa.2000.1",
-        "spatialmap.tqa.2001.2",
-    }
-    rows = {}
-    for line in dataset.read_text().splitlines():
-        row = json.loads(line)
-        if row["id"] in selected_ids:
-            rows[row["id"]] = row
-    return rows
 
 
 @pytest.mark.parametrize("backend", ["reference", "z3"])
@@ -258,124 +232,3 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
     assert serialized["cases"][0]["direction"] == "North"
     assert serialized["cases"][0]["evidence"]["negation_unsatisfiable"] is True
     json.dumps(serialized)
-
-
-def test_training_trace_styles_share_proof_without_coordinates() -> None:
-    problem = SpatialProblem(
-        objects=("A", "B", "C"),
-        premise=And(
-            (
-                atom("A", Direction.NORTHEAST, "B"),
-                atom("B", Direction.NORTH, "C"),
-            )
-        ),
-        query=DirectionQuery("A", "C"),
-    )
-    explanation = SpatialExplainerV2().explain(problem)
-
-    natural = render_training_trace(problem, explanation, TraceFormat.NATURAL)
-    symbolic = render_training_trace(problem, explanation, TraceFormat.SYMBOLIC)
-
-    assert "X-axis decomposition: A is east of B." in natural
-    assert "Possible directions: Northeast." in natural
-    assert "X-State: [B = C] < A" in symbolic
-    assert "X-Query: C < A" in symbolic
-    assert "Direction-Domain: {Northeast}" in symbolic
-    assert " < " not in natural
-    assert "X-State:" not in natural
-    assert re.search(r"=\(-?\d+,\s*-?\d+\)", natural) is None
-    assert re.search(r"=\(-?\d+,\s*-?\d+\)", symbolic) is None
-
-
-@pytest.mark.parametrize("trace_format", list(TraceFormat))
-def test_delta_and_full_modes_expose_the_same_closure(
-    trace_format: TraceFormat,
-) -> None:
-    problem = SpatialProblem(
-        objects=("A", "B", "C"),
-        premise=And(
-            (
-                atom("A", Direction.NORTHEAST, "B"),
-                atom("B", Direction.NORTH, "C"),
-            )
-        ),
-        query=DirectionQuery("A", "C"),
-    )
-    explanation = SpatialExplainerV2().explain(problem)
-
-    final_only = render_training_trace(
-        problem, explanation, trace_format, StateMode.FINAL_ONLY
-    )
-    delta = render_training_trace(problem, explanation, trace_format, StateMode.DELTA)
-    full = render_training_trace(problem, explanation, trace_format, StateMode.FULL)
-
-    if trace_format is TraceFormat.NATURAL:
-        assert (
-            "New X-axis consequences: B and C have the same X coordinate; C is west of A."
-            in delta
-        )
-        assert (
-            "X-axis ordering after premise 2 from west to east: B and C at the same coordinate, then A."
-            in full
-        )
-        assert " < " not in delta + full
-    else:
-        assert "Delta-X: {B = C, C < A}" in delta
-        assert "X-State after P2: [B = C] < A" in full
-    assert "Initial:" not in final_only and "Initially," not in final_only
-    assert "Delta-" not in final_only + full
-    assert "after premise" not in delta and "after P" not in delta
-    assert (
-        "Possible directions: Northeast." in delta
-        or "Direction-Domain: {Northeast}" in delta
-    )
-    assert (
-        "Possible directions: Northeast." in full
-        or "Direction-Domain: {Northeast}" in full
-    )
-    assert re.search(r"=\(-?\d+,\s*-?\d+\)", final_only + delta + full) is None
-
-
-@pytest.mark.parametrize(
-    ("row_id", "expected_natural", "expected_symbolic"),
-    [
-        (
-            "spatialmap.tqa.2003.0",
-            "Possible directions: Northeast, Northwest.",
-            "Direction-Domain: {Northeast, Northwest}",
-        ),
-        (
-            "spatialmap.tqa.2000.1",
-            "Contingent members: Narwhal's Novelties, Police Supply Store.",
-            "Entailed-Members: {}",
-        ),
-        (
-            "spatialmap.tqa.2001.2",
-            "One jointly realizable case contains Tremor Toys, Wolf's Wardrobe, giving count 2.",
-            "Count-Domain: {0, 1, 2}",
-        ),
-    ],
-)
-def test_spatialeval_training_traces_are_coordinate_free(
-    row_id: str,
-    expected_natural: str,
-    expected_symbolic: str,
-) -> None:
-    row = spatialeval_rows()[row_id]
-    problem = SpatialEvalAdapter(SpatialTextAdapter()).parse(row).problem
-    explanation = SpatialExplainerV2().explain(problem)
-
-    audit = render_audit_explanation(explanation)
-
-    for state_mode in StateMode:
-        natural = render_training_trace(
-            problem, explanation, TraceFormat.NATURAL, state_mode
-        )
-        symbolic = render_training_trace(
-            problem, explanation, TraceFormat.SYMBOLIC, state_mode
-        )
-        assert expected_natural in natural
-        assert expected_symbolic in symbolic
-        assert re.search(r"=\(-?\d+,\s*-?\d+\)", natural) is None
-        assert re.search(r"=\(-?\d+,\s*-?\d+\)", symbolic) is None
-    assert re.search(r"=\(-?\d+,\s*-?\d+\)", audit) is not None

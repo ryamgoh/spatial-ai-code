@@ -9,7 +9,7 @@ one domain model and one gold-label contract.
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
 | `spatial_serialization_v2.py` | Deterministic JSON-compatible serialization for typed spatial artifacts | Certificate and explanation modules |
 | `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
-| `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
+| `spatial_trace_v2.py` | Natural and Symbolic trace-format contract | Certificate renderers and workload variants |
 | `spatial_proofs_v2.py` | Typed Direction proof certificates, deterministic construction, replay checking, and serialization | Proof-first SpatialEntail generation |
 | `spatial_proof_renderers_v2.py` | Natural and Symbolic views of one checked proof certificate | Proof-first SFT traces |
 | `spatial_model_certificates_v2.py` | Constructive model, countermodel, and contingency validation without Z3 | Possibility and non-entailment evidence |
@@ -20,6 +20,7 @@ one domain model and one gold-label contract.
 | `spatial_which_certificate_renderers_v2.py` | Natural and Symbolic views of checked Which membership classifications | Proof-first Which traces |
 | `spatial_count_certificates_v2.py` | Exhaustive model-or-refutation evidence over correlated membership assignments | Complete Count answer sets |
 | `spatial_count_certificate_renderers_v2.py` | Natural and Symbolic views of checked Count domains and joint exclusions | Proof-first Count traces |
+| `spatial_certificate_generation_v2.py` | Convert solver witnesses into independently replayed answer certificates | Proof-first generator |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
@@ -66,15 +67,14 @@ Run the domain tests from the repository root:
       pytest spatial -q
 
 The V2 core intentionally has no JSONL, prompt, option-letter, oracle, or
-dataset-policy knowledge. New generators should construct `SpatialProblem`
-directly, render text above that seam, parse the rendered text back through an
-adapter, and verify the reparsed problem before emitting a row. They can pass
-the same problem to `SpatialExplainerV2`, serialize its typed evidence, and use
-`render_training_trace` with `TraceFormat.NATURAL` or `TraceFormat.SYMBOLIC`
-and an independent `StateMode`. Coordinate witnesses belong only in structured
-audit metadata or `render_audit_explanation`, never in an SFT reasoning target.
+dataset-policy knowledge. New generators construct `SpatialProblem` directly,
+render text above that seam, parse the rendered text back through an adapter,
+and verify the reparsed problem before emitting a row. Accepted rows carry a
+checked answer certificate and render it as either `TraceFormat.NATURAL` or
+`TraceFormat.SYMBOLIC`. Coordinate witnesses belong only in structured audit
+metadata or `render_audit_explanation`, never in an SFT reasoning target.
 
-The proof-first seam is the replacement path for training explanations.
+The proof-first seam is the training-explanation path.
 `build_direction_proof` currently accepts only exact positive-conjunction
 Direction problems, constructs a typed certificate without consulting Z3, and
 replays every premise, decomposition, inversion, transitivity, and recomposition
@@ -85,8 +85,8 @@ syllogism, biconditional elimination, double negation, and explicit
 contradiction. Scoped assumptions, contradiction closure, explosion, and
 complete case splits support branched proofs while rejecting cross-branch
 dependencies. Boolean-derived atoms feed the same axis rules as direct spatial
-premises. The module is not wired behind a fallback to the post-hoc training
-renderer. `SpatialModelCertificate` independently checks constructive witnesses
+premises. Unsupported proof construction rejects the sample; there is no
+post-hoc training-renderer fallback. `SpatialModelCertificate` independently checks constructive witnesses
 and countermodels against the complete premise formula; a
 `ContingencyCertificate` requires both sides for the same claim. These
 certificates establish possibility and non-entailment, not completeness of an
@@ -102,6 +102,11 @@ checked models; impossible values require checked refutations for every complete
 membership assignment with that count. The generic Count checker is complete
 relative to supplied evidence, while automatic refutation construction remains
 limited by the proof builder's supported fragment.
+
+`spatial_generation_v2.py` rejects any candidate for which
+`build_answer_certificate` cannot produce complete checked evidence. Accepted
+training traces are rendered only from that certificate; there is no post-hoc
+explanation fallback or independent state-snapshot mode.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 
@@ -126,8 +131,7 @@ Generate a balanced V2 workload with:
       --semantic-shapes unique,ambiguous \
       --query-directions north,northeast,east,southeast,south,southwest,west,northwest \
       --target-directions north,northeast,east,southeast,south,southwest,west,northwest \
-      --trace-formats natural,symbolic \
-      --state-modes delta
+      --trace-formats natural,symbolic
 
 This writes `data/spatial_v2_train.jsonl`, `data/spatial_v2_test.jsonl`, and
 `data/spatial_v2_manifest.json`. Natural/Symbolic variants of one base problem

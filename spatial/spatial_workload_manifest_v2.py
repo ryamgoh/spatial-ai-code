@@ -89,8 +89,8 @@ def build_workload_manifest(
     train_rows: Sequence[Mapping[str, Any]],
     test_rows: Sequence[Mapping[str, Any]],
     *,
-    expected_trace_variants: Iterable[tuple[Any, Any]] | None = None,
-    expected_variants_by_base: Mapping[str, Iterable[tuple[Any, Any, Any, Any]]]
+    expected_trace_variants: Iterable[Any] | None = None,
+    expected_variants_by_base: Mapping[str, Iterable[tuple[Any, Any, Any]]]
     | None = None,
 ) -> dict[str, Any]:
     """Validate a split workload and return a JSON-compatible manifest."""
@@ -115,30 +115,27 @@ def build_workload_manifest(
         raise ValueError("cross-split prompts")
 
     prompt_bases: dict[str, set[str]] = defaultdict(set)
-    variants_by_base: dict[str, set[tuple[str, str]]] = defaultdict(set)
-    row_variants_by_base: dict[str, set[tuple[str, str, str, str]]] = defaultdict(set)
+    variants_by_base: dict[str, set[str]] = defaultdict(set)
+    row_variants_by_base: dict[str, set[tuple[str, str, str]]] = defaultdict(set)
     rows_by_base: dict[str, Mapping[str, Any]] = {}
     for row in rows:
         metadata = row["metadata"]
         base_id = str(metadata["base_id"])
         prompt_bases[_user_prompt(row)].add(base_id)
         rows_by_base.setdefault(base_id, row)
-        variants_by_base[base_id].add(
-            (str(metadata["trace_format"]), str(metadata["state_mode"]))
-        )
+        variants_by_base[base_id].add(str(metadata["trace_format"]))
         row_variants_by_base[base_id].add(
             (
                 str(metadata["answer_mode"]),
                 str(metadata["menu_coverage"]),
                 str(metadata["trace_format"]),
-                str(metadata["state_mode"]),
             )
         )
     if any(len(base_ids) != 1 for base_ids in prompt_bases.values()):
         raise ValueError("duplicate prompts belong to different base IDs")
 
     expected = (
-        {(_value(first), _value(second)) for first, second in expected_trace_variants}
+        {_value(variant) for variant in expected_trace_variants}
         if expected_trace_variants is not None
         else None
     )
@@ -185,7 +182,7 @@ def build_workload_manifest(
         "menu_coverage",
         "menu_status",
     )
-    trace_distribution_fields = ("trace_format", "state_mode")
+    trace_distribution_fields = ("trace_format",)
     difficulty_fields = (
         "possibility_count",
         "direct_query_relation",

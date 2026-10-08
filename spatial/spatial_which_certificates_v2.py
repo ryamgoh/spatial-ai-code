@@ -211,6 +211,76 @@ def _check_refutations(
             ) from exc
 
 
+def check_which_candidate_certificate(
+    problem: SpatialProblem,
+    query: WhichQuery,
+    item: WhichCandidateCertificate,
+) -> None:
+    """Replay one candidate's membership evidence under a Which projection."""
+    all_directions = frozenset(Direction)
+    if item.candidate not in query.candidates:
+        raise WhichCertificateCheckError(
+            f"{item.candidate} is outside the Which candidate set"
+        )
+    claim = _membership_claim(query, item.candidate)
+    projection = _direction_projection(problem, query, item.candidate)
+    if isinstance(item.evidence, MembershipProofCertificate):
+        _check_model(item.evidence.witness, problem, claim, True, item.candidate)
+        if item.evidence.proof.problem != projection:
+            raise WhichCertificateCheckError(
+                f"{item.candidate} proof uses the wrong Direction projection"
+            )
+        try:
+            check_direction_proof(item.evidence.proof)
+        except ProofCheckError as exc:
+            raise WhichCertificateCheckError(
+                f"{item.candidate} has an invalid direction proof: {exc}"
+            ) from exc
+        if item.evidence.proof.conclusion.direction not in query.directions:
+            raise WhichCertificateCheckError(
+                f"{item.candidate} proof concludes a non-matching direction"
+            )
+    elif isinstance(item.evidence, MembershipEntailmentCertificate):
+        _check_model(item.evidence.witness, problem, claim, True, item.candidate)
+        _check_refutations(
+            item.evidence.refutations,
+            projection,
+            all_directions - query.directions,
+            item.candidate,
+            "complement",
+        )
+    elif isinstance(item.evidence, ContingencyCertificate):
+        if item.evidence.problem != problem or item.evidence.claim != claim:
+            raise WhichCertificateCheckError(
+                f"{item.candidate} contingency certifies the wrong membership claim"
+            )
+        try:
+            check_contingency_certificate(item.evidence)
+        except ModelCheckError as exc:
+            raise WhichCertificateCheckError(
+                f"{item.candidate} has invalid contingency evidence: {exc}"
+            ) from exc
+    elif isinstance(item.evidence, MembershipImpossibilityCertificate):
+        _check_model(
+            item.evidence.countermodel,
+            problem,
+            claim,
+            False,
+            item.candidate,
+        )
+        _check_refutations(
+            item.evidence.refutations,
+            projection,
+            query.directions,
+            item.candidate,
+            "matching",
+        )
+    else:
+        raise WhichCertificateCheckError(
+            f"{item.candidate} has unsupported membership evidence"
+        )
+
+
 def check_which_answer_set(certificate: WhichAnswerSetCertificate) -> None:
     """Replay complete membership evidence without consulting an SMT solver."""
     problem = certificate.problem
@@ -223,66 +293,8 @@ def check_which_answer_set(certificate: WhichAnswerSetCertificate) -> None:
             "membership evidence must cover every declared candidate exactly once "
             "in query order"
         )
-
-    all_directions = frozenset(Direction)
     for item in certificate.candidates:
-        claim = _membership_claim(query, item.candidate)
-        projection = _direction_projection(problem, query, item.candidate)
-        if isinstance(item.evidence, MembershipProofCertificate):
-            _check_model(item.evidence.witness, problem, claim, True, item.candidate)
-            if item.evidence.proof.problem != projection:
-                raise WhichCertificateCheckError(
-                    f"{item.candidate} proof uses the wrong Direction projection"
-                )
-            try:
-                check_direction_proof(item.evidence.proof)
-            except ProofCheckError as exc:
-                raise WhichCertificateCheckError(
-                    f"{item.candidate} has an invalid direction proof: {exc}"
-                ) from exc
-            if item.evidence.proof.conclusion.direction not in query.directions:
-                raise WhichCertificateCheckError(
-                    f"{item.candidate} proof concludes a non-matching direction"
-                )
-        elif isinstance(item.evidence, MembershipEntailmentCertificate):
-            _check_model(item.evidence.witness, problem, claim, True, item.candidate)
-            _check_refutations(
-                item.evidence.refutations,
-                projection,
-                all_directions - query.directions,
-                item.candidate,
-                "complement",
-            )
-        elif isinstance(item.evidence, ContingencyCertificate):
-            if item.evidence.problem != problem or item.evidence.claim != claim:
-                raise WhichCertificateCheckError(
-                    f"{item.candidate} contingency certifies the wrong membership claim"
-                )
-            try:
-                check_contingency_certificate(item.evidence)
-            except ModelCheckError as exc:
-                raise WhichCertificateCheckError(
-                    f"{item.candidate} has invalid contingency evidence: {exc}"
-                ) from exc
-        elif isinstance(item.evidence, MembershipImpossibilityCertificate):
-            _check_model(
-                item.evidence.countermodel,
-                problem,
-                claim,
-                False,
-                item.candidate,
-            )
-            _check_refutations(
-                item.evidence.refutations,
-                projection,
-                query.directions,
-                item.candidate,
-                "matching",
-            )
-        else:
-            raise WhichCertificateCheckError(
-                f"{item.candidate} has unsupported membership evidence"
-            )
+        check_which_candidate_certificate(problem, query, item)
 
 
 def _model_certificate(

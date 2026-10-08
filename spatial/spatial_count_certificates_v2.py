@@ -28,6 +28,14 @@ from spatial_solver_v2 import (
     RelationConstraint,
     SpatialFormula,
     SpatialProblem,
+    WhichQuery,
+)
+from spatial_which_certificates_v2 import (
+    MembershipEvidence,
+    MembershipStatus,
+    WhichCandidateCertificate,
+    WhichCertificateCheckError,
+    check_which_candidate_certificate,
 )
 
 
@@ -38,7 +46,13 @@ class CountCertificateCheckError(ValueError):
 @dataclass(frozen=True)
 class CountAssignmentRefutation:
     members: tuple[str, ...]
-    refutation: FormulaRefutationCertificate
+    refutation: FormulaRefutationCertificate | CountMembershipConflict
+
+
+@dataclass(frozen=True)
+class CountMembershipConflict:
+    candidate: str
+    evidence: MembershipEvidence
 
 
 @dataclass(frozen=True)
@@ -163,16 +177,56 @@ def check_count_answer_set(certificate: CountAnswerSetCertificate) -> None:
         for assignment in item.evidence.assignments:
             expected_claim = count_assignment_formula(query, assignment.members)
             refutation = assignment.refutation
-            if refutation.problem != problem or refutation.claim != expected_claim:
+            if isinstance(refutation, FormulaRefutationCertificate):
+                if refutation.problem != problem or refutation.claim != expected_claim:
+                    raise CountCertificateCheckError(
+                        f"count {item.count} refutation certifies the wrong assignment"
+                    )
+                try:
+                    check_formula_refutation(refutation)
+                except ProofCheckError as exc:
+                    raise CountCertificateCheckError(
+                        f"count {item.count} has an invalid refutation: {exc}"
+                    ) from exc
+                continue
+
+            if not isinstance(refutation, CountMembershipConflict):
                 raise CountCertificateCheckError(
-                    f"count {item.count} refutation certifies the wrong assignment"
+                    f"count {item.count} has unsupported assignment evidence"
                 )
+            which_query = WhichQuery(
+                query.directions,
+                query.reference,
+                query.candidates,
+            )
+            which_problem = SpatialProblem(
+                problem.objects,
+                problem.premise,
+                which_query,
+            )
+            candidate_evidence = WhichCandidateCertificate(
+                refutation.candidate,
+                refutation.evidence,
+            )
             try:
-                check_formula_refutation(refutation)
-            except ProofCheckError as exc:
+                check_which_candidate_certificate(
+                    which_problem,
+                    which_query,
+                    candidate_evidence,
+                )
+            except WhichCertificateCheckError as exc:
                 raise CountCertificateCheckError(
-                    f"count {item.count} has an invalid refutation: {exc}"
+                    f"count {item.count} has an invalid membership conflict: {exc}"
                 ) from exc
+            assigned_true = refutation.candidate in assignment.members
+            status = candidate_evidence.status
+            if (assigned_true and status is not MembershipStatus.IMPOSSIBLE) or (
+                not assigned_true and status is not MembershipStatus.ENTAILED
+            ):
+                raise CountCertificateCheckError(
+                    f"count {item.count} membership evidence does not contradict "
+                    "the assignment"
+                )
 
     if not certificate.possible_counts:
         raise CountCertificateCheckError(
@@ -186,7 +240,7 @@ def build_count_answer_set(
     possible_models: Mapping[int, Mapping[str, tuple[int, int]]],
     impossible_refutations: Mapping[
         int,
-        Sequence[FormulaRefutationCertificate],
+        Sequence[FormulaRefutationCertificate | CountMembershipConflict],
     ],
 ) -> CountAnswerSetCertificate:
     """Build complete Count evidence from models and assignment refutations."""

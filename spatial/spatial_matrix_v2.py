@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, TypeVar
 
 import yaml
-from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import (
     GenerationPolicy,
     MenuCoverage,
@@ -22,6 +21,7 @@ from spatial_generation_v2 import (
 )
 from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
+from spatial_trace_v2 import TraceFormat
 from spatial_workload_manifest_v2 import (
     check_output_paths,
     remove_output_paths,
@@ -70,7 +70,6 @@ class AnswerVariant:
 @dataclass(frozen=True)
 class TraceVariant:
     trace_format: TraceFormat
-    state_mode: StateMode
 
 
 @dataclass(frozen=True)
@@ -189,16 +188,13 @@ def _trace_variants(raw: dict[str, Any]) -> tuple[TraceVariant, ...]:
     variants = []
     for item in items:
         item = _mapping(item, "trace variant")
-        unknown = set(item) - {"format", "state_mode"}
+        unknown = set(item) - {"format"}
         if unknown:
             raise ValueError(
                 "unknown trace variant keys: " + ", ".join(sorted(unknown))
             )
         variants.append(
-            TraceVariant(
-                _enum(item.get("format"), TraceFormat, "trace format"),
-                _enum(item.get("state_mode", "delta"), StateMode, "state mode"),
-            )
+            TraceVariant(_enum(item.get("format"), TraceFormat, "trace format"))
         )
     if len(set(variants)) != len(variants):
         raise ValueError("duplicate trace variants")
@@ -342,7 +338,6 @@ def _policy(
         semantic_shape=cell.semantic_shape,
         menu_coverage=answer.menu_coverage,
         trace_format=trace.trace_format,
-        state_mode=trace.state_mode,
         num_entities=cell.num_entities,
         num_premises=cell.num_premises,
         query_direction=query_direction,
@@ -418,7 +413,7 @@ def generate_matrix(
     cell_counts: dict[str, int] = {}
     first_trace = matrix.trace_variants[0]
     expected_variants_by_base: dict[
-        str, set[tuple[AnswerMode, MenuCoverage, TraceFormat, StateMode]]
+        str, set[tuple[AnswerMode, MenuCoverage, TraceFormat]]
     ] = {}
 
     for cell in matrix.cells:
@@ -448,10 +443,7 @@ def generate_matrix(
                         answer.mode,
                         answer.menu_coverage,
                     )
-                    variant = answer_sample.with_trace(
-                        trace.trace_format,
-                        trace.state_mode,
-                    )
+                    variant = answer_sample.with_trace(trace.trace_format)
                     row = variant.as_sft_row(include_audit=matrix.include_audit)
                     row["metadata"]["matrix_cell"] = cell.name
                     row["metadata"]["matrix_answer_variant"] = answer.name
@@ -462,16 +454,13 @@ def generate_matrix(
                         answer.mode,
                         answer.menu_coverage,
                         trace.trace_format,
-                        trace.state_mode,
                     )
                     for answer, trace in product(answers, matrix.trace_variants)
                 }
                 generated += 1
         cell_counts[cell.name] = generated
 
-    trace_variants = tuple(
-        (variant.trace_format, variant.state_mode) for variant in matrix.trace_variants
-    )
+    trace_variants = tuple(variant.trace_format for variant in matrix.trace_variants)
     matrix_config = matrix.manifest_config()
     matrix_config.update(
         {
@@ -522,7 +511,6 @@ def _variant_key(row: dict[str, Any]) -> str:
         (
             metadata["matrix_answer_variant"],
             metadata["trace_format"],
-            metadata["state_mode"],
         )
     )
 

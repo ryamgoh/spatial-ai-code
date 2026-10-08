@@ -470,10 +470,11 @@ $
 
 A Count answer-set certificate covers every $k$ from zero through $n$ exactly
 once. A possible count carries an accepted model satisfying $P and C_k$. An
-impossible count carries one accepted formula-refutation certificate for every
-assignment $A_T$ with $|T| = k$. The checker requires exactly the
-$binom(n, k)$ canonical assignments and verifies that every refutation uses the
-same problem and the corresponding complete assignment.
+impossible count carries one accepted contradiction for every assignment $A_T$
+with $|T| = k$. The contradiction may be a formula-refutation certificate for
+the whole assignment, or a checked membership classification that contradicts
+one of its literals. The checker requires exactly the $binom(n, k)$ canonical
+assignments and validates the problem, claim, and contradiction in each entry.
 
 #heading(level: 2, numbering: none)[Proposition 7: Count-Domain Completeness]
 
@@ -482,22 +483,24 @@ certificates are exactly the possible counts among $0, ..., n$.
 
 _Proof._ Each model-backed count is possible by Proposition 4. For an
 impossible count $k$, every spatial world has one complete membership assignment
-$A_T$ with $|T| = k$ exactly when it satisfies $C_k$. The accepted refutations
-show $P and A_T |= bot$ for every such $T$, so no model of $P and C_k$ exists.
-Exact coverage of all count values therefore leaves precisely the model-backed
-values as possible. $square$
+$A_T$ with $|T| = k$ exactly when it satisfies $C_k$. Each assignment entry
+either directly establishes $P and A_T |= bot$, or identifies a literal of
+$A_T$ contradicted by Proposition 6. Hence no model of $P and C_k$ exists.
+Exact coverage of all count values leaves precisely the model-backed values as
+possible. $square$
 
 This construction preserves correlations. For example, if $M_A equiv not M_B$,
 both individual memberships are contingent, but assignments with neither or
 both members are refutable and the only possible count is one. No independent
 summation of Which statuses can establish that result.
 
-The evidence size is potentially exponential: excluding count $k$ may require
-$binom(n, k)$ assignment refutations. The checker is generic over supported
-Boolean formulas, but the current automatic proof builder does not synthesize
-all such refutations. A constructor may supply checked Boolean proof steps; a
-missing certificate remains a construction limitation rather than semantic
-evidence that the count is possible.
+The evidence size is potentially exponential: excluding count $k$ requires
+$binom(n, k)$ assignment entries. The generator automatically uses contradictory
+entailed or impossible memberships where available. The current automatic proof
+builder does not synthesize every genuinely correlated Boolean refutation; a
+constructor may supply checked Boolean proof steps. A missing certificate is a
+construction limitation rather than semantic evidence that the count is
+possible.
 
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 

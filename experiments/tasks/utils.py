@@ -161,7 +161,6 @@ def process_docs_v2_sft(dataset):
             "matrix_cell": str(metadata.get("matrix_cell") or ""),
             "answer_mode": str(metadata.get("answer_mode") or ""),
             "trace_format": str(metadata.get("trace_format") or ""),
-            "state_mode": str(metadata.get("state_mode") or ""),
             "difficulty": dict(metadata.get("difficulty") or {}),
         }
 

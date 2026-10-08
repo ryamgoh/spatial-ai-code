@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 from generate_matrix_v2 import app
-from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import MenuCoverage, QueryKind, SemanticShape
 from spatial_grading_v2 import AnswerMode
 from spatial_matrix_v2 import generate_matrix, load_experiment_matrix
 from spatial_solver_v2 import Direction
+from spatial_trace_v2 import TraceFormat
 from typer.testing import CliRunner
 
 MATRIX_YAML = """
@@ -35,9 +35,7 @@ variants:
       menu_coverage: full
   traces:
     - format: natural
-      state_mode: delta
     - format: symbolic
-      state_mode: delta
 cells:
   - name: direction-depth-2
     count: 2
@@ -81,9 +79,9 @@ def test_matrix_parser_builds_typed_cells_and_variants(tmp_path) -> None:
         "complete",
         "visible",
     ]
-    assert [(item.trace_format, item.state_mode) for item in matrix.trace_variants] == [
-        (TraceFormat.NATURAL, StateMode.DELTA),
-        (TraceFormat.SYMBOLIC, StateMode.DELTA),
+    assert [item.trace_format for item in matrix.trace_variants] == [
+        TraceFormat.NATURAL,
+        TraceFormat.SYMBOLIC,
     ]
     cell = matrix.cells[0]
     assert cell.name == "direction-depth-2"
@@ -203,7 +201,7 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
     }
     views = manifest["views"]
     assert views["split_fingerprint"]["train"] != views["split_fingerprint"]["test"]
-    variant = views["by_variant"]["single__natural__delta"]
+    variant = views["by_variant"]["single__natural"]
     assert variant["train_rows"] == 3
     assert variant["test_rows"] == 1
     assert (tmp_path / variant["train"]).exists()
@@ -217,11 +215,10 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
         (
             row["metadata"]["matrix_answer_variant"],
             row["metadata"]["trace_format"],
-            row["metadata"]["state_mode"],
         )
         for row in variant_rows
-    } == {("single", "natural", "delta")}
-    cell_variant = views["by_cell"]["direction-depth-2"]["single__natural__delta"]
+    } == {("single", "natural")}
+    cell_variant = views["by_cell"]["direction-depth-2"]["single__natural"]
     assert cell_variant["train_rows"] == 3
     assert cell_variant["test_rows"] == 1
     assert (tmp_path / cell_variant["train"]).exists()
@@ -255,7 +252,7 @@ variants:
     - {name: complete, mode: all-possible, menu_coverage: full}
     - {name: visible, mode: visible-possible, menu_coverage: partial}
   traces:
-    - {format: symbolic, state_mode: delta}
+    - {format: symbolic}
 cells:
   - name: which-ambiguity-2
     count: 1

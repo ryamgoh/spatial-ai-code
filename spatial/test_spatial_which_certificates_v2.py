@@ -6,7 +6,6 @@ import json
 from dataclasses import replace
 
 import pytest
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificates_v2 import ContingencyCertificate
 from spatial_proofs_v2 import ProofConstructionError
 from spatial_solver_v2 import (
@@ -18,6 +17,7 @@ from spatial_solver_v2 import (
     WhichQuery,
     direction_signs,
 )
+from spatial_trace_v2 import TraceFormat
 from spatial_which_certificate_renderers_v2 import render_which_answer_set
 from spatial_which_certificates_v2 import (
     MembershipEntailmentCertificate,

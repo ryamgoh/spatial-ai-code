@@ -365,7 +365,7 @@ Avoid:
 | “The proof checker and SMT solver are not really independent.” | They may share parser, IR, relation tables, or tests, allowing correlated bugs. | Document separate implementations and trust boundaries; use mutation, differential, metamorphic, witness, and countermodel tests. |
 | “A checked proof can still formalize the English incorrectly.” | Formal proof systems guarantee derivability from the formalization, not semantic fidelity of the translation. | Deterministically generate text from typed atoms where possible; reparse every emitted prompt; reject non-round-tripping cases; manually audit held-out templates. |
 | “Proof-first data teaches templates, not reasoning.” | Proof skeleton, premise order, surface form, or answer position can leak construction. | Use premise-first evaluation, held-out rule compositions, proof-shape splits, premise permutations, distractors, and canonical-world deduplication. |
-| “Natural and Symbolic traces differ in more than representation.” | Length, tokenization, instruction wording, and error exposure can confound results. | Pair by base problem and proof; report target tokens and compute; keep state schedule fixed; vary one representation factor at a time. |
+| “Natural and Symbolic traces differ in more than representation.” | Length, tokenization, instruction wording, and error exposure can confound results. | Pair by base problem and checked certificate; report target tokens and compute; vary one representation factor at a time. |
 | “SMT says entailment but does not provide a human proof.” | Unsatisfiability is a semantic decision, not automatically an explanatory derivation. | Keep the replayable proof as the explanation artifact and SMT as the independent global oracle; publish countermodels for non-entailments. |
 | “The benchmark is only another synthetic micro-world.” | Controlled logic may not transfer to natural language. | Include held-out templates and names, ReSQ/SpaRTUN transfer where semantically compatible, and the corrected SpatialMap external case study. |
 
@@ -392,8 +392,7 @@ Avoid:
    proofs also replay successfully.
 
 5. **Run matched trace ablations.** Answer-only, Natural, and Symbolic targets
-   should share the same base IDs and proof supports. Keep state schedule fixed
-   for the first comparison; then compare final-only, delta, and full state.
+   should share the same base IDs and checked proof supports.
 
 6. **Include the nearest baselines, not only generic CoT.** At minimum compare
    direct answer, natural CoT, CoS-like symbolic prompting, SpaRP-like verbalized

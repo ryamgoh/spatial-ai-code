@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_proofs_v2 import (
     AxisFact,
     Contradiction,
@@ -29,6 +28,7 @@ from spatial_solver_v2 import (
     RelationConstraint,
     SpatialFormula,
 )
+from spatial_trace_v2 import TraceFormat
 
 
 def _label(value: str, labels: Mapping[str, str]) -> str:

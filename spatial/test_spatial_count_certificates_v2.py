@@ -17,7 +17,6 @@ from spatial_count_certificates_v2 import (
     count_assignment_formula,
     exact_count_formula,
 )
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_proof_renderers_v2 import render_formula
 from spatial_proofs_v2 import (
     Contradiction,
@@ -38,6 +37,7 @@ from spatial_solver_v2 import (
     SpatialProblem,
     SpatialSolverV2,
 )
+from spatial_trace_v2 import TraceFormat
 
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:

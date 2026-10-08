@@ -24,7 +24,6 @@ def test_v2_loader_uses_metadata_gold_through_z() -> None:
                     "matrix_cell": "direction-depth-10",
                     "answer_mode": "all-possible",
                     "trace_format": "symbolic",
-                    "state_mode": "delta",
                     "difficulty": {"x_depth": 10, "y_depth": 10},
                 },
             }
@@ -39,7 +38,6 @@ def test_v2_loader_uses_metadata_gold_through_z() -> None:
         "matrix_cell": "direction-depth-10",
         "answer_mode": "all-possible",
         "trace_format": "symbolic",
-        "state_mode": "delta",
         "difficulty": {"x_depth": 10, "y_depth": 10},
     }
     assert strict_acc(["A,Z", ["A,Z"]]) == 1.0

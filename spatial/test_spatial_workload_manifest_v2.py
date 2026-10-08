@@ -6,9 +6,9 @@ import json
 
 import pytest
 from generate_all_v2 import WorkloadSpec, generate_workload
-from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import QueryKind, SemanticShape
 from spatial_grading_v2 import AnswerMode
+from spatial_trace_v2 import TraceFormat
 from spatial_workload_manifest_v2 import build_workload_manifest
 
 
@@ -34,7 +34,6 @@ def _row(
             "semantic_shape": "unique",
             "menu_coverage": "full",
             "trace_format": trace_format,
-            "state_mode": "delta",
             "menu_status": "exact",
             "possible_values": ["North"],
             "round_trip_verified": True,
@@ -64,8 +63,8 @@ def test_manifest_reports_distributions_and_paired_variants() -> None:
         train,
         test,
         expected_trace_variants=(
-            (TraceFormat.NATURAL, StateMode.DELTA),
-            (TraceFormat.SYMBOLIC, StateMode.DELTA),
+            TraceFormat.NATURAL,
+            TraceFormat.SYMBOLIC,
         ),
     )
 
@@ -104,16 +103,11 @@ def test_manifest_rejects_incomplete_answer_trace_product() -> None:
         build_workload_manifest(
             rows,
             [],
-            expected_trace_variants=((TraceFormat.NATURAL, StateMode.DELTA),),
+            expected_trace_variants=(TraceFormat.NATURAL,),
             expected_variants_by_base={
                 "base-1": {
-                    (AnswerMode.SINGLE, "full", TraceFormat.NATURAL, StateMode.DELTA),
-                    (
-                        AnswerMode.ALL_POSSIBLE,
-                        "full",
-                        TraceFormat.NATURAL,
-                        StateMode.DELTA,
-                    ),
+                    (AnswerMode.SINGLE, "full", TraceFormat.NATURAL),
+                    (AnswerMode.ALL_POSSIBLE, "full", TraceFormat.NATURAL),
                 }
             },
         )
@@ -151,7 +145,6 @@ def test_generator_writes_a_valid_manifest_next_to_splits(tmp_path) -> None:
             answer_modes=(AnswerMode.SINGLE,),
             semantic_shapes=(SemanticShape.UNIQUE,),
             trace_formats=(TraceFormat.NATURAL, TraceFormat.SYMBOLIC),
-            state_modes=(StateMode.DELTA,),
             test_split=0.5,
             seed=1737,
         ),
@@ -175,7 +168,6 @@ def test_workload_forwards_proof_controls_into_manifest(tmp_path) -> None:
             answer_modes=(AnswerMode.SINGLE,),
             semantic_shapes=(SemanticShape.UNIQUE,),
             trace_formats=(TraceFormat.SYMBOLIC,),
-            state_modes=(StateMode.DELTA,),
             num_entities=7,
             num_premises=8,
             omit_direct_query_relation=True,

@@ -23,14 +23,14 @@ artifacts, plus directly usable views:
 ```text
 spatial_v2_ablation_views/
 ├── by_variant/
-│   ├── single__natural__delta_train.jsonl
-│   ├── single__natural__delta_test.jsonl
-│   ├── complete__symbolic__delta_train.jsonl
-│   └── complete__symbolic__delta_test.jsonl
+│   ├── single__natural_train.jsonl
+│   ├── single__natural_test.jsonl
+│   ├── complete__symbolic_train.jsonl
+│   └── complete__symbolic_test.jsonl
 └── by_cell/
     └── direction-depth-2/
-        ├── single__natural__delta_train.jsonl
-        └── single__natural__delta_test.jsonl
+        ├── single__natural_train.jsonl
+        └── single__natural_test.jsonl
 ```
 
 Use `by_variant` to train one representation over the selected problem mix.
@@ -55,8 +55,8 @@ variants:
     - {name: complete, mode: all-possible, menu_coverage: full}
     - {name: visible-partial, mode: visible-possible, menu_coverage: partial}
   traces:
-    - {format: natural, state_mode: delta}
-    - {format: symbolic, state_mode: delta}
+    - {format: natural}
+    - {format: symbolic}
 
 cells:
   - name: direction-depth-2

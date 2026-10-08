@@ -52,6 +52,8 @@ encoding; `spatial_proofs_v2.py` and its renderer for checked derivations;
 `spatial_answer_certificates_v2.py` for complete Direction candidate sets;
 `spatial_which_certificates_v2.py` for complete three-valued membership sets;
 `spatial_count_certificates_v2.py` for correlation-preserving Count domains;
+`spatial_certificate_generation_v2.py` for oracle-assisted certificate
+construction;
 `spatial_explanations_v2.py` for current audit compatibility; and
 `audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
 
@@ -138,14 +140,15 @@ parses that rendered prompt back into a second `SpatialProblem`, and solves it
 again. A row is emitted only when the round trip preserves both the structured
 problem and its answer.
 
-The target SpatialEntail path renders Natural or Symbolic reasoning from one
-replayable certificate. The proof-first generator migration is incomplete:
-Direction certificates support spatial chains and bounded Boolean case proofs;
-complete Direction, Which, and correlated Count certificates support unique and
-ambiguous answer sets. Automatic Boolean proof construction and wholesale
-generator migration remain incomplete, so the post-hoc training renderer has
-not yet been removed. Training rows exclude coordinate witnesses by default.
-Coordinates can be added only as separate audit metadata for diagnostic use.
+The SpatialEntail generator renders Natural or Symbolic reasoning from one
+replayable certificate. Direction certificates support spatial chains and
+bounded Boolean case proofs; complete Direction, Which, and correlated Count
+certificates support unique and ambiguous answer sets. The former post-hoc
+training renderer and its independent state-snapshot modes have been removed.
+Automatic construction for arbitrary Boolean premises remains incomplete, so
+unsupported candidates are rejected rather than routed through a fallback.
+Training rows exclude coordinate witnesses by default. Coordinates can be added
+only as separate audit metadata for diagnostic use.
 
 == Failure and Output Contracts
 

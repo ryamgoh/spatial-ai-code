@@ -19,10 +19,10 @@ dataset row or synthetic spec
 - `spatial_solver_v2.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
 - `spatial_explanations_v2.py` classifies individual claims, extracts readable
-  axis proofs where possible, and records typed evidence without parsing text.
-- `spatial_explanation_renderers_v2.py` renders that evidence as either a
-  natural-language trace or a symbolic axis-chain trace, with an independent
-  state-update schedule.
+  axis paths where possible, and records audit evidence without parsing text.
+- `spatial_*_certificates_v2.py` builds and independently checks Direction,
+  Which, and correlated Count evidence; their renderers emit Natural or
+  Symbolic training traces from the same accepted certificate.
 - `spatial_audit_rendering_v2.py` is the only renderer that formats coordinate
   witnesses.
 - `spatial_text_v2.py` adapts the current prompt grammar into a
@@ -79,10 +79,10 @@ receive the all-eight default.
 
 - Use `spatial_solver_v2.py` when the caller already has structured objects,
   formulas, and a query.
-- Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when a
-  generator or audit needs machine-readable evidence.
-- Use `spatial_explanation_renderers_v2.py` to choose a training-trace ablation
-  without exposing coordinates.
+- Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when an
+  audit or difficulty analysis needs machine-readable evidence.
+- Use the answer-certificate builders and renderers for proof-first training
+  traces without exposing coordinates.
 - Use `spatial_audit_rendering_v2.py` only for coordinate-bearing diagnostics.
 - Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
 - Use `spatial_grading_v2.py` after semantic analysis to resolve answer
@@ -358,53 +358,34 @@ The structured explanation is authoritative. Renderers accept an optional
 mapping from opaque object IDs to display labels and have no dataset schema or
 prompt parser.
 
-Training and audit output are deliberately separate:
-
-- `TraceFormat.NATURAL` emits premise decomposition, axis reasoning, candidate
-  classifications, and correlated count cases in natural language.
-- `TraceFormat.SYMBOLIC` emits the same proof as
-  compact `X[...]`, `Y[...]`, `X-State`, `Y-State`, direction-domain, and member-
-  set symbols. This preserves the original Chain-of-Symbols ablation style.
-- `StateMode.FINAL_ONLY` prints premise extraction followed by one final state.
-- `StateMode.DELTA` prints only newly entailed direct or transitive facts after
-  each premise, followed by one final state.
-- `StateMode.FULL` prints the complete entailed state after every premise.
-- `render_audit_explanation(...)` may include normalized coordinate witnesses.
-  It is for diagnostics and must not be used as an SFT reasoning target.
-
-Incremental axis states apply to positive conjunctions of exact relations—the
-original SpatialEval statement grammar. A general Boolean premise is rendered
-as one formula because `OR`, `IF`, and `IFF` may require branched proof states
-rather than one monotonically growing pair of axis graphs.
-
-Both training styles are coordinate-free by contract. Coordinate witnesses
-remain inside the structured explanation so an auditor can establish that an
-alternative world exists without teaching the model to invent a hidden map.
+Training and audit output are deliberately separate. `TraceFormat.NATURAL` and
+`TraceFormat.SYMBOLIC` are deterministic views of one checked certificate.
+They expose the same premises, rule dependencies, candidate classifications,
+and correlated Count cases. There is no independent state-update mode: such a
+mode belonged to the removed post-hoc renderer and could change presentation
+without preserving a one-to-one relation with checked proof steps.
+`render_audit_explanation(...)` may include normalized coordinate witnesses; it
+is for diagnostics and is not an SFT reasoning target.
 
 A synthetic generator should therefore construct once and render later:
 
 ```python
 problem = build_structured_problem(seed)
 analysis = solver.analyze(problem)
-explanation = explainer.explain(problem, analysis)
+certificate = build_answer_certificate(problem, analysis, solver)
 resolution = resolve_answer(analysis, answer_mode)
 menu_answer = encode_menu_answer(resolution, options)
 
 row = {
     "prompt": prompt_renderer.render(problem),
     "answer": menu_answer.raw,
-    "proof": explanation_to_dict(explanation),
-    "explanation": render_training_trace(
-        problem,
-        explanation,
-        trace_format=trace_format,
-        state_mode=state_mode,
-        labels=labels,
+    "proof": answer_certificate_to_dict(certificate),
+    "explanation": render_answer_certificate(
+        certificate, trace_format, labels=labels, include_coordinates=False
     ),
     "metadata": {
         "answer_mode": answer_mode.value,
         "trace_format": trace_format.value,
-        "state_mode": state_mode.value,
         "audit_witnesses": analysis.witnesses,
         "seed": seed,
     },
@@ -520,8 +501,8 @@ exact answer when that entity is absent in another valid world.
 
 `spatial/spatial_generation_v2.py` keeps synthetic-data policy above the
 solver. A `GenerationPolicy` chooses the query family, answer mode, semantic
-shape, menu coverage, trace format, state schedule, entity count, and premise
-count. The solver sees only the resulting `SpatialProblem`.
+shape, menu coverage, trace format, entity count, and premise count. The solver
+sees only the resulting `SpatialProblem`.
 
 Each accepted item follows one fail-closed path:
 
@@ -530,12 +511,15 @@ Each accepted item follows one fail-closed path:
 3. Analyze the complete model set with `SpatialSolverV2`.
 4. Reject candidates that do not match the requested `unique`, `ambiguous`, or
    `no-match` semantic shape.
-5. Resolve `SINGLE`, `ALL_POSSIBLE`, or `VISIBLE_POSSIBLE`, then construct the
+5. Build and replay a complete Direction, Which, or Count answer certificate;
+   reject the candidate if the proof constructor cannot cover it.
+6. Resolve `SINGLE`, `ALL_POSSIBLE`, or `VISIBLE_POSSIBLE`, then construct the
    requested full, partial, or zero-coverage menu.
-6. Render the question, parse it back through `SpatialTextAdapter`, re-solve
+7. Render the question, parse it back through `SpatialTextAdapter`, re-solve
    it, and require the problem, options, resolution, menu status, and gold
    letters to match.
-7. Render coordinate-free Natural CoT or Symbolic CoS. Coordinates and
+8. Render coordinate-free Natural CoT or Symbolic CoS from the accepted
+   certificate. Coordinates and
    coordinate-bearing evidence remain available only as audit metadata. The
    trace ends with an explicit answer-mode and menu-selection deduction so the
    option letters follow from the proved semantic domain.
@@ -590,9 +574,9 @@ back to measured rejection sampling and remain visible in the efficiency data.
 
 ### Paired trace variants and manifests
 
-Natural/Symbolic and state-schedule variants are rendered from the same
-`GeneratedSpatialSample`. They share a `base_id`, prompt, problem, options, and
-gold answer, while retaining distinct row IDs. Variant groups are split as a
+Natural and Symbolic variants are rendered from the same checked certificate in
+one `GeneratedSpatialSample`. They share a `base_id`, prompt, problem, options,
+and gold answer while retaining distinct row IDs. Variant groups are split as a
 unit, preventing the same problem from appearing in both train and test.
 
 Every CLI run also writes a `*_manifest.json`. The manifest validates unique

@@ -16,10 +16,11 @@ from itertools import combinations, pairwise
 from string import ascii_uppercase
 from typing import Any
 
-from spatial_explanation_renderers_v2 import (
-    StateMode,
-    TraceFormat,
-    render_training_trace,
+from spatial_answer_certificate_renderers_v2 import render_answer_certificate
+from spatial_certificate_generation_v2 import (
+    AnswerCertificate,
+    answer_certificate_to_dict,
+    build_answer_certificate,
 )
 from spatial_explanations_v2 import (
     ClaimStatus,
@@ -28,7 +29,6 @@ from spatial_explanations_v2 import (
     QueryExplanation,
     SpatialExplainerV2,
     WhichExplanation,
-    explanation_to_dict,
 )
 from spatial_grading_v2 import (
     AnswerMode,
@@ -38,6 +38,7 @@ from spatial_grading_v2 import (
     encode_menu_answer,
     resolve_answer,
 )
+from spatial_proofs_v2 import ProofConstructionError
 from spatial_solver_v2 import (
     And,
     CountAnalysis,
@@ -55,6 +56,7 @@ from spatial_solver_v2 import (
     direction_signs,
 )
 from spatial_text_v2 import SpatialTextAdapter
+from spatial_trace_v2 import TraceFormat
 
 ENTITY_NAMES = (
     "Bakery",
@@ -126,7 +128,6 @@ class GenerationPolicy:
     semantic_shape: SemanticShape = SemanticShape.ANY
     menu_coverage: MenuCoverage = MenuCoverage.FULL
     trace_format: TraceFormat = TraceFormat.NATURAL
-    state_mode: StateMode = StateMode.DELTA
     num_entities: int = 6
     num_premises: int = 7
     ordinary_option_target: int = 4
@@ -153,7 +154,6 @@ class GenerationPolicy:
         object.__setattr__(self, "semantic_shape", SemanticShape(self.semantic_shape))
         object.__setattr__(self, "menu_coverage", MenuCoverage(self.menu_coverage))
         object.__setattr__(self, "trace_format", TraceFormat(self.trace_format))
-        object.__setattr__(self, "state_mode", StateMode(self.state_mode))
         if self.query_direction is not None:
             object.__setattr__(self, "query_direction", Direction(self.query_direction))
         if self.target_direction is not None:
@@ -331,17 +331,15 @@ def _has_direct_membership_fact(problem: SpatialProblem) -> bool:
 
 
 def _render_trace(
-    problem: SpatialProblem,
-    explanation: QueryExplanation,
+    certificate: AnswerCertificate,
     resolution: AnswerResolution,
     menu_answer: MenuAnswer,
     policy: GenerationPolicy,
 ) -> str:
-    reasoning = render_training_trace(
-        problem,
-        explanation,
+    reasoning = render_answer_certificate(
+        certificate,
         policy.trace_format,
-        policy.state_mode,
+        include_coordinates=False,
     )
     decision = _render_answer_decision(
         resolution,
@@ -358,6 +356,7 @@ class GeneratedSpatialSample:
     analysis: QueryAnalysis
     resolution: AnswerResolution
     menu_answer: MenuAnswer
+    certificate: AnswerCertificate
     explanation: QueryExplanation
     prompt: str
     trace: str
@@ -377,7 +376,7 @@ class GeneratedSpatialSample:
     def audit_metadata(self) -> dict[str, Any]:
         return {
             "generation_witness": _coordinate_payload(self.generation_witness),
-            "explanation": explanation_to_dict(self.explanation),
+            "answer_certificate": answer_certificate_to_dict(self.certificate),
         }
 
     def as_sft_row(self, *, include_audit: bool = False) -> dict[str, Any]:
@@ -398,7 +397,7 @@ class GeneratedSpatialSample:
             "id": (
                 f"{self.base_id}-{self.policy.answer_mode.value}-"
                 f"{self.policy.menu_coverage.value}-"
-                f"{self.policy.trace_format.value}-{self.policy.state_mode.value}"
+                f"{self.policy.trace_format.value}"
             ),
             "messages": [
                 {"role": "system", "content": _system_prompt(self.policy.answer_mode)},
@@ -422,7 +421,6 @@ class GeneratedSpatialSample:
                 "semantic_shape": self.policy.semantic_shape.value,
                 "menu_coverage": self.policy.menu_coverage.value,
                 "trace_format": self.policy.trace_format.value,
-                "state_mode": self.policy.state_mode.value,
                 "num_entities": len(self.problem.objects),
                 "num_premises": len(self.problem.premise.operands),
                 "possible_values": [
@@ -443,19 +441,15 @@ class GeneratedSpatialSample:
     def with_trace(
         self,
         trace_format: TraceFormat | str,
-        state_mode: StateMode | str,
     ) -> GeneratedSpatialSample:
         """Render another training trace for the same problem and gold answer."""
         trace_format = TraceFormat(trace_format)
-        state_mode = StateMode(state_mode)
         policy = replace(
             self.policy,
             trace_format=trace_format,
-            state_mode=state_mode,
         )
         trace = _render_trace(
-            self.problem,
-            self.explanation,
+            self.certificate,
             self.resolution,
             self.menu_answer,
             policy,
@@ -659,8 +653,7 @@ class SpatialGeneratorV2:
             menu_answer,
         )
         trace = _render_trace(
-            sample.problem,
-            sample.explanation,
+            sample.certificate,
             resolution,
             menu_answer,
             policy,
@@ -711,6 +704,12 @@ class SpatialGeneratorV2:
         elif controlled_membership:
             assert isinstance(analysis, (WhichAnalysis, CountAnalysis))
             coordinates = next(iter(analysis.witnesses.values()), {})
+        try:
+            certificate = build_answer_certificate(problem, analysis, self._solver)
+        except ProofConstructionError as exc:
+            raise _RetryGeneration(
+                f"proof-first certificate construction failed: {exc}"
+            ) from exc
 
         resolution = resolve_answer(analysis, policy.answer_mode)
         options = self._menu(policy, analysis, resolution)
@@ -721,8 +720,7 @@ class SpatialGeneratorV2:
         prompt = self._prompt(problem, options, policy.answer_mode)
         self._verify_round_trip(problem, options, prompt, policy, menu_answer)
         trace = _render_trace(
-            problem,
-            explanation,
+            certificate,
             resolution,
             menu_answer,
             policy,
@@ -733,6 +731,7 @@ class SpatialGeneratorV2:
             analysis,
             resolution,
             menu_answer,
+            certificate,
             explanation,
             prompt,
             trace,

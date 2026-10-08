@@ -7,11 +7,41 @@ from collections.abc import Mapping
 from spatial_count_certificates_v2 import (
     CountAnswerSetCertificate,
     CountImpossibilityCertificate,
+    CountMembershipConflict,
     check_count_answer_set,
 )
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificate_renderers_v2 import render_model_certificate
-from spatial_proof_renderers_v2 import render_formula_refutation
+from spatial_proof_renderers_v2 import (
+    render_direction_proof,
+    render_direction_refutation,
+    render_formula_refutation,
+)
+from spatial_trace_v2 import TraceFormat
+from spatial_which_certificates_v2 import (
+    MembershipEntailmentCertificate,
+    MembershipImpossibilityCertificate,
+    MembershipProofCertificate,
+)
+
+
+def _render_membership_conflict(
+    conflict: CountMembershipConflict,
+    trace_format: TraceFormat,
+    labels: Mapping[str, str],
+) -> str:
+    evidence = conflict.evidence
+    if isinstance(evidence, MembershipProofCertificate):
+        return render_direction_proof(evidence.proof, trace_format, labels)
+    if isinstance(evidence, MembershipEntailmentCertificate):
+        return "\n".join(
+            render_direction_refutation(refutation, trace_format, labels)
+            for refutation in evidence.refutations
+        )
+    assert isinstance(evidence, MembershipImpossibilityCertificate)
+    return "\n".join(
+        render_direction_refutation(refutation, trace_format, labels)
+        for refutation in evidence.refutations
+    )
 
 
 def render_count_answer_set(
@@ -35,10 +65,21 @@ def render_count_answer_set(
                 )
                 assignment_lines.append(
                     f"membership assignment {{{members}}}\n"
-                    + render_formula_refutation(
-                        assignment.refutation,
-                        trace_format,
-                        labels,
+                    + (
+                        _render_membership_conflict(
+                            assignment.refutation,
+                            trace_format,
+                            labels,
+                        )
+                        if isinstance(
+                            assignment.refutation,
+                            CountMembershipConflict,
+                        )
+                        else render_formula_refutation(
+                            assignment.refutation,
+                            trace_format,
+                            labels,
+                        )
                     )
                 )
             evidence = "\n".join(assignment_lines)

@@ -13,9 +13,7 @@ variants:
       menu_coverage: full
   traces:
     - format: natural
-      state_mode: delta
     - format: symbolic
-      state_mode: delta
 
 cells:
   - name: direction-depth-2

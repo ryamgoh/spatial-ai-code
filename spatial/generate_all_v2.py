@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import TypeVar
 
 import typer
-from spatial_explanation_renderers_v2 import StateMode, TraceFormat
 from spatial_generation_v2 import (
     GenerationPolicy,
     MenuCoverage,
@@ -19,6 +18,7 @@ from spatial_generation_v2 import (
 )
 from spatial_grading_v2 import AnswerMode
 from spatial_solver_v2 import Direction
+from spatial_trace_v2 import TraceFormat
 from spatial_workload_manifest_v2 import (
     check_output_paths,
     remove_output_paths,
@@ -41,7 +41,6 @@ class WorkloadSpec:
     )
     menu_coverages: tuple[MenuCoverage, ...] = (MenuCoverage.FULL,)
     trace_formats: tuple[TraceFormat, ...] = tuple(TraceFormat)
-    state_modes: tuple[StateMode, ...] = (StateMode.DELTA,)
     query_directions: tuple[Direction, ...] | None = None
     target_directions: tuple[Direction, ...] | None = None
     num_entities: int = 6
@@ -73,7 +72,6 @@ class WorkloadSpec:
             "semantic shape": self.semantic_shapes,
             "menu coverage": self.menu_coverages,
             "trace format": self.trace_formats,
-            "state mode": self.state_modes,
         }
         empty = [name for name, values in dimensions.items() if not values]
         if empty:
@@ -150,7 +148,6 @@ def generate_workload(
                     semantic_shape=shape,
                     menu_coverage=coverage,
                     trace_format=spec.trace_formats[0],
-                    state_mode=spec.state_modes[0],
                     num_entities=spec.num_entities,
                     num_premises=spec.num_premises,
                     query_direction=query_direction,
@@ -176,12 +173,10 @@ def generate_workload(
                 )
                 row_groups.append(
                     [
-                        sample.with_trace(trace_format, state_mode).as_sft_row(
+                        sample.with_trace(trace_format).as_sft_row(
                             include_audit=spec.include_audit
                         )
-                        for trace_format, state_mode in product(
-                            spec.trace_formats, spec.state_modes
-                        )
+                        for trace_format in spec.trace_formats
                     ]
                 )
 
@@ -192,7 +187,7 @@ def generate_workload(
         row_groups,
         test_split=spec.test_split,
         seed=spec.seed,
-        expected_trace_variants=tuple(product(spec.trace_formats, spec.state_modes)),
+        expected_trace_variants=spec.trace_formats,
         manifest_metadata={"generation": spec.manifest_config()},
     )
     return train_path, test_path
@@ -207,7 +202,6 @@ def main(
     semantic_shapes: str = typer.Option("unique,ambiguous"),
     menu_coverages: str = typer.Option("full"),
     trace_formats: str = typer.Option("natural,symbolic"),
-    state_modes: str = typer.Option("delta"),
     query_directions: str = typer.Option(
         "north,northeast,east,southeast,south,southwest,west,northwest",
         help="Balanced Which/Count query directions; ignored for Direction queries.",
@@ -252,7 +246,6 @@ def main(
                     menu_coverages, MenuCoverage, "menu coverages"
                 ),
                 trace_formats=_enum_values(trace_formats, TraceFormat, "trace formats"),
-                state_modes=_enum_values(state_modes, StateMode, "state modes"),
                 query_directions=_enum_values(
                     query_directions, Direction, "query directions"
                 ),

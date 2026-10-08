@@ -6,7 +6,6 @@ import json
 from dataclasses import replace
 
 import pytest
-from spatial_explanation_renderers_v2 import TraceFormat
 from spatial_model_certificate_renderers_v2 import (
     render_contingency_certificate,
     render_model_certificate,
@@ -33,6 +32,7 @@ from spatial_solver_v2 import (
     SpatialProblem,
     direction_signs,
 )
+from spatial_trace_v2 import TraceFormat
 
 
 def atom(subject: str, direction: Direction, reference: str) -> RelationConstraint:

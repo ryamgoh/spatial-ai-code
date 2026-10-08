@@ -197,15 +197,9 @@ similar.
 
 ## SFT study 2: reasoning representation
 
-The two representation axes are independent:
-
-- **Trace form:** Natural or Symbolic.
-- **State schedule:** Final-only, Delta, or Full.
-
-A full factorial comparison requires six trace arms. A staged alternative first
-compares Natural and Symbolic at Delta, then compares state schedules using the
-selected trace form. The staged design is cheaper but cannot estimate every
-trace-by-state interaction.
+The representation comparison has two checked trace forms: Natural and
+Symbolic. Both are rendered from the same certificate, so changing the view
+does not change proof dependencies or the accepted answer evidence.
 
 Keep the base problems, row order, model, optimizer, effective batch, epochs,
 context limit, decoding, and evaluation prompts fixed. Report target-token
@@ -324,12 +318,11 @@ retention.
 2. Calibrate structural cells with untuned LLMs.
 3. Freeze evaluation modules and prompts.
 4. Run the prompting baselines.
-5. Run answer-only, Natural Delta, and Symbolic Delta SFT.
-6. Decide whether the full state-schedule comparison is warranted.
-7. Run the propositional-data comparison.
-8. Scale only the selected training design.
-9. Test broader answer-contract training if it remains relevant.
-10. Attempt RL only after its go/no-go conditions pass.
+5. Run answer-only, Natural, and Symbolic SFT.
+6. Run the propositional-data comparison.
+7. Scale only the selected training design.
+8. Test broader answer-contract training if it remains relevant.
+9. Attempt RL only after its go/no-go conditions pass.
 
 ## Open decisions
 
