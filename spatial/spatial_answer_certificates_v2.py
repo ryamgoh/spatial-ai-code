@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
-from enum import Enum
+from dataclasses import dataclass
 from typing import Any
 
 from spatial_model_certificates_v2 import (
@@ -20,6 +19,7 @@ from spatial_proofs_v2 import (
     build_direction_refutation,
     check_direction_refutation,
 )
+from spatial_serialization_v2 import tagged_dataclass_to_dict
 from spatial_solver_v2 import (
     Direction,
     DirectionQuery,
@@ -178,27 +178,8 @@ def build_direction_answer_set(
     return certificate
 
 
-def _serialize(value: Any) -> Any:
-    if isinstance(value, Enum):
-        return value.value
-    if is_dataclass(value):
-        return {
-            field.name: _serialize(getattr(value, field.name))
-            for field in fields(value)
-        }
-    if isinstance(value, Mapping):
-        return {str(key): _serialize(item) for key, item in value.items()}
-    if isinstance(value, (tuple, list)):
-        return [_serialize(item) for item in value]
-    if isinstance(value, (set, frozenset)):
-        return sorted(_serialize(item) for item in value)
-    return value
-
-
 def answer_set_to_dict(
     certificate: DirectionAnswerSetCertificate,
 ) -> dict[str, Any]:
     check_direction_answer_set(certificate)
-    payload = _serialize(certificate)
-    assert isinstance(payload, dict)
-    return {"type": type(certificate).__name__, **payload}
+    return tagged_dataclass_to_dict(certificate)

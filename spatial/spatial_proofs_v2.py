@@ -12,10 +12,11 @@ from __future__ import annotations
 
 from collections import deque
 from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+from spatial_serialization_v2 import tagged_dataclass_to_dict
 from spatial_solver_v2 import (
     And,
     Direction,
@@ -753,30 +754,10 @@ def _derive_axis_path(
     return current_id
 
 
-def _serialize(value: Any) -> Any:
-    if isinstance(value, Enum):
-        return value.value
-    if is_dataclass(value):
-        return {
-            field.name: _serialize(getattr(value, field.name))
-            for field in fields(value)
-        }
-    if isinstance(value, Mapping):
-        return {str(key): _serialize(item) for key, item in value.items()}
-    if isinstance(value, (tuple, list)):
-        return [_serialize(item) for item in value]
-    if isinstance(value, (set, frozenset)):
-        return sorted(_serialize(item) for item in value)
-    return value
-
-
 def proof_to_dict(certificate: DirectionProofCertificate) -> dict[str, Any]:
     """Return a deterministic JSON-compatible proof representation."""
     check_direction_proof(certificate)
-    payload = _serialize(certificate)
-    if not isinstance(payload, dict):
-        raise TypeError("proof certificate did not serialize to an object")
-    return {"type": type(certificate).__name__, **payload}
+    return tagged_dataclass_to_dict(certificate)
 
 
 def refutation_to_dict(
@@ -784,10 +765,7 @@ def refutation_to_dict(
 ) -> dict[str, Any]:
     """Return a deterministic JSON-compatible refutation representation."""
     check_direction_refutation(certificate)
-    payload = _serialize(certificate)
-    if not isinstance(payload, dict):
-        raise TypeError("refutation certificate did not serialize to an object")
-    return {"type": type(certificate).__name__, **payload}
+    return tagged_dataclass_to_dict(certificate)
 
 
 def _exact_direction_premises(

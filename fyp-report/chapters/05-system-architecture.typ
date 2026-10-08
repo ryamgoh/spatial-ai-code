@@ -37,7 +37,7 @@ reconstruction of a hidden source map.
     [Answer policy], [Turn semantic results into single-answer or set-valued decisions.],
     [Proof layer], [Build replayable derivations and render matched Natural or Symbolic traces.],
     [Model-certificate layer], [Validate constructive witnesses, countermodels, and contingency evidence.],
-    [Answer-certificate layer], [Require exhaustive model-or-refutation evidence for every declared candidate.],
+    [Answer-certificate layer], [Require exhaustive typed evidence for every declared candidate.],
     [Audit layer], [Retain checked evidence and source provenance.],
     [Pipeline coordinator], [Run the stages in order and write validated artifacts.],
   ),
@@ -50,6 +50,7 @@ contract and reasoning core; `spatial_grading_v2.py` for answer policy and menu
 encoding; `spatial_proofs_v2.py` and its renderer for checked derivations;
 `spatial_model_certificates_v2.py` for constructive evidence;
 `spatial_answer_certificates_v2.py` for complete Direction candidate sets;
+`spatial_which_certificates_v2.py` for complete three-valued membership sets;
 `spatial_explanations_v2.py` for current audit compatibility; and
 `audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
 
@@ -138,9 +139,10 @@ problem and its answer.
 
 The target SpatialEntail path renders Natural or Symbolic reasoning from one
 replayable certificate. The proof-first generator migration is incomplete:
-Direction certificates support spatial chains and bounded Boolean case proofs,
-while ambiguity, Which, and Count certificates remain to be implemented before
-the post-hoc training renderer is removed. Training rows exclude coordinate
+Direction certificates support spatial chains and bounded Boolean case proofs;
+complete Direction and Which certificates support unique and ambiguous answer
+sets. Correlated Count certificates remain to be implemented before the
+post-hoc training renderer is removed. Training rows exclude coordinate
 witnesses by default. Coordinates can be added only as separate audit metadata
 for diagnostic use.
 

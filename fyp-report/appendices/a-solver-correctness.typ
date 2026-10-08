@@ -405,6 +405,52 @@ adapter that exposes only four ordinal directions is making a narrower contract
 than the generic eight-direction solver; the certificate does not silently add
 directions outside that contract.
 
+#heading(level: 2, numbering: none)[Complete Which Membership Sets]
+
+For a Which query with reference object $r$, direction set $S$, and declared
+candidate $c$, define the membership claim
+
+$
+  M_c = or_(D in S) R_D(c,r).
+$
+
+The certificate assigns exactly one of three statuses to every declared
+candidate, in query order:
+
+- *entailed*: an accepted model establishes consistency, together with either
+  an accepted exact-direction proof whose conclusion lies in $S$, or accepted
+  refutations excluding every direction outside $S$;
+- *contingent*: one accepted model satisfies $P and M_c$, while another
+  satisfies $P and not M_c$; or
+- *impossible*: an accepted countermodel establishes consistency, and accepted
+  refutations exclude every direction in $S$.
+
+The refutations use a Direction-query projection over the same objects and
+premise formula. The Which checker verifies that projection before replaying
+each refutation; it does not accept evidence from a different problem.
+
+#heading(level: 2, numbering: none)[Proposition 6: Which Classification Correctness]
+
+If a Which answer-set certificate is accepted, its possible, entailed,
+contingent, and impossible entity sets equal the corresponding model-theoretic
+classes among the query's declared candidates.
+
+_Proof._ The eight exact directions partition every valid relative position.
+For an entailed candidate, an accepted exact-direction proof within $S$
+directly establishes $P |= M_c$; alternatively, refuting every direction
+outside $S$ establishes the same result. Its accepted witness establishes
+consistency. For an impossible candidate, refuting every direction in $S$
+establishes $P |= not M_c$; its accepted countermodel establishes consistency.
+The two accepted models in a contingency certificate establish both
+$P and M_c$ and $P and not M_c$. Exact candidate coverage therefore yields the
+stated partition. $square$
+
+This result is deliberately per-candidate. It does not determine a Count answer
+by counting individually entailed or possible memberships: two contingent
+memberships may be correlated so that exactly one is true in every world.
+Count therefore requires certificates for whole joint assignments or count
+values rather than a reduction to independent Which statuses.
+
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 
 #assurance-case <solver-assurance-case>

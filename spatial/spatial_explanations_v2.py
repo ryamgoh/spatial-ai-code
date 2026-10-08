@@ -8,11 +8,11 @@ It does not parse prompts, inspect answer menus, or know dataset schemas.
 from __future__ import annotations
 
 from collections import deque
-from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+from spatial_serialization_v2 import tagged_dataclass_to_dict
 from spatial_solver_v2 import (
     CountAnalysis,
     CountQuery,
@@ -142,29 +142,9 @@ class CountExplanation:
 QueryExplanation = DirectionExplanation | WhichExplanation | CountExplanation
 
 
-def _serialize(value: Any) -> Any:
-    if isinstance(value, Enum):
-        return value.value
-    if is_dataclass(value):
-        return {
-            field.name: _serialize(getattr(value, field.name))
-            for field in fields(value)
-        }
-    if isinstance(value, Mapping):
-        return {str(key): _serialize(item) for key, item in value.items()}
-    if isinstance(value, (tuple, list)):
-        return [_serialize(item) for item in value]
-    if isinstance(value, (set, frozenset)):
-        return sorted(_serialize(item) for item in value)
-    return value
-
-
 def explanation_to_dict(explanation: QueryExplanation) -> dict[str, Any]:
     """Return a deterministic JSON-compatible representation for generators."""
-    payload = _serialize(explanation)
-    if not isinstance(payload, dict):
-        raise TypeError("explanation did not serialize to an object")
-    return {"type": type(explanation).__name__, **payload}
+    return tagged_dataclass_to_dict(explanation)
 
 
 def _claim_status(consistent: bool, possible: bool, entailed: bool) -> ClaimStatus:

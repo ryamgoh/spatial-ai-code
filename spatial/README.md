@@ -7,6 +7,7 @@ one domain model and one gold-label contract.
 |---|---|---|
 | `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
 | `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
+| `spatial_serialization_v2.py` | Deterministic JSON-compatible serialization for typed spatial artifacts | Certificate and explanation modules |
 | `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
 | `spatial_explanation_renderers_v2.py` | Coordinate-free natural and symbolic traces with final, delta, or full state | SFT trace ablations |
 | `spatial_proofs_v2.py` | Typed Direction proof certificates, deterministic construction, replay checking, and serialization | Proof-first SpatialEntail generation |
@@ -15,6 +16,8 @@ one domain model and one gold-label contract.
 | `spatial_model_certificate_renderers_v2.py` | Natural and Symbolic views of checked constructive evidence | Ambiguity and audit traces |
 | `spatial_answer_certificates_v2.py` | Exhaustive Direction candidate coverage using models or refutations | Unique and ambiguous answer sets |
 | `spatial_answer_certificate_renderers_v2.py` | Natural and Symbolic complete candidate classifications | Proof-first answer traces |
+| `spatial_which_certificates_v2.py` | Entailed, contingent, or impossible membership evidence for every Which candidate | Complete Which answer sets |
+| `spatial_which_certificate_renderers_v2.py` | Natural and Symbolic views of checked Which membership classifications | Proof-first Which traces |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
@@ -32,6 +35,7 @@ one domain model and one gold-label contract.
 | `test_spatial_proofs_v2.py` | Proof construction, compact certificates, mutation rejection, and paired rendering | Local/CI verification |
 | `test_spatial_model_certificates_v2.py` | Formula, coordinate, contingency, corruption, and rendering contracts | Local/CI verification |
 | `test_spatial_answer_certificates_v2.py` | Candidate coverage, unique/ambiguous sets, refutations, and corruption contracts | Local/CI verification |
+| `test_spatial_which_certificates_v2.py` | Eight-direction, coarse, contingent, empty, corruption, and solver-agreement Which contracts | Local/CI verification |
 | `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
 | `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
 | `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
@@ -85,8 +89,12 @@ and countermodels against the complete premise formula; a
 certificates establish possibility and non-entailment, not completeness of an
 answer set. `DirectionAnswerSetCertificate` adds completeness by requiring every
 declared candidate, in canonical order, to carry exactly one checked model or
-checked refutation. Which and Count certificates must still be implemented
-before proof-first workload generation is enabled for every query shape.
+checked refutation. `WhichAnswerSetCertificate` classifies every declared entity
+as entailed, contingent, or impossible. Entailment excludes every non-matching
+direction when no shorter exact-direction proof is available; impossibility
+excludes every matching direction; and contingency requires both a supporting
+model and a countermodel. Count certificates must still be implemented before
+proof-first workload generation is enabled for every query shape.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 
