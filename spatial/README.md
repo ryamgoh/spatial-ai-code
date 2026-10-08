@@ -69,8 +69,8 @@ and countermodels against the complete premise formula; a
 `ContingencyCertificate` requires both sides for the same claim. These
 certificates establish possibility and non-entailment, not completeness of an
 answer set. `DirectionAnswerSetCertificate` adds completeness by requiring every
-declared candidate, in canonical order, to carry exactly one checked model or
-checked refutation. `WhichAnswerSetCertificate` classifies every declared entity
+declared candidate to carry positive proof plus a witness when entailed, a model
+when contingent, or a refutation when impossible. `WhichAnswerSetCertificate` classifies every declared entity
 as entailed, contingent, or impossible. Entailment excludes every non-matching
 direction when no shorter exact-direction proof is available; impossibility
 excludes every matching direction; and contingency requires both a supporting

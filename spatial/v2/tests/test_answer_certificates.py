@@ -12,11 +12,11 @@ from spatial.v2.answer_certificates import (
     AnswerSetCheckError,
     DirectionAnswerSetCertificate,
     DirectionCandidateCertificate,
+    DirectionEntailmentCertificate,
     answer_set_to_dict,
     build_direction_answer_set,
     check_direction_answer_set,
 )
-from spatial.v2.model_certificates import SpatialModelCertificate
 from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.solver import (
     And,
@@ -48,6 +48,18 @@ def test_unique_answer_set_covers_all_eight_candidates() -> None:
     check_direction_answer_set(certificate)
     assert certificate.possible_directions == (Direction.NORTHEAST,)
     assert certificate.is_unique
+    assert certificate.entailed_directions == (Direction.NORTHEAST,)
+    assert isinstance(
+        next(item for item in certificate.candidates if item.possible).evidence,
+        DirectionEntailmentCertificate,
+    )
+    natural = render_direction_answer_set(
+        certificate,
+        TraceFormat.NATURAL,
+        include_coordinates=False,
+    )
+    assert "Combining the X and Y conclusions" in natural
+    assert "supporting model" not in natural
     assert len(certificate.candidates) == len(Direction)
     assert sum(not item.possible for item in certificate.candidates) == 7
     json.dumps(answer_set_to_dict(certificate))
@@ -97,6 +109,7 @@ def test_ambiguous_ordinal_answer_set_has_two_models_and_two_refutations() -> No
         Direction.NORTHWEST,
     )
     assert not certificate.is_unique
+    assert certificate.entailed_directions == ()
     assert sum(item.possible for item in certificate.candidates) == 2
     assert sum(not item.possible for item in certificate.candidates) == 2
     natural = render_direction_answer_set(
@@ -191,7 +204,7 @@ def test_checker_rejects_incomplete_duplicate_and_mismatched_evidence() -> None:
         for item in certificate.candidates
         if item.direction is Direction.SOUTHWEST
     )
-    assert isinstance(northeast_evidence.evidence, SpatialModelCertificate)
+    assert isinstance(northeast_evidence.evidence, DirectionEntailmentCertificate)
     mismatched = DirectionCandidateCertificate(
         Direction.NORTHEAST,
         southwest_refutation,
@@ -204,3 +217,32 @@ def test_checker_rejects_incomplete_duplicate_and_mismatched_evidence() -> None:
         check_direction_answer_set(
             DirectionAnswerSetCertificate(problem, mismatched_candidates)
         )
+
+    assert isinstance(northeast_evidence.evidence, DirectionEntailmentCertificate)
+    missing_proof = replace(
+        certificate,
+        candidates=tuple(
+            replace(item, evidence=northeast_evidence.evidence.witness)
+            if item.direction is Direction.NORTHEAST
+            else item
+            for item in certificate.candidates
+        ),
+    )
+    with pytest.raises(AnswerSetCheckError, match="requires positive proof"):
+        check_direction_answer_set(missing_proof)
+
+    broken_entailment = replace(
+        northeast_evidence.evidence,
+        proof=replace(northeast_evidence.evidence.proof, conclusion_step="missing"),
+    )
+    broken = replace(
+        certificate,
+        candidates=tuple(
+            replace(item, evidence=broken_entailment)
+            if item.direction is Direction.NORTHEAST
+            else item
+            for item in certificate.candidates
+        ),
+    )
+    with pytest.raises(AnswerSetCheckError, match="invalid entailment evidence"):
+        check_direction_answer_set(broken)

@@ -13,10 +13,14 @@ from spatial.v2.model_certificates import (
     check_model_certificate,
 )
 from spatial.v2.proofs import (
+    DirectionClaim,
+    DirectionProofCertificate,
     DirectionRefutationCertificate,
     ProofCheckError,
     ProofConstructionError,
+    build_direction_proof,
     build_direction_refutation,
+    check_direction_proof,
     check_direction_refutation,
 )
 from spatial.v2.serialization import tagged_dataclass_to_dict
@@ -33,13 +37,30 @@ class AnswerSetCheckError(ValueError):
 
 
 @dataclass(frozen=True)
+class DirectionEntailmentCertificate:
+    witness: SpatialModelCertificate
+    proof: DirectionProofCertificate
+
+
+@dataclass(frozen=True)
 class DirectionCandidateCertificate:
     direction: Direction
-    evidence: SpatialModelCertificate | DirectionRefutationCertificate
+    evidence: (
+        DirectionEntailmentCertificate
+        | SpatialModelCertificate
+        | DirectionRefutationCertificate
+    )
 
     @property
     def possible(self) -> bool:
-        return isinstance(self.evidence, SpatialModelCertificate)
+        return isinstance(
+            self.evidence,
+            (DirectionEntailmentCertificate, SpatialModelCertificate),
+        )
+
+    @property
+    def entailed(self) -> bool:
+        return isinstance(self.evidence, DirectionEntailmentCertificate)
 
 
 @dataclass(frozen=True)
@@ -54,6 +75,10 @@ class DirectionAnswerSetCertificate:
     @property
     def is_unique(self) -> bool:
         return len(self.possible_directions) == 1
+
+    @property
+    def entailed_directions(self) -> tuple[Direction, ...]:
+        return tuple(item.direction for item in self.candidates if item.entailed)
 
 
 def _candidate_claim(
@@ -85,7 +110,33 @@ def check_direction_answer_set(certificate: DirectionAnswerSetCertificate) -> No
 
     for item in certificate.candidates:
         expected_claim = _candidate_claim(query, item.direction)
-        if isinstance(item.evidence, SpatialModelCertificate):
+        if isinstance(item.evidence, DirectionEntailmentCertificate):
+            evidence = item.evidence
+            if (
+                evidence.witness.problem != problem
+                or evidence.witness.claim != expected_claim
+                or evidence.witness.expected_claim_value is not True
+                or evidence.proof.problem != problem
+            ):
+                raise AnswerSetCheckError(
+                    f"{item.direction.value} entailment certifies the wrong candidate"
+                )
+            try:
+                check_model_certificate(evidence.witness)
+                check_direction_proof(evidence.proof)
+            except (ModelCheckError, ProofCheckError) as exc:
+                raise AnswerSetCheckError(
+                    f"{item.direction.value} has invalid entailment evidence: {exc}"
+                ) from exc
+            if evidence.proof.conclusion != DirectionClaim(
+                query.target,
+                item.direction,
+                query.reference,
+            ):
+                raise AnswerSetCheckError(
+                    f"{item.direction.value} entailment certifies the wrong candidate"
+                )
+        elif isinstance(item.evidence, SpatialModelCertificate):
             if (
                 item.evidence.problem != problem
                 or item.evidence.claim != expected_claim
@@ -122,6 +173,16 @@ def check_direction_answer_set(certificate: DirectionAnswerSetCertificate) -> No
     if not certificate.possible_directions:
         raise AnswerSetCheckError(
             "a consistent Direction answer set needs a possible value"
+        )
+    if certificate.is_unique and certificate.entailed_directions != (
+        certificate.possible_directions[0],
+    ):
+        raise AnswerSetCheckError(
+            "a unique possible direction requires positive proof evidence"
+        )
+    if not certificate.is_unique and certificate.entailed_directions:
+        raise AnswerSetCheckError(
+            "an ambiguous Direction answer set cannot mark a candidate entailed"
         )
 
 
@@ -162,6 +223,25 @@ def build_direction_answer_set(
                 f"missing a model for non-refutable candidate {direction.value}"
             ) from exc
         evidence.append(DirectionCandidateCertificate(direction, refutation))
+
+    if len(possible_models) == 1:
+        direction = next(iter(possible_models))
+        try:
+            proof = build_direction_proof(problem, direction)
+        except ProofConstructionError as exc:
+            raise ProofConstructionError(
+                f"missing a positive proof for unique candidate {direction.value}"
+            ) from exc
+        evidence = [
+            DirectionCandidateCertificate(
+                item.direction,
+                DirectionEntailmentCertificate(item.evidence, proof),
+            )
+            if item.direction is direction
+            and isinstance(item.evidence, SpatialModelCertificate)
+            else item
+            for item in evidence
+        ]
 
     certificate = DirectionAnswerSetCertificate(problem, tuple(evidence))
     check_direction_answer_set(certificate)

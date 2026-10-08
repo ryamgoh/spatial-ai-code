@@ -7,13 +7,17 @@ from typing import TYPE_CHECKING
 
 from spatial.v2.answer_certificates import (
     DirectionAnswerSetCertificate,
+    DirectionEntailmentCertificate,
     check_direction_answer_set,
 )
 from spatial.v2.count_certificate_renderers import render_count_answer_set
 from spatial.v2.count_certificates import CountAnswerSetCertificate
 from spatial.v2.model_certificate_renderers import render_model_certificate
 from spatial.v2.model_certificates import SpatialModelCertificate
-from spatial.v2.proof_renderers import render_direction_refutation
+from spatial.v2.proof_renderers import (
+    render_direction_proof,
+    render_direction_refutation,
+)
 from spatial.v2.trace import TraceFormat
 from spatial.v2.which_certificate_renderers import render_which_answer_set
 from spatial.v2.which_certificates import WhichAnswerSetCertificate
@@ -35,7 +39,14 @@ def render_direction_answer_set(
     labels = labels or {}
     lines = []
     for item in certificate.candidates:
-        if isinstance(item.evidence, SpatialModelCertificate):
+        if isinstance(item.evidence, DirectionEntailmentCertificate):
+            evidence = render_direction_proof(
+                item.evidence.proof,
+                trace_format,
+                labels,
+            )
+            status = "entailed"
+        elif isinstance(item.evidence, SpatialModelCertificate):
             evidence = render_model_certificate(
                 item.evidence,
                 trace_format,

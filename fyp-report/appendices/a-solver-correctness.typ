@@ -383,23 +383,30 @@ closed proof or an independent unsatisfiability decision.
 A Direction answer-set certificate enumerates the query's declared candidate
 directions in canonical compass order. Each candidate carries exactly one of:
 
-- an accepted model certificate satisfying $P and R_D(a,b)$; or
+- for the unique entailed direction, an accepted supporting model and an
+  accepted positive proof;
+- for a contingent direction, an accepted model satisfying $P and R_D(a,b)$;
+  or
 - an accepted refutation certificate showing that $P and R_D(a,b)$ has no
   spatial model.
 
 Missing candidates, duplicate candidates, evidence for an undeclared direction,
-or a candidate carrying both forms of evidence invalidate the certificate.
+or evidence with the wrong status invalidate the certificate. A singleton
+possibility set is accepted only when its candidate carries positive proof
+evidence; an ambiguous set cannot mark any exact direction as entailed.
 
 #heading(level: 2, numbering: none)[Proposition 5: Answer-Set Completeness]
 
-If a Direction answer-set certificate is accepted, the directions marked by
-model certificates are exactly the possible directions among the declared
-candidates.
+If a Direction answer-set certificate is accepted, its entailed, contingent,
+and impossible classifications match the model-theoretic status of every
+declared direction.
 
-_Proof._ Every model-backed candidate is possible by Proposition 4. Every
-refutation-backed candidate is impossible by Corollary 3.1. The coverage check
-partitions the complete declared candidate set into these two classes exactly
-once, so no declared possibility is omitted or duplicated. $square$
+_Proof._ Every witness-backed candidate is possible by Proposition 4. An
+entailed candidate additionally has an accepted positive proof by Theorem 3.
+Every refutation-backed candidate is impossible by Corollary 3.1. If multiple
+exact directions are possible, their mutual exclusivity makes each contingent;
+if exactly one is possible, exhaustive exclusion of all alternatives plus its
+positive proof makes it the unique entailed direction. $square$
 
 This is completeness relative to the query's declared candidate set. A dataset
 adapter that exposes only four ordinal directions is making a narrower contract
