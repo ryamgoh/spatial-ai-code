@@ -9,7 +9,7 @@ formats are rendered from the same checked answer certificate:
 
 Normalized coordinate models are audit witnesses only. They are not emitted by
 either training trace. Checked traces live in the proof and answer-certificate
-renderers; coordinate reports live in `spatial/spatial_audit_rendering_v2.py`.
+renderers; coordinate reports live in `spatial/v2/audit_rendering.py`.
 
 The V2 generator exposes only trace format as a representation dimension. Every
 generated prompt is reparsed and re-solved before either view is rendered, so
@@ -22,8 +22,8 @@ variable in an ablation instead of generating a different random map for each
 format.
 
 The remainder of this document describes the historical V6 state-trace design
-in `spatial/generate_all_v6.py`; it is not the V2 proof-first generation path.
-Its oracle is `eval/clean_v6.py`, and `spatial/generate_all.py` is frozen.
+in `spatial/v1/generate_all_v6.py`; it is not the V2 proof-first generation path.
+Its oracle is `eval/clean_v6.py`, and `spatial/v1/generate_all.py` is frozen.
 
 Catalog of every question bucket, with examples from the 6k set: `docs/question-types.md`.
 
@@ -281,8 +281,8 @@ Answer: E
 
 | Piece | Where |
 |---|---|
-| Shared gold rules | `spatial/spatial_solver.py` (`SpatialSolver.grade`) — **only** gold |
-| World + traces | `spatial/generate_all_v6.py` proposes a map; keeps the sample iff `grade.accept` |
+| Shared gold rules | `spatial/v1/solver.py` (`SpatialSolver.grade`) — **only** gold |
+| World + traces | `spatial/v1/generate_all_v6.py` proposes a map; keeps the sample iff `grade.accept` |
 | Type 0 undetermined count | `--num-type0-undetermined` (gold E). No 4-ans flag. |
 | SpatialMap JSONL labels | `eval/clean_v6.py` (calls the same solver) |
 | Old SpatialMap cleaner | `eval/clean_v5.py` (do not edit for this calculus) |

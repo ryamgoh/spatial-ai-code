@@ -7,9 +7,9 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "spatial"))
+sys.path.insert(0, str(REPO))
 
-from spatial_generation_v13 import (
+from spatial.v1.generation_v13 import (
     DepthRange,
     DistractorPolicy,
     DistractorSpec,

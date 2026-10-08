@@ -16,20 +16,20 @@ dataset row or synthetic spec
     -> grading, structured explanation, audit reporting, or map rendering
 ```
 
-- `spatial_solver_v2.py` owns the spatial theory, model search, and coordinate
+- `spatial/v2/solver.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
-- `spatial_explanations_v2.py` classifies individual claims, extracts readable
+- `spatial/v2/explanations.py` classifies individual claims, extracts readable
   axis paths where possible, and records audit evidence without parsing text.
 - `spatial_*_certificates_v2.py` builds and independently checks Direction,
   Which, and correlated Count evidence; their renderers emit Natural or
   Symbolic training traces from the same accepted certificate.
-- `spatial_audit_rendering_v2.py` is the only renderer that formats coordinate
+- `spatial/v2/audit_rendering.py` is the only renderer that formats coordinate
   witnesses.
-- `spatial_text_v2.py` adapts the current prompt grammar into a
+- `spatial/v2/text.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
-- `spatial_grading_v2.py` resolves answer semantics, encodes menu selections,
+- `spatial/v2/grading.py` resolves answer semantics, encodes menu selections,
   and scores predicted letter sets against an existing query analysis.
-- `spatialeval_adapter_v2.py` converts original SpatialEval rows, preserves
+- `spatial/v2/spatialeval_adapter.py` converts original SpatialEval rows, preserves
   their oracle metadata, and classifies the oracle against the model set.
 
 The core solver has no knowledge of JSONL rows, chat messages, prompt wording,
@@ -77,21 +77,21 @@ receive the all-eight default.
 
 ### File-level use cases
 
-- Use `spatial_solver_v2.py` when the caller already has structured objects,
+- Use `spatial/v2/solver.py` when the caller already has structured objects,
   formulas, and a query.
-- Use `spatial_explanations_v2.py` after constructing a `SpatialProblem` when an
+- Use `spatial/v2/explanations.py` after constructing a `SpatialProblem` when an
   audit or difficulty analysis needs machine-readable evidence.
 - Use the answer-certificate builders and renderers for proof-first training
   traces without exposing coordinates.
-- Use `spatial_audit_rendering_v2.py` only for coordinate-bearing diagnostics.
-- Use `spatial_text_v2.py` only to adapt the current rendered prompt grammar.
-- Use `spatial_grading_v2.py` after semantic analysis to resolve answer
+- Use `spatial/v2/audit_rendering.py` only for coordinate-bearing diagnostics.
+- Use `spatial/v2/text.py` only to adapt the current rendered prompt grammar.
+- Use `spatial/v2/grading.py` after semantic analysis to resolve answer
   semantics, encode an option menu, or score a model response.
-- Use `spatialeval_adapter_v2.py` to preserve original SpatialEval oracle
+- Use `spatial/v2/spatialeval_adapter.py` to preserve original SpatialEval oracle
   metadata while comparing it with the solver-derived model set.
-- Use `test_spatial_solver_v2.py` as the executable semantic contract before
+- Use `spatial/v2/tests/test_solver.py` as the executable semantic contract before
   changing the solver or building proof rendering.
-- Use `test_spatial_explanations_v2.py` as the executable claim-evidence and
+- Use `spatial/v2/tests/test_explanations.py` as the executable claim-evidence and
   explanation contract.
 
 ## Motivation: text must determine its own answer
@@ -499,7 +499,7 @@ exact answer when that entity is absent in another valid world.
 
 ## V2 generation pipeline
 
-`spatial/spatial_generation_v2.py` keeps synthetic-data policy above the
+`spatial/v2/generation.py` keeps synthetic-data policy above the
 solver. A `GenerationPolicy` chooses the query family, answer mode, semantic
 shape, menu coverage, trace format, entity count, and premise count. The solver
 sees only the resulting `SpatialProblem`.
@@ -538,7 +538,7 @@ The reporting roles remain distinct:
 | `ALL_POSSIBLE` | Strict complete-ambiguity metric |
 | `VISIBLE_POSSIBLE` | Loose menu-conditioned diagnostic; never headline accuracy |
 
-`spatial/generate_all_v2.py` crosses requested policy dimensions into balanced
+`spatial/v2/generate_all.py` crosses requested policy dimensions into balanced
 cells, assigns deterministic unique IDs, shuffles deterministically, and writes
 train/test JSONL splits. Which and Count cells can additionally be balanced
 across all eight query directions, while Direction cells can be balanced across
@@ -590,7 +590,7 @@ acceptance rate, maximum rejections before acceptance, and rejection reasons.
 
 ## Ablation matrices
 
-`spatial/spatial_matrix_v2.py` parses a strict versioned YAML experiment matrix.
+`spatial/v2/matrix.py` parses a strict versioned YAML experiment matrix.
 Named cells set exact base-problem counts and structural controls. Named answer
 variants and trace variants are expanded from each accepted base problem, so
 changing answer semantics or trace representation does not silently change the

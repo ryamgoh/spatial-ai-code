@@ -1,55 +1,33 @@
 # Spatial reasoning
 
-The solver and synthetic data generators live together here because they share
-one domain model and one gold-label contract.
+Active SpatialEntail code lives in `v2/`. Retired pre-V2 implementations are
+kept under `v1/` only for historical reproducibility.
 
 | File | Responsibility | Typical caller |
 |---|---|---|
-| `spatial_solver.py` | Frozen v6 answer oracle | Legacy v6 generation/evaluation |
-| `spatial_solver_v2.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
-| `spatial_serialization_v2.py` | Deterministic JSON-compatible serialization for typed spatial artifacts | Certificate and explanation modules |
-| `spatial_explanations_v2.py` | Structured claim evidence, axis proofs, qualitative domains, and ambiguity witnesses | Generators and audit reports |
-| `spatial_trace_v2.py` | Natural and Symbolic trace-format contract | Certificate renderers and workload variants |
-| `spatial_proofs_v2.py` | Typed Direction proof certificates, deterministic construction, replay checking, and serialization | Proof-first SpatialEntail generation |
-| `spatial_proof_renderers_v2.py` | Natural and Symbolic views of one checked proof certificate | Proof-first SFT traces |
-| `spatial_model_certificates_v2.py` | Constructive model, countermodel, and contingency validation without Z3 | Possibility and non-entailment evidence |
-| `spatial_model_certificate_renderers_v2.py` | Natural and Symbolic views of checked constructive evidence | Ambiguity and audit traces |
-| `spatial_answer_certificates_v2.py` | Exhaustive Direction candidate coverage using models or refutations | Unique and ambiguous answer sets |
-| `spatial_answer_certificate_renderers_v2.py` | Natural and Symbolic complete candidate classifications | Proof-first answer traces |
-| `spatial_which_certificates_v2.py` | Entailed, contingent, or impossible membership evidence for every Which candidate | Complete Which answer sets |
-| `spatial_which_certificate_renderers_v2.py` | Natural and Symbolic views of checked Which membership classifications | Proof-first Which traces |
-| `spatial_count_certificates_v2.py` | Exhaustive model-or-refutation evidence over correlated membership assignments | Complete Count answer sets |
-| `spatial_count_certificate_renderers_v2.py` | Natural and Symbolic views of checked Count domains and joint exclusions | Proof-first Count traces |
-| `spatial_certificate_generation_v2.py` | Convert solver witnesses into independently replayed answer certificates | Proof-first generator |
-| `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
-| `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
-| `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
-| `spatial_generation_v2.py` | Policy-driven problem, menu, trace, and audit construction with mandatory round-trip validation | V2 synthetic workloads |
-| `generate_all_v2.py` | Balanced JSONL workload CLI over V2 policy cells | SFT train/test generation |
-| `spatial_workload_manifest_v2.py` | Distribution summaries, paired-variant checks, and split-leakage validation | V2 workload generation and audit |
-| `spatial_matrix_v2.py` | Strict YAML matrix parsing and paired ablation expansion | Reproducible multi-cell experiments |
-| `generate_matrix_v2.py` | Thin CLI for a V2 experiment matrix | Pilot and full dataset generation |
-| `spatialeval_adapter_v2.py` | Original SpatialEval rows to structured cases and oracle audit status | SpatialEval audit pipeline |
-| `audit_spatialeval_v2.py` | Deterministic full audit, witness validation, and SpatialMap-TQA-Corr derivation | Part I benchmark audit |
-| `test_spatial_solver_v2.py` | Core, adapter, answer semantics, witness, and differential contracts | Local/CI verification |
-| `test_audit_spatialeval_v2.py` | Source preservation, correction, determinism, and overwrite contracts | Part I audit verification |
-| `test_spatial_grading_v2.py` | Single/complete/visible modes and exact letter-set scoring | Local/CI verification |
-| `test_spatial_explanations_v2.py` | Claim assessment and Direction/Which/Count explanation contracts | Local/CI verification |
-| `test_spatial_proofs_v2.py` | Proof construction, compact certificates, mutation rejection, and paired rendering | Local/CI verification |
-| `test_spatial_model_certificates_v2.py` | Formula, coordinate, contingency, corruption, and rendering contracts | Local/CI verification |
-| `test_spatial_answer_certificates_v2.py` | Candidate coverage, unique/ambiguous sets, refutations, and corruption contracts | Local/CI verification |
-| `test_spatial_which_certificates_v2.py` | Eight-direction, coarse, contingent, empty, corruption, and solver-agreement Which contracts | Local/CI verification |
-| `test_spatial_count_certificates_v2.py` | Correlated Boolean counts, ambiguous count domains, assignment coverage, rendering, and corruption contracts | Local/CI verification |
-| `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
-| `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
-| `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
+| `v2/solver.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
+| `v2/proofs.py` | Typed proof and refutation certificates with replay checking | Proof-first SpatialEntail generation |
+| `v2/model_certificates.py` | Constructive model, countermodel, and contingency validation | Possibility and non-entailment evidence |
+| `v2/answer_certificates.py` | Complete Direction candidate coverage | Direction answer sets |
+| `v2/which_certificates.py` | Entailed, contingent, or impossible membership evidence | Which answer sets |
+| `v2/count_certificates.py` | Correlation-preserving evidence over complete membership assignments | Count answer sets |
+| `v2/certificate_generation.py` | Convert solver witnesses into independently replayed answer certificates | Proof-first generator |
+| `v2/*_renderers.py` | Natural and Symbolic views of checked evidence | Proof-first traces |
+| `v2/text.py` | Controlled prompt grammar to `SpatialProblem` | Round-trip validation |
+| `v2/grading.py` | Answer-mode resolution, menu encoding, and scoring | Dataset adapters |
+| `v2/generation.py` | Policy-driven, certificate-backed workload construction | V2 synthetic workloads |
+| `v2/generate_all.py` | Balanced workload CLI | SFT train/test generation |
+| `v2/matrix.py` and `v2/generate_matrix.py` | Strict ablation matrices and runner | Reproducible experiments |
+| `v2/spatialeval_adapter.py` and `v2/audit_spatialeval.py` | SpatialEval audit and correction | Part I benchmark audit |
+| `v2/tests/` | V2 semantic, certificate, generation, and audit contracts | Local/CI verification |
 
-Legacy generators remain separate:
+Retired implementations live under `v1/`:
 
-- `generate_all.py`: frozen legacy SFT generator
-- `generate_all_v6.py`: solver-validated SFT generator
-- `generate_grpo.py`: prompt-only GRPO data generator
-- `test_spatial_laws.py`: solver/generator contract tests
+- `v1/generate_all.py`: frozen original SFT generator
+- `v1/generate_all_v6.py`: solver-validated V6 generator
+- `v1/generation_v13.py`: V13 typed generator
+- `v1/generate_grpo.py`: historical prompt-only GRPO generator
+- `v1/tests/`: retained regression tests
 
 V2 deliberately remains separate from the V13 data contract. Its semantics,
 including exact cardinals, coarse `*ward` relations, and negation, are defined
@@ -103,7 +81,7 @@ membership assignment with that count. The generic Count checker is complete
 relative to supplied evidence, while automatic refutation construction remains
 limited by the proof builder's supported fragment.
 
-`spatial_generation_v2.py` rejects any candidate for which
+`v2/generation.py` rejects any candidate for which
 `build_answer_certificate` cannot produce complete checked evidence. Accepted
 training traces are rendered only from that certificate; there is no post-hoc
 explanation fallback or independent state-snapshot mode.
@@ -111,7 +89,7 @@ explanation fallback or independent state-snapshot mode.
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 
     uv --system-certs run --python 3.12 --no-project --with typer --with z3-solver \
-      python spatial/audit_spatialeval_v2.py \
+      python -m spatial.v2.audit_spatialeval \
       --input data/spatialeval_org.jsonl \
       --output-dir results/part1-spatialeval-audit
 
@@ -123,7 +101,7 @@ but excludes coordinate witnesses; witnesses remain in the audit artifact.
 Generate a balanced V2 workload with:
 
     uv run --python 3.12 --no-project --with typer --with z3-solver \
-      python spatial/generate_all_v2.py \
+      python -m spatial.v2.generate_all \
       --out data/spatial_v2.jsonl \
       --samples-per-cell 100 \
       --query-kinds direction,which,count \
@@ -146,7 +124,7 @@ The workload CLI also fails on existing outputs unless `--replace` is passed.
 For a heterogeneous ablation, use the checked-in matrix example:
 
     uv run --python 3.12 --no-project --with typer --with pyyaml --with z3-solver \
-      python spatial/generate_matrix_v2.py \
+      python -m spatial.v2.generate_matrix \
       experiments/spatial-v2-ablation.example.yaml \
       --out data/spatial_v2_ablation.jsonl
 
@@ -158,7 +136,7 @@ Existing matrix outputs are preserved unless `--replace` is explicitly passed.
 For a transitive Direction workload, use a single compatible policy cell:
 
     uv run --python 3.12 --no-project --with typer --with z3-solver \
-      python spatial/generate_all_v2.py \
+      python -m spatial.v2.generate_all \
       --out data/spatial_v2_depth.jsonl \
       --query-kinds direction \
       --semantic-shapes unique \

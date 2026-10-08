@@ -64,7 +64,7 @@ if [[ ! -s "$TEST" ]]; then
     flock 9
     cd finetune
     srun --cpu-bind=cores uv run --no-project --with typer python \
-      ../spatial/generate_all_v6.py \
+      ../spatial/v1/generate_all_v6.py \
       --out ../data/spatial_sft_v12_21000_pool.jsonl \
       --test-split 0 \
       --seed 52 \

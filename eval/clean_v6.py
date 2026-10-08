@@ -2,7 +2,7 @@
 SpatialMap cleaner (v6)
 =======================
 Re-labels SpatialEval JSONL with the shared v6 solver
-(`spatial/spatial_solver.py`). Gold matches `spatial/generate_all_v6.py`.
+(`spatial/v1/solver.py`). Gold matches `spatial/v1/generate_all_v6.py`.
 
   Type 0: unique compound / two remaining compounds / E. Never A,B,C,D.
   Type 1: proven entities only. No all-four fallback.
@@ -15,10 +15,10 @@ from pathlib import Path
 
 import typer
 
-_SPATIAL_DIR = Path(__file__).resolve().parent.parent / "spatial"
-if str(_SPATIAL_DIR) not in sys.path:
-    sys.path.insert(0, str(_SPATIAL_DIR))
-from spatial_solver import parse_options, parse_problem, solve
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+from spatial.v1.solver import parse_options, parse_problem, solve
 
 
 TYPE0 = """Consider a map with multiple objects:
@@ -97,7 +97,7 @@ def clean_jsonl(input_path: str, output_path: str) -> None:
 #   cd eval && uv run python clean_v6.py
 #   cd eval && uv run python clean_v6.py batch
 
-app = typer.Typer(help="v6 cleaner: labels JSONL with spatial_solver.SpatialSolver.")
+app = typer.Typer(help="v6 cleaner: labels JSONL with spatial.v1.solver.SpatialSolver.")
 
 
 def demo() -> None:

@@ -154,7 +154,7 @@ not uniquely entailed by the released text.
 
 ```bash
 uv --system-certs run --python 3.12 --no-project --with typer --with z3-solver \
-  python spatial/audit_spatialeval_v2.py \
+  python -m spatial.v2.audit_spatialeval \
   --input data/spatialeval_org.jsonl \
   --output-dir results/part1-spatialeval-audit
 ```

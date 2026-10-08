@@ -10,13 +10,13 @@ from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "spatial"))
+sys.path.insert(0, str(REPO))
 
-from spatial_generation_v13 import (
+from spatial.v1.generation_v13 import (
     TraceFormat,
     render_trace,
 )
-from spatial_solver_v13 import SpatialSolverV13
+from spatial.v1.solver_v13 import SpatialSolverV13
 
 VERSION = "v13.1-trace-ablation-v1"
 EXPECTED_TRAIN = 8000

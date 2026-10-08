@@ -8,7 +8,7 @@ Run the checked-in example with:
 
 ```bash
 uv run --python 3.12 --no-project --with typer --with pyyaml --with z3-solver \
-  python spatial/generate_matrix_v2.py \
+  python -m spatial.v2.generate_matrix \
   experiments/spatial-v2-ablation.example.yaml \
   --out data/spatial_v2_ablation.jsonl
 ```

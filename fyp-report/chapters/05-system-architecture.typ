@@ -44,18 +44,18 @@ reconstruction of a hidden source map.
   caption: [Logical module boundaries in the V2 architecture.],
 ) <solver-module-responsibilities>
 
-The implementation maps these responsibilities to `spatial_text_v2.py` and
-`spatialeval_adapter_v2.py` for reading; `spatial_solver_v2.py` for the shared
-contract and reasoning core; `spatial_grading_v2.py` for answer policy and menu
-encoding; `spatial_proofs_v2.py` and its renderer for checked derivations;
-`spatial_model_certificates_v2.py` for constructive evidence;
-`spatial_answer_certificates_v2.py` for complete Direction candidate sets;
-`spatial_which_certificates_v2.py` for complete three-valued membership sets;
-`spatial_count_certificates_v2.py` for correlation-preserving Count domains;
-`spatial_certificate_generation_v2.py` for oracle-assisted certificate
+The implementation maps these responsibilities to `spatial/v2/text.py` and
+`spatial/v2/spatialeval_adapter.py` for reading; `spatial/v2/solver.py` for the shared
+contract and reasoning core; `spatial/v2/grading.py` for answer policy and menu
+encoding; `spatial/v2/proofs.py` and its renderer for checked derivations;
+`spatial/v2/model_certificates.py` for constructive evidence;
+`spatial/v2/answer_certificates.py` for complete Direction candidate sets;
+`spatial/v2/which_certificates.py` for complete three-valued membership sets;
+`spatial/v2/count_certificates.py` for correlation-preserving Count domains;
+`spatial/v2/certificate_generation.py` for oracle-assisted certificate
 construction;
-`spatial_explanations_v2.py` for current audit compatibility; and
-`audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
+`spatial/v2/explanations.py` for current audit compatibility; and
+`spatial/v2/audit_spatialeval.py` or `spatial/v2/generation.py` for the two pipelines.
 
 == End-to-End Lifecycle
 

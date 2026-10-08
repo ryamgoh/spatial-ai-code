@@ -11,7 +11,7 @@ if [[ "${REPLACE_DATA:-0}" == "1" ]]; then
 fi
 
 uv run --no-project --with typer --with pyyaml --with z3-solver \
-  python spatial/generate_matrix_v2.py \
+  python -m spatial.v2.generate_matrix \
   "$MATRIX" \
   --out "$DATA_OUTPUT" \
   "${args[@]}"

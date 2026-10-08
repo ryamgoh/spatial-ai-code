@@ -12,9 +12,9 @@ from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "spatial"))
+sys.path.insert(0, str(REPO))
 
-from spatial_generation_v13 import (
+from spatial.v1.generation_v13 import (
     CycleAxes,
     CyclePlacement,
     CycleSpec,
@@ -30,7 +30,7 @@ from spatial_generation_v13 import (
     StructuralConstraints,
     WorldConsistency,
 )
-from spatial_graph import ENTITY_NAMES
+from spatial.v1.graph import ENTITY_NAMES
 
 SEED = 13700
 VERSION = "v13.1-structural-breakpoint-v1"

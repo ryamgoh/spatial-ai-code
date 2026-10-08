@@ -184,19 +184,19 @@ experiment,” but not yet “GRPO improves V13.”
 
 This appendix separates **answer semantics** from **orthogonal structure**. V13
 defines exactly 12 consistent-world semantic subtypes; cycle is deliberately not a
-thirteenth subtype (`spatial/spatial_generation_v13.py:36-48`,
-`spatial/spatial_solver_v13.py:770-777`). The solver, not hidden generation
+thirteenth subtype (`spatial/v1/generation_v13.py:36-48`,
+`spatial/v1/solver_v13.py:770-777`). The solver, not hidden generation
 coordinates, is authoritative: it reparses the rendered prompt, computes transitive
 closure, and the generator rejects a row if the recovered subtype or requested
-structure differs (`spatial/spatial_solver_v13.py:204-235`,
-`spatial/spatial_generation_v13.py:1110-1215`).
+structure differs (`spatial/v1/solver_v13.py:204-235`,
+`spatial/v1/generation_v13.py:1110-1215`).
 
 ### Shared calculus and special-option rule
 
 On X, `A < B` means A is west of B; on Y it means A is south of B. A cardinal
 premise adds one axis edge and a diagonal premise adds two; proofs are directed
-paths in the transitive closure (`spatial/spatial_solver_v13.py:37-46`,
-`spatial/spatial_solver_v13.py:119-131`). Thus a compact faithful trace prefix is:
+paths in the transitive closure (`spatial/v1/solver_v13.py:37-46`,
+`spatial/v1/solver_v13.py:119-131`). Thus a compact faithful trace prefix is:
 
 ```text
 For each premise: emit X edge / Y edge (or “none” for the untouched axis).
@@ -209,16 +209,16 @@ Answer: <exact accepted letter set>
 consistent world, the former is Type-0 insufficient information or an incomplete
 two-direction menu; the latter means a derived answer is absent. For consistent
 which/count questions, an empty listed result uses None, while Cannot is reserved
-for inconsistency (`spatial/spatial_solver_v13.py:480-503`,
-`spatial/spatial_solver_v13.py:600-620`). The accepted textual paraphrases are
-enumerated—not guessed—at `spatial/spatial_solver_v13.py:21-35`.
+for inconsistency (`spatial/v1/solver_v13.py:480-503`,
+`spatial/v1/solver_v13.py:600-620`). The accepted textual paraphrases are
+enumerated—not guessed—at `spatial/v1/solver_v13.py:21-35`.
 
 ### All consistent-world semantic subtypes
 
 The examples below use option labels only illustratively; option order is shuffled,
 so semantics attach to option text, not to a fixed letter. Each template is the
 minimal final-deduction portion of the generated trace; the actual renderer also
-emits per-premise extraction and state updates (`spatial/spatial_generation_v13.py:940-1025`).
+emits per-premise extraction and state updates (`spatial/v1/generation_v13.py:940-1025`).
 
 | subtype | minimal example | faithful compact CoT/CoS rule |
 |---|---|---|
@@ -234,14 +234,14 @@ emits per-premise extraction and state updates (`spatial/spatial_generation_v13.
 
 These are distinct option-set rules, not merely answer cardinalities. Type 0 first
 constructs zero, one, or two compatible compounds and then applies the complete-menu
-rule (`spatial/spatial_solver_v13.py:480-520`,
-`spatial/spatial_solver_v13.py:640-646`). Which requires every axis named by the
+rule (`spatial/v1/solver_v13.py:480-520`,
+`spatial/v1/solver_v13.py:640-646`). Which requires every axis named by the
 queried direction for each candidate; count applies the identical predicate to all
-objects and takes its cardinality (`spatial/spatial_solver_v13.py:523-599`). The
+objects and takes its cardinality (`spatial/v1/solver_v13.py:523-599`). The
 generator explicitly maps the 12 subtype names to question family and requested
-answer count (`spatial/spatial_generation_v13.py:183-202`), constructs `which-0`
-with four non-proven choices (`spatial/spatial_generation_v13.py:761-794`), and
-constructs count omission by excluding the true integer (`spatial/spatial_generation_v13.py:797-820`).
+answer count (`spatial/v1/generation_v13.py:183-202`), constructs `which-0`
+with four non-proven choices (`spatial/v1/generation_v13.py:761-794`), and
+constructs count omission by excluding the true integer (`spatial/v1/generation_v13.py:797-820`).
 
 ### Orthogonal V13 structural conditions
 
@@ -250,19 +250,19 @@ be parsed, selected, or composed before applying it.
 
 | dimension | exact conditions | minimal example and trace obligation |
 |---|---|---|
-| relation mode | `diagonal`, `cardinal`, `mixed` | Diagonal: “A NE of B” emits `B<A` on both axes. Cardinal: “A east of B” emits X only and Y `none`. Mixed uses both premise kinds. The enum is exact at `spatial/spatial_generation_v13.py:30-34`; extraction behavior is at `spatial/spatial_generation_v13.py:963-978`. |
-| proof depth | shortest X depth and shortest Y depth, with direct iff depth 1 | `B < C < A` has depth 2. Trace the shortest path, not hidden coordinates or every possible path. Depth/path/support metadata comes from BFS (`spatial/spatial_solver_v13.py:655-715`) and is recorded per axis (`spatial/spatial_solver_v13.py:907-929`). |
-| axis support | shared or independent X/Y supporting statements | Independent example: X proof `B<X<A`, Y proof `B<Y<A`, with disjoint statement IDs. Trace both paths separately. `axes_independent` is true exactly when both exist and their support intersection is empty (`spatial/spatial_solver_v13.py:911-929`). |
+| relation mode | `diagonal`, `cardinal`, `mixed` | Diagonal: “A NE of B” emits `B<A` on both axes. Cardinal: “A east of B” emits X only and Y `none`. Mixed uses both premise kinds. The enum is exact at `spatial/v1/generation_v13.py:30-34`; extraction behavior is at `spatial/v1/generation_v13.py:963-978`. |
+| proof depth | shortest X depth and shortest Y depth, with direct iff depth 1 | `B < C < A` has depth 2. Trace the shortest path, not hidden coordinates or every possible path. Depth/path/support metadata comes from BFS (`spatial/v1/solver_v13.py:655-715`) and is recorded per axis (`spatial/v1/solver_v13.py:907-929`). |
+| axis support | shared or independent X/Y supporting statements | Independent example: X proof `B<X<A`, Y proof `B<Y<A`, with disjoint statement IDs. Trace both paths separately. `axes_independent` is true exactly when both exist and their support intersection is empty (`spatial/v1/solver_v13.py:911-929`). |
 | unequal axes | `(x_depth,y_depth)` may differ | Example X depth 2, Y depth 6: trace the complete two-edge X proof and six-edge Y proof, then compose once both finish. V13.1 freezes `(2,6),(6,2),(4,8),(8,4),(6,10),(10,6)` (`experiments/13-iterative-hardening/scripts/make_breakpoint_data.py:35-40`). Unequal depth is structural, still `dir-1`. |
-| distractor policy | `none`, `disconnected`, `query-branch` | A disconnected relation lies outside the query proof component; a query-branch relation touches that component but belongs to neither shortest proof. Parse it into state, but exclude it from the final support path. Classification is by non-proof statement IDs and connectivity (`spatial/spatial_solver_v13.py:718-760`); construction is explicit at `spatial/spatial_generation_v13.py:527-551`. |
-| trace representation | `full-state`, `delta-state` | Full-state reprints both complete axis states after every premise. Delta-state prints only affected components plus X/Y conflict status, then one complete final state. Final proof and option verdicts are identical (`spatial/spatial_generation_v13.py:128-131`, `spatial/spatial_generation_v13.py:979-1025`). This is a representation ablation, not a question subtype. |
+| distractor policy | `none`, `disconnected`, `query-branch` | A disconnected relation lies outside the query proof component; a query-branch relation touches that component but belongs to neither shortest proof. Parse it into state, but exclude it from the final support path. Classification is by non-proof statement IDs and connectivity (`spatial/v1/solver_v13.py:718-760`); construction is explicit at `spatial/v1/generation_v13.py:527-551`. |
+| trace representation | `full-state`, `delta-state` | Full-state reprints both complete axis states after every premise. Delta-state prints only affected components plus X/Y conflict status, then one complete final state. Final proof and option verdicts are identical (`spatial/v1/generation_v13.py:128-131`, `spatial/v1/generation_v13.py:979-1025`). This is a representation ablation, not a question subtype. |
 
 Depth and distractor controls currently apply only to `dir-1`, require independent
 axes, and disallow diagonal-only mode; distractors additionally require exact depths
-(`spatial/spatial_generation_v13.py:267-300`). The original V13 diagnostic crosses
+(`spatial/v1/generation_v13.py:267-300`). The original V13 diagnostic crosses
 depths 1–5 with cardinal/mixed modes and none/disconnected/query-branch policies
-where feasible (`spatial/generate_diagnostic_v13.py:38-43`,
-`spatial/generate_diagnostic_v13.py:161-173`). V13.1 extends equal depths to 6/8/10
+where feasible (`spatial/v1/generate_diagnostic_v13.py:38-43`,
+`spatial/v1/generate_diagnostic_v13.py:161-173`). V13.1 extends equal depths to 6/8/10
 and adds the unequal-axis cells above; distractor count there equals the larger axis
 depth (`experiments/13-iterative-hardening/scripts/make_breakpoint_data.py:89-118`).
 
@@ -271,8 +271,8 @@ depth (`experiments/13-iterative-hardening/scripts/make_breakpoint_data.py:89-11
 V13 first checks **global** consistency. A directed strict-order cycle on X, Y, or
 both makes the whole world inconsistent, whether it is query-connected or in a
 disconnected component. The only valid answer for direction, which, and count is the
-listed `Cannot be determined` option (`spatial/spatial_solver_v13.py:351-405`,
-`spatial/spatial_solver_v13.py:407-449`). The compact trace is:
+listed `Cannot be determined` option (`spatial/v1/solver_v13.py:351-405`,
+`spatial/v1/solver_v13.py:407-449`). The compact trace is:
 
 ```text
 Parse every premise -> close X/Y globally.
@@ -284,16 +284,16 @@ Cannot be determined In; every content/None option Out.
 Cycle structure is independently parameterized by axes `x|y|both`, topology
 `direct|indirect`, placement `query-connected|disconnected`, and length; a direct
 cycle must have length 2 and an indirect one length at least 3
-(`spatial/spatial_generation_v13.py:107-145`). Diagonal-only cycles can only target
+(`spatial/v1/generation_v13.py:107-145`). Diagonal-only cycles can only target
 both axes because every diagonal edge updates both
-(`spatial/generate_diagnostic_v13.py:75-80`). Generated inconsistent rows retain
+(`spatial/v1/generate_diagnostic_v13.py:75-80`). Generated inconsistent rows retain
 their solver-verified **base** subtype as metadata, but prompt-only analysis returns
 `semantic_subtype=null`, since local semantics are overridden
-(`spatial/spatial_generation_v13.py:1110-1151`).
+(`spatial/v1/generation_v13.py:1110-1151`).
 
 The matched open-chain control replaces the closing destination with a fresh entity,
 keeping relation and overall entity budgets matched. It has no cycle and therefore
-uses its base semantic rule normally (`spatial/generate_diagnostic_v13.py:97-132`).
+uses its base semantic rule normally (`spatial/v1/generate_diagnostic_v13.py:97-132`).
 Its compact trace is the ordinary consistent template: `global cycle check: none;`
 then show the local proofs and apply the subtype's option rule. Closed and open rows
 are structurally matched but independently sampled, not literal one-edge rewrites of
@@ -315,12 +315,12 @@ one paragraph (`experiments/13-iterative-hardening/OBSERVATIONS.md:184-190`,
   `which-0`, `count`, and `count-omit`
   (`experiments/11-v6-synthetic/README.md:16-21`). Here `dir-cycle` is a semantic
   bucket: a conflict makes the affected queried axis unknown; it does **not** run a
-  global pre-check over every family (`spatial/spatial_solver.py:1-10`,
-  `spatial/spatial_solver.py:227-243`, `spatial/spatial_solver.py:278-353`). V12
+  global pre-check over every family (`spatial/v1/solver.py:1-10`,
+  `spatial/v1/solver.py:227-243`, `spatial/v1/solver.py:278-353`). V12
   uses the same v6 generator/solver, but balances one third direction, one third
   which, one third count and equalizes subtypes within each family
   (`experiments/12-v6-mix-reweight/README.md:10-24`).
 - **V13:** cardinal premises are first-class, `count` is renamed `count-1`, and
   cycle becomes orthogonal global consistency rather than a direction subtype. Its
   canonical base list therefore contains 12, not 13, semantic subtypes
-  (`spatial/spatial_generation_v13.py:24-48`).
+  (`spatial/v1/generation_v13.py:24-48`).

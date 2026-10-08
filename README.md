@@ -76,7 +76,7 @@ Job output is kept with its experiment:
 
     python3 tools/validate_repo.py
     uv run --python 3.12 --no-project --with pytest --with typer \
-      pytest spatial/test_spatial_laws.py -q
+      pytest spatial/v1/tests/test_laws.py -q
 
 The validator is GPU-free. It checks shell syntax, Slurm headers, time limits,
 shared CPU pinning, and local shell-script references. It also parses every

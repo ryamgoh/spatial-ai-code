@@ -286,12 +286,12 @@ original V13 suite.
 
 The first narrow implementation increment is complete:
 
-- `spatial/spatial_solver_v13.py` independently implements the explicit v13
+- `spatial/v1/solver_v13.py` independently implements the explicit v13
   semantic contract, parses cardinal/diagonal relations, and measures shortest
   X/Y proof paths. It does not subclass or import the v6 solver.
-- `spatial/spatial_generation_v13.py` owns typed generation specs, scenes,
+- `spatial/v1/generation_v13.py` owns typed generation specs, scenes,
   subtype policies, constraint checking, and dataset construction.
-- `spatial/generate_all_v13.py` is the CLI/compatibility adapter supporting
+- `spatial/v1/generate_all_v13.py` is the CLI/compatibility adapter supporting
   `diagonal`, `cardinal`, and `mixed` relation modes across Type 0/1/2.
   Generated rows include `oracle_option`, solver-measured `difficulty`, and
   independent generator/schema version stamps.
@@ -326,8 +326,7 @@ or Type 2 query evaluation.
 Foundation smoke command:
 
 ```bash
-cd spatial
-uv run --no-project --with typer python generate_all_v13.py \
+uv run --no-project --with typer python -m spatial.v1.generate_all_v13 \
   --out ../data/spatial_sft_v13_foundation.jsonl \
   --relation-modes diagonal,cardinal,mixed \
   --samples-per-cell 100 \
@@ -356,8 +355,7 @@ CLI expose the common cross-product selection through `--relation-modes` and
 `dir-2`/`count-omit` cells:
 
 ```bash
-cd spatial
-uv run --no-project --with typer python generate_all_v13.py \
+uv run --no-project --with typer python -m spatial.v1.generate_all_v13 \
   --out ../data/spatial_sft_v13_subset.jsonl \
   --relation-modes cardinal,mixed \
   --subtypes dir-2,count-omit \
@@ -374,7 +372,7 @@ can choose their own cell mixture without adding another generator entrypoint.
 
 ### Generation architecture
 
-The extensible interface lives in `spatial/spatial_generation_v13.py`:
+The extensible interface lives in `spatial/v1/generation_v13.py`:
 
 ```text
 GenerationSpec + seeded RNG
@@ -403,9 +401,9 @@ list[GenerationCell] ──► generate_dataset ──► stratified train/test 
 - `GeneratedExample.to_row` is the only conversion to JSON-compatible data and
   stamps `difficulty_schema_version`.
 - `generate_dataset` owns cell-stratified splitting and JSONL output.
-- `spatial/generate_all_v13.py` is intentionally only a CLI plus compatibility
+- `spatial/v1/generate_all_v13.py` is intentionally only a CLI plus compatibility
   adapter for early v13 callers.
-- `spatial/spatial_graph.py` holds stable graph primitives; v13 no longer
+- `spatial/v1/graph.py` holds stable graph primitives; v13 no longer
   imports implementation details from the v6 generator.
 - `SpatialSolverV13.solve_and_analyze` returns one `SolvedProblem`, keeping the
   accepted grade and structural profile together.
@@ -466,8 +464,7 @@ The CLI accepts extra cells as `MODE:XxY:COUNT`; each axis may be an exact
 integer or a `MIN-MAX` range:
 
 ```bash
-cd spatial
-uv run --no-project --with typer python generate_all_v13.py \
+uv run --no-project --with typer python -m spatial.v1.generate_all_v13 \
   --out ../data/spatial_sft_v13_depth.jsonl \
   --subtypes '' \
   --samples-per-cell 0 \
@@ -510,8 +507,7 @@ GenerationSpec(
 The CLI accepts `MODE:XxY:POLICY:DISTRACTORS:COUNT`:
 
 ```bash
-cd spatial
-uv run --no-project --with typer python generate_all_v13.py \
+uv run --no-project --with typer python -m spatial.v1.generate_all_v13 \
   --out ../data/spatial_sft_v13_distractors.jsonl \
   --subtypes '' \
   --samples-per-cell 0 \
@@ -581,8 +577,7 @@ The CLI format is
 `BASE_SUBTYPE:MODE:AXES:TOPOLOGY:PLACEMENT:LENGTH:COUNT`:
 
 ```bash
-cd spatial
-uv run --no-project --with typer python generate_all_v13.py \
+uv run --no-project --with typer python -m spatial.v1.generate_all_v13 \
   --out ../data/spatial_sft_v13_cycles.jsonl \
   --subtypes '' \
   --samples-per-cell 0 \

@@ -70,7 +70,7 @@ if [[ "${FORCE_DATA:-0}" != "1" && -s "$DATA" ]]; then
 fi
 if [[ "${FORCE_DATA:-0}" == "1" || ! -s "$DATA" ]]; then
   echo "=== Generate frozen V13 diagnostic suite (2,256 rows, seed 1313) ==="
-  srun --cpu-bind=cores uv run python spatial/generate_diagnostic_v13.py \
+  srun --cpu-bind=cores uv run python spatial/v1/generate_diagnostic_v13.py \
     --out data/spatial_v13_diagnostic.jsonl \
     --seed 1313 || exit 1
 fi

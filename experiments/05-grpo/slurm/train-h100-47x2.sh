@@ -24,9 +24,9 @@ cd finetune
 srun uv sync
 
 if [[ -s ../spatial_grpo_data.jsonl ]]; then
-  srun uv run python ../spatial/generate_grpo.py --annotate --out ../spatial_grpo_data.jsonl
+  srun uv run python ../spatial/v1/generate_grpo.py --annotate --out ../spatial_grpo_data.jsonl
 else
-  srun uv run python ../spatial/generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
+  srun uv run python ../spatial/v1/generate_grpo.py --n 4000 --out ../spatial_grpo_data.jsonl
 fi
 
 SFT_ADAPTER=../experiments/03-sft-vs-baseline/models/deepseek-r1-qwen3-8b

@@ -53,7 +53,7 @@ uv sync || exit 1
 cd "$SLURM_SUBMIT_DIR"
 
 if [[ ! -s "$DIAGNOSTIC" ]]; then
-  uv run python spatial/generate_diagnostic_v13.py --out data/spatial_v13_diagnostic.jsonl --seed 1313 || exit 1
+  uv run python spatial/v1/generate_diagnostic_v13.py --out data/spatial_v13_diagnostic.jsonl --seed 1313 || exit 1
 fi
 uv run --no-project python "$EXP/scripts/validate_diagnostic_data.py" "$DIAGNOSTIC" || exit 1
 
