@@ -146,8 +146,9 @@ replayable certificate. Direction certificates support spatial chains and
 bounded Boolean case proofs; complete Direction, Which, and correlated Count
 certificates support unique and ambiguous answer sets. The former post-hoc
 training renderer and its independent state-snapshot modes have been removed.
-Automatic construction for arbitrary Boolean premises remains incomplete, so
-unsupported candidates are rejected rather than routed through a fallback.
+Automatic construction performs deterministic Boolean closure and bounded case
+splits but is not complete for arbitrary nesting, so unsupported candidates are
+rejected rather than routed through a fallback.
 Training rows exclude coordinate witnesses by default. Coordinates can be added
 only as separate audit metadata for diagnostic use.
 

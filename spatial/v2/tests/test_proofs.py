@@ -25,8 +25,10 @@ from spatial.v2.proofs import (
     ProofStep,
     build_direction_proof,
     build_direction_refutation,
+    build_formula_refutation,
     check_direction_proof,
     check_direction_refutation,
+    check_formula_refutation,
     proof_to_dict,
     refutation_to_dict,
 )
@@ -155,6 +157,173 @@ def test_refutation_builder_rejects_a_possible_direction() -> None:
 
     with pytest.raises(ProofConstructionError, match="do not refute Northeast"):
         build_direction_refutation(problem, Direction.NORTHEAST)
+
+
+def test_automatic_builder_applies_modus_ponens() -> None:
+    antecedent = atom("A", Direction.NORTH, "B")
+    consequent = atom("C", Direction.SOUTHWEST, "D")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D"),
+        premise=And((antecedent, Implies(antecedent, consequent))),
+        query=DirectionQuery("C", "D"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.SOUTHWEST
+    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
+
+
+def test_automatic_builder_constructs_conjunctive_antecedent() -> None:
+    north = atom("A", Direction.NORTH, "B")
+    east = atom("C", Direction.EAST, "D")
+    consequent = atom("E", Direction.SOUTHWEST, "F")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D", "E", "F"),
+        premise=And((north, east, Implies(And((north, east)), consequent))),
+        query=DirectionQuery("E", "F"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.SOUTHWEST
+    assert any(step.rule is ProofRule.AND_INTRODUCTION for step in proof.steps)
+    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
+
+
+def test_boolean_derived_atom_feeds_axis_transitivity() -> None:
+    antecedent = atom("A", Direction.NORTHEAST, "B")
+    derived = atom("B", Direction.NORTH, "C")
+    problem = SpatialProblem(
+        objects=("A", "B", "C"),
+        premise=And((antecedent, Implies(antecedent, derived))),
+        query=DirectionQuery("A", "C"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.NORTHEAST
+    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
+    assert any(step.rule is ProofRule.AXIS_TRANSITIVITY for step in proof.steps)
+
+
+def test_automatic_builder_applies_iff_and_double_negation() -> None:
+    left = atom("A", Direction.EAST, "B")
+    right = atom("C", Direction.SOUTH, "D")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D"),
+        premise=And((Iff(left, right), Not(Not(left)))),
+        query=DirectionQuery("C", "D"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.SOUTH
+    assert any(step.rule is ProofRule.DOUBLE_NEGATION for step in proof.steps)
+    assert any(step.rule is ProofRule.IFF_ELIMINATION for step in proof.steps)
+
+
+def test_automatic_builder_applies_disjunctive_syllogism() -> None:
+    northeast = atom("A", Direction.NORTHEAST, "B")
+    northwest = atom("A", Direction.NORTHWEST, "B")
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=And((Or((northeast, northwest)), Not(northwest))),
+        query=DirectionQuery("A", "B"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.NORTHEAST
+    assert any(step.rule is ProofRule.DISJUNCTIVE_SYLLOGISM for step in proof.steps)
+
+
+def test_automatic_builder_performs_complete_case_split() -> None:
+    northeast = atom("A", Direction.NORTHEAST, "B")
+    northwest = atom("A", Direction.NORTHWEST, "B")
+    east = atom("C", Direction.EAST, "D")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D"),
+        premise=And(
+            (
+                Or((northeast, northwest)),
+                Implies(northeast, east),
+                Implies(northwest, east),
+            )
+        ),
+        query=DirectionQuery("C", "D"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.EAST
+    assert any(step.rule is ProofRule.CASE_SPLIT for step in proof.steps)
+    assert sum(step.rule is ProofRule.ASSUMPTION for step in proof.steps) == 2
+
+
+def test_automatic_case_split_closes_contradictory_branch() -> None:
+    northeast = atom("A", Direction.NORTHEAST, "B")
+    northwest = atom("A", Direction.NORTHWEST, "B")
+    southwest = atom("A", Direction.SOUTHWEST, "B")
+    east = atom("C", Direction.EAST, "D")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D"),
+        premise=And(
+            (
+                Or((northeast, northwest, southwest)),
+                Implies(northwest, Not(northwest)),
+                Implies(northeast, east),
+                Implies(southwest, east),
+            )
+        ),
+        query=DirectionQuery("C", "D"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.EAST
+    assert any(step.rule is ProofRule.CONTRADICTION for step in proof.steps)
+    assert any(step.rule is ProofRule.EXPLOSION for step in proof.steps)
+    assert any(step.rule is ProofRule.CASE_SPLIT for step in proof.steps)
+
+
+def test_automatic_direction_refutation_uses_boolean_contradiction() -> None:
+    south = atom("A", Direction.SOUTH, "B")
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=Implies(south, Not(south)),
+        query=DirectionQuery("A", "B"),
+    )
+
+    refutation = build_direction_refutation(problem, Direction.SOUTH)
+
+    assert any(step.rule is ProofRule.MODUS_PONENS for step in refutation.steps)
+    assert refutation.steps[-1].rule is ProofRule.CONTRADICTION
+
+
+def test_automatic_formula_refutation_preserves_boolean_correlation() -> None:
+    a_member = atom("A", Direction.NORTHEAST, "R")
+    b_member = atom("B", Direction.NORTHEAST, "R")
+    claim = And((Not(a_member), Not(b_member)))
+    problem = SpatialProblem(
+        objects=("A", "B", "R"),
+        premise=Iff(a_member, Not(b_member)),
+        query=DirectionQuery("A", "R"),
+    )
+
+    refutation = build_formula_refutation(problem, claim)
+
+    check_formula_refutation(refutation)
+    assert refutation.claim == claim
+    assert any(step.rule is ProofRule.IFF_ELIMINATION for step in refutation.steps)
+    assert refutation.steps[-1].rule is ProofRule.CONTRADICTION
+
+    invalid_claim = replace(
+        refutation,
+        claim=atom("missing", Direction.NORTH, "R"),
+    )
+    with pytest.raises(ProofCheckError, match="invalid refutation claim"):
+        check_formula_refutation(invalid_claim)
 
 
 def test_transitive_certificate_renders_one_checked_proof_in_two_forms() -> None:
@@ -706,7 +875,7 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
         check_direction_proof(duplicate_assumptions)
 
 
-def test_proof_builder_rejects_boolean_premises_in_initial_fragment() -> None:
+def test_proof_builder_handles_repeated_disjuncts_by_case_split() -> None:
     northeast = atom("A", Direction.NORTHEAST, "B")
     problem = SpatialProblem(
         objects=("A", "B"),
@@ -714,8 +883,10 @@ def test_proof_builder_rejects_boolean_premises_in_initial_fragment() -> None:
         query=DirectionQuery("A", "B"),
     )
 
-    with pytest.raises(ProofConstructionError, match="positive conjunctions"):
-        build_direction_proof(problem)
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.NORTHEAST
+    assert any(step.rule is ProofRule.CASE_SPLIT for step in proof.steps)
 
 
 def test_checker_rejects_a_tampered_direction_conclusion() -> None:

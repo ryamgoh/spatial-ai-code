@@ -2,10 +2,10 @@
 
 This module is deliberately independent of the SMT implementation. It builds
 and checks typed derivations from the structured premises themselves. The
-automatic builder covers exact positive-conjunction Direction problems; the
-checker additionally supports bounded Boolean, case-split, and arbitrary-formula
-refutation certificates. Direction, Which, and Count answer sets are assembled
-by certificate layers rather than solver-status fallbacks.
+automatic builder performs deterministic Boolean closure, bounded case splits,
+axis reasoning, and formula refutation. The checker remains the independent
+acceptance seam. Direction, Which, and Count answer sets are assembled by
+certificate layers rather than solver-status fallbacks.
 """
 
 from __future__ import annotations
@@ -619,6 +619,14 @@ def _check_refutation(
 
 def check_formula_refutation(certificate: FormulaRefutationCertificate) -> None:
     """Replay a contradiction for an arbitrary supported spatial formula."""
+    try:
+        SpatialProblem(
+            certificate.problem.objects,
+            And((certificate.problem.premise, certificate.claim)),
+            certificate.problem.query,
+        )
+    except (TypeError, ValueError) as exc:
+        raise ProofCheckError(f"invalid refutation claim: {exc}") from exc
     _check_refutation(
         certificate.problem,
         certificate.claim,
@@ -668,9 +676,14 @@ def _proof_graph(
     objects: tuple[str, ...],
     steps: tuple[ProofStep, ...],
     axis: ProofAxis,
+    branch: str | None = None,
 ) -> dict[str, list[_GraphEdge]]:
     adjacency = {obj: [] for obj in objects}
     for step in steps:
+        if branch is None and step.branch is not None:
+            continue
+        if branch is not None and step.branch not in {None, branch}:
+            continue
         fact = step.conclusion
         if not isinstance(fact, AxisFact) or fact.axis is not axis:
             continue
@@ -816,70 +829,308 @@ def formula_refutation_to_dict(
     return tagged_dataclass_to_dict(certificate)
 
 
-def _exact_direction_premises(
-    problem: SpatialProblem,
-) -> tuple[RelationConstraint, ...]:
-    premises = _top_level_premises(problem.premise)
-    if any(
-        not isinstance(premise, RelationConstraint) or len(premise.allowed) != 1
-        for premise in premises
-    ):
-        raise ProofConstructionError(
-            "proof construction currently requires exact positive conjunctions"
+def _fresh_step_id(steps: list[ProofStep], prefix: str) -> str:
+    existing = {step.id for step in steps}
+    index = 1
+    while f"{prefix}{index}" in existing:
+        index += 1
+    return f"{prefix}{index}"
+
+
+def _premise_steps(problem: SpatialProblem) -> list[ProofStep]:
+    return [
+        ProofStep(
+            f"P{index + 1}",
+            ProofRule.PREMISE,
+            premise,
+            premise_index=index,
         )
-    return tuple(
-        premise for premise in premises if isinstance(premise, RelationConstraint)
+        for index, premise in enumerate(_top_level_premises(problem.premise))
+    ]
+
+
+def _accessible_formula_steps(
+    steps: list[ProofStep],
+    branch: str | None,
+) -> dict[SpatialFormula, str]:
+    formulas: dict[SpatialFormula, str] = {}
+    for step in steps:
+        if not isinstance(step.conclusion, SpatialFormula):
+            continue
+        if branch is None and step.branch is not None:
+            continue
+        if branch is not None and step.branch not in {None, branch}:
+            continue
+        formulas[step.conclusion] = step.id
+    return formulas
+
+
+def _append_formula_step(
+    steps: list[ProofStep],
+    rule: ProofRule,
+    conclusion: SpatialFormula,
+    inputs: tuple[str, ...],
+    branch: str | None,
+) -> bool:
+    if conclusion in _accessible_formula_steps(steps, branch):
+        return False
+    prefix = "F" if branch is None else f"{branch}-F"
+    steps.append(
+        ProofStep(
+            _fresh_step_id(steps, prefix),
+            rule,
+            conclusion,
+            inputs,
+            branch=branch,
+        )
     )
+    return True
 
 
-def _base_direction_steps(
-    problem: SpatialProblem,
-) -> tuple[list[ProofStep], dict[ProofAxis, dict[str, list[_GraphEdge]]]]:
-    steps: list[ProofStep] = []
-    for premise_index, atom in enumerate(_exact_direction_premises(problem)):
-        premise_id = f"P{premise_index + 1}"
+def _saturate_formula_steps(
+    steps: list[ProofStep],
+    branch: str | None = None,
+) -> dict[SpatialFormula, str]:
+    changed = True
+    while changed:
+        changed = False
+        known = _accessible_formula_steps(steps, branch)
+        snapshot = tuple(known.items())
+
+        for formula, source_id in snapshot:
+            if isinstance(formula, And):
+                for operand in formula.operands:
+                    changed |= _append_formula_step(
+                        steps,
+                        ProofRule.AND_ELIMINATION,
+                        operand,
+                        (source_id,),
+                        branch,
+                    )
+            if isinstance(formula, Not) and isinstance(formula.operand, Not):
+                changed |= _append_formula_step(
+                    steps,
+                    ProofRule.DOUBLE_NEGATION,
+                    formula.operand.operand,
+                    (source_id,),
+                    branch,
+                )
+
+        known = _accessible_formula_steps(steps, branch)
+        conjunctions = []
+        for formula in known:
+            candidates = (
+                (formula.antecedent,)
+                if isinstance(formula, Implies)
+                else (formula.left, formula.right)
+                if isinstance(formula, Iff)
+                else ()
+            )
+            for candidate in candidates:
+                if isinstance(candidate, And) and candidate not in conjunctions:
+                    conjunctions.append(candidate)
+        for conjunction in conjunctions:
+            if all(operand in known for operand in conjunction.operands):
+                changed |= _append_formula_step(
+                    steps,
+                    ProofRule.AND_INTRODUCTION,
+                    conjunction,
+                    tuple(known[operand] for operand in conjunction.operands),
+                    branch,
+                )
+
+        known = _accessible_formula_steps(steps, branch)
+        for formula, source_id in tuple(known.items()):
+            if isinstance(formula, Implies) and formula.antecedent in known:
+                changed |= _append_formula_step(
+                    steps,
+                    ProofRule.MODUS_PONENS,
+                    formula.consequent,
+                    (source_id, known[formula.antecedent]),
+                    branch,
+                )
+            if isinstance(formula, Iff):
+                for known_side, conclusion in (
+                    (formula.left, formula.right),
+                    (formula.right, formula.left),
+                ):
+                    if known_side in known:
+                        changed |= _append_formula_step(
+                            steps,
+                            ProofRule.IFF_ELIMINATION,
+                            conclusion,
+                            (source_id, known[known_side]),
+                            branch,
+                        )
+            if isinstance(formula, Or):
+                for operand in formula.operands:
+                    negation = Not(operand)
+                    if negation not in known:
+                        continue
+                    remaining = tuple(
+                        candidate
+                        for candidate in formula.operands
+                        if candidate != operand
+                    )
+                    if not remaining:
+                        continue
+                    conclusion: SpatialFormula = (
+                        remaining[0] if len(remaining) == 1 else Or(remaining)
+                    )
+                    changed |= _append_formula_step(
+                        steps,
+                        ProofRule.DISJUNCTIVE_SYLLOGISM,
+                        conclusion,
+                        (source_id, known[negation]),
+                        branch,
+                    )
+    return _accessible_formula_steps(steps, branch)
+
+
+def _append_formula_contradiction(
+    steps: list[ProofStep],
+    branch: str,
+    assumption_step: str,
+) -> str | None:
+    known = _accessible_formula_steps(steps, branch)
+    for formula, formula_id in known.items():
+        negation_id = known.get(Not(formula))
+        if negation_id is None:
+            continue
+        if assumption_step not in (
+            _reachable_step_ids(tuple(steps), formula_id)
+            | _reachable_step_ids(tuple(steps), negation_id)
+        ):
+            continue
+        contradiction_id = _fresh_step_id(steps, f"{branch}-C")
         steps.append(
             ProofStep(
-                premise_id,
-                ProofRule.PREMISE,
-                atom,
-                premise_index=premise_index,
+                contradiction_id,
+                ProofRule.CONTRADICTION,
+                Contradiction(),
+                (formula_id, negation_id),
+                branch=branch,
             )
         )
+        return contradiction_id
+    return None
+
+
+def _append_axis_decompositions(
+    steps: list[ProofStep],
+    branch: str | None = None,
+) -> None:
+    existing = {
+        (step.inputs[0], step.conclusion.axis)
+        for step in steps
+        if step.rule is ProofRule.DIRECTION_DECOMPOSITION
+        and step.inputs
+        and isinstance(step.conclusion, AxisFact)
+    }
+    for source in tuple(steps):
+        if not isinstance(source.conclusion, RelationConstraint):
+            continue
+        if len(source.conclusion.allowed) != 1:
+            continue
+        if branch is None and source.branch is not None:
+            continue
+        if branch is not None and source.branch not in {None, branch}:
+            continue
         for axis in ProofAxis:
-            direct_id = f"{premise_id}-{axis.value.upper()}"
+            if (source.id, axis) in existing:
+                continue
+            step_branch = source.branch
+            prefix = (
+                f"{source.id}-{axis.value.upper()}"
+                if step_branch is None
+                else f"{step_branch}-{axis.value.upper()}"
+            )
             steps.append(
                 ProofStep(
-                    direct_id,
+                    _fresh_step_id(steps, prefix),
                     ProofRule.DIRECTION_DECOMPOSITION,
-                    _axis_fact(atom, axis),
-                    (premise_id,),
+                    _axis_fact(source.conclusion, axis),
+                    (source.id,),
+                    branch=step_branch,
                 )
             )
+            existing.add((source.id, axis))
+
+
+def _derive_formula_by_cases(
+    steps: list[ProofStep],
+    target: SpatialFormula,
+) -> str | None:
+    known = _saturate_formula_steps(steps)
+    if target in known:
+        return known[target]
+    for source, source_id in tuple(known.items()):
+        if not isinstance(source, Or) or len(source.operands) < 2:
+            continue
+        branch_results = []
+        attempt_start = len(steps)
+        for index, operand in enumerate(source.operands, start=1):
+            branch = f"case-{source_id}-{index}"
+            assumption_id = _fresh_step_id(steps, f"{branch}-A")
+            steps.append(
+                ProofStep(
+                    assumption_id,
+                    ProofRule.ASSUMPTION,
+                    operand,
+                    (source_id,),
+                    branch=branch,
+                )
+            )
+            branch_known = _saturate_formula_steps(steps, branch)
+            result_id = branch_known.get(target)
+            if result_id is None:
+                contradiction_id = _append_formula_contradiction(
+                    steps,
+                    branch,
+                    assumption_id,
+                )
+                if contradiction_id is not None:
+                    result_id = _fresh_step_id(steps, f"{branch}-X")
+                    steps.append(
+                        ProofStep(
+                            result_id,
+                            ProofRule.EXPLOSION,
+                            target,
+                            (contradiction_id,),
+                            branch=branch,
+                        )
+                    )
+            if result_id is None:
+                del steps[attempt_start:]
+                branch_results = []
+                break
+            branch_results.append(result_id)
+        if branch_results:
+            result_id = _fresh_step_id(steps, "CASE")
+            steps.append(
+                ProofStep(
+                    result_id,
+                    ProofRule.CASE_SPLIT,
+                    target,
+                    (source_id, *branch_results),
+                )
+            )
+            return result_id
+    return None
+
+
+def _direction_paths(
+    problem: SpatialProblem,
+    steps: list[ProofStep],
+    candidates: list[Direction],
+) -> dict[Direction, dict[ProofAxis, _AxisPath]]:
+    _append_axis_decompositions(steps)
     graphs = {
         axis: _proof_graph(problem.objects, tuple(steps), axis) for axis in ProofAxis
     }
-    return steps, graphs
-
-
-def build_direction_proof(
-    problem: SpatialProblem,
-    direction: Direction | None = None,
-) -> DirectionProofCertificate:
-    """Construct and replay a proof for one entailed exact Direction answer."""
     query = problem.query
-    if not isinstance(query, DirectionQuery):
-        raise ProofConstructionError(
-            "proof construction currently supports DirectionQuery"
-        )
-    steps, graphs = _base_direction_steps(problem)
-
-    candidates = [direction] if direction is not None else list(Direction)
-    candidates = [item for item in candidates if item in query.candidate_directions]
-    paths_by_direction: dict[
-        Direction,
-        dict[ProofAxis, _AxisPath],
-    ] = {}
+    assert isinstance(query, DirectionQuery)
+    paths_by_direction = {}
     for candidate in candidates:
         x_sign, y_sign = direction_signs(candidate)
         paths = {
@@ -894,6 +1145,33 @@ def build_direction_proof(
             paths_by_direction[candidate] = {
                 axis: path for axis, path in paths.items() if path is not None
             }
+    return paths_by_direction
+
+
+def build_direction_proof(
+    problem: SpatialProblem,
+    direction: Direction | None = None,
+) -> DirectionProofCertificate:
+    """Construct and replay a proof for one entailed exact Direction answer."""
+    query = problem.query
+    if not isinstance(query, DirectionQuery):
+        raise ProofConstructionError(
+            "proof construction currently supports DirectionQuery"
+        )
+    candidates = [direction] if direction is not None else list(Direction)
+    candidates = [item for item in candidates if item in query.candidate_directions]
+    steps = _premise_steps(problem)
+    _saturate_formula_steps(steps)
+    for candidate in candidates:
+        _derive_formula_by_cases(
+            steps,
+            RelationConstraint(
+                query.target,
+                query.reference,
+                frozenset({candidate}),
+            ),
+        )
+    paths_by_direction = _direction_paths(problem, steps, candidates)
 
     if direction is not None and direction not in paths_by_direction:
         raise ProofConstructionError(
@@ -932,11 +1210,137 @@ def build_direction_proof(
     return certificate
 
 
+def _axis_facts_conflict(first: AxisFact, second: AxisFact) -> bool:
+    if first.axis is not second.axis or {
+        first.subject,
+        first.reference,
+    } != {second.subject, second.reference}:
+        return False
+    first_sign = _relation_sign(first.relation)
+    second_sign = _relation_sign(second.relation)
+    if first.subject == second.reference:
+        second_sign = -second_sign
+    return first_sign != second_sign
+
+
+def _append_axis_contradiction(
+    problem: SpatialProblem,
+    steps: list[ProofStep],
+    branch: str,
+    assumption_id: str,
+) -> str | None:
+    _append_axis_decompositions(steps, branch)
+    global_graphs = {
+        axis: _proof_graph(problem.objects, tuple(steps), axis) for axis in ProofAxis
+    }
+    branch_facts = [
+        step
+        for step in steps
+        if isinstance(step.conclusion, AxisFact)
+        and step.branch == branch
+        and assumption_id in _reachable_step_ids(tuple(steps), step.id)
+    ]
+    for assumption_fact in branch_facts:
+        fact = assumption_fact.conclusion
+        assert isinstance(fact, AxisFact)
+        desired_sign = _relation_sign(fact.relation)
+        for conflicting_sign in (-1, 0, 1):
+            if conflicting_sign == desired_sign:
+                continue
+            path = _find_axis_path(
+                global_graphs[fact.axis],
+                fact.subject,
+                fact.reference,
+                conflicting_sign,
+            )
+            if path is None:
+                continue
+            premise_fact = _derive_axis_path(fact.axis, path, steps)
+            contradiction_id = _fresh_step_id(steps, f"{branch}-C")
+            steps.append(
+                ProofStep(
+                    contradiction_id,
+                    ProofRule.AXIS_CONTRADICTION,
+                    Contradiction(),
+                    (premise_fact, assumption_fact.id),
+                    branch=branch,
+                )
+            )
+            return contradiction_id
+
+    accessible_facts = [
+        step
+        for step in steps
+        if isinstance(step.conclusion, AxisFact) and step.branch in {None, branch}
+    ]
+    for index, first in enumerate(accessible_facts):
+        for second in accessible_facts[index + 1 :]:
+            if not _axis_facts_conflict(first.conclusion, second.conclusion):
+                continue
+            if assumption_id not in (
+                _reachable_step_ids(tuple(steps), first.id)
+                | _reachable_step_ids(tuple(steps), second.id)
+            ):
+                continue
+            contradiction_id = _fresh_step_id(steps, f"{branch}-C")
+            steps.append(
+                ProofStep(
+                    contradiction_id,
+                    ProofRule.AXIS_CONTRADICTION,
+                    Contradiction(),
+                    (first.id, second.id),
+                    branch=branch,
+                )
+            )
+            return contradiction_id
+    return None
+
+
+def build_formula_refutation(
+    problem: SpatialProblem,
+    claim: SpatialFormula,
+) -> FormulaRefutationCertificate:
+    """Construct and replay a contradiction for a supported Boolean claim."""
+    steps = _premise_steps(problem)
+    _saturate_formula_steps(steps)
+    branch = "refutation"
+    assumption_id = "A-REFUTE"
+    steps.append(
+        ProofStep(
+            assumption_id,
+            ProofRule.REFUTATION_ASSUMPTION,
+            claim,
+            branch=branch,
+        )
+    )
+    _saturate_formula_steps(steps, branch)
+    contradiction_id = _append_formula_contradiction(steps, branch, assumption_id)
+    if contradiction_id is None:
+        contradiction_id = _append_axis_contradiction(
+            problem,
+            steps,
+            branch,
+            assumption_id,
+        )
+    if contradiction_id is None:
+        raise ProofConstructionError("premises do not refute the supplied formula")
+    reachable = _reachable_step_ids(tuple(steps), contradiction_id)
+    certificate = FormulaRefutationCertificate(
+        problem,
+        claim,
+        tuple(step for step in steps if step.id in reachable),
+        assumption_id,
+        contradiction_id,
+    )
+    check_formula_refutation(certificate)
+    return certificate
+
+
 def build_direction_refutation(
     problem: SpatialProblem,
     direction: Direction,
 ) -> DirectionRefutationCertificate:
-    """Construct an axis contradiction for one impossible Direction candidate."""
+    """Construct an axis or Boolean contradiction for one Direction candidate."""
     query = problem.query
     if not isinstance(query, DirectionQuery):
         raise ProofConstructionError(
@@ -946,69 +1350,23 @@ def build_direction_refutation(
         raise ProofConstructionError(
             "refuted direction is outside the query candidates"
         )
-    steps, graphs = _base_direction_steps(problem)
     claim = RelationConstraint(
         query.target,
         query.reference,
         frozenset({direction}),
     )
-    branch = f"refute-{direction.value.lower()}"
-    assumption_id = "A-DIR"
-    steps.append(
-        ProofStep(
-            assumption_id,
-            ProofRule.REFUTATION_ASSUMPTION,
-            claim,
-            branch=branch,
-        )
+    try:
+        formula_refutation = build_formula_refutation(problem, claim)
+    except ProofConstructionError as exc:
+        raise ProofConstructionError(
+            f"premises do not refute {direction.value} for the query pair"
+        ) from exc
+    certificate = DirectionRefutationCertificate(
+        problem,
+        claim,
+        formula_refutation.steps,
+        formula_refutation.assumption_step,
+        formula_refutation.contradiction_step,
     )
-    assumption_axes = {}
-    for axis in ProofAxis:
-        step_id = f"A-{axis.value.upper()}"
-        steps.append(
-            ProofStep(
-                step_id,
-                ProofRule.DIRECTION_DECOMPOSITION,
-                _axis_fact(claim, axis),
-                (assumption_id,),
-                branch=branch,
-            )
-        )
-        assumption_axes[axis] = step_id
-
-    for axis, desired_sign in zip(ProofAxis, direction_signs(direction)):
-        for conflicting_sign in (-1, 0, 1):
-            if conflicting_sign == desired_sign:
-                continue
-            path = _find_axis_path(
-                graphs[axis],
-                query.target,
-                query.reference,
-                conflicting_sign,
-            )
-            if path is None:
-                continue
-            premise_fact = _derive_axis_path(axis, path, steps)
-            contradiction_id = f"C-{axis.value.upper()}"
-            steps.append(
-                ProofStep(
-                    contradiction_id,
-                    ProofRule.AXIS_CONTRADICTION,
-                    Contradiction(),
-                    (premise_fact, assumption_axes[axis]),
-                    branch=branch,
-                )
-            )
-            reachable = _reachable_step_ids(tuple(steps), contradiction_id)
-            certificate = DirectionRefutationCertificate(
-                problem,
-                claim,
-                tuple(step for step in steps if step.id in reachable),
-                assumption_id,
-                contradiction_id,
-            )
-            check_direction_refutation(certificate)
-            return certificate
-    raise ProofConstructionError(
-        f"premises do not refute {direction.value} for the query pair"
-    )
+    check_direction_refutation(certificate)
+    return certificate

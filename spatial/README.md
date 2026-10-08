@@ -55,17 +55,15 @@ checked answer certificate and render it as either `TraceFormat.NATURAL` or
 metadata or `render_audit_report`, never in an SFT reasoning target.
 
 The proof-first seam is the training-explanation path.
-`build_direction_proof` currently accepts only exact positive-conjunction
-Direction problems, constructs a typed certificate without consulting Z3, and
-replays every premise, decomposition, inversion, transitivity, and recomposition
-step through `check_direction_proof`. `render_direction_proof` produces Natural
-or Symbolic text from that same certificate. The certificate checker also
-supports conjunction introduction/elimination, modus ponens, disjunctive
-syllogism, biconditional elimination, double negation, and explicit
-contradiction. Scoped assumptions, contradiction closure, explosion, and
-complete case splits support branched proofs while rejecting cross-branch
-dependencies. Boolean-derived atoms feed the same axis rules as direct spatial
-premises. Unsupported proof construction rejects the sample; there is no
+`build_direction_proof` performs deterministic closure over conjunction,
+modus ponens, disjunctive syllogism, biconditional elimination, and double
+negation before applying the spatial axis rules. It also constructs bounded
+case splits with scoped assumptions, contradiction closure, and explosion.
+`build_formula_refutation` handles explicit Boolean and spatial contradictions.
+Every generated step is replayed without consulting Z3, and Boolean-derived
+atoms feed the same decomposition, inversion, transitivity, and recomposition
+rules as direct premises. Nested or otherwise unsupported proof search rejects
+the sample; there is no
 post-hoc training-renderer fallback. `SpatialModelCertificate` independently checks constructive witnesses
 and countermodels against the complete premise formula; a
 `ContingencyCertificate` requires both sides for the same claim. These

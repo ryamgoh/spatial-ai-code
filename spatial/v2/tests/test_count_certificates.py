@@ -7,6 +7,7 @@ from dataclasses import replace
 
 import pytest
 
+from spatial.v2.certificate_generation import build_answer_certificate
 from spatial.v2.count_certificate_renderers import render_count_answer_set
 from spatial.v2.count_certificates import (
     CountAnswerSetCertificate,
@@ -162,6 +163,23 @@ def test_correlated_count_certificate_proves_exactly_one() -> None:
 
     solver_analysis = SpatialSolverV2("reference").analyze(problem)
     assert certificate.possible_counts == solver_analysis.possible_counts
+
+
+def test_oracle_assisted_builder_constructs_correlated_refutations() -> None:
+    problem, _ = correlated_problem()
+    solver = SpatialSolverV2("reference")
+    analysis = solver.analyze(problem)
+
+    certificate = build_answer_certificate(problem, analysis, solver)
+
+    assert isinstance(certificate, CountAnswerSetCertificate)
+    assert certificate.possible_counts == (1,)
+    for count in (0, 2):
+        evidence = certificate.values[count].evidence
+        assert isinstance(evidence, CountImpossibilityCertificate)
+        assert isinstance(
+            evidence.assignments[0].refutation, FormulaRefutationCertificate
+        )
 
 
 def test_count_renderer_preserves_joint_evidence() -> None:

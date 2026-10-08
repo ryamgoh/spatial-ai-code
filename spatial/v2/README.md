@@ -5,7 +5,8 @@ This is the active SpatialEntail implementation.
 - `solver.py` defines the structured Boolean spatial language and semantic
   oracle.
 - `proofs.py` and the certificate modules define independently replayed
-  evidence.
+  evidence. Its deterministic constructor handles Boolean closure, one-level
+  case splits, axis reasoning, and explicit or spatial contradictions.
 - `difficulty.py` measures proof depth and support for workload controls.
 - `audit_evidence.py` and `audit_rendering.py` produce diagnostic reports; they
   are not training explanation modules.

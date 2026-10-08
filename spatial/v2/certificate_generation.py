@@ -14,9 +14,10 @@ from spatial.v2.count_certificates import (
     CountMembershipConflict,
     build_count_answer_set,
     count_answer_set_to_dict,
+    count_assignment_formula,
     count_assignments,
 )
-from spatial.v2.proofs import ProofConstructionError
+from spatial.v2.proofs import ProofConstructionError, build_formula_refutation
 from spatial.v2.solver import (
     CountAnalysis,
     CountQuery,
@@ -112,13 +113,16 @@ def _build_count_certificate(
                 None,
             )
             if conflict is None:
-                raise ProofConstructionError(
-                    f"count {count} assignment {members} needs a correlated "
-                    "formula refutation"
+                conflicts.append(
+                    build_formula_refutation(
+                        problem,
+                        count_assignment_formula(query, members),
+                    )
                 )
-            conflicts.append(
-                CountMembershipConflict(conflict.candidate, conflict.evidence)
-            )
+            else:
+                conflicts.append(
+                    CountMembershipConflict(conflict.candidate, conflict.evidence)
+                )
         impossible_refutations[count] = tuple(conflicts)
     return build_count_answer_set(
         problem,
