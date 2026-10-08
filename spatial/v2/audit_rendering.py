@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from spatial.v2.explanations import (
-    AxisDerivation,
-    ClaimEvidence,
+from spatial.v2.audit_evidence import (
+    ClaimAuditEvidence,
     ClaimStatus,
     Coordinates,
-    DirectionExplanation,
-    QueryExplanation,
-    WhichExplanation,
+    DirectionAuditEvidence,
+    QueryAuditEvidence,
+    WhichAuditEvidence,
 )
+from spatial.v2.difficulty import AxisDerivation
 from spatial.v2.solver import Direction
 
 
@@ -51,7 +51,7 @@ def _render_evidence(
     subject: str,
     relation: str,
     reference: str,
-    evidence: ClaimEvidence,
+    evidence: ClaimAuditEvidence,
     labels: Mapping[str, str],
 ) -> list[str]:
     claim = f"{_label(subject, labels)} is {relation} of {_label(reference, labels)}"
@@ -80,61 +80,61 @@ def _render_evidence(
     return lines
 
 
-def render_audit_explanation(
-    explanation: QueryExplanation,
+def render_audit_report(
+    evidence: QueryAuditEvidence,
     labels: Mapping[str, str] | None = None,
 ) -> str:
     """Render coordinate witnesses for audits; do not use this as SFT CoT."""
     labels = labels or {}
     lines: list[str] = []
-    if isinstance(explanation, DirectionExplanation):
-        for case in explanation.cases:
+    if isinstance(evidence, DirectionAuditEvidence):
+        for case in evidence.cases:
             if case.evidence.status is ClaimStatus.IMPOSSIBLE:
                 continue
             lines.extend(
                 _render_evidence(
-                    explanation.target,
+                    evidence.target,
                     case.direction.value,
-                    explanation.reference,
+                    evidence.reference,
                     case.evidence,
                     labels,
                 )
             )
         impossible = [
             case.direction.value
-            for case in explanation.cases
+            for case in evidence.cases
             if case.evidence.status is ClaimStatus.IMPOSSIBLE
         ]
         if impossible:
             lines.append("Impossible alternatives: " + ", ".join(impossible) + ".")
-    elif isinstance(explanation, WhichExplanation):
-        relation = _directions(explanation.directions)
-        for membership in explanation.memberships:
+    elif isinstance(evidence, WhichAuditEvidence):
+        relation = _directions(evidence.directions)
+        for membership in evidence.memberships:
             lines.extend(
                 _render_evidence(
                     membership.candidate,
                     relation,
-                    explanation.reference,
+                    evidence.reference,
                     membership.evidence,
                     labels,
                 )
             )
     else:
         lines.append(
-            "Possible counts: " + ", ".join(map(str, explanation.possible_counts)) + "."
+            "Possible counts: " + ", ".join(map(str, evidence.possible_counts)) + "."
         )
         lines.extend(
             f"Count {case.count} witness: {_render_coordinates(case.witness, labels)}."
-            for case in explanation.counts
+            for case in evidence.counts
             if case.witness is not None
         )
-        relation = _directions(explanation.directions)
-        for membership in explanation.memberships:
+        relation = _directions(evidence.directions)
+        for membership in evidence.memberships:
             lines.extend(
                 _render_evidence(
                     membership.candidate,
                     relation,
-                    explanation.reference,
+                    evidence.reference,
                     membership.evidence,
                     labels,
                 )

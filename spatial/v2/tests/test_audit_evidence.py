@@ -1,4 +1,4 @@
-"""Contract tests for structured V2 explanations."""
+"""Contract tests for structured V2 audit evidence."""
 
 from __future__ import annotations
 
@@ -6,17 +6,16 @@ import json
 
 import pytest
 
-from spatial.v2.audit_rendering import render_audit_explanation
-from spatial.v2.explanations import (
-    Axis,
-    AxisRelation,
+from spatial.v2.audit_evidence import (
+    AuditEvidenceBuilder,
     ClaimStatus,
-    CountExplanation,
-    DirectionExplanation,
-    SpatialExplainerV2,
-    WhichExplanation,
-    explanation_to_dict,
+    CountAuditEvidence,
+    DirectionAuditEvidence,
+    WhichAuditEvidence,
+    audit_evidence_to_dict,
 )
+from spatial.v2.audit_rendering import render_audit_report
+from spatial.v2.difficulty import Axis, AxisRelation
 from spatial.v2.solver import (
     And,
     CountQuery,
@@ -57,7 +56,7 @@ def test_claim_assessment_retains_positive_and_negative_models(backend: str) -> 
     assert assessment.counterexample is not None
 
 
-def test_direction_explanation_extracts_axis_transitivity_proof() -> None:
+def test_direction_audit_evidence_extracts_axis_transitivity_proof() -> None:
     problem = SpatialProblem(
         objects=("A", "B", "C"),
         premise=And(
@@ -69,12 +68,12 @@ def test_direction_explanation_extracts_axis_transitivity_proof() -> None:
         query=DirectionQuery("A", "C"),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
+    evidence = AuditEvidenceBuilder().build(problem)
 
-    assert isinstance(explanation, DirectionExplanation)
-    assert explanation.possible_directions == (Direction.NORTHEAST,)
+    assert isinstance(evidence, DirectionAuditEvidence)
+    assert evidence.possible_directions == (Direction.NORTHEAST,)
     northeast = next(
-        case for case in explanation.cases if case.direction is Direction.NORTHEAST
+        case for case in evidence.cases if case.direction is Direction.NORTHEAST
     )
     assert northeast.evidence.status is ClaimStatus.ENTAILED
     assert northeast.evidence.negation_unsatisfiable
@@ -94,24 +93,24 @@ def test_propositional_entailment_uses_solver_certificate_fallback() -> None:
         query=DirectionQuery("A", "B"),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
+    evidence = AuditEvidenceBuilder().build(problem)
 
-    assert isinstance(explanation, DirectionExplanation)
+    assert isinstance(evidence, DirectionAuditEvidence)
     case = next(
-        item for item in explanation.cases if item.direction is Direction.NORTHEAST
+        item for item in evidence.cases if item.direction is Direction.NORTHEAST
     )
     assert case.evidence.status is ClaimStatus.ENTAILED
     assert case.evidence.axis_proof is None
     assert case.evidence.negation_unsatisfiable
     assert (
         next(
-            item for item in explanation.cases if item.direction is Direction.NORTHWEST
+            item for item in evidence.cases if item.direction is Direction.NORTHWEST
         ).evidence.status
         is ClaimStatus.IMPOSSIBLE
     )
 
 
-def test_ambiguous_direction_explanation_has_two_sided_evidence() -> None:
+def test_ambiguous_direction_audit_evidence_has_two_sided_models() -> None:
     problem = SpatialProblem(
         objects=("A", "B"),
         premise=RelationConstraint(
@@ -122,21 +121,21 @@ def test_ambiguous_direction_explanation_has_two_sided_evidence() -> None:
         query=DirectionQuery("A", "B"),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
+    evidence = AuditEvidenceBuilder().build(problem)
 
-    assert isinstance(explanation, DirectionExplanation)
-    assert explanation.possible_directions == (
+    assert isinstance(evidence, DirectionAuditEvidence)
+    assert evidence.possible_directions == (
         Direction.NORTHEAST,
         Direction.NORTHWEST,
     )
-    for case in explanation.cases:
-        if case.direction in explanation.possible_directions:
+    for case in evidence.cases:
+        if case.direction in evidence.possible_directions:
             assert case.evidence.status is ClaimStatus.CONTINGENT
             assert case.evidence.witness is not None
             assert case.evidence.counterexample is not None
 
 
-def test_which_explanation_classifies_each_candidate() -> None:
+def test_which_audit_evidence_classifies_each_candidate() -> None:
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
         premise=And(
@@ -157,12 +156,12 @@ def test_which_explanation_classifies_each_candidate() -> None:
         ),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
+    evidence = AuditEvidenceBuilder().build(problem)
 
-    assert isinstance(explanation, WhichExplanation)
+    assert isinstance(evidence, WhichAuditEvidence)
     statuses = {
         membership.candidate: membership.evidence.status
-        for membership in explanation.memberships
+        for membership in evidence.memberships
     }
     assert statuses == {
         "A": ClaimStatus.ENTAILED,
@@ -170,9 +169,7 @@ def test_which_explanation_classifies_each_candidate() -> None:
         "D": ClaimStatus.IMPOSSIBLE,
     }
     contingent = next(
-        membership
-        for membership in explanation.memberships
-        if membership.candidate == "C"
+        membership for membership in evidence.memberships if membership.candidate == "C"
     )
     assert contingent.possible_directions == (
         Direction.NORTHEAST,
@@ -182,7 +179,7 @@ def test_which_explanation_classifies_each_candidate() -> None:
     assert contingent.evidence.counterexample is not None
 
 
-def test_count_explanation_preserves_correlated_non_contiguous_counts() -> None:
+def test_count_audit_evidence_preserves_correlated_non_contiguous_counts() -> None:
     a_member = atom("A", Direction.NORTHEAST, "R")
     b_member = atom("B", Direction.NORTHEAST, "R")
     problem = SpatialProblem(
@@ -195,19 +192,19 @@ def test_count_explanation_preserves_correlated_non_contiguous_counts() -> None:
         ),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
+    evidence = AuditEvidenceBuilder().build(problem)
 
-    assert isinstance(explanation, CountExplanation)
-    assert explanation.possible_counts == (0, 2)
-    assert [case.status for case in explanation.counts] == [
+    assert isinstance(evidence, CountAuditEvidence)
+    assert evidence.possible_counts == (0, 2)
+    assert [case.status for case in evidence.counts] == [
         ClaimStatus.CONTINGENT,
         ClaimStatus.IMPOSSIBLE,
         ClaimStatus.CONTINGENT,
     ]
-    assert [case.members for case in explanation.counts] == [(), (), ("A", "B")]
+    assert [case.members for case in evidence.counts] == [(), (), ("A", "B")]
     assert all(
         membership.evidence.status is ClaimStatus.CONTINGENT
-        for membership in explanation.memberships
+        for membership in evidence.memberships
     )
 
 
@@ -218,9 +215,9 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
         query=DirectionQuery("obj_0", "obj_1"),
     )
 
-    explanation = SpatialExplainerV2().explain(problem)
-    rendered = render_audit_explanation(
-        explanation,
+    evidence = AuditEvidenceBuilder().build(problem)
+    rendered = render_audit_report(
+        evidence,
         {"obj_0": "Bakery", "obj_1": "Library"},
     )
 
@@ -228,8 +225,8 @@ def test_renderer_uses_optional_display_labels_without_dataset_knowledge() -> No
     assert "Combining both axes gives North." in rendered
     assert "obj_0" not in rendered
 
-    serialized = explanation_to_dict(explanation)
-    assert serialized["type"] == "DirectionExplanation"
+    serialized = audit_evidence_to_dict(evidence)
+    assert serialized["type"] == "DirectionAuditEvidence"
     assert serialized["cases"][0]["direction"] == "North"
     assert serialized["cases"][0]["evidence"]["negation_unsatisfiable"] is True
     json.dumps(serialized)

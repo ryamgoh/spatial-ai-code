@@ -1,17 +1,12 @@
-"""Structured, data-agnostic explanations for V2 spatial analyses.
-
-The solver establishes model-theoretic truth. This module turns those results
-into typed evidence and optionally renders that evidence as deterministic text.
-It does not parse prompts, inspect answer menus, or know dataset schemas.
-"""
+"""Structured model-theoretic evidence for spatial audit reports."""
 
 from __future__ import annotations
 
-from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+from spatial.v2.difficulty import AxisProof, derive_axis_proof
 from spatial.v2.serialization import tagged_dataclass_to_dict
 from spatial.v2.solver import (
     CountAnalysis,
@@ -25,9 +20,7 @@ from spatial.v2.solver import (
     SpatialSolverV2,
     WhichAnalysis,
     WhichQuery,
-    conjunctive_atoms,
     direction_between,
-    direction_signs,
 )
 
 Coordinates = dict[str, tuple[int, int]]
@@ -40,36 +33,8 @@ class ClaimStatus(str, Enum):
     INCONSISTENT = "inconsistent"
 
 
-class Axis(str, Enum):
-    X = "x"
-    Y = "y"
-
-
-class AxisRelation(str, Enum):
-    LESS = "<"
-    EQUAL = "="
-    GREATER = ">"
-
-
 @dataclass(frozen=True)
-class AxisDerivation:
-    axis: Axis
-    subject: str
-    relation: AxisRelation
-    reference: str
-    path: tuple[str, ...]
-    premise_indices: tuple[int, ...]
-
-
-@dataclass(frozen=True)
-class AxisProof:
-    x: AxisDerivation
-    y: AxisDerivation
-    direction: Direction
-
-
-@dataclass(frozen=True)
-class ClaimEvidence:
+class ClaimAuditEvidence:
     status: ClaimStatus
     witness: Coordinates | None = None
     counterexample: Coordinates | None = None
@@ -78,16 +43,16 @@ class ClaimEvidence:
 
 
 @dataclass(frozen=True)
-class DirectionCase:
+class DirectionAuditCase:
     direction: Direction
-    evidence: ClaimEvidence
+    evidence: ClaimAuditEvidence
 
 
 @dataclass(frozen=True)
-class DirectionExplanation:
+class DirectionAuditEvidence:
     target: str
     reference: str
-    cases: tuple[DirectionCase, ...]
+    cases: tuple[DirectionAuditCase, ...]
     engine: str
 
     @property
@@ -100,22 +65,22 @@ class DirectionExplanation:
 
 
 @dataclass(frozen=True)
-class MembershipExplanation:
+class MembershipAuditEvidence:
     candidate: str
-    evidence: ClaimEvidence
+    evidence: ClaimAuditEvidence
     possible_directions: tuple[Direction, ...]
 
 
 @dataclass(frozen=True)
-class WhichExplanation:
+class WhichAuditEvidence:
     reference: str
     directions: frozenset[Direction]
-    memberships: tuple[MembershipExplanation, ...]
+    memberships: tuple[MembershipAuditEvidence, ...]
     engine: str
 
 
 @dataclass(frozen=True)
-class CountCase:
+class CountAuditCase:
     count: int
     status: ClaimStatus
     members: tuple[str, ...] = ()
@@ -123,11 +88,11 @@ class CountCase:
 
 
 @dataclass(frozen=True)
-class CountExplanation:
+class CountAuditEvidence:
     reference: str
     directions: frozenset[Direction]
-    memberships: tuple[MembershipExplanation, ...]
-    counts: tuple[CountCase, ...]
+    memberships: tuple[MembershipAuditEvidence, ...]
+    counts: tuple[CountAuditCase, ...]
     engine: str
 
     @property
@@ -139,12 +104,12 @@ class CountExplanation:
         )
 
 
-QueryExplanation = DirectionExplanation | WhichExplanation | CountExplanation
+QueryAuditEvidence = DirectionAuditEvidence | WhichAuditEvidence | CountAuditEvidence
 
 
-def explanation_to_dict(explanation: QueryExplanation) -> dict[str, Any]:
-    """Return a deterministic JSON-compatible representation for generators."""
-    return tagged_dataclass_to_dict(explanation)
+def audit_evidence_to_dict(evidence: QueryAuditEvidence) -> dict[str, Any]:
+    """Return a deterministic JSON-compatible representation for audits."""
+    return tagged_dataclass_to_dict(evidence)
 
 
 def _claim_status(consistent: bool, possible: bool, entailed: bool) -> ClaimStatus:
@@ -157,143 +122,30 @@ def _claim_status(consistent: bool, possible: bool, entailed: bool) -> ClaimStat
     return ClaimStatus.IMPOSSIBLE
 
 
-@dataclass(frozen=True)
-class _Edge:
-    destination: str
-    strict: bool
-    premise_index: int
-
-
-def _axis_adjacency(
-    problem: SpatialProblem,
-    axis: Axis,
-) -> dict[str, list[_Edge]] | None:
-    atoms = conjunctive_atoms(problem.premise)
-    if atoms is None or any(len(atom.allowed) != 1 for atom in atoms):
-        return None
-
-    axis_index = 0 if axis is Axis.X else 1
-    adjacency = {obj: [] for obj in problem.objects}
-    for premise_index, atom in enumerate(atoms):
-        direction = next(iter(atom.allowed))
-        sign = direction_signs(direction)[axis_index]
-        if sign == 0:
-            adjacency[atom.subject].append(_Edge(atom.reference, False, premise_index))
-            adjacency[atom.reference].append(_Edge(atom.subject, False, premise_index))
-        elif sign > 0:
-            adjacency[atom.reference].append(_Edge(atom.subject, True, premise_index))
-        else:
-            adjacency[atom.subject].append(_Edge(atom.reference, True, premise_index))
-    for edges in adjacency.values():
-        edges.sort(key=lambda edge: (edge.destination, edge.premise_index))
-    return adjacency
-
-
-def _axis_path(
-    problem: SpatialProblem,
-    axis: Axis,
-    subject: str,
-    reference: str,
-    sign: int,
-) -> AxisDerivation | None:
-    adjacency = _axis_adjacency(problem, axis)
-    if adjacency is None:
-        return None
-
-    if sign > 0:
-        start, end, require_strict = reference, subject, True
-        relation = AxisRelation.GREATER
-    elif sign < 0:
-        start, end, require_strict = subject, reference, True
-        relation = AxisRelation.LESS
-    else:
-        start, end, require_strict = subject, reference, False
-        relation = AxisRelation.EQUAL
-
-    initial = (start, False)
-    frontier = deque([initial])
-    parents: dict[tuple[str, bool], tuple[tuple[str, bool], int]] = {}
-    visited = {initial}
-    final: tuple[str, bool] | None = None
-    while frontier:
-        state = frontier.popleft()
-        node, has_strict = state
-        if node == end and (has_strict or not require_strict):
-            final = state
-            break
-        for edge in adjacency[node]:
-            if not require_strict and edge.strict:
-                continue
-            next_state = (edge.destination, has_strict or edge.strict)
-            if next_state in visited:
-                continue
-            visited.add(next_state)
-            parents[next_state] = (state, edge.premise_index)
-            frontier.append(next_state)
-    if final is None:
-        return None
-
-    nodes = [final[0]]
-    premise_indices: list[int] = []
-    cursor = final
-    while cursor != initial:
-        previous, premise_index = parents[cursor]
-        premise_indices.append(premise_index)
-        nodes.append(previous[0])
-        cursor = previous
-    nodes.reverse()
-    premise_indices.reverse()
-    if sign > 0:
-        nodes.reverse()
-        premise_indices.reverse()
-    return AxisDerivation(
-        axis,
-        subject,
-        relation,
-        reference,
-        tuple(nodes),
-        tuple(premise_indices),
-    )
-
-
-def _axis_proof(
-    problem: SpatialProblem,
-    subject: str,
-    reference: str,
-    direction: Direction,
-) -> AxisProof | None:
-    x_sign, y_sign = direction_signs(direction)
-    x = _axis_path(problem, Axis.X, subject, reference, x_sign)
-    y = _axis_path(problem, Axis.Y, subject, reference, y_sign)
-    if x is None or y is None:
-        return None
-    return AxisProof(x, y, direction)
-
-
-class SpatialExplainerV2:
-    """Build typed explanations from structured problems and solver results."""
+class AuditEvidenceBuilder:
+    """Build typed audit evidence from structured problems and solver results."""
 
     def __init__(self, solver: SpatialSolverV2 | None = None) -> None:
         self._solver = solver or SpatialSolverV2()
 
-    def explain(
+    def build(
         self,
         problem: SpatialProblem,
         analysis: QueryAnalysis | None = None,
-    ) -> QueryExplanation:
+    ) -> QueryAuditEvidence:
         analysis = analysis or self._solver.analyze(problem)
         if isinstance(problem.query, DirectionQuery) and isinstance(
             analysis, DirectionAnalysis
         ):
-            return self._explain_direction(problem, analysis)
+            return self._build_direction(problem, analysis)
         if isinstance(problem.query, WhichQuery) and isinstance(
             analysis, WhichAnalysis
         ):
-            return self._explain_which(problem, analysis)
+            return self._build_which(problem, analysis)
         if isinstance(problem.query, CountQuery) and isinstance(
             analysis, CountAnalysis
         ):
-            return self._explain_count(problem, analysis)
+            return self._build_count(problem, analysis)
         raise TypeError("analysis type does not match the problem query")
 
     def _evidence(
@@ -301,7 +153,7 @@ class SpatialExplainerV2:
         problem: SpatialProblem,
         claim: RelationConstraint,
         axis_proof: AxisProof | None = None,
-    ) -> ClaimEvidence:
+    ) -> ClaimAuditEvidence:
         assessed = self._solver.assess(problem, claim)
         if assessed.error:
             raise RuntimeError(assessed.error)
@@ -310,7 +162,7 @@ class SpatialExplainerV2:
             assessed.possible,
             assessed.entailed,
         )
-        return ClaimEvidence(
+        return ClaimAuditEvidence(
             status=status,
             witness=assessed.witness,
             counterexample=assessed.counterexample,
@@ -318,11 +170,11 @@ class SpatialExplainerV2:
             negation_unsatisfiable=status is ClaimStatus.ENTAILED,
         )
 
-    def _explain_direction(
+    def _build_direction(
         self,
         problem: SpatialProblem,
         analysis: DirectionAnalysis,
-    ) -> DirectionExplanation:
+    ) -> DirectionAuditEvidence:
         query = problem.query
         assert isinstance(query, DirectionQuery)
         cases = []
@@ -335,12 +187,12 @@ class SpatialExplainerV2:
                 frozenset({direction}),
             )
             cases.append(
-                DirectionCase(
+                DirectionAuditCase(
                     direction,
                     self._evidence(
                         problem,
                         claim,
-                        _axis_proof(
+                        derive_axis_proof(
                             problem,
                             query.target,
                             query.reference,
@@ -349,18 +201,18 @@ class SpatialExplainerV2:
                     ),
                 )
             )
-        return DirectionExplanation(
+        return DirectionAuditEvidence(
             query.target,
             query.reference,
             tuple(cases),
             analysis.engine,
         )
 
-    def _membership_explanations(
+    def _membership_evidence(
         self,
         problem: SpatialProblem,
         query: WhichQuery | CountQuery,
-    ) -> tuple[MembershipExplanation, ...]:
+    ) -> tuple[MembershipAuditEvidence, ...]:
         memberships = []
         for candidate in query.candidates:
             direction_problem = SpatialProblem(
@@ -393,9 +245,9 @@ class SpatialExplainerV2:
                 next(iter(query.directions)) if len(query.directions) == 1 else None
             )
             memberships.append(
-                MembershipExplanation(
+                MembershipAuditEvidence(
                     candidate,
-                    ClaimEvidence(
+                    ClaimAuditEvidence(
                         status=status,
                         witness=(
                             direction_analysis.witnesses[matching[0]]
@@ -408,7 +260,7 @@ class SpatialExplainerV2:
                             else None
                         ),
                         axis_proof=(
-                            _axis_proof(
+                            derive_axis_proof(
                                 problem,
                                 candidate,
                                 query.reference,
@@ -424,25 +276,25 @@ class SpatialExplainerV2:
             )
         return tuple(memberships)
 
-    def _explain_which(
+    def _build_which(
         self,
         problem: SpatialProblem,
         analysis: WhichAnalysis,
-    ) -> WhichExplanation:
+    ) -> WhichAuditEvidence:
         query = problem.query
         assert isinstance(query, WhichQuery)
-        return WhichExplanation(
+        return WhichAuditEvidence(
             query.reference,
             query.directions,
-            self._membership_explanations(problem, query),
+            self._membership_evidence(problem, query),
             analysis.engine,
         )
 
-    def _explain_count(
+    def _build_count(
         self,
         problem: SpatialProblem,
         analysis: CountAnalysis,
-    ) -> CountExplanation:
+    ) -> CountAuditEvidence:
         query = problem.query
         assert isinstance(query, CountQuery)
         possible = set(analysis.possible_counts)
@@ -468,11 +320,11 @@ class SpatialExplainerV2:
                 if witness is not None
                 else ()
             )
-            cases.append(CountCase(count, status, members, witness))
-        return CountExplanation(
+            cases.append(CountAuditCase(count, status, members, witness))
+        return CountAuditEvidence(
             query.reference,
             query.directions,
-            self._membership_explanations(problem, query),
+            self._membership_evidence(problem, query),
             tuple(cases),
             analysis.engine,
         )

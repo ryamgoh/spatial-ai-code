@@ -6,6 +6,8 @@ kept under `v1/` only for historical reproducibility.
 | File | Responsibility | Typical caller |
 |---|---|---|
 | `v2/solver.py` | Data-agnostic formulas, Direction/Which/Count queries, Z3/reference engines, witnesses | Any structured spatial workload |
+| `v2/difficulty.py` | Axis-path depth, proof support, and distractor measurement | Generation policy checks |
+| `v2/audit_evidence.py` | Diagnostic claim statuses, witnesses, and counterexamples | Audit reporting |
 | `v2/proofs.py` | Typed proof and refutation certificates with replay checking | Proof-first SpatialEntail generation |
 | `v2/model_certificates.py` | Constructive model, countermodel, and contingency validation | Possibility and non-entailment evidence |
 | `v2/answer_certificates.py` | Complete Direction candidate coverage | Direction answer sets |
@@ -50,7 +52,7 @@ render text above that seam, parse the rendered text back through an adapter,
 and verify the reparsed problem before emitting a row. Accepted rows carry a
 checked answer certificate and render it as either `TraceFormat.NATURAL` or
 `TraceFormat.SYMBOLIC`. Coordinate witnesses belong only in structured audit
-metadata or `render_audit_explanation`, never in an SFT reasoning target.
+metadata or `render_audit_report`, never in an SFT reasoning target.
 
 The proof-first seam is the training-explanation path.
 `build_direction_proof` currently accepts only exact positive-conjunction

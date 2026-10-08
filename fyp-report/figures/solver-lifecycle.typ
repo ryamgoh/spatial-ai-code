@@ -50,17 +50,17 @@
         fill: answer-fill,
       ), name: <policy>),
       node((1, 4), diagram-panel(
-        [Explanation layer],
-        [Build typed evidence \ render coordinate-free \ reasoning traces],
+        [Certificate layer],
+        [Build and replay evidence \ render Natural or \ Symbolic traces],
         fill: explanation-fill,
-      ), name: <explain>),
+      ), name: <certificate>),
       node((2, 4), diagram-panel(
         [Audit layer],
         [Validate witnesses \ record alternatives \ and provenance],
         fill: audit-fill,
       ), name: <audit>),
       edge(<analysis.south-west>, <policy.north>, "->"),
-      edge(<analysis.south>, <explain.north>, "->"),
+      edge(<analysis.south>, <certificate.north>, "->"),
       edge(<analysis.south-east>, <audit.north>, "->"),
 
       node((0, 5), diagram-panel(
@@ -80,7 +80,7 @@
       ), name: <artifact>),
       edge(<policy.south>, <answer.north>, "->"),
       edge(<policy.south-east>, <training.north-west>, "->"),
-      edge(<explain.south>, <training.north>, "->"),
+      edge(<certificate.south>, <training.north>, "->"),
       edge(<audit.south>, <artifact.north>, "->"),
     )
   ],

@@ -22,14 +22,7 @@ from spatial.v2.certificate_generation import (
     answer_certificate_to_dict,
     build_answer_certificate,
 )
-from spatial.v2.explanations import (
-    ClaimStatus,
-    CountExplanation,
-    DirectionExplanation,
-    QueryExplanation,
-    SpatialExplainerV2,
-    WhichExplanation,
-)
+from spatial.v2.difficulty import measure_difficulty
 from spatial.v2.grading import (
     AnswerMode,
     AnswerResolution,
@@ -300,34 +293,12 @@ def _coordinate_payload(
     return {name: [point[0], point[1]] for name, point in sorted(coordinates.items())}
 
 
-def _opposite(direction: Direction) -> Direction:
-    x_sign, y_sign = direction_signs(direction)
-    return _DIRECTION_BY_SIGNS[(-x_sign, -y_sign)]
-
-
 def _exact_relation(
     subject: str,
     direction: Direction,
     reference: str,
 ) -> RelationConstraint:
     return RelationConstraint(subject, reference, frozenset({direction}))
-
-
-def _has_direct_membership_fact(problem: SpatialProblem) -> bool:
-    query = problem.query
-    if not isinstance(query, (WhichQuery, CountQuery)):
-        return False
-    candidates = set(query.candidates)
-    for atom in problem.premise.operands:
-        if atom.reference == query.reference and atom.subject in candidates:
-            allowed = atom.allowed
-        elif atom.subject == query.reference and atom.reference in candidates:
-            allowed = frozenset(_opposite(direction) for direction in atom.allowed)
-        else:
-            continue
-        if allowed <= query.directions:
-            return True
-    return False
 
 
 def _render_trace(
@@ -357,7 +328,6 @@ class GeneratedSpatialSample:
     resolution: AnswerResolution
     menu_answer: MenuAnswer
     certificate: AnswerCertificate
-    explanation: QueryExplanation
     prompt: str
     trace: str
     policy: GenerationPolicy
@@ -461,85 +431,6 @@ class _RetryGeneration(Exception):
     pass
 
 
-def _difficulty(
-    problem: SpatialProblem,
-    analysis: QueryAnalysis,
-    explanation: QueryExplanation,
-) -> dict[str, Any]:
-    query = problem.query
-    direct_query_relation = False
-    x_depth: int | None = None
-    y_depth: int | None = None
-    x_support: set[int] = set()
-    y_support: set[int] = set()
-    membership_proofs: list[dict[str, Any]] = []
-    if isinstance(query, DirectionQuery):
-        query_pair = {query.target, query.reference}
-        direct_query_relation = any(
-            {atom.subject, atom.reference} == query_pair
-            for atom in problem.premise.operands
-        )
-    if isinstance(explanation, DirectionExplanation):
-        entailed = next(
-            (
-                case
-                for case in explanation.cases
-                if case.evidence.status is ClaimStatus.ENTAILED
-                and case.evidence.axis_proof is not None
-            ),
-            None,
-        )
-        if entailed is not None:
-            proof = entailed.evidence.axis_proof
-            assert proof is not None
-            x_depth = len(proof.x.premise_indices)
-            y_depth = len(proof.y.premise_indices)
-            x_support.update(proof.x.premise_indices)
-            y_support.update(proof.y.premise_indices)
-    elif isinstance(explanation, (WhichExplanation, CountExplanation)):
-        for membership in explanation.memberships:
-            proof = membership.evidence.axis_proof
-            if membership.evidence.status is not ClaimStatus.ENTAILED or proof is None:
-                continue
-            membership_x = set(proof.x.premise_indices)
-            membership_y = set(proof.y.premise_indices)
-            x_support.update(membership_x)
-            y_support.update(membership_y)
-            membership_proofs.append(
-                {
-                    "candidate": membership.candidate,
-                    "x_depth": len(membership_x),
-                    "y_depth": len(membership_y),
-                    "axes_independent": bool(
-                        membership_x
-                        and membership_y
-                        and membership_x.isdisjoint(membership_y)
-                    ),
-                    "premise_indices": sorted(membership_x | membership_y),
-                }
-            )
-        direct_query_relation = _has_direct_membership_fact(problem)
-    support = x_support | y_support
-    membership_x_depths = [proof["x_depth"] for proof in membership_proofs]
-    membership_y_depths = [proof["y_depth"] for proof in membership_proofs]
-    return {
-        "possibility_count": len(_answer_values(analysis)),
-        "direct_query_relation": direct_query_relation,
-        "x_depth": x_depth,
-        "y_depth": y_depth,
-        "axes_independent": bool(
-            x_support and y_support and x_support.isdisjoint(y_support)
-        ),
-        "membership_proofs": membership_proofs,
-        "min_membership_x_depth": min(membership_x_depths, default=None),
-        "max_membership_x_depth": max(membership_x_depths, default=None),
-        "min_membership_y_depth": min(membership_y_depths, default=None),
-        "max_membership_y_depth": max(membership_y_depths, default=None),
-        "supporting_premise_indices": sorted(support),
-        "num_distractor_premises": len(problem.premise.operands) - len(support),
-    }
-
-
 def _difficulty_matches(
     policy: GenerationPolicy,
     difficulty: dict[str, Any],
@@ -597,7 +488,6 @@ class SpatialGeneratorV2:
         self.seed = seed
         self._random = random.Random(seed)
         self._solver = solver or SpatialSolverV2()
-        self._explainer = SpatialExplainerV2(self._solver)
         self._text_adapter = SpatialTextAdapter()
         self._emitted = 0
 
@@ -694,8 +584,7 @@ class SpatialGeneratorV2:
             )
         if not self._shape_matches(analysis, policy.semantic_shape):
             raise _RetryGeneration("semantic shape did not match")
-        explanation = self._explainer.explain(problem, analysis)
-        difficulty = _difficulty(problem, analysis, explanation)
+        difficulty = measure_difficulty(problem, analysis, self._solver)
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
         if controlled_direction:
@@ -732,7 +621,6 @@ class SpatialGeneratorV2:
             resolution,
             menu_answer,
             certificate,
-            explanation,
             prompt,
             trace,
             policy,

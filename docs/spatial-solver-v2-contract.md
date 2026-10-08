@@ -13,13 +13,15 @@ dataset row or synthetic spec
     -> SpatialProblem
     -> SpatialSolverV2
     -> QueryAnalysis
-    -> grading, structured explanation, audit reporting, or map rendering
+    -> grading, checked certificates, audit reporting, or map rendering
 ```
 
 - `spatial/v2/solver.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
-- `spatial/v2/explanations.py` classifies individual claims, extracts readable
-  axis paths where possible, and records audit evidence without parsing text.
+- `spatial/v2/audit_evidence.py` classifies individual claims for diagnostic
+  reports without participating in training-trace generation.
+- `spatial/v2/difficulty.py` measures axis-path depth, proof support, and
+  distractors for generated workloads.
 - `spatial_*_certificates_v2.py` builds and independently checks Direction,
   Which, and correlated Count evidence; their renderers emit Natural or
   Symbolic training traces from the same accepted certificate.
@@ -79,8 +81,9 @@ receive the all-eight default.
 
 - Use `spatial/v2/solver.py` when the caller already has structured objects,
   formulas, and a query.
-- Use `spatial/v2/explanations.py` after constructing a `SpatialProblem` when an
-  audit or difficulty analysis needs machine-readable evidence.
+- Use `spatial/v2/audit_evidence.py` only when an audit needs machine-readable
+  witnesses and counterexamples.
+- Use `spatial/v2/difficulty.py` for structural generation metrics.
 - Use the answer-certificate builders and renderers for proof-first training
   traces without exposing coordinates.
 - Use `spatial/v2/audit_rendering.py` only for coordinate-bearing diagnostics.
@@ -91,8 +94,8 @@ receive the all-eight default.
   metadata while comparing it with the solver-derived model set.
 - Use `spatial/v2/tests/test_solver.py` as the executable semantic contract before
   changing the solver or building proof rendering.
-- Use `spatial/v2/tests/test_explanations.py` as the executable claim-evidence and
-  explanation contract.
+- Use `spatial/v2/tests/test_audit_evidence.py` as the executable diagnostic
+  evidence contract.
 
 ## Motivation: text must determine its own answer
 
@@ -326,10 +329,10 @@ For a paired text-and-image dataset:
 
 The resulting map is therefore arbitrary, but its answer is not.
 
-## Structured explanations
+## Semantic assessment and audit evidence
 
 `SpatialSolverV2.assess(problem, claim)` is the semantic interface used by the
-explanation layer. It checks both `premise AND claim` and `premise AND NOT
+audit-evidence module. It checks both `premise AND claim` and `premise AND NOT
 claim` and returns:
 
 - a satisfying coordinate witness when the claim is possible;
@@ -347,16 +350,14 @@ answer menu or oracle:
 | unsatisfiable | satisfiable | impossible |
 | unsatisfiable | unsatisfiable | inconsistent premise |
 
-`SpatialExplainerV2.explain(problem, analysis)` converts these semantic results
-into typed Direction, Which, or Count evidence. For positive conjunctions of
-exact relations, it also decomposes directions onto the X and Y axes, finds
-transitive paths, and recombines the two derived comparisons. Arbitrary
-propositional formulas remain explainable through satisfying witnesses and the
-unsatisfiability of a negated claim even when no simple axis path exists.
+`AuditEvidenceBuilder.build(problem, analysis)` converts these semantic results
+into typed Direction, Which, or Count audit evidence. `difficulty.py`
+independently extracts shortest axis support for positive conjunctions when the
+generator needs structural measurements.
 
-The structured explanation is authoritative. Renderers accept an optional
-mapping from opaque object IDs to display labels and have no dataset schema or
-prompt parser.
+Audit evidence is diagnostic rather than a training proof. Its renderer accepts
+an optional mapping from opaque object IDs to display labels and has no dataset
+schema or prompt parser.
 
 Training and audit output are deliberately separate. `TraceFormat.NATURAL` and
 `TraceFormat.SYMBOLIC` are deterministic views of one checked certificate.
@@ -364,7 +365,7 @@ They expose the same premises, rule dependencies, candidate classifications,
 and correlated Count cases. There is no independent state-update mode: such a
 mode belonged to the removed post-hoc renderer and could change presentation
 without preserving a one-to-one relation with checked proof steps.
-`render_audit_explanation(...)` may include normalized coordinate witnesses; it
+`render_audit_report(...)` may include normalized coordinate witnesses; it
 is for diagnostics and is not an SFT reasoning target.
 
 A synthetic generator should therefore construct once and render later:
@@ -395,8 +396,8 @@ row = {
 For exact-answer generation, the generation policy rejects inconsistent or
 ambiguous analyses before rendering. For ambiguity datasets and benchmark
 audits, it retains the alternative witnesses as constructive counterexamples.
-Prompt text, menus, answer mode, and generator metadata remain outside both the
-solver and explanation modules.
+Prompt text, menus, answer mode, and generator metadata remain outside the
+solver and certificate modules.
 
 ## Completeness boundary
 
@@ -410,10 +411,9 @@ set of models for each possible query direction.
 This does not cover unrestricted spatial language. V2 currently excludes
 quantifiers, distance, adjacency, betweenness, nearest-object questions, and
 three-object orientation. It supports Direction, Which, and Count projections
-over finite named entities. Its explanation layer provides axis-path proofs for
-exact positive conjunctions and solver-backed possibility/entailment evidence
-for arbitrary supported formulas. It does not yet expose a low-level Z3
-unsatisfiable core for arbitrary propositional proofs.
+over finite named entities. The proof and certificate modules provide replayed
+axis proofs for exact positive conjunctions and checked models or refutations
+for supported formulas. They do not expose a low-level Z3 unsatisfiable core.
 
 ## Query families
 
