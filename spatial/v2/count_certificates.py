@@ -25,10 +25,10 @@ from spatial.v2.solver import (
     CountQuery,
     Not,
     Or,
-    RelationConstraint,
     SpatialFormula,
     SpatialProblem,
     WhichQuery,
+    membership_constraint,
 )
 from spatial.v2.which_certificates import (
     MembershipEvidence,
@@ -84,10 +84,6 @@ class CountAnswerSetCertificate:
         return len(self.possible_counts) == 1
 
 
-def _membership_claim(query: CountQuery, candidate: str) -> RelationConstraint:
-    return RelationConstraint(candidate, query.reference, query.directions)
-
-
 def count_assignments(
     query: CountQuery,
     count: int,
@@ -111,9 +107,9 @@ def count_assignment_formula(
         raise ValueError("count-assignment members must be unique and in query order")
     return And(
         tuple(
-            _membership_claim(query, candidate)
+            membership_constraint(candidate, query)
             if candidate in member_set
-            else Not(_membership_claim(query, candidate))
+            else Not(membership_constraint(candidate, query))
             for candidate in query.candidates
         )
     )

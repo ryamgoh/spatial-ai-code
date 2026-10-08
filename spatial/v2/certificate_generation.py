@@ -24,11 +24,11 @@ from spatial.v2.solver import (
     DirectionAnalysis,
     DirectionQuery,
     QueryAnalysis,
-    RelationConstraint,
     SpatialProblem,
     SpatialSolverV2,
     WhichAnalysis,
     WhichQuery,
+    membership_constraint,
 )
 from spatial.v2.which_certificates import (
     MembershipStatus,
@@ -55,7 +55,7 @@ def _membership_models(
     positive = {}
     negative = {}
     for candidate in query.candidates:
-        claim = RelationConstraint(candidate, query.reference, query.directions)
+        claim = membership_constraint(candidate, query)
         assessment = solver.assess(problem, claim)
         if assessment.error or not assessment.consistent:
             raise ProofConstructionError(

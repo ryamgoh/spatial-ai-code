@@ -13,13 +13,14 @@ from spatial.v2.solver import (
     DirectionAnalysis,
     DirectionQuery,
     QueryAnalysis,
-    RelationConstraint,
     SpatialProblem,
     SpatialSolverV2,
     WhichAnalysis,
     WhichQuery,
     conjunctive_atoms,
+    direction_constraint,
     direction_signs,
+    membership_constraint,
 )
 
 
@@ -205,7 +206,7 @@ def measure_difficulty(
     analysis: QueryAnalysis,
     solver: SpatialSolverV2,
 ) -> dict[str, Any]:
-    """Measure proof support and distractors without constructing audit evidence."""
+    """Measure proof support and distractors without building diagnostics."""
     query = problem.query
     direct_query_relation = False
     x_depth: int | None = None
@@ -221,11 +222,7 @@ def measure_difficulty(
             {atom.subject, atom.reference} == query_pair for atom in atoms
         )
         for direction in analysis.possible_directions:
-            claim = RelationConstraint(
-                query.target,
-                query.reference,
-                frozenset({direction}),
-            )
+            claim = direction_constraint(query.target, query.reference, direction)
             assessment = solver.assess(problem, claim)
             if not assessment.entailed:
                 continue
@@ -247,11 +244,7 @@ def measure_difficulty(
         if len(query.directions) == 1:
             direction = next(iter(query.directions))
             for candidate in query.candidates:
-                claim = RelationConstraint(
-                    candidate,
-                    query.reference,
-                    query.directions,
-                )
+                claim = membership_constraint(candidate, query)
                 assessment = solver.assess(problem, claim)
                 if not assessment.entailed:
                     continue

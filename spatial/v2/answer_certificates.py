@@ -29,6 +29,7 @@ from spatial.v2.solver import (
     DirectionQuery,
     RelationConstraint,
     SpatialProblem,
+    direction_constraint,
 )
 
 
@@ -85,11 +86,109 @@ def _candidate_claim(
     query: DirectionQuery,
     direction: Direction,
 ) -> RelationConstraint:
-    return RelationConstraint(
+    return direction_constraint(query.target, query.reference, direction)
+
+
+def _check_entailment_evidence(
+    problem: SpatialProblem,
+    query: DirectionQuery,
+    direction: Direction,
+    expected_claim: RelationConstraint,
+    evidence: DirectionEntailmentCertificate,
+) -> None:
+    if (
+        evidence.witness.problem != problem
+        or evidence.witness.claim != expected_claim
+        or evidence.witness.expected_claim_value is not True
+        or evidence.proof.problem != problem
+    ):
+        raise AnswerSetCheckError(
+            f"{direction.value} entailment certifies the wrong candidate"
+        )
+    try:
+        check_model_certificate(evidence.witness)
+        check_direction_proof(evidence.proof)
+    except (ModelCheckError, ProofCheckError) as exc:
+        raise AnswerSetCheckError(
+            f"{direction.value} has invalid entailment evidence: {exc}"
+        ) from exc
+    if evidence.proof.conclusion != DirectionClaim(
         query.target,
+        direction,
         query.reference,
-        frozenset({direction}),
-    )
+    ):
+        raise AnswerSetCheckError(
+            f"{direction.value} entailment certifies the wrong candidate"
+        )
+
+
+def _check_model_evidence(
+    problem: SpatialProblem,
+    direction: Direction,
+    expected_claim: RelationConstraint,
+    evidence: SpatialModelCertificate,
+) -> None:
+    if (
+        evidence.problem != problem
+        or evidence.claim != expected_claim
+        or evidence.expected_claim_value is not True
+    ):
+        raise AnswerSetCheckError(
+            f"{direction.value} model certifies the wrong candidate"
+        )
+    try:
+        check_model_certificate(evidence)
+    except ModelCheckError as exc:
+        raise AnswerSetCheckError(
+            f"{direction.value} has an invalid model: {exc}"
+        ) from exc
+
+
+def _check_refutation_evidence(
+    problem: SpatialProblem,
+    direction: Direction,
+    expected_claim: RelationConstraint,
+    evidence: DirectionRefutationCertificate,
+) -> None:
+    if evidence.problem != problem or evidence.claim != expected_claim:
+        raise AnswerSetCheckError(
+            f"{direction.value} refutation certifies the wrong candidate"
+        )
+    try:
+        check_direction_refutation(evidence)
+    except ProofCheckError as exc:
+        raise AnswerSetCheckError(
+            f"{direction.value} has an invalid refutation: {exc}"
+        ) from exc
+
+
+def _check_candidate_evidence(
+    problem: SpatialProblem,
+    query: DirectionQuery,
+    item: DirectionCandidateCertificate,
+) -> None:
+    expected_claim = _candidate_claim(query, item.direction)
+    if isinstance(item.evidence, DirectionEntailmentCertificate):
+        _check_entailment_evidence(
+            problem,
+            query,
+            item.direction,
+            expected_claim,
+            item.evidence,
+        )
+    elif isinstance(item.evidence, SpatialModelCertificate):
+        _check_model_evidence(problem, item.direction, expected_claim, item.evidence)
+    elif isinstance(item.evidence, DirectionRefutationCertificate):
+        _check_refutation_evidence(
+            problem,
+            item.direction,
+            expected_claim,
+            item.evidence,
+        )
+    else:
+        raise AnswerSetCheckError(
+            f"{item.direction.value} has unsupported candidate evidence"
+        )
 
 
 def check_direction_answer_set(certificate: DirectionAnswerSetCertificate) -> None:
@@ -109,66 +208,7 @@ def check_direction_answer_set(certificate: DirectionAnswerSetCertificate) -> No
         )
 
     for item in certificate.candidates:
-        expected_claim = _candidate_claim(query, item.direction)
-        if isinstance(item.evidence, DirectionEntailmentCertificate):
-            evidence = item.evidence
-            if (
-                evidence.witness.problem != problem
-                or evidence.witness.claim != expected_claim
-                or evidence.witness.expected_claim_value is not True
-                or evidence.proof.problem != problem
-            ):
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} entailment certifies the wrong candidate"
-                )
-            try:
-                check_model_certificate(evidence.witness)
-                check_direction_proof(evidence.proof)
-            except (ModelCheckError, ProofCheckError) as exc:
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} has invalid entailment evidence: {exc}"
-                ) from exc
-            if evidence.proof.conclusion != DirectionClaim(
-                query.target,
-                item.direction,
-                query.reference,
-            ):
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} entailment certifies the wrong candidate"
-                )
-        elif isinstance(item.evidence, SpatialModelCertificate):
-            if (
-                item.evidence.problem != problem
-                or item.evidence.claim != expected_claim
-                or item.evidence.expected_claim_value is not True
-            ):
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} model certifies the wrong candidate"
-                )
-            try:
-                check_model_certificate(item.evidence)
-            except ModelCheckError as exc:
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} has an invalid model: {exc}"
-                ) from exc
-        elif isinstance(item.evidence, DirectionRefutationCertificate):
-            if (
-                item.evidence.problem != problem
-                or item.evidence.claim != expected_claim
-            ):
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} refutation certifies the wrong candidate"
-                )
-            try:
-                check_direction_refutation(item.evidence)
-            except ProofCheckError as exc:
-                raise AnswerSetCheckError(
-                    f"{item.direction.value} has an invalid refutation: {exc}"
-                ) from exc
-        else:
-            raise AnswerSetCheckError(
-                f"{item.direction.value} has unsupported candidate evidence"
-            )
+        _check_candidate_evidence(problem, query, item)
 
     if not certificate.possible_directions:
         raise AnswerSetCheckError(

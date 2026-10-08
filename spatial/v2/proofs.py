@@ -28,6 +28,7 @@ from spatial.v2.solver import (
     RelationConstraint,
     SpatialFormula,
     SpatialProblem,
+    direction_constraint,
     direction_signs,
 )
 
@@ -552,12 +553,8 @@ def _check_step(
             first.reference,
         } != {second.subject, second.reference}:
             raise ProofCheckError(f"{step.id} compares different axis pairs")
-        first_sign = _relation_sign(first.relation)
-        second_sign = _relation_sign(second.relation)
-        if first.subject == second.reference:
-            second_sign = -second_sign
         if (
-            first_sign == second_sign
+            not _axis_facts_conflict(first, second)
             or not isinstance(step.conclusion, Contradiction)
             or step.branch is None
         ):
@@ -1234,11 +1231,7 @@ def build_direction_proof(
     for candidate in candidates:
         _derive_formula(
             steps,
-            RelationConstraint(
-                query.target,
-                query.reference,
-                frozenset({candidate}),
-            ),
+            direction_constraint(query.target, query.reference, candidate),
         )
     paths_by_direction = _direction_paths(problem, steps, candidates)
 
@@ -1378,10 +1371,10 @@ def build_formula_refutation(
                 continue
             _derive_formula(
                 steps,
-                RelationConstraint(
+                direction_constraint(
                     problem.query.target,
                     problem.query.reference,
-                    frozenset({direction}),
+                    direction,
                 ),
             )
     branch = "refutation"
@@ -1431,11 +1424,7 @@ def build_direction_refutation(
         raise ProofConstructionError(
             "refuted direction is outside the query candidates"
         )
-    claim = RelationConstraint(
-        query.target,
-        query.reference,
-        frozenset({direction}),
-    )
+    claim = direction_constraint(query.target, query.reference, direction)
     try:
         formula_refutation = build_formula_refutation(problem, claim)
     except ProofConstructionError as exc:

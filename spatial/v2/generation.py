@@ -50,6 +50,7 @@ from spatial.v2.solver import (
     WhichAnalysis,
     WhichQuery,
     direction_between,
+    direction_constraint,
     direction_signs,
 )
 from spatial.v2.text import (
@@ -340,7 +341,7 @@ def _exact_relation(
     direction: Direction,
     reference: str,
 ) -> RelationConstraint:
-    return RelationConstraint(subject, reference, frozenset({direction}))
+    return direction_constraint(subject, reference, direction)
 
 
 def _render_trace(

@@ -61,7 +61,6 @@ encoding; `spatial/v2/proofs.py` and its renderer for checked derivations;
 `spatial/v2/certificate_generation.py` for oracle-assisted certificate
 construction;
 `spatial/v2/difficulty.py` for structural measurements;
-`spatial/v2/audit_evidence.py` for diagnostic evidence; and
 `spatial/v2/audit_spatialeval.py` or `spatial/v2/generation.py` for the two pipelines.
 
 == End-to-End Lifecycle

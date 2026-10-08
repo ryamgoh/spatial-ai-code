@@ -18,15 +18,13 @@ dataset row or synthetic spec
 
 - `spatial/v2/solver.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
-- `spatial/v2/audit_evidence.py` classifies individual claims for diagnostic
-  reports without participating in training-trace generation.
 - `spatial/v2/difficulty.py` measures axis-path depth, proof support, and
   distractors for generated workloads.
 - `spatial_*_certificates_v2.py` builds and independently checks Direction,
   Which, and correlated Count evidence; their renderers emit Natural or
   Symbolic training traces from the same accepted certificate.
-- `spatial/v2/audit_rendering.py` is the only renderer that formats coordinate
-  witnesses.
+- `spatial/v2/audit_spatialeval.py` validates and records coordinate witnesses
+  for benchmark auditing.
 - `spatial/v2/text.py` adapts the current prompt grammar into a
   `SpatialProblem` and returns options separately.
 - `spatial/v2/grading.py` resolves answer semantics, encodes menu selections,
@@ -81,12 +79,10 @@ receive the all-eight default.
 
 - Use `spatial/v2/solver.py` when the caller already has structured objects,
   formulas, and a query.
-- Use `spatial/v2/audit_evidence.py` only when an audit needs machine-readable
-  witnesses and counterexamples.
 - Use `spatial/v2/difficulty.py` for structural generation metrics.
 - Use the answer-certificate builders and renderers for proof-first training
   traces without exposing coordinates.
-- Use `spatial/v2/audit_rendering.py` only for coordinate-bearing diagnostics.
+- Use `spatial/v2/audit_spatialeval.py` for coordinate-bearing benchmark audits.
 - Use `spatial/v2/text.py` only to adapt the current rendered prompt grammar.
 - Use `spatial/v2/grading.py` after semantic analysis to resolve answer
   semantics, encode an option menu, or score a model response.
@@ -94,8 +90,6 @@ receive the all-eight default.
   metadata while comparing it with the solver-derived model set.
 - Use `spatial/v2/tests/test_solver.py` as the executable semantic contract before
   changing the solver or building proof rendering.
-- Use `spatial/v2/tests/test_audit_evidence.py` as the executable diagnostic
-  evidence contract.
 
 ## Motivation: text must determine its own answer
 
@@ -344,10 +338,10 @@ For a paired text-and-image dataset:
 
 The resulting map is therefore arbitrary, but its answer is not.
 
-## Semantic assessment and audit evidence
+## Semantic assessment
 
-`SpatialSolverV2.assess(problem, claim)` is the semantic interface used by the
-audit-evidence module. It checks both `premise AND claim` and `premise AND NOT
+`SpatialSolverV2.assess(problem, claim)` checks both `premise AND claim` and
+`premise AND NOT
 claim` and returns:
 
 - a satisfying coordinate witness when the claim is possible;
@@ -365,14 +359,9 @@ answer menu or oracle:
 | unsatisfiable | satisfiable | impossible |
 | unsatisfiable | unsatisfiable | inconsistent premise |
 
-`AuditEvidenceBuilder.build(problem, analysis)` converts these semantic results
-into typed Direction, Which, or Count audit evidence. `difficulty.py`
-independently extracts shortest axis support for positive conjunctions when the
-generator needs structural measurements.
-
-Audit evidence is diagnostic rather than a training proof. Its renderer accepts
-an optional mapping from opaque object IDs to display labels and has no dataset
-schema or prompt parser.
+`difficulty.py` extracts shortest axis support for positive conjunctions when
+the generator needs structural measurements. Benchmark audit artifacts are
+written directly by `audit_spatialeval.py` from checked analyses and witnesses.
 
 Training and audit output are deliberately separate. `TraceFormat.NATURAL` and
 `TraceFormat.SYMBOLIC` are deterministic views of one checked certificate.
@@ -380,8 +369,8 @@ They expose the same premises, rule dependencies, candidate classifications,
 and correlated Count cases. There is no independent state-update mode: such a
 mode belonged to the removed post-hoc renderer and could change presentation
 without preserving a one-to-one relation with checked proof steps.
-`render_audit_report(...)` may include normalized coordinate witnesses; it
-is for diagnostics and is not an SFT reasoning target.
+Audit artifacts may include normalized coordinate witnesses; they are not SFT
+reasoning targets.
 
 A synthetic generator should therefore construct once and render later:
 

@@ -32,6 +32,7 @@ from spatial.v2.solver import (
     RelationConstraint,
     SpatialProblem,
     WhichQuery,
+    membership_constraint,
 )
 
 
@@ -137,10 +138,6 @@ class WhichAnswerSetCertificate:
         )
 
 
-def _membership_claim(query: WhichQuery, candidate: str) -> RelationConstraint:
-    return RelationConstraint(candidate, query.reference, query.directions)
-
-
 def _direction_projection(
     problem: SpatialProblem,
     query: WhichQuery,
@@ -222,7 +219,7 @@ def check_which_candidate_certificate(
         raise WhichCertificateCheckError(
             f"{item.candidate} is outside the Which candidate set"
         )
-    claim = _membership_claim(query, item.candidate)
+    claim = membership_constraint(item.candidate, query)
     projection = _direction_projection(problem, query, item.candidate)
     if isinstance(item.evidence, MembershipProofCertificate):
         _check_model(item.evidence.witness, problem, claim, True, item.candidate)
@@ -342,7 +339,7 @@ def build_which_answer_set(
     all_directions = frozenset(Direction)
     candidates = []
     for candidate in query.candidates:
-        claim = _membership_claim(query, candidate)
+        claim = membership_constraint(candidate, query)
         projection = _direction_projection(problem, query, candidate)
         positive_coordinates = positive_models.get(candidate)
         negative_coordinates = negative_models.get(candidate)

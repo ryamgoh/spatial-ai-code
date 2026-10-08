@@ -9,7 +9,8 @@ formats are rendered from the same checked answer certificate:
 
 Normalized coordinate models are audit witnesses only. They are not emitted by
 either training trace. Checked traces live in the proof and answer-certificate
-renderers; coordinate reports live in `spatial/v2/audit_rendering.py`.
+renderers; benchmark witness artifacts are written by
+`spatial/v2/audit_spatialeval.py`.
 
 The V2 generator exposes only trace format as a representation dimension. Every
 generated prompt is reparsed and re-solved before either view is rendered, so
