@@ -11,14 +11,17 @@ from spatial_proofs_v2 import (
     DirectionClaim,
     DirectionProofCertificate,
     DirectionRefutationCertificate,
+    FormulaRefutationCertificate,
     OrderRelation,
     ProofAxis,
     ProofRule,
     check_direction_proof,
     check_direction_refutation,
+    check_formula_refutation,
 )
 from spatial_solver_v2 import (
     And,
+    Direction,
     Iff,
     Implies,
     Not,
@@ -36,9 +39,16 @@ def _direction_atom(
     atom: RelationConstraint,
     labels: Mapping[str, str],
 ) -> str:
-    direction = next(iter(atom.allowed))
+    directions = tuple(
+        direction.value for direction in Direction if direction in atom.allowed
+    )
+    relation = (
+        directions[0]
+        if len(directions) == 1
+        else "one of {" + ", ".join(directions) + "}"
+    )
     return (
-        f"{_label(atom.subject, labels)} is {direction.value} of "
+        f"{_label(atom.subject, labels)} is {relation} of "
         f"{_label(atom.reference, labels)}"
     )
 
@@ -51,9 +61,18 @@ def _formula_text(
 ) -> str:
     if isinstance(formula, RelationConstraint):
         if symbolic:
-            direction = next(iter(formula.allowed)).name
+            directions = tuple(
+                direction.name
+                for direction in Direction
+                if direction in formula.allowed
+            )
+            relation = (
+                directions[0]
+                if len(directions) == 1
+                else "IN_{" + ",".join(directions) + "}"
+            )
             return (
-                f"DIR_{direction}({_label(formula.subject, labels)},"
+                f"DIR_{relation}({_label(formula.subject, labels)},"
                 f"{_label(formula.reference, labels)})"
             )
         return _direction_atom(formula, labels)
@@ -245,6 +264,29 @@ def render_direction_refutation(
 ) -> str:
     """Render one checked contradiction for an impossible candidate."""
     check_direction_refutation(certificate)
+    trace_format = TraceFormat(trace_format)
+    labels = labels or {}
+    lines = (
+        [_symbolic_step(step, labels) for step in certificate.steps]
+        if trace_format is TraceFormat.SYMBOLIC
+        else [_natural_step(step, labels) for step in certificate.steps]
+    )
+    claim = render_formula(certificate.claim, trace_format, labels)
+    lines.append(
+        f"Impossible: {claim}"
+        if trace_format is TraceFormat.SYMBOLIC
+        else f"Therefore {claim} is impossible."
+    )
+    return "\n".join(lines)
+
+
+def render_formula_refutation(
+    certificate: FormulaRefutationCertificate,
+    trace_format: TraceFormat | str,
+    labels: Mapping[str, str] | None = None,
+) -> str:
+    """Render one checked contradiction for an arbitrary spatial formula."""
+    check_formula_refutation(certificate)
     trace_format = TraceFormat(trace_format)
     labels = labels or {}
     lines = (

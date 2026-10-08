@@ -54,6 +54,38 @@ class ContingencyCertificate:
     counterexample: SpatialModelCertificate
 
 
+def build_model_certificate(
+    problem: SpatialProblem,
+    claim: SpatialFormula,
+    coordinates: Mapping[str, tuple[int, int]],
+    expected_claim_value: bool,
+) -> SpatialModelCertificate:
+    """Build and validate one model certificate from named coordinates."""
+    supplied = set(coordinates)
+    expected = set(problem.objects)
+    if supplied != expected:
+        missing = sorted(expected - supplied)
+        extra = sorted(supplied - expected)
+        details = []
+        if missing:
+            details.append(f"missing {', '.join(missing)}")
+        if extra:
+            details.append(f"unexpected {', '.join(extra)}")
+        raise ModelCheckError(
+            "coordinate assignments have wrong object coverage: " + "; ".join(details)
+        )
+    certificate = SpatialModelCertificate(
+        problem,
+        claim,
+        tuple(
+            CoordinateAssignment(name, *coordinates[name]) for name in problem.objects
+        ),
+        expected_claim_value,
+    )
+    check_model_certificate(certificate)
+    return certificate
+
+
 def _evaluate(
     formula: SpatialFormula,
     coordinates: Mapping[str, tuple[int, int]],

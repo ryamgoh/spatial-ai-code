@@ -18,6 +18,8 @@ one domain model and one gold-label contract.
 | `spatial_answer_certificate_renderers_v2.py` | Natural and Symbolic complete candidate classifications | Proof-first answer traces |
 | `spatial_which_certificates_v2.py` | Entailed, contingent, or impossible membership evidence for every Which candidate | Complete Which answer sets |
 | `spatial_which_certificate_renderers_v2.py` | Natural and Symbolic views of checked Which membership classifications | Proof-first Which traces |
+| `spatial_count_certificates_v2.py` | Exhaustive model-or-refutation evidence over correlated membership assignments | Complete Count answer sets |
+| `spatial_count_certificate_renderers_v2.py` | Natural and Symbolic views of checked Count domains and joint exclusions | Proof-first Count traces |
 | `spatial_audit_rendering_v2.py` | Coordinate-bearing witness reports | Benchmark audits only |
 | `spatial_text_v2.py` | Current natural-language prompt to `SpatialProblem` adapter | Synthetic text round trips |
 | `spatial_grading_v2.py` | Answer-mode resolution, menu encoding, and exact letter-set scoring | Dataset-specific evaluation |
@@ -36,6 +38,7 @@ one domain model and one gold-label contract.
 | `test_spatial_model_certificates_v2.py` | Formula, coordinate, contingency, corruption, and rendering contracts | Local/CI verification |
 | `test_spatial_answer_certificates_v2.py` | Candidate coverage, unique/ambiguous sets, refutations, and corruption contracts | Local/CI verification |
 | `test_spatial_which_certificates_v2.py` | Eight-direction, coarse, contingent, empty, corruption, and solver-agreement Which contracts | Local/CI verification |
+| `test_spatial_count_certificates_v2.py` | Correlated Boolean counts, ambiguous count domains, assignment coverage, rendering, and corruption contracts | Local/CI verification |
 | `test_spatial_generation_v2.py` | Generator, difficulty, menu, pairing, and CLI contracts | Local/CI verification |
 | `test_spatial_workload_manifest_v2.py` | Manifest and leakage validation contracts | Local/CI verification |
 | `test_spatial_matrix_v2.py` | YAML matrix parsing and exact expansion contracts | Local/CI verification |
@@ -93,8 +96,12 @@ checked refutation. `WhichAnswerSetCertificate` classifies every declared entity
 as entailed, contingent, or impossible. Entailment excludes every non-matching
 direction when no shorter exact-direction proof is available; impossibility
 excludes every matching direction; and contingency requires both a supporting
-model and a countermodel. Count certificates must still be implemented before
-proof-first workload generation is enabled for every query shape.
+model and a countermodel. `CountAnswerSetCertificate` preserves correlation by
+covering every value from zero through the candidate count. Possible values use
+checked models; impossible values require checked refutations for every complete
+membership assignment with that count. The generic Count checker is complete
+relative to supplied evidence, while automatic refutation construction remains
+limited by the proof builder's supported fragment.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 

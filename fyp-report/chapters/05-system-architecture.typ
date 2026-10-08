@@ -51,6 +51,7 @@ encoding; `spatial_proofs_v2.py` and its renderer for checked derivations;
 `spatial_model_certificates_v2.py` for constructive evidence;
 `spatial_answer_certificates_v2.py` for complete Direction candidate sets;
 `spatial_which_certificates_v2.py` for complete three-valued membership sets;
+`spatial_count_certificates_v2.py` for correlation-preserving Count domains;
 `spatial_explanations_v2.py` for current audit compatibility; and
 `audit_spatialeval_v2.py` or `spatial_generation_v2.py` for the two pipelines.
 
@@ -140,11 +141,11 @@ problem and its answer.
 The target SpatialEntail path renders Natural or Symbolic reasoning from one
 replayable certificate. The proof-first generator migration is incomplete:
 Direction certificates support spatial chains and bounded Boolean case proofs;
-complete Direction and Which certificates support unique and ambiguous answer
-sets. Correlated Count certificates remain to be implemented before the
-post-hoc training renderer is removed. Training rows exclude coordinate
-witnesses by default. Coordinates can be added only as separate audit metadata
-for diagnostic use.
+complete Direction, Which, and correlated Count certificates support unique and
+ambiguous answer sets. Automatic Boolean proof construction and wholesale
+generator migration remain incomplete, so the post-hoc training renderer has
+not yet been removed. Training rows exclude coordinate witnesses by default.
+Coordinates can be added only as separate audit metadata for diagnostic use.
 
 == Failure and Output Contracts
 

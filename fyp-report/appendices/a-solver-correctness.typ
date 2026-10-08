@@ -451,6 +451,54 @@ memberships may be correlated so that exactly one is true in every world.
 Count therefore requires certificates for whole joint assignments or count
 values rather than a reduction to independent Which statuses.
 
+#heading(level: 2, numbering: none)[Complete Correlated Count Domains]
+
+Let a Count query have ordered candidates $c_1, ..., c_n$ and membership claims
+$M_1, ..., M_n$. For a subset $T$ of candidate indices, define its complete
+membership assignment as
+
+$
+  A_T = (and_(i in T) M_i) and (and_(j in.not T) not M_j).
+$
+
+The exact-count formula for $k$ is the disjunction of all assignments whose
+member set has size $k$:
+
+$
+  C_k = or_(T subset.eq {1, ..., n}, |T| = k) A_T.
+$
+
+A Count answer-set certificate covers every $k$ from zero through $n$ exactly
+once. A possible count carries an accepted model satisfying $P and C_k$. An
+impossible count carries one accepted formula-refutation certificate for every
+assignment $A_T$ with $|T| = k$. The checker requires exactly the
+$binom(n, k)$ canonical assignments and verifies that every refutation uses the
+same problem and the corresponding complete assignment.
+
+#heading(level: 2, numbering: none)[Proposition 7: Count-Domain Completeness]
+
+If a Count answer-set certificate is accepted, the values marked by model
+certificates are exactly the possible counts among $0, ..., n$.
+
+_Proof._ Each model-backed count is possible by Proposition 4. For an
+impossible count $k$, every spatial world has one complete membership assignment
+$A_T$ with $|T| = k$ exactly when it satisfies $C_k$. The accepted refutations
+show $P and A_T |= bot$ for every such $T$, so no model of $P and C_k$ exists.
+Exact coverage of all count values therefore leaves precisely the model-backed
+values as possible. $square$
+
+This construction preserves correlations. For example, if $M_A equiv not M_B$,
+both individual memberships are contingent, but assignments with neither or
+both members are refutable and the only possible count is one. No independent
+summation of Which statuses can establish that result.
+
+The evidence size is potentially exponential: excluding count $k$ may require
+$binom(n, k)$ assignment refutations. The checker is generic over supported
+Boolean formulas, but the current automatic proof builder does not synthesize
+all such refutations. A constructor may supply checked Boolean proof steps; a
+missing certificate remains a construction limitation rather than semantic
+evidence that the count is possible.
+
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 
 #assurance-case <solver-assurance-case>

@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from spatial_model_certificates_v2 import (
-    CoordinateAssignment,
     ModelCheckError,
     SpatialModelCertificate,
+    build_model_certificate,
     check_model_certificate,
 )
 from spatial_proofs_v2 import (
@@ -148,18 +148,8 @@ def build_direction_answer_set(
         coordinates = possible_models.get(direction)
         if coordinates is not None:
             try:
-                assignments = tuple(
-                    CoordinateAssignment(name, *coordinates[name])
-                    for name in problem.objects
-                )
-            except KeyError as exc:
-                raise ProofConstructionError(
-                    f"{direction.value} model omits object: {exc.args[0]}"
-                ) from exc
-            model = SpatialModelCertificate(problem, claim, assignments, True)
-            try:
-                check_model_certificate(model)
-            except ValueError as exc:
+                model = build_model_certificate(problem, claim, coordinates, True)
+            except ModelCheckError as exc:
                 raise ProofConstructionError(
                     f"invalid {direction.value} model: {exc}"
                 ) from exc

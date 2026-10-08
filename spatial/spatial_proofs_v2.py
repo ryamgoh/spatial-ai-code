@@ -3,9 +3,9 @@
 This module is deliberately independent of the SMT implementation. It builds
 and checks typed derivations from the structured premises themselves. The
 automatic builder covers exact positive-conjunction Direction problems; the
-checker additionally supports bounded Boolean and case-split proofs. Ambiguous
-Direction answer sets are assembled by the answer-certificate layer; Which and
-Count remain explicit future extensions rather than solver-status fallbacks.
+checker additionally supports bounded Boolean, case-split, and arbitrary-formula
+refutation certificates. Direction, Which, and Count answer sets are assembled
+by certificate layers rather than solver-status fallbacks.
 """
 
 from __future__ import annotations
@@ -129,6 +129,19 @@ class DirectionProofCertificate:
 class DirectionRefutationCertificate:
     problem: SpatialProblem
     claim: RelationConstraint
+    steps: tuple[ProofStep, ...]
+    assumption_step: str
+    contradiction_step: str
+
+    @property
+    def support_premise_indices(self) -> tuple[int, ...]:
+        return _support_premise_indices(self.steps, self.contradiction_step)
+
+
+@dataclass(frozen=True)
+class FormulaRefutationCertificate:
+    problem: SpatialProblem
+    claim: SpatialFormula
     steps: tuple[ProofStep, ...]
     assumption_step: str
     contradiction_step: str
@@ -577,6 +590,44 @@ def check_direction_proof(certificate: DirectionProofCertificate) -> None:
     _reachable_step_ids(certificate.steps, certificate.conclusion_step)
 
 
+def _check_refutation(
+    problem: SpatialProblem,
+    claim: SpatialFormula,
+    proof_steps: tuple[ProofStep, ...],
+    assumption_step: str,
+    contradiction_step: str,
+) -> None:
+    steps = _replay_steps(problem, proof_steps)
+    assumption = steps.get(assumption_step)
+    if (
+        assumption is None
+        or assumption.rule is not ProofRule.REFUTATION_ASSUMPTION
+        or assumption.conclusion != claim
+    ):
+        raise ProofCheckError("assumption_step does not assume the refuted claim")
+    contradiction = steps.get(contradiction_step)
+    if contradiction is None or not isinstance(contradiction.conclusion, Contradiction):
+        raise ProofCheckError("contradiction_step does not close the refutation")
+    if contradiction.branch != assumption.branch:
+        raise ProofCheckError(
+            "refutation assumption and contradiction use different scopes"
+        )
+    reachable = _reachable_step_ids(proof_steps, contradiction_step)
+    if assumption_step not in reachable:
+        raise ProofCheckError("contradiction does not depend on the refuted claim")
+
+
+def check_formula_refutation(certificate: FormulaRefutationCertificate) -> None:
+    """Replay a contradiction for an arbitrary supported spatial formula."""
+    _check_refutation(
+        certificate.problem,
+        certificate.claim,
+        certificate.steps,
+        certificate.assumption_step,
+        certificate.contradiction_step,
+    )
+
+
 def check_direction_refutation(
     certificate: DirectionRefutationCertificate,
 ) -> None:
@@ -593,24 +644,13 @@ def check_direction_refutation(
         or not claim.allowed <= query.candidate_directions
     ):
         raise ProofCheckError("refutation claim does not identify one query candidate")
-    steps = _replay_steps(problem, certificate.steps)
-    assumption = steps.get(certificate.assumption_step)
-    if (
-        assumption is None
-        or assumption.rule is not ProofRule.REFUTATION_ASSUMPTION
-        or assumption.conclusion != claim
-    ):
-        raise ProofCheckError("assumption_step does not assume the refuted claim")
-    contradiction = steps.get(certificate.contradiction_step)
-    if contradiction is None or not isinstance(contradiction.conclusion, Contradiction):
-        raise ProofCheckError("contradiction_step does not close the refutation")
-    if contradiction.branch != assumption.branch:
-        raise ProofCheckError(
-            "refutation assumption and contradiction use different scopes"
-        )
-    reachable = _reachable_step_ids(certificate.steps, certificate.contradiction_step)
-    if certificate.assumption_step not in reachable:
-        raise ProofCheckError("contradiction does not depend on the refuted claim")
+    _check_refutation(
+        problem,
+        claim,
+        certificate.steps,
+        certificate.assumption_step,
+        certificate.contradiction_step,
+    )
 
 
 @dataclass(frozen=True)
@@ -765,6 +805,14 @@ def refutation_to_dict(
 ) -> dict[str, Any]:
     """Return a deterministic JSON-compatible refutation representation."""
     check_direction_refutation(certificate)
+    return tagged_dataclass_to_dict(certificate)
+
+
+def formula_refutation_to_dict(
+    certificate: FormulaRefutationCertificate,
+) -> dict[str, Any]:
+    """Return a deterministic JSON-compatible formula-refutation representation."""
+    check_formula_refutation(certificate)
     return tagged_dataclass_to_dict(certificate)
 
 

@@ -9,9 +9,9 @@ from typing import Any
 
 from spatial_model_certificates_v2 import (
     ContingencyCertificate,
-    CoordinateAssignment,
     ModelCheckError,
     SpatialModelCertificate,
+    build_model_certificate,
     check_contingency_certificate,
     check_model_certificate,
 )
@@ -292,35 +292,12 @@ def _model_certificate(
     expected_value: bool,
     candidate: str,
 ) -> SpatialModelCertificate:
-    supplied = set(coordinates)
-    expected = set(problem.objects)
-    if supplied != expected:
-        missing = sorted(expected - supplied)
-        extra = sorted(supplied - expected)
-        details = []
-        if missing:
-            details.append(f"missing {', '.join(missing)}")
-        if extra:
-            details.append(f"unexpected {', '.join(extra)}")
-        raise ProofConstructionError(
-            f"{candidate} membership model has wrong object coverage: "
-            + "; ".join(details)
-        )
-    model = SpatialModelCertificate(
-        problem,
-        claim,
-        tuple(
-            CoordinateAssignment(name, *coordinates[name]) for name in problem.objects
-        ),
-        expected_value,
-    )
     try:
-        check_model_certificate(model)
+        return build_model_certificate(problem, claim, coordinates, expected_value)
     except ModelCheckError as exc:
         raise ProofConstructionError(
             f"invalid {candidate} membership model: {exc}"
         ) from exc
-    return model
 
 
 def _build_refutations(
