@@ -92,6 +92,7 @@ class Contradiction:
 
 
 ProofConclusion = SpatialFormula | AxisFact | DirectionClaim | Contradiction
+_MAX_CASE_SPLIT_DEPTH = 4
 
 
 @dataclass(frozen=True)
@@ -263,6 +264,35 @@ def _positive_and_negative(
     return None
 
 
+def _branch_parents(previous: Mapping[str, ProofStep]) -> dict[str, str | None]:
+    parents: dict[str, str | None] = {}
+    for step in previous.values():
+        if step.branch is None:
+            continue
+        if step.rule is ProofRule.ASSUMPTION and step.inputs:
+            source = previous.get(step.inputs[0])
+            if source is not None:
+                parents.setdefault(step.branch, source.branch)
+        elif step.rule is ProofRule.REFUTATION_ASSUMPTION:
+            parents.setdefault(step.branch, None)
+    return parents
+
+
+def _scope_is_accessible(
+    source: str | None,
+    target: str | None,
+    parents: Mapping[str, str | None],
+) -> bool:
+    if source is None:
+        return True
+    cursor = target
+    while cursor is not None:
+        if cursor == source:
+            return True
+        cursor = parents.get(cursor)
+    return False
+
+
 def _check_step(
     step: ProofStep,
     previous: Mapping[str, ProofStep],
@@ -273,15 +303,18 @@ def _check_step(
         raise ProofCheckError(f"{step.id} depends on an unknown or later step")
     resolved_inputs = tuple(item for item in inputs if item is not None)
 
-    if step.rule is not ProofRule.CASE_SPLIT:
-        if step.branch is None and any(
-            item.branch is not None for item in resolved_inputs
+    if step.rule not in {ProofRule.CASE_SPLIT, ProofRule.ASSUMPTION}:
+        parents = _branch_parents(previous)
+        if any(
+            not _scope_is_accessible(item.branch, step.branch, parents)
+            for item in resolved_inputs
         ):
-            raise ProofCheckError(f"{step.id} leaks a branch result into global scope")
-        if step.branch is not None and any(
-            item.branch not in {None, step.branch} for item in resolved_inputs
-        ):
-            raise ProofCheckError(f"{step.id} depends on another proof branch")
+            message = (
+                "leaks a branch result into global scope"
+                if step.branch is None
+                else "depends on another proof branch"
+            )
+            raise ProofCheckError(f"{step.id} {message}")
 
     if step.rule is ProofRule.PREMISE:
         if step.inputs or step.premise_index is None or step.branch is not None:
@@ -310,6 +343,8 @@ def _check_step(
             raise ProofCheckError(f"{step.id} is not a scoped disjunct assumption")
         if step.conclusion not in input_formulas[0].operands:
             raise ProofCheckError(f"{step.id} assumes no disjunct from its source")
+        if step.branch in _branch_parents(previous):
+            raise ProofCheckError(f"{step.id} reuses an existing proof branch")
         return
 
     if step.rule is ProofRule.REFUTATION_ASSUMPTION:
@@ -431,11 +466,11 @@ def _check_step(
         return
 
     if step.rule is ProofRule.CASE_SPLIT:
-        if step.branch is not None or len(resolved_inputs) < 3:
-            raise ProofCheckError(f"{step.id} is not a global case-split conclusion")
+        if len(resolved_inputs) < 3:
+            raise ProofCheckError(f"{step.id} is not a complete case-split conclusion")
         source = resolved_inputs[0]
-        if not isinstance(source.conclusion, Or) or source.branch is not None:
-            raise ProofCheckError(f"{step.id} must split one global disjunction")
+        if not isinstance(source.conclusion, Or) or source.branch != step.branch:
+            raise ProofCheckError(f"{step.id} must split a disjunction in its scope")
         branch_results = resolved_inputs[1:]
         branches = tuple(item.branch for item in branch_results)
         if any(branch is None for branch in branches) or len(set(branches)) != len(
@@ -461,9 +496,13 @@ def _check_step(
                     f"{step.id} has duplicate assumptions for one branch"
                 )
             assumptions_by_branch[assumption.branch] = assumption
-        if set(assumptions_by_branch) != set(branches) or {
-            item.conclusion for item in assumptions_by_branch.values()
-        } != set(source.conclusion.operands):
+        parents = _branch_parents(previous)
+        if (
+            set(assumptions_by_branch) != set(branches)
+            or any(parents.get(branch) != step.branch for branch in branches)
+            or {item.conclusion for item in assumptions_by_branch.values()}
+            != set(source.conclusion.operands)
+        ):
             raise ProofCheckError(f"{step.id} does not cover every disjunct")
         return
 
@@ -854,12 +893,11 @@ def _accessible_formula_steps(
     branch: str | None,
 ) -> dict[SpatialFormula, str]:
     formulas: dict[SpatialFormula, str] = {}
+    parents = _branch_parents({step.id: step for step in steps})
     for step in steps:
         if not isinstance(step.conclusion, SpatialFormula):
             continue
-        if branch is None and step.branch is not None:
-            continue
-        if branch is not None and step.branch not in {None, branch}:
+        if not _scope_is_accessible(step.branch, branch, parents):
             continue
         formulas[step.conclusion] = step.id
     return formulas
@@ -1057,49 +1095,83 @@ def _append_axis_decompositions(
             existing.add((source.id, axis))
 
 
-def _derive_formula_by_cases(
+def _derive_formula(
     steps: list[ProofStep],
     target: SpatialFormula,
+    branch: str | None = None,
+    depth: int = 0,
+    max_depth: int = _MAX_CASE_SPLIT_DEPTH,
 ) -> str | None:
-    known = _saturate_formula_steps(steps)
+    known = _saturate_formula_steps(steps, branch)
     if target in known:
         return known[target]
+    if isinstance(target, And):
+        inputs = []
+        for operand in target.operands:
+            result = _derive_formula(steps, operand, branch, depth, max_depth)
+            if result is None:
+                break
+            inputs.append(result)
+        if len(inputs) == len(target.operands):
+            _append_formula_step(
+                steps,
+                ProofRule.AND_INTRODUCTION,
+                target,
+                tuple(inputs),
+                branch,
+            )
+            return _accessible_formula_steps(steps, branch).get(target)
+    if depth >= max_depth:
+        return None
+    by_id = {step.id: step for step in steps}
     for source, source_id in tuple(known.items()):
-        if not isinstance(source, Or) or len(source.operands) < 2:
+        if (
+            not isinstance(source, Or)
+            or len(source.operands) < 2
+            or by_id[source_id].branch != branch
+        ):
             continue
         branch_results = []
         attempt_start = len(steps)
         for index, operand in enumerate(source.operands, start=1):
-            branch = f"case-{source_id}-{index}"
-            assumption_id = _fresh_step_id(steps, f"{branch}-A")
+            child_branch = f"{branch + '/' if branch else ''}case-{source_id}-{index}"
+            assumption_id = _fresh_step_id(steps, f"{child_branch}-A")
             steps.append(
                 ProofStep(
                     assumption_id,
                     ProofRule.ASSUMPTION,
                     operand,
                     (source_id,),
-                    branch=branch,
+                    branch=child_branch,
                 )
             )
-            branch_known = _saturate_formula_steps(steps, branch)
+            branch_known = _saturate_formula_steps(steps, child_branch)
             result_id = branch_known.get(target)
             if result_id is None:
                 contradiction_id = _append_formula_contradiction(
                     steps,
-                    branch,
+                    child_branch,
                     assumption_id,
                 )
                 if contradiction_id is not None:
-                    result_id = _fresh_step_id(steps, f"{branch}-X")
+                    result_id = _fresh_step_id(steps, f"{child_branch}-X")
                     steps.append(
                         ProofStep(
                             result_id,
                             ProofRule.EXPLOSION,
                             target,
                             (contradiction_id,),
-                            branch=branch,
+                            branch=child_branch,
                         )
                     )
+            if result_id is None:
+                result_id = _derive_formula(
+                    steps,
+                    target,
+                    child_branch,
+                    depth + 1,
+                    max_depth,
+                )
             if result_id is None:
                 del steps[attempt_start:]
                 branch_results = []
@@ -1113,6 +1185,7 @@ def _derive_formula_by_cases(
                     ProofRule.CASE_SPLIT,
                     target,
                     (source_id, *branch_results),
+                    branch=branch,
                 )
             )
             return result_id
@@ -1163,7 +1236,7 @@ def build_direction_proof(
     steps = _premise_steps(problem)
     _saturate_formula_steps(steps)
     for candidate in candidates:
-        _derive_formula_by_cases(
+        _derive_formula(
             steps,
             RelationConstraint(
                 query.target,

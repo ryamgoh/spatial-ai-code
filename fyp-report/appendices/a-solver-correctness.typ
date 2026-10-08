@@ -323,12 +323,12 @@ inconsistent problem.
 The certificate calculus is claimed to be sound, not complete. The automatic
 builder saturates conjunction elimination and introduction, modus ponens,
 biconditional elimination, double negation, and disjunctive syllogism. It can
-also construct one-level case splits, close contradictory branches by
-explosion, feed Boolean-derived atoms into axis transitivity, and refute formulas
-through explicit or axis contradictions. It does not claim complete search for
-arbitrarily nested Boolean formulas. Absence of a certificate is therefore not
-evidence of non-entailment; the SMT oracle remains the complete semantic
-decision procedure within the declared encoding.
+also construct nested case splits to a fixed depth, close contradictory branches
+by explosion, feed Boolean-derived atoms into axis transitivity, and refute
+formulas through explicit or axis contradictions. It does not claim unbounded
+complete search for arbitrary Boolean formulas. Absence of a certificate is
+therefore not evidence of non-entailment; the SMT oracle remains the complete
+semantic decision procedure within the declared encoding.
 
 The replay checker does not call Z3. It shares the formula types and direction
 sign table with the solver, then independently validates local dependencies and

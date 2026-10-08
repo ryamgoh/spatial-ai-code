@@ -303,6 +303,38 @@ def test_automatic_case_split_closes_contradictory_branch() -> None:
     assert any(step.rule is ProofRule.CASE_SPLIT for step in proof.steps)
 
 
+def test_automatic_builder_handles_nested_case_splits() -> None:
+    northeast = atom("A", Direction.NORTHEAST, "B")
+    northwest = atom("A", Direction.NORTHWEST, "B")
+    north = atom("E", Direction.NORTH, "F")
+    south = atom("E", Direction.SOUTH, "F")
+    east = atom("C", Direction.EAST, "D")
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D", "E", "F"),
+        premise=And(
+            (
+                Or((northeast, northwest)),
+                Implies(northeast, Or((north, south))),
+                Implies(north, east),
+                Implies(south, east),
+                Implies(northwest, east),
+            )
+        ),
+        query=DirectionQuery("C", "D"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.EAST
+    assert sum(step.rule is ProofRule.CASE_SPLIT for step in proof.steps) == 2
+    nested = next(
+        step
+        for step in proof.steps
+        if step.rule is ProofRule.CASE_SPLIT and step.branch is not None
+    )
+    assert nested.branch.startswith("case-")
+
+
 def test_automatic_direction_refutation_uses_boolean_contradiction() -> None:
     south = atom("A", Direction.SOUTH, "B")
     problem = SpatialProblem(
@@ -887,7 +919,7 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
         "S1",
         east,
     )
-    with pytest.raises(ProofCheckError, match="duplicate assumptions"):
+    with pytest.raises(ProofCheckError, match="reuses an existing proof branch"):
         check_direction_proof(duplicate_assumptions)
 
 
