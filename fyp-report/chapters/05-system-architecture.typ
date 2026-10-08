@@ -22,6 +22,12 @@ coordinates first appear later, when the solving backend finds one assignment
 that satisfies those constraints. Such an assignment is a witness, not a
 reconstruction of a hidden source map.
 
+SpatialEntail uses a controlled textual language. Its atomic form is
+`X is to the DIR of Y`; explicit parentheses and `NOT`, `AND`, `OR`,
+`IF ... THEN`, and `IFF` compose atoms into formulas. The adapter renders and
+parses this language deterministically. Unsupported free-form paraphrases are
+rejected instead of being assigned a guessed formal meaning.
+
 == Module Responsibilities
 
 #figure(

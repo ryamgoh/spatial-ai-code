@@ -141,9 +141,11 @@ class, or equality on both axes makes the premise set inconsistent.
 
 `RelationConstraint` is the atomic spatial proposition. `Not`, `And`, `Or`,
 `Implies`, and `Iff` form a propositionally complete structured formula AST.
-The text adapter maps the eight compass words to atomic constraints and combines
-all rendered statements with `And`. It additionally accepts `Northward`,
-`Eastward`, `Southward`, and `Westward` as coarse atomic domains. For example:
+The controlled text adapter uses `X is to the DIR of Y` as its atom and accepts
+explicit parenthesized `NOT`, `AND`, `OR`, `IF ... THEN`, and `IFF`
+compositions. Separate full-stop-terminated premises are combined with `And`.
+It additionally accepts `Northward`, `Eastward`, `Southward`, and `Westward` as
+coarse atomic domains. For example:
 
 ```text
 East      = {East}
@@ -152,11 +154,24 @@ not East  = every exact direction except East
 not NE    = every exact direction except Northeast
 ```
 
+Canonical Boolean examples are:
+
+```text
+NOT (A is to the North of B).
+(A is to the North of B) AND (C is to the East of D).
+(A is to the North of B) OR (A is to the Northwest of B).
+IF (A is to the North of B) THEN (C is to the East of D).
+(A is to the North of B) IFF (C is to the East of D).
+```
+
+The grammar is intentionally controlled. Clock-face expressions and free-form
+paraphrases are rejected rather than guessed.
+
 Negation is set complement over the eight exact directions. Missing evidence is
 not negation. Both `A is not Northeast of B` and the generator-style
 `A is not to the Northeast of B` are accepted.
 
-Structured synthetic callers may build formulas directly:
+Structured callers may also build formulas directly:
 
 ```python
 premise = And((

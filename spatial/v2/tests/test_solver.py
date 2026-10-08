@@ -31,7 +31,7 @@ from spatial.v2.solver import (
     WhichQuery,
 )
 from spatial.v2.spatialeval_adapter import SpatialEvalAdapter, audit
-from spatial.v2.text import SpatialTextAdapter
+from spatial.v2.text import SpatialTextAdapter, render_spatial_formula
 
 SOLVER = SpatialSolverV2()
 TEXT_ADAPTER = SpatialTextAdapter()
@@ -261,6 +261,28 @@ def test_empty_boolean_connective_is_rejected() -> None:
             premise=And(()),
             query=DirectionQuery("A", "B"),
         )
+
+
+def test_controlled_boolean_formula_round_trips() -> None:
+    north = RelationConstraint("A", "B", frozenset({Direction.NORTH}))
+    east = RelationConstraint("C", "D", frozenset({Direction.EAST}))
+    south = RelationConstraint("E", "F", frozenset({Direction.SOUTH}))
+    west = RelationConstraint("G", "H", frozenset({Direction.WEST}))
+    formula = Iff(
+        Implies(And((north, east)), south),
+        Not(Or((west, north))),
+    )
+
+    rendered = render_spatial_formula(formula)
+    parsed = TEXT_ADAPTER.parse(prompt([rendered + "."]))
+
+    assert parsed.problem.premise == And((formula,))
+    assert set(parsed.problem.objects) == set("ABCDEFGH")
+
+
+def test_text_adapter_rejects_noncanonical_clock_language() -> None:
+    with pytest.raises(ValueError, match="cannot parse premise"):
+        TEXT_ADAPTER.parse(prompt(["Jonathan is at 2 o'clock relative to Samuel."]))
 
 
 def test_spatialeval_adapter_reports_constructive_ambiguity() -> None:

@@ -45,6 +45,7 @@ from spatial.v2.solver import (
     SpatialProblem,
     direction_signs,
 )
+from spatial.v2.text import SpatialTextAdapter
 from spatial.v2.trace import TraceFormat
 
 
@@ -171,6 +172,21 @@ def test_automatic_builder_applies_modus_ponens() -> None:
     proof = build_direction_proof(problem)
 
     assert proof.conclusion.direction is Direction.SOUTHWEST
+    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
+
+
+def test_automatic_builder_accepts_parsed_controlled_boolean_text() -> None:
+    prompt = (
+        "Consider a map with multiple locations:\n\n"
+        "A is to the North of B. "
+        "IF (A is to the North of B) THEN (C is to the East of D).\n\n"
+        "Question: In which direction is C relative to D?"
+    )
+    problem = SpatialTextAdapter().parse(prompt).problem
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.EAST
     assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
 
 

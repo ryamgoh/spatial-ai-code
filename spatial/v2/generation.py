@@ -48,7 +48,11 @@ from spatial.v2.solver import (
     direction_between,
     direction_signs,
 )
-from spatial.v2.text import SpatialTextAdapter
+from spatial.v2.text import (
+    SpatialTextAdapter,
+    render_spatial_formula,
+    spatial_formula_objects,
+)
 from spatial.v2.trace import TraceFormat
 
 ENTITY_NAMES = (
@@ -1093,14 +1097,15 @@ class SpatialGeneratorV2:
         options: dict[str, str],
         answer_mode: AnswerMode,
     ) -> str:
-        assert isinstance(problem.premise, And)
-        atoms = problem.premise.operands
-        premise_text = [
-            f"{atom.subject} is to the {next(iter(atom.allowed)).value} of "
-            f"{atom.reference}."
-            for atom in atoms
-        ]
-        mentioned = {name for atom in atoms for name in (atom.subject, atom.reference)}
+        formulas = (
+            problem.premise.operands
+            if isinstance(problem.premise, And)
+            else (problem.premise,)
+        )
+        premise_text = [f"{render_spatial_formula(formula)}." for formula in formulas]
+        mentioned = {
+            name for formula in formulas for name in spatial_formula_objects(formula)
+        }
         premise_text.extend(
             f"{name} is in the map."
             for name in problem.objects
