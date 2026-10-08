@@ -179,11 +179,11 @@ def test_generator_constructs_proof_first_boolean_curriculum(
     )
 
 
-def test_boolean_curriculum_rejects_non_direction_queries() -> None:
-    with pytest.raises(ValueError, match="require Direction"):
+def test_boolean_curriculum_rejects_ambiguous_semantics() -> None:
+    with pytest.raises(ValueError, match="require unique"):
         GenerationPolicy(
             query_kind=QueryKind.WHICH,
-            semantic_shape=SemanticShape.UNIQUE,
+            semantic_shape=SemanticShape.AMBIGUOUS,
             boolean_shape=BooleanShape.MODUS_PONENS,
         )
 
@@ -212,8 +212,43 @@ def test_boolean_curriculum_does_not_construct_premises_from_coordinates(
     assert sample.analysis.possible_directions
 
 
+@pytest.mark.parametrize("query_kind", (QueryKind.WHICH, QueryKind.COUNT))
+@pytest.mark.parametrize(
+    "shape",
+    tuple(shape for shape in BooleanShape if shape is not BooleanShape.ATOMIC),
+)
+def test_boolean_curriculum_supports_membership_query_families(
+    query_kind: QueryKind,
+    shape: BooleanShape,
+) -> None:
+    sample = SpatialGeneratorV2(seed=1722).generate(
+        GenerationPolicy(
+            query_kind=query_kind,
+            semantic_shape=SemanticShape.UNIQUE,
+            boolean_shape=shape,
+            query_direction=Direction.EAST,
+            trace_format=TraceFormat.SYMBOLIC,
+            num_entities=6,
+            num_premises=7,
+        ),
+        max_attempts=1,
+    )
+
+    if query_kind is QueryKind.WHICH:
+        assert sample.analysis.possible_entities == (
+            sample.problem.query.candidates[0],
+        )
+        assert sample.analysis.entailed_entities == (
+            sample.problem.query.candidates[0],
+        )
+        assert "Which-Possible:" in sample.trace
+    else:
+        assert sample.analysis.possible_counts == (1,)
+        assert "Count-Domain: {1}" in sample.trace
+
+
 def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
-    with pytest.raises(ValueError, match="only Direction/unique"):
+    with pytest.raises(ValueError, match="require unique"):
         WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))
 
 

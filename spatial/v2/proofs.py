@@ -92,7 +92,6 @@ class Contradiction:
 
 
 ProofConclusion = SpatialFormula | AxisFact | DirectionClaim | Contradiction
-_MAX_CASE_SPLIT_DEPTH = 4
 
 
 @dataclass(frozen=True)
@@ -1099,8 +1098,7 @@ def _derive_formula(
     steps: list[ProofStep],
     target: SpatialFormula,
     branch: str | None = None,
-    depth: int = 0,
-    max_depth: int = _MAX_CASE_SPLIT_DEPTH,
+    used_disjunctions: frozenset[SpatialFormula] = frozenset(),
 ) -> str | None:
     known = _saturate_formula_steps(steps, branch)
     if target in known:
@@ -1108,7 +1106,7 @@ def _derive_formula(
     if isinstance(target, And):
         inputs = []
         for operand in target.operands:
-            result = _derive_formula(steps, operand, branch, depth, max_depth)
+            result = _derive_formula(steps, operand, branch, used_disjunctions)
             if result is None:
                 break
             inputs.append(result)
@@ -1121,14 +1119,13 @@ def _derive_formula(
                 branch,
             )
             return _accessible_formula_steps(steps, branch).get(target)
-    if depth >= max_depth:
-        return None
     by_id = {step.id: step for step in steps}
     for source, source_id in tuple(known.items()):
         if (
             not isinstance(source, Or)
             or len(source.operands) < 2
             or by_id[source_id].branch != branch
+            or source in used_disjunctions
         ):
             continue
         branch_results = []
@@ -1169,8 +1166,7 @@ def _derive_formula(
                     steps,
                     target,
                     child_branch,
-                    depth + 1,
-                    max_depth,
+                    used_disjunctions | {source},
                 )
             if result_id is None:
                 del steps[attempt_start:]

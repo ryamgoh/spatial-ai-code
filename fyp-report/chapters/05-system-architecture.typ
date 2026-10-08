@@ -152,6 +152,9 @@ The implemented schemas cover modus ponens, equivalence elimination, double
 negation, disjunctive syllogism, case split, and bounded nested case split over
 ordinary directional atoms. Thus the target conclusion is fixed by the proof
 obligation rather than selected from a previously sampled coordinate world.
+Direction cells prove one exact relation; Which and Count cells prove one
+membership, exclude every other declared candidate, and certify the resulting
+entity or cardinality answer.
 
 The SpatialEntail generator renders Natural or Symbolic reasoning from one
 replayable certificate. Direction certificates support spatial chains and

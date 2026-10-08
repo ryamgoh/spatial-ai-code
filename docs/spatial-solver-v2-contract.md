@@ -521,9 +521,12 @@ premise count. The solver sees only the resulting `SpatialProblem`.
 
 The proof-first Boolean shapes are `modus-ponens`, `iff`, `double-negation`,
 `disjunctive-syllogism`, `case-split`, and `nested-case-split`. They currently
-target unique Direction questions. `atomic` retains the ordinary spatial
-generation path. Each Boolean template constructs a logical proof obligation
-before solving; it is not derived from a privileged coordinate answer map.
+target unique Direction, Which, and Count questions. Which and Count cells prove
+one member and explicitly exclude every other declared candidate; Count then
+certifies the resulting joint cardinality. `atomic` retains the ordinary
+spatial generation path. Each Boolean template constructs a logical proof
+obligation before solving; it is not derived from a privileged coordinate
+answer map.
 
 Each accepted item follows one fail-closed path:
 

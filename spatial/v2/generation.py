@@ -211,8 +211,6 @@ class GenerationPolicy:
 
     def _validate_difficulty(self) -> None:
         if self.boolean_shape is not BooleanShape.ATOMIC:
-            if self.query_kind is not QueryKind.DIRECTION:
-                raise ValueError("Boolean proof shapes currently require Direction")
             if self.semantic_shape not in {SemanticShape.ANY, SemanticShape.UNIQUE}:
                 raise ValueError("Boolean proof shapes require unique semantics")
             minimum_entities = (
@@ -636,7 +634,13 @@ class SpatialGeneratorV2:
         difficulty = measure_difficulty(problem, analysis, self._solver)
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
-        if boolean_problem or controlled_direction:
+        if boolean_problem:
+            if isinstance(analysis, DirectionAnalysis):
+                coordinates = analysis.coordinates or {}
+            else:
+                assert isinstance(analysis, (WhichAnalysis, CountAnalysis))
+                coordinates = next(iter(analysis.witnesses.values()), {})
+        elif controlled_direction:
             assert isinstance(analysis, DirectionAnalysis)
             coordinates = analysis.coordinates or {}
         elif controlled_membership:
@@ -687,8 +691,10 @@ class SpatialGeneratorV2:
         objects: tuple[str, ...],
     ) -> SpatialProblem:
         target, reference, first, second = objects[:4]
-        target_direction = policy.target_direction or self._random.choice(
-            list(Direction)
+        target_direction = (
+            policy.target_direction
+            or policy.query_direction
+            or self._random.choice(list(Direction))
         )
         target_atom = _exact_relation(target, target_direction, reference)
         premise_atom = _exact_relation(
@@ -761,6 +767,28 @@ class SpatialGeneratorV2:
         else:
             raise ValueError("atomic problems use the ordinary generation path")
 
+        if policy.query_kind is QueryKind.DIRECTION:
+            query: DirectionQuery | WhichQuery | CountQuery = DirectionQuery(
+                target,
+                reference,
+            )
+        else:
+            candidates = tuple(obj for obj in objects if obj != reference)
+            premises.append(
+                And(
+                    tuple(
+                        Not(_exact_relation(candidate, target_direction, reference))
+                        for candidate in candidates
+                        if candidate != target
+                    )
+                )
+            )
+            query = (
+                WhichQuery(frozenset({target_direction}), reference, candidates)
+                if policy.query_kind is QueryKind.WHICH
+                else CountQuery(frozenset({target_direction}), reference, candidates)
+            )
+
         if len(premises) > policy.num_premises:
             raise _RetryGeneration(
                 f"{policy.boolean_shape.value} requires at least "
@@ -782,11 +810,7 @@ class SpatialGeneratorV2:
             premises.append(Or((filler_atom, Not(filler_atom))))
         if len(premises) != policy.num_premises:
             raise _RetryGeneration("premise budget exceeds Boolean filler capacity")
-        return SpatialProblem(
-            objects,
-            And(tuple(premises)),
-            DirectionQuery(target, reference),
-        )
+        return SpatialProblem(objects, And(tuple(premises)), query)
 
     @staticmethod
     def _uses_controlled_direction(policy: GenerationPolicy) -> bool:

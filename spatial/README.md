@@ -89,7 +89,8 @@ explanation fallback or independent state-snapshot mode.
 For proof-first Boolean curricula, `BooleanShape` provides `modus-ponens`,
 `iff`, `double-negation`, `disjunctive-syllogism`, `case-split`, and
 `nested-case-split`. These templates construct the proof obligation before
-semantic validation; `atomic` retains ordinary spatial generation.
+semantic validation for unique Direction, Which, or Count questions; `atomic`
+retains ordinary spatial generation.
 
 Audit the untouched SpatialMap-TQA release and derive SpatialMap-TQA-Corr with:
 

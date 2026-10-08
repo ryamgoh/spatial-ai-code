@@ -335,6 +335,40 @@ def test_automatic_builder_handles_nested_case_splits() -> None:
     assert nested.branch.startswith("case-")
 
 
+def test_nested_case_search_is_bounded_by_formula_structure_not_magic_depth() -> None:
+    target = atom("T", Direction.EAST, "R")
+    levels = [
+        (
+            atom(f"L{index}", Direction.NORTH, f"X{index}"),
+            atom(f"L{index}", Direction.SOUTH, f"X{index}"),
+        )
+        for index in range(5)
+    ]
+    premises: list[SpatialFormula] = [Or(levels[0])]
+    for index, (left, right) in enumerate(levels):
+        premises.append(Implies(right, target))
+        premises.append(
+            Implies(left, Or(levels[index + 1]))
+            if index + 1 < len(levels)
+            else Implies(left, target)
+        )
+    objects = (
+        "T",
+        "R",
+        *(name for index in range(5) for name in (f"L{index}", f"X{index}")),
+    )
+    problem = SpatialProblem(
+        objects=objects,
+        premise=And(tuple(premises)),
+        query=DirectionQuery("T", "R"),
+    )
+
+    proof = build_direction_proof(problem)
+
+    assert proof.conclusion.direction is Direction.EAST
+    assert sum(step.rule is ProofRule.CASE_SPLIT for step in proof.steps) == 5
+
+
 def test_automatic_direction_refutation_uses_boolean_contradiction() -> None:
     south = atom("A", Direction.SOUTH, "B")
     problem = SpatialProblem(

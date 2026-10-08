@@ -81,12 +81,9 @@ class WorkloadSpec:
         if empty:
             raise ValueError("empty workload dimensions: " + ", ".join(empty))
         if any(shape is not BooleanShape.ATOMIC for shape in self.boolean_shapes) and (
-            set(self.query_kinds) != {QueryKind.DIRECTION}
-            or set(self.semantic_shapes) != {SemanticShape.UNIQUE}
+            set(self.semantic_shapes) != {SemanticShape.UNIQUE}
         ):
-            raise ValueError(
-                "non-atomic Boolean shapes require only Direction/unique cells"
-            )
+            raise ValueError("non-atomic Boolean shapes require unique semantic cells")
 
     def manifest_config(self) -> dict:
         def serialize(value):
