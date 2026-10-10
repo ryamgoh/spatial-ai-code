@@ -39,8 +39,10 @@ for one base problem remain in one split.
 
 #heading(level: 2, numbering: none)[Quality-Review Rubric]
 
-The source-blinded review asks two independent external LLM families and one
-human reviewer to score the same anonymized prompt and checked Natural trace.
+The source-blinded screen runs `DeepSeek-V4-Pro` and `GPT-5.5` sequentially in
+isolated terminal-agent contexts over the same anonymized prompt and checked
+Natural trace. A human sees only items rejected by both judges and decides an
+Approve/Reject appeal without seeing either model's reasons.
 
 #figure(
   table(
@@ -57,14 +59,19 @@ human reviewer to score the same anonymized prompt and checked Natural trace.
   caption: [Human-facing review rubric. Formal correctness remains checker-authoritative.],
 ) <appendix-quality-rubric>
 
-The executed review record must pin both judge model identifiers, temperature,
-system prompt, output schema, sample IDs, randomized order, and human
-instructions. It reports raw agreement, Fleiss' kappa, pairwise Spearman
-correlations, and adjudicated disagreement categories.
+The executed review record must pin both requested model identifiers, provider,
+system-prompt version, output schema, sample IDs, randomized order, routing
+decisions, and human instructions. Any generation control unavailable through
+the terminal-agent interface is recorded as unavailable rather than invented.
+It reports double-approval, split, double-rejection,
+human-override, and final disposition rates, plus agreement and Cohen's kappa
+between the two model judges. Selective human appeal cannot estimate overall
+human acceptability or LLM–human agreement.
 
 Let $C$ denote the number of frozen reporting cells. Review covers at least the
-larger of 2% of the selected pool or $5 C$ examples, with at least five per
-cell. A fixed numeric floor is not declared before the registry is frozen.
+larger of 2% of the formally admitted maximum candidate pool or $5 C$ examples,
+with at least five per cell. A fixed numeric floor is not declared before the
+registry is frozen.
 
 #heading(level: 2, numbering: none)[External Adapter Record]
 

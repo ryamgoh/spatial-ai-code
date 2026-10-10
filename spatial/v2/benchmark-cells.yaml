@@ -1,0 +1,118 @@
+version: 1
+cells:
+  - id: DIR-ARC-UNI
+    readiness: ready
+    query_kind: direction
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [ARC]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: atomic, num_entities: 3, num_premises: 2, depth: 1}
+
+  - id: DIR-TRC-UNI
+    readiness: ready
+    query_kind: direction
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [TRC]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: atomic, num_entities: 4, num_premises: 4, depth: 2, omit_direct_query_relation: true}
+
+  - id: CNT-AXC-UNI
+    readiness: ready
+    query_kind: count
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [AXC]
+    semantic_status: UNI
+    evidence_obligations: [possibility-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: atomic, num_entities: 6, num_premises: 7, depth: 2, require_independent_axes: true}
+
+  - id: DIR-MP-UNI
+    readiness: ready
+    query_kind: direction
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [MP]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: modus-ponens, generation_mode: proof-template-first, num_entities: 6, num_premises: 7}
+
+  - id: SEL-IFF-UNI
+    readiness: ready
+    query_kind: which
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [IFF]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: iff, generation_mode: proof-template-first, num_entities: 6, num_premises: 7}
+
+  - id: CNT-NEG-UNI
+    readiness: ready
+    query_kind: count
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [NEG]
+    semantic_status: UNI
+    evidence_obligations: [possibility-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: double-negation, generation_mode: proof-template-first, num_entities: 6, num_premises: 7}
+
+  - id: DIR-DJE-UNI
+    readiness: ready
+    query_kind: direction
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [DJE]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: disjunctive-syllogism, generation_mode: proof-template-first, num_entities: 6, num_premises: 7}
+
+  - id: SEL-CSR-UNI
+    readiness: ready
+    query_kind: which
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [CSR]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: case-split, generation_mode: proof-template-first, num_entities: 6, num_premises: 7}
+
+  - id: DIR-ARC-ALT
+    readiness: ready
+    query_kind: direction
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [ARC]
+    semantic_status: ALT
+    evidence_obligations: [possibility-witness, candidate-exclusion]
+    generation: {semantic_shape: ambiguous, boolean_shape: atomic, num_entities: 4, num_premises: 3, ambiguity_size: 2}
+
+  - id: SEL-ARC-NOM
+    readiness: ready
+    query_kind: which
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [ARC]
+    semantic_status: NOM
+    evidence_obligations: [candidate-exclusion]
+    generation: {semantic_shape: no-match, boolean_shape: atomic, num_entities: 4, num_premises: 3}
+
+  - id: SEL-ARC-MUL
+    readiness: ready
+    query_kind: which
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [ARC]
+    semantic_status: MUL
+    evidence_obligations: [positive-proof, consistency-witness]
+    generation: {semantic_shape: multiple-certain, boolean_shape: atomic, num_entities: 6, num_premises: 5}
+
+  - id: CNT-CSR-JCR-UNI
+    readiness: ready
+    query_kind: count
+    capability_lenses: [LR, MTR]
+    reasoning_structures: [CSR]
+    semantic_status: UNI
+    evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+    generation: {semantic_shape: unique, boolean_shape: case-split, generation_mode: proof-template-first, num_entities: 6, num_premises: 7, require_joint_count_dependency: true}
+
+  - id: SEL-TRC-UNI-NOISE
+    readiness: ready
+    query_kind: which
+    capability_lenses: [RR, MTR]
+    reasoning_structures: [TRC]
+    semantic_status: UNI
+    evidence_obligations: [positive-proof, consistency-witness, candidate-exclusion]
+    generation: {semantic_shape: unique, boolean_shape: atomic, num_entities: 7, num_premises: 9, depth: 2, omit_direct_query_relation: true, distractor_premises: 2}

@@ -396,6 +396,7 @@ def build_workload_manifest(
         "min_membership_y_depth",
         "max_membership_y_depth",
         "num_distractor_premises",
+        "joint_count_dependency",
         "support_checks_complete",
         "support_semantics",
     )

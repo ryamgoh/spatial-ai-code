@@ -180,6 +180,17 @@ corpora or finalized cell quotas. Before generation, freeze:
 4. quality-review stratification; and
 5. group-sensitive size-calibration safeguards.
 
+The initial executable feasibility registry is
+[`spatial/v2/benchmark-cells.yaml`](../../spatial/v2/benchmark-cells.yaml). At
+this revision it contains thirteen ready representative cells and no blocked
+cells. It is a coverage seed, not the final reporting registry or an
+allocation. Run its static check or one-sample-per-cell probe with:
+
+```bash
+python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml
+python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe
+```
+
 Primary supporting analysis:
 [capability and framework synthesis](capability-validation-and-framework.md),
 [SODA taxonomy check](soda-task-taxonomy.md),

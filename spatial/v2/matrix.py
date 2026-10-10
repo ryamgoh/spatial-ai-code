@@ -70,6 +70,7 @@ _CELL_KEYS = {
     "omit_direct_query_relation",
     "require_independent_axes",
     "distractor_premises",
+    "require_joint_count_dependency",
     "max_attempts_per_sample",
     "query_directions",
     "target_directions",
@@ -106,6 +107,7 @@ class MatrixCell:
     omit_direct_query_relation: bool
     require_independent_axes: bool
     distractor_premises: int
+    require_joint_count_dependency: bool
     max_attempts_per_sample: int
     query_directions: tuple[Direction, ...] | None
     target_directions: tuple[Direction, ...] | None
@@ -273,6 +275,10 @@ def _cell(raw: dict[str, Any], defaults: dict[str, Any]) -> MatrixCell:
             "require_independent_axes",
         ),
         distractor_premises=int(values.get("distractor_premises", 0)),
+        require_joint_count_dependency=_boolean(
+            values.get("require_joint_count_dependency", False),
+            "require_joint_count_dependency",
+        ),
         max_attempts_per_sample=int(values.get("max_attempts_per_sample", 2_000)),
         query_directions=_directions(
             values.get("query_directions"), "query directions"
@@ -406,6 +412,7 @@ def _policy(
         require_independent_axes=cell.require_independent_axes,
         ambiguity_size=cell.ambiguity_size,
         distractor_premises=cell.distractor_premises,
+        require_joint_count_dependency=cell.require_joint_count_dependency,
         **depth_args,
     )
 

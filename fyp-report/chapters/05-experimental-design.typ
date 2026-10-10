@@ -127,10 +127,10 @@ query, and answer plus two solver-verified removable distractors. The noisy set
 adds 2,400 examples. Clean depth accuracy is the headline extrapolation curve;
 the paired clean/noisy delta measures robustness separately.
 
-The current generator exposes controlled removable distractors only for
-Direction. The stated paired Selection/Count conditions are therefore implementation
-requirements, not completed artifacts; the depth suite cannot be frozen until
-those controls pass semantic and context-admission checks.
+The current generator exposes controlled removable distractors for Direction
+and controlled-depth Selection. The stated paired Count condition remains an
+implementation requirement; the complete depth suite cannot be frozen until
+that control passes semantic and context-admission checks.
 
 Any family/depth cell that cannot produce 100 context-admitted examples fails
 before freezing. It is never backfilled with a shallower or different-family
@@ -185,27 +185,36 @@ described as replicated only when its direction agrees across both seeds.
 
 Automatic semantic, certificate, round-trip, split, menu, and context checks
 apply to every row. Let $C$ be the number of frozen reporting cells. Human-facing
-quality is reviewed on at least the larger of 2% of the selected training pool
-or $5 C$ examples, stratified with at least five examples per cell. The numeric
-floor is therefore determined only after the cell registry is frozen.
+quality is screened on at least the larger of 2% of the formally admitted
+maximum candidate pool or $5 C$ examples, stratified with at least five examples
+per cell. The numeric floor is therefore determined only after the cell registry
+is frozen.
 
-The same anonymized prompt and checked Natural trace are judged independently
-by one version-pinned OpenAI model, one version-pinned Anthropic model, and one
-human reviewer. Tier, supervision arm, generation mode, source label, model
-identity, expected hypothesis, and certificate metadata are hidden; item order
-is randomized.
+The same anonymized prompt and checked Natural trace are screened sequentially
+by isolated terminal-agent runs using version-pinned `DeepSeek-V4-Pro` and
+`GPT-5.5`. Each judge sees the frozen rubric and current item but not the other
+judge's output. Capability, supervision arm, generation mode, source label,
+expected hypothesis, and certificate metadata are hidden; item order is
+randomized.
 
 The structured rubric covers prompt clarity, answer-contract clarity,
 readability, self-containment, unnecessary repetition, answer-before-evidence
 leakage, and overall acceptability. Formal correctness is never delegated to an
-LLM judge. The report gives raw agreement, Fleiss' kappa for acceptability,
-pairwise Spearman correlations for readability, and disagreement categories.
-If LLM–human kappa is below 0.60, automated judgements remain descriptive.
+LLM judge. Two approvals accept the item. A split verdict holds it out for
+revision or replacement without involving the human. Two rejections route the
+item to a separate payload-blinded human appeal, presented as a one-item
+Approve/Reject menu without either model's reasons. Human approval records an
+LLM consensus false-positive rejection; human rejection confirms removal or
+revision.
 
-Release requires 100% automatic validity and at least 95% human acceptability
-overall. Any task with two or more unacceptable sampled examples is revised and
-re-audited. This protocol is described as _source-blinded independent LLM
-judging with human calibration_, not double-blind review.
+Release requires 100% automatic validity and at least 95% final acceptance in
+the quality sample after this routing. Two or more final non-acceptances in one
+reporting cell trigger revision and a newly versioned review packet. The report
+gives double-approval, split, double-rejection, human-override, and final
+disposition rates, plus agreement and Cohen's kappa between the two model
+judges. Because the human sees only unanimous rejections, the study does not
+report overall human acceptability, LLM–human kappa, or a human false-acceptance
+rate.
 
 == Relation to SODA's Data Process
 

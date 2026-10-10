@@ -21,8 +21,8 @@ not a learning benefit. The final study therefore predeclares answer-only,
 checked Natural, checked Symbolic, corrupted Symbolic, and local-proof
 conditions over 2B and 4B models. It separates matched interpolation,
 depth-5–8 extrapolation, premise-first formula composition, and external
-transfer. A source-blinded LLM/human review measures readability separately
-from formal validity.
+transfer. A source-blinded two-model quality screen with selective human appeal
+measures readability separately from formal validity.
 
 The unresolved empirical question is whether checked evidence teaches a more
 general spatial procedure than task exposure alone. The rank-witness comparison

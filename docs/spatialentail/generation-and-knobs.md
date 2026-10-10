@@ -12,9 +12,12 @@ split, or admit problems after the solver has established their semantics.
 The research-facing [task taxonomy](../research/task-taxonomy.md) composes query
 contract, reasoning structure, semantic status, and evidence burden into
 benchmark cells. The current generator exposes the lower-level controls listed
-here; it does not yet emit frozen `RR`/`LR`/`MTR` cell identifiers or implement
-the final allocation. Existing `boolean_shape` and depth fields must not be
-relabelled as verified capabilities without the taxonomy's admission checks.
+here. The versioned `spatial/v2/benchmark-cells.yaml` registry maps selected
+taxonomy cells to representative generator policies; `benchmark_registry.py`
+validates declarations and can probe one checked example per ready cell. The
+registry contains no quotas and does not yet annotate generated workload rows.
+Existing `boolean_shape` and depth fields must not be relabelled as verified
+capabilities without the taxonomy's admission checks.
 
 ## Knob classes
 
@@ -37,7 +40,7 @@ the accepted problem.
 | Field | Values | Effect | Important constraints |
 |---|---|---|---|
 | `query_kind` | `direction`, `which`, `count` | Selects the question and certificate family. | Direction compares one target/reference pair. Which and Count use declared candidates and a requested relation set. |
-| `semantic_shape` | `any`, `unique`, `ambiguous`, `no-match` | Filters the all-model answer domain. | `no-match` is currently realizable only for Which. Controlled proof-depth cells require `unique`. |
+| `semantic_shape` | `any`, `unique`, `ambiguous`, `multiple-certain`, `no-match` | Filters the all-model answer domain. | `multiple-certain` and `no-match` apply only to Selection. Controlled proof-depth cells require `unique`. |
 | `ambiguity_size` | integer ≥ 2 or omitted | Requires exactly this many possible semantic answers. | Applies to ambiguous cells; the feasible maximum depends on the query domain. |
 | `query_direction` | one of eight exact directions or omitted | Fixes the requested membership direction for Which/Count. | Invalid for Direction queries. Matrix files can enumerate `query_directions`. |
 | `target_direction` | one of eight exact directions or omitted | Requires a particular unique Direction answer. | Requires a Direction query and `semantic_shape: unique`. Matrix files can enumerate `target_directions`. |
@@ -78,6 +81,14 @@ The recorded provenance reflects the route actually used:
   solve, classify, and certify without an answer-bearing map;
 - **auto:** choose the supported route implied by the policy.
 
+For atomic Direction policies with `semantic_shape: ambiguous` and
+`ambiguity_size: 2`, auto mode uses a constructive template when the premises
+form a spanning tree. Both queried objects are constrained to the same value on
+one axis relative to a shared pivot, while their order on the other axis remains
+open. The solver must therefore confirm exactly the opposite pair North/South
+or East/West. This constructs only the visible premises and query; it does not
+derive them from an answer-bearing coordinate map.
+
 `certificate-first` remains vocabulary for a stricter proposed construction and
 is not an implemented `GenerationMode`.
 
@@ -91,7 +102,8 @@ is not an implemented `GenerationMode`.
 | `min_axis_depth`, `max_axis_depth` | positive integers | Bounds measured X/Y proof depth for Direction. | Applies only to unique Direction cells. |
 | `min_membership_depth`, `max_membership_depth` | positive integers | Bounds positive membership-proof depth for Which/Count. | Requires at least one entailed member; correlated counts without one do not receive a fabricated depth. |
 | `require_independent_axes` | Boolean | Requires X and Y conclusions to depend on disjoint supporting premises. | Requires the relevant minimum depth to be at least two. |
-| `distractor_premises` | non-negative integer | Requires this many jointly removable premises after preserving answer and membership semantics. | Currently Direction-only and no greater than `num_premises`. Support is sufficient and order-dependent, not globally minimum. Incomplete semantic checks retain premises and set `support_checks_complete: false`. |
+| `distractor_premises` | non-negative integer | Requires this many jointly removable premises after preserving answer and membership semantics. | Supported for Direction and controlled-depth Selection; Count remains unsupported. No greater than `num_premises`. Support is sufficient and order-dependent, not globally minimum. Incomplete semantic checks retain premises and set `support_checks_complete: false`. |
+| `require_joint_count_dependency` | Boolean | Requires possible Count values to be stricter than the interval implied by independent candidate-membership marginals. | Count-only; currently constructed as a unique case-split/XOR obligation. |
 
 Difficulty is measured on accepted problems. Generator intent alone does not
 establish the reported depth, independence, or distractor count.
@@ -110,7 +122,7 @@ The constructor rejects impossible combinations before sampling:
   depth, so `2 × depth + distractor_premises` must fit the premise budget;
 - without independent axes, `depth + distractor_premises` must fit;
 - `ambiguity_size` requires ambiguous semantics and cannot exceed eight for
-  Direction, `num_entities - 1` for Which, or `num_entities` for Count; and
+  Direction, `num_entities - 1` for Selection, or `num_entities` for Count; and
 - depth, independent-axis, direct-omission, and distractor controls require
   unique semantics. Membership depth is invalid for Direction; axis depth is
   invalid for Which/Count.

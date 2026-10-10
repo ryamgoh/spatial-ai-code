@@ -109,6 +109,34 @@ def test_matrix_parser_accepts_boolean_proof_shape(tmp_path) -> None:
     assert matrix.cells[0].boolean_shape is BooleanShape.NESTED_CASE_SPLIT
 
 
+def test_matrix_parser_accepts_joint_count_dependency_control(tmp_path) -> None:
+    path = tmp_path / "joint-count.yaml"
+    path.write_text(
+        """
+version: 1
+variants:
+  answers:
+    - {name: single, mode: single, menu_coverage: full}
+  traces:
+    - {format: natural}
+cells:
+  - name: count-joint
+    count: 1
+    query_kind: count
+    semantic_shape: unique
+    boolean_shape: case-split
+    generation_mode: proof-template-first
+    num_entities: 6
+    num_premises: 7
+    require_joint_count_dependency: true
+"""
+    )
+
+    matrix = load_experiment_matrix(path)
+
+    assert matrix.cells[0].require_joint_count_dependency is True
+
+
 def test_checked_in_ablation_matrix_is_valid() -> None:
     path = Path(__file__).parents[3] / "experiments/spatial-v2-ablation.example.yaml"
 

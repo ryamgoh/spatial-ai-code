@@ -279,9 +279,10 @@ and answer plus two solver-verified removable distractors, adding 2,400
 examples. Clean accuracy is the headline depth curve; the paired clean/noisy
 delta is reported separately as robustness.
 
-Controlled removable distractors are currently implemented only for Direction.
-The Selection and Count pairs are requirements for the final suite, not completed
-artifacts; they must pass semantic and context-admission checks before freezing.
+Controlled removable distractors are implemented for Direction and
+controlled-depth Selection. The Count pairs remain requirements for the final
+suite, not completed artifacts; they must pass semantic and context-admission
+checks before freezing.
 
 Any family-depth cell that cannot produce 100 context-admitted examples fails
 before freezing rather than being backfilled with a different depth or family.
@@ -311,17 +312,23 @@ diagnostic is important enough to justify another arm. Evaluate retention on
 
 Formal semantic, certificate, round-trip, split, menu, and context checks cover
 every selected row. Let `C` be the number of frozen reporting cells. Review uses
-at least the larger of 2% of the selected training pool or `5C` examples,
-stratified with at least five examples from each cell. One version-pinned
-OpenAI judge, one version-pinned Anthropic judge, and one human review the same
-sample independently. They see only the anonymized prompt and checked Natural
-trace; raw Symbolic quality remains parser- and replay-based.
+at least the larger of 2% of the formally admitted maximum candidate pool or
+`5C` examples,
+stratified with at least five examples from each cell. Version-pinned
+`DeepSeek-V4-Pro` and `GPT-5.5` review the same anonymized prompt and checked
+Natural trace in sequential, isolated terminal-agent runs. Raw Symbolic quality
+remains parser- and replay-based.
 
-Release requires 100% automatic validity and at least 95% overall human
-acceptability. Two or more unacceptable samples in one task trigger revision
-and re-audit. If LLM-human kappa is below 0.60, automated judgements remain
-descriptive. This is source-blinded LLM judging with human calibration, not
-classical double-blind review.
+Two approvals accept an item. A split verdict is held out for revision or
+replacement without human review. Two rejections trigger a separate
+payload-blinded human Approve/Reject appeal; model reasons remain hidden. Human
+approval records a consensus false-positive rejection, while human rejection
+confirms removal or revision. Release requires 100% automatic validity and at
+least 95% final sample acceptance after routing. Two or more final
+non-acceptances in one reporting cell trigger revision and re-audit. Report
+model–model agreement and Cohen's kappa, disposition counts, and the human
+override rate among double rejections. Selective human review cannot estimate
+overall human acceptability or LLM–human kappa.
 
 ## Optional RL study
 
@@ -406,12 +413,22 @@ These are preparation diagnostics for the executed configuration, not model
 accuracy or learning results. The earlier four-entity/three-premise proposal
 failed admission and was narrowed equally across arms.
 
+The current taxonomy feasibility pilot generated 50 checked Natural examples
+for each of thirteen ready representative cells (650 total), after implementing
+multiple-certain Selection admission, correlation-sensitive Count admission,
+and removable Selection distractors. A deterministic five-per-cell packet was
+screened sequentially by `DeepSeek-V4-Pro` and `GPT-5.5`; both approved all 65
+items, so the human appeal queue was empty. Exact hashes and local artifact paths
+are summarized in the tracked [v3 audit](../audits/capability-pilot-v3.md).
+This validates the representative registry and automated quality workflow, not
+the final cell allocation, human acceptability, data-size sufficiency, or learning.
+
 ## Decision order
 
 1. Freeze the benchmark-cell registry, Selection strata, and reporting units.
 2. Run a bounded capability-coverage, admission, and generation-yield pilot.
-3. Implement and verify any required missing controls, including paired
-   Selection/Count distractors and the local-proof acceptance contract.
+3. Implement and verify any required missing controls, including paired Count
+   distractors and the local-proof acceptance contract.
 4. Freeze cell quotas, matched-test totals, quality strata, and external
    adapter ledgers.
 5. Generate and formally validate the nested 4K/8K/17K candidate pool.

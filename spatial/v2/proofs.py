@@ -273,7 +273,13 @@ def _branch_parents(previous: Mapping[str, ProofStep]) -> dict[str, str | None]:
         if step.rule is ProofRule.ASSUMPTION and step.inputs:
             source = previous.get(step.inputs[0])
             if source is not None:
-                parents.setdefault(step.branch, source.branch)
+                encoded_parent, separator, _ = step.branch.rpartition("/")
+                parents.setdefault(
+                    step.branch,
+                    encoded_parent
+                    if separator and step.branch.startswith("refutation/")
+                    else source.branch,
+                )
         elif step.rule is ProofRule.REFUTATION_ASSUMPTION:
             parents.setdefault(step.branch, None)
     return parents
@@ -481,7 +487,10 @@ def _check_step(
         if len(resolved_inputs) < 3:
             raise ProofCheckError(f"{step.id} is not a complete case-split conclusion")
         source = resolved_inputs[0]
-        if not isinstance(source.conclusion, Or) or source.branch != step.branch:
+        parents = _branch_parents(previous)
+        if not isinstance(source.conclusion, Or) or not _scope_is_accessible(
+            source.branch, step.branch, parents
+        ):
             raise ProofCheckError(f"{step.id} must split a disjunction in its scope")
         branch_results = resolved_inputs[1:]
         branches = tuple(item.branch for item in branch_results)
@@ -489,7 +498,7 @@ def _check_step(
             branches
         ):
             raise ProofCheckError(f"{step.id} must use distinct scoped branch results")
-        if not isinstance(step.conclusion, SpatialFormula) or any(
+        if not isinstance(step.conclusion, (SpatialFormula, Contradiction)) or any(
             item.conclusion != step.conclusion for item in branch_results
         ):
             raise ProofCheckError(f"{step.id} branches do not prove one conclusion")
@@ -508,7 +517,6 @@ def _check_step(
                     f"{step.id} has duplicate assumptions for one branch"
                 )
             assumptions_by_branch[assumption.branch] = assumption
-        parents = _branch_parents(previous)
         if (
             set(assumptions_by_branch) != set(branches)
             or any(parents.get(branch) != step.branch for branch in branches)
@@ -1107,6 +1115,76 @@ def _append_formula_contradiction(
     return None
 
 
+def _derive_contradiction_by_cases(
+    problem: SpatialProblem,
+    steps: list[ProofStep],
+    branch: str,
+    refutation_assumption: str,
+    used_disjunctions: frozenset[SpatialFormula] = frozenset(),
+) -> str | None:
+    """Close every branch of an accessible disjunction by contradiction."""
+    known = _saturate_formula_steps(steps, branch)
+    by_id = {step.id: step for step in steps}
+    for source, source_id in tuple(known.items()):
+        if not isinstance(source, Or) or source in used_disjunctions:
+            continue
+        if by_id[source_id].branch not in {None, branch}:
+            continue
+        attempt_start = len(steps)
+        contradictions = []
+        for index, operand in enumerate(source.operands, start=1):
+            child_branch = f"{branch}/case-{source_id}-{index}"
+            assumption_id = _fresh_step_id(steps, f"{child_branch}-A")
+            steps.append(
+                ProofStep(
+                    assumption_id,
+                    ProofRule.ASSUMPTION,
+                    operand,
+                    (source_id,),
+                    branch=child_branch,
+                )
+            )
+            _saturate_formula_steps(steps, child_branch)
+            contradiction_id = _append_formula_contradiction(
+                steps,
+                child_branch,
+                refutation_assumption,
+            )
+            if contradiction_id is None:
+                contradiction_id = _append_axis_contradiction(
+                    problem,
+                    steps,
+                    child_branch,
+                    refutation_assumption,
+                )
+            if contradiction_id is None:
+                contradiction_id = _derive_contradiction_by_cases(
+                    problem,
+                    steps,
+                    child_branch,
+                    refutation_assumption,
+                    used_disjunctions | {source},
+                )
+            if contradiction_id is None:
+                del steps[attempt_start:]
+                contradictions = []
+                break
+            contradictions.append(contradiction_id)
+        if contradictions:
+            conclusion_id = _fresh_step_id(steps, f"{branch}-CASE")
+            steps.append(
+                ProofStep(
+                    conclusion_id,
+                    ProofRule.CASE_SPLIT,
+                    Contradiction(),
+                    (source_id, *contradictions),
+                    branch=branch,
+                )
+            )
+            return conclusion_id
+    return None
+
+
 def _append_axis_decompositions(
     steps: list[ProofStep],
     branch: str | None = None,
@@ -1463,6 +1541,13 @@ def build_formula_refutation(
     contradiction_id = _append_formula_contradiction(steps, branch, assumption_id)
     if contradiction_id is None:
         contradiction_id = _append_axis_contradiction(
+            problem,
+            steps,
+            branch,
+            assumption_id,
+        )
+    if contradiction_id is None:
+        contradiction_id = _derive_contradiction_by_cases(
             problem,
             steps,
             branch,

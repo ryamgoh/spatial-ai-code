@@ -9,6 +9,7 @@ from typing import Any
 
 from spatial.v2.solver import (
     And,
+    CountAnalysis,
     CountQuery,
     Direction,
     DirectionAnalysis,
@@ -223,6 +224,7 @@ def measure_difficulty(
     x_support: set[int] = set()
     y_support: set[int] = set()
     membership_proofs: list[dict[str, Any]] = []
+    membership_statuses: dict[str, tuple[bool, bool]] = {}
 
     if isinstance(query, DirectionQuery):
         query_pair = {query.target, query.reference}
@@ -250,12 +252,16 @@ def measure_difficulty(
     else:
         assert isinstance(query, (WhichQuery, CountQuery))
         direct_query_relation = _has_direct_membership_fact(problem)
+        for candidate in query.candidates:
+            assessment = solver.assess(problem, membership_constraint(candidate, query))
+            membership_statuses[candidate] = (
+                assessment.possible,
+                assessment.entailed,
+            )
         if len(query.directions) == 1:
             direction = next(iter(query.directions))
             for candidate in query.candidates:
-                claim = membership_constraint(candidate, query)
-                assessment = solver.assess(problem, claim)
-                if not assessment.entailed:
+                if not membership_statuses[candidate][1]:
                     continue
                 proof = derive_axis_proof(
                     problem,
@@ -321,6 +327,19 @@ def measure_difficulty(
             support = retained
     membership_x_depths = [proof["x_depth"] for proof in membership_proofs]
     membership_y_depths = [proof["y_depth"] for proof in membership_proofs]
+    joint_count_dependency = False
+    if isinstance(analysis, CountAnalysis):
+        entailed_count = sum(
+            entailed for _, entailed in membership_statuses.values()
+        )
+        contingent_count = sum(
+            possible and not entailed
+            for possible, entailed in membership_statuses.values()
+        )
+        marginal_counts = set(
+            range(entailed_count, entailed_count + contingent_count + 1)
+        )
+        joint_count_dependency = set(analysis.possible_counts) != marginal_counts
     premise_count = len(units)
     return {
         "possibility_count": _possibility_count(analysis),
@@ -339,6 +358,7 @@ def measure_difficulty(
         "positive_axis_premise_indices": sorted(positive_support),
         "support_semantics": "jointly-sufficient-answer-and-membership",
         "support_checks_complete": support_checks_complete,
+        "joint_count_dependency": joint_count_dependency,
         "premise_indexing": "flattened-atoms"
         if conjunctive_atoms(problem.premise) is not None
         else "top-level-formulas",

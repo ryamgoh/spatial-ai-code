@@ -182,8 +182,13 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
             f"so {_formula_text(conclusion, labels, symbolic=False)} follows in that case."
         )
     if step.rule is ProofRule.CASE_SPLIT:
-        assert isinstance(conclusion, SpatialFormula)
         branches = ", ".join(step.inputs[1:])
+        if isinstance(conclusion, Contradiction):
+            return (
+                f"{scope}{step.id}: Every case from {step.inputs[0]} closes in "
+                f"contradiction via {branches}."
+            )
+        assert isinstance(conclusion, SpatialFormula)
         return (
             f"{scope}{step.id}: Every case from {step.inputs[0]} concludes "
             f"{_formula_text(conclusion, labels, symbolic=False)} via {branches}."

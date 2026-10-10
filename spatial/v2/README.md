@@ -28,6 +28,11 @@ The supported certificate acceptance contract is recorded in
   the selected tokenizer/template and rejects whole paired groups on overflow.
   Workload manifests report lengths and matching multipliers, not measured compute.
 - `difficulty.py` measures proof depth and support for workload controls.
+- `benchmark_registry.py` loads the taxonomy-level benchmark-cell registry,
+  validates its semantic and generator-policy declarations, and probes one
+  checked example per ready cell. `benchmark-cells.yaml` contains no quotas:
+  ready cells are executable coverage seeds, while any future blocked cells
+  must name their exact implementation prerequisites.
 - `generation.py` emits training rows only after certificate checking and text
   round-trip validation. Each row records its actual `world-first`, `proof-template-first`, or
   `premise-first` proposal route. The premise-first route samples visible
@@ -41,6 +46,7 @@ Run commands from the repository root, for example:
 
 ```bash
 python -m spatial.v2.generate_all --help
+python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe
 pytest spatial/v2 -q
 ```
 

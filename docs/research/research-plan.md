@@ -413,14 +413,14 @@ structural reasons.
 - Depth-controlled training stops at depth 4. Direction, Selection, and Count are
   tested separately at depths 1--8 with 100 clean examples per family-depth
   cell and one paired noisy counterpart per item. Depths 5--8 are extrapolation.
-  Paired Selection/Count distractors remain an implementation prerequisite.
+  Paired Count distractors remain an implementation prerequisite.
 - External evaluation uses SpatialMap-TQA-Corr, StepGame, Text2Space,
   SpartQA-Human, and ReSQ under their native semantics and metrics.
 - Every row receives formal checking. If `C` is the number of frozen reporting
-  cells, source-blinded review uses at least the larger of 2% of the selected
-  pool or `5C` examples, with at least five per cell. One
-  pinned OpenAI judge, one pinned Anthropic judge, and one human see only the
-  prompt and checked Natural trace.
+  cells, source-blinded review uses at least the larger of 2% of the formally
+  admitted maximum candidate pool or `5C` examples, with at least five per cell. Sequential isolated
+  `DeepSeek-V4-Pro` and `GPT-5.5` runs screen the prompt and checked Natural trace;
+  only unanimous rejections reach a payload-blinded human appeal.
 - SFT is the main study. GRPO is conditional future work.
 
 ## Evaluation commitments
@@ -471,6 +471,6 @@ low-priority KIV extension.
 - Held-out proof compositions and formula structures for the final test
 - Manual case-selection and checking protocol
 - Frozen inference prompts and decoding conditions
-- Version-pinned OpenAI and Anthropic judge identifiers
+- Frozen quality-judge prompt and any provider-exposed model revision metadata
 - Whether `ALL_POSSIBLE` belongs in the core benchmark
 - Go/no-go criteria and compute budget for RL

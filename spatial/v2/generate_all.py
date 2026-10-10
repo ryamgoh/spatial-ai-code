@@ -72,6 +72,7 @@ class WorkloadSpec:
     min_membership_depth: int = 1
     max_membership_depth: int | None = None
     distractor_premises: int = 0
+    require_joint_count_dependency: bool = False
     max_attempts_per_sample: int = 2_000
     dev_split: float = 0
     context_budget: ContextBudget | None = None
@@ -216,6 +217,7 @@ def generate_workload(
                     min_membership_depth=spec.min_membership_depth,
                     max_membership_depth=spec.max_membership_depth,
                     distractor_premises=spec.distractor_premises,
+                    require_joint_count_dependency=spec.require_joint_count_dependency,
                 )
             except ValueError as exc:
                 raise ValueError(
@@ -342,6 +344,7 @@ def main(
     min_membership_depth: int = typer.Option(1, min=1),
     max_membership_depth: int | None = typer.Option(None, min=1),
     distractor_premises: int = typer.Option(0, min=0),
+    require_joint_count_dependency: bool = typer.Option(False),
     max_attempts_per_sample: int = typer.Option(2_000, min=1),
     dev_split: float = typer.Option(0, min=0.0, max=0.999999),
     tokenizer_name: str | None = typer.Option(None),
@@ -401,6 +404,7 @@ def main(
                 min_membership_depth=min_membership_depth,
                 max_membership_depth=max_membership_depth,
                 distractor_premises=distractor_premises,
+                require_joint_count_dependency=require_joint_count_dependency,
                 max_attempts_per_sample=max_attempts_per_sample,
                 test_split=test_split,
                 dev_split=dev_split,

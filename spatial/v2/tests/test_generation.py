@@ -16,6 +16,7 @@ from spatial.v2.count_certificates import CountAnswerSetCertificate
 from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
 from spatial.v2.generation import (
     BooleanShape,
+    GenerationMode,
     GenerationPolicy,
     GenerationProvenance,
     MenuCoverage,
@@ -411,6 +412,88 @@ def test_boolean_curriculum_supports_membership_query_families(
         assert '"schema":"spatial-count-trace-v2"' in sample.trace
 
 
+def test_generator_targets_multiple_certain_selection() -> None:
+    sample = SpatialGeneratorV2(seed=1723).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.WHICH,
+            semantic_shape=SemanticShape.MULTIPLE_CERTAIN,
+            query_direction=Direction.EAST,
+            trace_format=TraceFormat.SYMBOLIC,
+            num_entities=6,
+            num_premises=5,
+        ),
+        max_attempts=100,
+    )
+
+    assert len(sample.analysis.entailed_entities) >= 2
+    assert sample.analysis.possible_entities == sample.analysis.entailed_entities
+    assert sample.resolution.status.value == "ambiguous"
+
+
+def test_multiple_certain_shape_is_selection_only() -> None:
+    with pytest.raises(ValueError, match="multiple-certain applies only to Which"):
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.MULTIPLE_CERTAIN,
+        )
+
+
+def test_generator_targets_joint_count_dependency() -> None:
+    sample = SpatialGeneratorV2(seed=1724).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.COUNT,
+            semantic_shape=SemanticShape.UNIQUE,
+            boolean_shape=BooleanShape.CASE_SPLIT,
+            generation_mode=GenerationMode.PROOF_TEMPLATE_FIRST,
+            query_direction=Direction.EAST,
+            trace_format=TraceFormat.SYMBOLIC,
+            num_entities=6,
+            num_premises=7,
+            require_joint_count_dependency=True,
+        ),
+        max_attempts=100,
+    )
+
+    assert sample.analysis.possible_counts == (1,)
+    assert sample.difficulty["joint_count_dependency"] is True
+    assert len(sample.certificate.fixed_memberships) < len(
+        sample.problem.query.candidates
+    )
+    assert parse_symbolic_training_trace(
+        sample.problem,
+        sample.trace,
+        sample.menu_answer,
+    ).reasoning is not None
+
+
+def test_joint_count_dependency_is_count_only() -> None:
+    with pytest.raises(ValueError, match="joint count dependency applies only to Count"):
+        GenerationPolicy(
+            query_kind=QueryKind.WHICH,
+            require_joint_count_dependency=True,
+        )
+
+
+def test_generator_supports_removable_selection_distractors() -> None:
+    sample = SpatialGeneratorV2(seed=1725).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.WHICH,
+            semantic_shape=SemanticShape.UNIQUE,
+            query_direction=Direction.EAST,
+            num_entities=7,
+            num_premises=9,
+            min_membership_depth=2,
+            max_membership_depth=2,
+            omit_direct_query_relation=True,
+            distractor_premises=2,
+        ),
+        max_attempts=100,
+    )
+
+    assert sample.difficulty["num_distractor_premises"] == 2
+    assert sample.analysis.possible_entities == sample.analysis.entailed_entities
+
+
 def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
     with pytest.raises(ValueError, match="require unique"):
         WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))
@@ -471,6 +554,32 @@ def test_controlled_direction_proofs_are_constructed_without_rejection() -> None
                 max_axis_depth=4,
                 distractor_premises=5,
             )
+        )
+        assert sample.attempt == 0
+        assert sample.rejection_counts == {}
+
+
+def test_exact_two_direction_ambiguity_is_constructed_without_rejection() -> None:
+    generator = SpatialGeneratorV2(seed=1725)
+
+    for _ in range(20):
+        sample = generator.generate(
+            GenerationPolicy(
+                query_kind=QueryKind.DIRECTION,
+                semantic_shape=SemanticShape.AMBIGUOUS,
+                ambiguity_size=2,
+                num_entities=6,
+                num_premises=5,
+            )
+        )
+        possibilities = set(sample.analysis.possible_directions)
+        assert possibilities in (
+            {Direction.NORTH, Direction.SOUTH},
+            {Direction.EAST, Direction.WEST},
+        )
+        assert (
+            sample.generation_provenance
+            is GenerationProvenance.PROOF_TEMPLATE_FIRST
         )
         assert sample.attempt == 0
         assert sample.rejection_counts == {}

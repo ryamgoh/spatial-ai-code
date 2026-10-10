@@ -39,6 +39,7 @@ from spatial.v2.grading import (
 from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.solver import (
     And,
+    CountAnalysis,
     CountQuery,
     Direction,
     DirectionAnalysis,
@@ -49,6 +50,7 @@ from spatial.v2.solver import (
     Or,
     QueryAnalysis,
     RelationConstraint,
+    SpatialFormula,
     SpatialProblem,
     SpatialSolverV2,
     WhichAnalysis,
@@ -125,6 +127,7 @@ class SemanticShape(str, Enum):
     ANY = "any"
     UNIQUE = "unique"
     AMBIGUOUS = "ambiguous"
+    MULTIPLE_CERTAIN = "multiple-certain"
     NO_MATCH = "no-match"
 
 
@@ -174,6 +177,7 @@ class GenerationPolicy:
     min_membership_depth: int = 1
     max_membership_depth: int | None = None
     distractor_premises: int = 0
+    require_joint_count_dependency: bool = False
     generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:
@@ -238,6 +242,25 @@ class GenerationPolicy:
             QueryKind.COUNT,
         }:
             raise ValueError("no-match is only realizable for Which queries")
+        if (
+            self.semantic_shape is SemanticShape.MULTIPLE_CERTAIN
+            and self.query_kind is not QueryKind.WHICH
+        ):
+            raise ValueError("multiple-certain applies only to Which queries")
+        if (
+            self.require_joint_count_dependency
+            and self.query_kind is not QueryKind.COUNT
+        ):
+            raise ValueError("joint count dependency applies only to Count queries")
+        if self.require_joint_count_dependency:
+            if self.semantic_shape is not SemanticShape.UNIQUE:
+                raise ValueError(
+                    "joint count dependency currently requires unique semantics"
+                )
+            if self.boolean_shape is not BooleanShape.CASE_SPLIT:
+                raise ValueError("joint count dependency requires case-split premises")
+            if self.num_entities < 3:
+                raise ValueError("joint count dependency requires at least three entities")
 
     def _validate_difficulty(self) -> None:
         if (
@@ -323,8 +346,16 @@ class GenerationPolicy:
     def _validate_distractor_control(self) -> None:
         if not 0 <= self.distractor_premises <= self.num_premises:
             raise ValueError("distractor_premises must be within the premise count")
-        if self.distractor_premises and self.query_kind is not QueryKind.DIRECTION:
-            raise ValueError("distractor controls currently require a Direction proof")
+        if self.distractor_premises and self.query_kind is QueryKind.COUNT:
+            raise ValueError("distractor controls do not yet support Count queries")
+        if (
+            self.distractor_premises
+            and self.query_kind is QueryKind.WHICH
+            and self.min_membership_depth <= 1
+        ):
+            raise ValueError(
+                "Selection distractors require controlled membership depth"
+            )
 
     def _validate_feasibility(self) -> None:
         maximum_depth = min(self.num_entities - 1, self.num_premises)
@@ -539,6 +570,10 @@ def _difficulty_matches(
             policy.distractor_premises
             and difficulty["num_distractor_premises"] != policy.distractor_premises
         )
+        or (
+            policy.require_joint_count_dependency
+            and not difficulty["joint_count_dependency"]
+        )
     ):
         return False
     if policy.min_membership_depth > 1 or policy.max_membership_depth is not None:
@@ -658,6 +693,7 @@ class SpatialGeneratorV2:
     ) -> GeneratedSpatialSample:
         objects = tuple(sorted(self._random.sample(ENTITY_NAMES, policy.num_entities)))
         boolean_problem = policy.boolean_shape is not BooleanShape.ATOMIC
+        exact_two_direction = self._uses_exact_two_direction_template(policy)
         controlled_direction = self._uses_controlled_direction(policy)
         controlled_membership = self._uses_controlled_membership(policy)
         use_templates = policy.generation_mode is not GenerationMode.WORLD_FIRST
@@ -665,8 +701,16 @@ class SpatialGeneratorV2:
             problem = self._premise_first_problem(policy, objects)
             coordinates = {}
             provenance = GenerationProvenance.PREMISE_FIRST
+        elif policy.require_joint_count_dependency:
+            problem = self._joint_count_problem(policy, objects)
+            coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         elif use_templates and boolean_problem:
             problem = self._boolean_problem(policy, objects)
+            coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
+        elif use_templates and exact_two_direction:
+            problem = self._exact_two_direction_problem(objects)
             coordinates = {}
             provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         elif use_templates and controlled_direction:
@@ -936,6 +980,101 @@ class SpatialGeneratorV2:
             raise _RetryGeneration("premise budget exceeds Boolean filler capacity")
         return SpatialProblem(objects, And(tuple(premises)), query)
 
+    def _joint_count_problem(
+        self,
+        policy: GenerationPolicy,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        """Construct an invariant Count whose memberships remain correlated."""
+        if policy.query_kind is not QueryKind.COUNT:
+            raise ValueError("joint count construction requires a Count query")
+        shuffled = list(objects)
+        self._random.shuffle(shuffled)
+        reference, first, second, *extras = shuffled
+        direction = policy.query_direction or self._random.choice(list(Direction))
+        first_member = _exact_relation(first, direction, reference)
+        second_member = _exact_relation(second, direction, reference)
+        premises: list[SpatialFormula] = [
+            Or(
+                (
+                    And((first_member, Not(second_member))),
+                    And((Not(first_member), second_member)),
+                )
+            ),
+            *(
+                Not(_exact_relation(candidate, direction, reference))
+                for candidate in extras
+            ),
+        ]
+        filler_pairs = list(combinations(objects, 2))
+        for index, (subject, filler_reference) in enumerate(filler_pairs):
+            if len(premises) == policy.num_premises:
+                break
+            filler = _exact_relation(
+                subject,
+                tuple(Direction)[index % len(Direction)],
+                filler_reference,
+            )
+            premises.append(Or((filler, Not(filler))))
+        if len(premises) != policy.num_premises:
+            raise _RetryGeneration("premise budget exceeds joint Count filler capacity")
+        return SpatialProblem(
+            objects,
+            And(tuple(premises)),
+            CountQuery(
+                frozenset({direction}),
+                reference,
+                tuple(candidate for candidate in objects if candidate != reference),
+            ),
+        )
+
+    @staticmethod
+    def _uses_exact_two_direction_template(policy: GenerationPolicy) -> bool:
+        return (
+            policy.query_kind is QueryKind.DIRECTION
+            and policy.semantic_shape is SemanticShape.AMBIGUOUS
+            and policy.ambiguity_size == 2
+            and policy.boolean_shape is BooleanShape.ATOMIC
+            and policy.num_entities >= 3
+            and policy.num_premises == policy.num_entities - 1
+        )
+
+    def _exact_two_direction_problem(
+        self,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        """Construct an atomic query with exactly two opposite possibilities.
+
+        The two queried objects are placed on the same known axis relative to a
+        shared pivot. Their order on the other axis is deliberately left open.
+        The remaining objects form a perpendicular chain, so they connect the
+        premise graph without resolving that open order.
+        """
+        shuffled = list(objects)
+        self._random.shuffle(shuffled)
+        target, reference, pivot, *extras = shuffled
+        uncertain_vertical = bool(self._random.getrandbits(1))
+        anchor_direction = (
+            Direction.NORTH if uncertain_vertical else Direction.EAST
+        )
+        filler_direction = (
+            Direction.EAST if uncertain_vertical else Direction.NORTH
+        )
+        relations = [
+            _exact_relation(target, anchor_direction, pivot),
+            _exact_relation(reference, anchor_direction, pivot),
+        ]
+        previous = pivot
+        for extra in extras:
+            relations.append(_exact_relation(extra, filler_direction, previous))
+            previous = extra
+        self._random.shuffle(relations)
+        return SpatialProblem(
+            objects,
+            And(tuple(relations)),
+            DirectionQuery(target, reference),
+        )
+
     @staticmethod
     def _uses_controlled_direction(policy: GenerationPolicy) -> bool:
         requested = policy.query_kind is QueryKind.DIRECTION and (
@@ -1194,7 +1333,10 @@ class SpatialGeneratorV2:
             for candidate in candidates
         }
         direction = policy.query_direction
-        if direction is None and policy.semantic_shape is SemanticShape.UNIQUE:
+        if direction is None and policy.semantic_shape in {
+            SemanticShape.UNIQUE,
+            SemanticShape.MULTIPLE_CERTAIN,
+        }:
             counts = {
                 candidate_direction: sum(
                     value is candidate_direction
@@ -1207,10 +1349,27 @@ class SpatialGeneratorV2:
                 for candidate_direction, count in counts.items()
                 if count == 1
             ]
-            if policy.query_kind is QueryKind.WHICH and not unique_directions:
+            if (
+                policy.query_kind is QueryKind.WHICH
+                and policy.semantic_shape is SemanticShape.UNIQUE
+                and not unique_directions
+            ):
                 raise _RetryGeneration("coordinate witness has no unique Which answer")
             if policy.query_kind is QueryKind.WHICH:
-                direction = self._random.choice(unique_directions)
+                available = (
+                    unique_directions
+                    if policy.semantic_shape is SemanticShape.UNIQUE
+                    else [
+                        candidate_direction
+                        for candidate_direction, count in counts.items()
+                        if count >= 2
+                    ]
+                )
+                if not available:
+                    raise _RetryGeneration(
+                        "coordinate witness has no multiple-certain Which answer"
+                    )
+                direction = self._random.choice(available)
             elif policy.min_membership_depth > 1:
                 positive_directions = [
                     candidate_direction
@@ -1232,6 +1391,14 @@ class SpatialGeneratorV2:
             != 1
         ):
             raise _RetryGeneration("requested Which direction is not unique in witness")
+        if (
+            policy.query_kind is QueryKind.WHICH
+            and policy.semantic_shape is SemanticShape.MULTIPLE_CERTAIN
+            and sum(value is direction for value in directions_by_candidate.values()) < 2
+        ):
+            raise _RetryGeneration(
+                "requested Which direction has fewer than two certain matches"
+            )
         direction_set = frozenset({direction})
         if policy.query_kind is QueryKind.WHICH:
             return WhichQuery(direction_set, reference, candidates)
@@ -1249,7 +1416,8 @@ class SpatialGeneratorV2:
             policy.omit_direct_query_relation or policy.min_membership_depth > 1
         )
         if (
-            policy.semantic_shape is SemanticShape.UNIQUE
+            policy.semantic_shape
+            in {SemanticShape.UNIQUE, SemanticShape.MULTIPLE_CERTAIN}
             and isinstance(query, (WhichQuery, CountQuery))
             and not controlled_membership
         ):
@@ -1339,6 +1507,12 @@ class SpatialGeneratorV2:
     def _shape_matches(analysis: QueryAnalysis, shape: SemanticShape) -> bool:
         if shape is SemanticShape.ANY:
             return True
+        if shape is SemanticShape.MULTIPLE_CERTAIN:
+            return (
+                isinstance(analysis, WhichAnalysis)
+                and len(analysis.entailed_entities) >= 2
+                and analysis.possible_entities == analysis.entailed_entities
+            )
         status = resolve_answer(analysis, AnswerMode.SINGLE).status
         expected = {
             SemanticShape.UNIQUE: ResolutionStatus.EXACT,

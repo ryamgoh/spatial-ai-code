@@ -47,6 +47,24 @@ decision, and Natural/answer-only process metrics were correctly inapplicable.
 These checks establish that the proposed experimental interfaces execute; they
 do not estimate LLM performance.
 
+The current no-quota benchmark registry contains thirteen representative cells,
+all marked ready after adding multiple-certain Selection admission,
+correlation-sensitive Count admission, and removable Selection distractors. A
+seed-1911 pilot generated and certificate-checked 50 examples per cell,
+producing 650 persisted rows with a content-hashed manifest. The generator made
+865 candidate attempts and rejected 215 proposals, for a 75.14% overall
+acceptance rate. A constructive atomic template raised `DIR-ARC-ALT` from 1.05%
+acceptance in the preceding pilot to 100% while retaining solver validation.
+
+A deterministic source-blinded sample contained five items from each cell.
+Sequential isolated `DeepSeek-V4-Pro` and `GPT-5.5` terminal-agent runs each
+returned 65 approvals and no rejections. Both receipts passed exact packet,
+item-ID, payload-hash, and rubric-field validation, so all 65 items were
+accepted and the human appeal queue was empty. These results concern the
+representative feasibility registry and automated Natural-trace screen only.
+They do not estimate human acceptability, determine the final allocation, or
+measure LLM task performance.
+
 The final nested 4K/8K/17K corpus, human-facing quality audit, and model training
 have not been executed. Their tables below are explicit placeholders rather
 than results; cell-level rows are added only after the taxonomy allocation is
@@ -57,7 +75,7 @@ frozen.
 #figure(
   table(
     columns: (auto, auto, auto, auto, auto),
-    table.header([*Query family*], [*Requested*], [*Accepted*], [*Rejected*], [*Human acceptable*]),
+    table.header([*Query family*], [*Requested*], [*Accepted*], [*Rejected*], [*Final review accept*]),
     [`DIR`], [—], [—], [—], [—],
     [`SEL`], [—], [—], [—], [—],
     [`CNT`], [—], [—], [—], [—],
@@ -173,7 +191,9 @@ does not reveal the model's hidden computation. Rank witnesses may be useful
 world-state scaffolds or arbitrary-completion noise; the ablation is intended to
 measure that trade-off rather than assume an outcome.
 
-Two seeds provide replication but weak seed-level uncertainty. Human and LLM
-readability judgements are source-blinded rather than classically double-blind.
+Two seeds provide replication but weak seed-level uncertainty. The LLM quality
+screen is source-blinded, while the human appeal is selected from unanimous
+rejections and therefore cannot estimate overall human acceptability or
+LLM–human agreement.
 External datasets differ in ontology, language, and answer contract, so their
 results support bounded transfer claims only.

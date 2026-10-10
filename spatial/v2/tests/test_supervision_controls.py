@@ -50,7 +50,10 @@ def test_answer_only_has_absent_process_instead_of_invalid_process():
         (kind, shape)
         for kind in QueryKind
         for shape in SemanticShape
-        if shape is not SemanticShape.NO_MATCH or kind is QueryKind.WHICH
+        if (
+            shape not in {SemanticShape.NO_MATCH, SemanticShape.MULTIPLE_CERTAIN}
+            or kind is QueryKind.WHICH
+        )
     ],
 )
 def test_corruption_changes_evidence_but_preserves_schema_and_gold_decision(
