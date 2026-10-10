@@ -1,19 +1,18 @@
-# Part II research plan: improving LLM spatial reasoning
+# SpatialEntail learning-study plan
 
 Status: living experimental plan
 
-This document develops the learning half of the project. It is subordinate to
-the main [`FYP research plan`](research-plan.md) and does not fix the
-dissertation chapter structure or experiment numbering.
+This document develops the learning study within the unified FYP pipeline. It
+is subordinate to the main [`FYP research plan`](research-plan.md) and does not
+define dissertation chapter numbering.
 
 ## Purpose
 
-Part I defines formal spatial semantics and tests them through the SpatialEval
-case study. Part II asks whether those semantics can improve spatial reasoning
-in LLMs.
-
-All new synthetic problem generation belongs to Part II. Part I only audits and
-relabels the existing SpatialEval questions.
+The project first defines and audits formal spatial semantics through the
+SpatialEval case study. SpatialEntail then asks whether supervision constructed
+under the same semantics improves spatial reasoning in LLMs. Released
+SpatialEval rows remain external evaluation data; all training problems are new
+solver-validated SpatialEntail examples.
 
 The formal system contributes to learning in three ways:
 
@@ -42,9 +41,9 @@ Supporting questions:
 6. How do gains change with data scale and structural difficulty?
 7. Does solver-verifiable RL add anything beyond strong SFT?
 
-## Required inputs from Part I
+## Required semantic inputs
 
-The main training study starts only after these artifacts are stable:
+The training study starts only after these artifacts are stable:
 
 - the qualitative spatial ontology and open-world semantics;
 - the validated solver and text round trip;
@@ -58,8 +57,8 @@ as SFT training data.
 ## Generation provenance
 
 The main research canvas distinguishes world-first, proof-template-first,
-certificate-first, and premise-first generation. Part II inherits that
-distinction:
+certificate-first, and premise-first generation. The learning study preserves
+that distinction:
 
 - world-first answers read from a privileged coordinate map are not valid gold
   labels;
@@ -75,9 +74,10 @@ distinction:
 
 Every track uses the same solver semantics, proof-checking boundary, and text
 round trip. Z3 supplies an independent answer oracle; it does not by itself
-supply the Natural or Symbolic trace. Coordinates may be retained as post-solve
-witnesses and considered as a separate trace arm, but they must not be the
-hidden source of both premises and labels.
+supply the Natural or Symbolic trace. Coordinates remain post-solve audit
+witnesses. The checked Symbolic core arm may render their qualitative rank
+compression; the 4B local-proof mechanism arm omits that global witness. Neither
+arm may read its label from a hidden generating map.
 
 ## Evaluation suites
 
@@ -94,11 +94,12 @@ modules and report each module directly.
 | Answer contracts | `SINGLE`, `ALL_POSSIBLE`, and diagnostic `VISIBLE_POSSIBLE` |
 | Propositional | Negation, disjunction, implication, equivalence, and mixed formulas |
 | Language shift | Held-out templates and entity-name domains |
-| External transfer | SpatialMap-TQA-Corr |
+| External transfer | SpatialMap-TQA-Corr, StepGame, Text2Space, SpartQA-Human, and ReSQ under their native contracts |
 
-Use a development suite for generator and prompt decisions, a validation split
-for checkpoint selection, and an untouched final test for reported claims. If
-RL is designed after SFT errors are inspected, reserve a separate RL holdout.
+Use development data for generator and prompt decisions, a validation split for
+checkpoint selection, and untouched final tests for reported claims. External
+datasets are never pooled into one aggregate score. If RL is designed after SFT
+errors are inspected, reserve a separate RL holdout.
 
 ## Baseline prompting study
 
@@ -187,13 +188,15 @@ Use the same underlying training problems and compare:
 | Untuned, prompt-matched | No parameter update |
 | Answer-only SFT | Final answer only |
 | Checked Natural SFT | Natural-language narration of checked steps and witnesses |
-| Checked Symbolic SFT | Replayable typed evidence and menu decision |
-| Corrupted Symbolic SFT | Invalid semantic evidence with the same gold answer |
+| Checked Symbolic SFT | Replayable typed evidence, qualitative rank witness, and menu decision |
+| Corrupted Symbolic SFT (4B only) | Invalid semantic evidence with the same gold answer |
+| Symbolic local-proof SFT (4B only) | Replayable local proof without the global qualitative rank witness |
 
-The answer-only arm controls for learning the task distribution and output
-format. Each reasoning-SFT arm must also be compared with the untuned model
-using the same inference instruction; otherwise training and prompting effects
-are confounded.
+The answer-only, checked Natural, and checked Symbolic arms run on
+`Qwen/Qwen3.5-2B` and `Qwen/Qwen3.5-4B` with training seeds 42 and 43. The two
+mechanism arms run only on 4B. This yields 12 central and four mechanism runs.
+The answer-only arm controls for task exposure and output format. Each trained
+arm is also compared with its prompt-matched untuned checkpoint.
 
 **Hypothesis:** at least one reasoning-trace condition will outperform
 answer-only SFT on structurally held-out problems, even if matched accuracy is
@@ -221,49 +224,25 @@ valid Symbolic evidence may improve over corrupted Symbolic evidence; Natural
 and Symbolic packages may trade off accuracy, output validity, and cost. All
 remain untested in the V2 pilot. No token-efficiency advantage is assumed.
 
-## SFT study 3: propositional training
+## Propositional coverage and composition holdout
 
-The core solver supports arbitrary finite propositional formulas over its
-spatial atoms, but the ordinary generator currently emits positive
-conjunctions. Treat richer logic as a separate track.
+The 17K pool includes explicit negation, disjunction, implication, equivalence,
+case split, and nested case split. Spatial proof depth, propositional depth, and
+branch count remain separate fields. Every primitive operator appears in
+training, while a separate 1,000-example premise-first test withholds selected
+formula trees and rule compounds. This is a composition holdout, not a claim of
+generalisation to unseen operators. The unchanged relational cells measure
+retention.
 
-### Evaluation modules
+## Data-size calibration
 
-- explicit negation;
-- disjunction and elimination;
-- implication, including invalid-converse controls;
-- equivalence;
-- mixed Boolean formulas;
-- unseen formula structures or greater Boolean depth; and
-- the unchanged core relational suite for retention.
-
-Track spatial proof depth and propositional depth separately. A problem may be
-spatially deep but propositionally shallow, or the reverse.
-
-### Controlled training comparison
-
-| Arm | Composition | Question answered |
-|---|---|---|
-| Core SFT | Fixed number of positive-conjunction examples | Baseline spatial learning |
-| Mixed SFT | Same total number, split between core and propositional examples | Effect of replacing some core data with logical diversity |
-| Optional volume control | Core-only data matched to the larger Core+Proposition row or token budget | Whether a gain comes from logic rather than more data |
-
-If an additive Core+Proposition model is trained without the volume control, it
-can identify the strongest model but not the causal value of propositional data.
-
-**Hypothesis:** mixed training will improve the propositional suites while
-retaining core relational performance. It need not improve the original
-SpatialEval case study, whose premises use a narrower language.
-
-Before trace SFT, propositional generation must support deterministic text
-round trips and replayed branch-scoped evidence. A satisfying coordinate model
-is evidence that a formula is possible; it is not by itself a valid CoT proof.
-
-## SFT study 4: data scale
-
-Use nested training sets so every smaller set is contained in the next. The
-working sizes are 1.5K and 6K, with a larger run only if the comparison retains
-headroom.
+Generate one stratified 17K base-problem pool with deterministic
+`4K ⊂ 8K ⊂ 17K` subsets. Calibrate checked Symbolic on both model sizes
+with seed 42. Select the smallest size for which the next size improves both
+macro answer accuracy and full Symbolic validity by less than two percentage
+points for both models. If 4K to 8K saturates, do not train 17K; otherwise 17K
+is the fallback when 8K to 17K does not saturate. Final test data are not used
+for this choice.
 
 **Hypothesis:** additional validated data will first improve matched accuracy,
 then plateau unless the added examples cover the structures responsible for
@@ -271,6 +250,20 @@ held-out errors.
 
 Scaling should use the selected representation. Do not multiply every data
 size by every exploratory trace condition.
+
+## Depth extrapolation and distractor robustness
+
+Depth-controlled training contains only depths 1--4 in every central arm,
+mechanism arm, and auxiliary demonstration. The frozen clean test has 100
+Direction, 100 Which, and 100 Count examples at each depth from 1 through 8,
+for 2,400 examples. Depths 1--4 are matched and depths 5--8 are extrapolative.
+Every clean item has one paired noisy counterpart with the same core problem
+and answer plus two solver-verified removable distractors, adding 2,400
+examples. Clean accuracy is the headline depth curve; the paired clean/noisy
+delta is reported separately as robustness.
+
+Any family-depth cell that cannot produce 100 context-admitted examples fails
+before freezing rather than being backfilled with a different depth or family.
 
 ## Answer-contract study
 
@@ -288,6 +281,22 @@ A fixed-budget comparison can contrast `SINGLE`-only training with a
 `SINGLE`/`ALL_POSSIBLE` mixture. Add `VISIBLE_POSSIBLE` training only if the
 diagnostic is important enough to justify another arm. Evaluate retention on
 `SINGLE` whenever broader answer contracts are introduced.
+
+## Source-blinded quality review
+
+Formal semantic, certificate, round-trip, split, menu, and context checks cover
+every selected row. Review uses the larger of 2% of the selected training pool
+or 85 examples, stratified with at least five examples from each of the 17 task
+buckets. The floor therefore binds when 4K is selected. One version-pinned
+OpenAI judge, one version-pinned Anthropic judge, and one human review the same
+sample independently. They see only the anonymized prompt and checked Natural
+trace; raw Symbolic quality remains parser- and replay-based.
+
+Release requires 100% automatic validity and at least 95% overall human
+acceptability. Two or more unacceptable samples in one task trigger revision
+and re-audit. If LLM-human kappa is below 0.60, automated judgements remain
+descriptive. This is source-blinded LLM judging with human calibration, not
+classical double-blind review.
 
 ## Optional RL study
 
@@ -314,7 +323,8 @@ retention.
   explicit cells before model selection for each structural generalisation claim.
 - Shuffle special and ordinary options together and report answer-position counts.
 - Hold model, training recipe, and decoding fixed within each comparison; select
-  checkpoints on development data only. Use repeated seeds for reported results.
+  checkpoints on development data only. Report seeds 42 and 43 separately, with
+  their mean and range.
 - Report strict exact-answer-set accuracy, cell macro-averages, paired changes,
   uncertainty, output validity, and token/resource costs.
 - Replay model-produced Symbolic evidence against the visible prompt. Report
@@ -341,21 +351,19 @@ prompt, and measures the remaining rendered completion including termination
 tokens against the generation limit. Raw assistant-text token counts alone do
 not capture that cost. Lossy or incompatible chat templates are rejected.
 
-## Implemented pilot and unrun studies
+## Implemented preparation and unrun studies
 
-`experiments/15-v2-ablation` wires four trained arms: checked Natural, checked
-Symbolic, answer-only, and corrupted Symbolic. Three prompt-matched untuned
-baselines are evaluation-only. The pilot uses unique depth-2 and two-way
-ambiguous Direction cells with three entities and two premises. Its configured
-limits are 4,096 training tokens, 8,192 evaluation-context tokens, and a 4,096-token
-generation reserve. Development and test each reserve 20% of base groups.
+The bounded integration pilot wires checked Natural, checked Symbolic,
+answer-only, and corrupted Symbolic artifacts plus prompt-matched evaluation
+views. It exercises unique depth-2 and two-way ambiguous Direction cells with
+three entities and two premises. Its configured limits are 4,096 training
+tokens, 8,192 evaluation-context tokens, and a 4,096-token generation reserve.
+This is solver and data-pipeline validation, not a named model experiment.
 
-This bounded configuration does not exercise all Which, Count, Boolean, transfer,
-or retention conditions described in the longer research plan. Retention is
-deferred until its prompt/scoring contract is integrated. Preparation and
-local smoke checks are software validation; SFT and model evaluation have not
-been run. See the experiment README for executable commands and the
-[remediation audit](../audits/critique-remediation.md) for implementation verification.
+The bounded configuration does not exercise the final Which, Count, Boolean,
+transfer, depth, or quality-review protocols. SFT and model evaluation have not
+been run. See the [remediation audit](../audits/critique-remediation.md) for the
+implemented verification evidence.
 
 The separate `matrix-premise-holdout.yaml` reserves premise-first IFF development
 cells and premise-first implication test cells against atomic training data.
@@ -375,22 +383,21 @@ failed admission and was narrowed equally across arms.
 
 ## Decision order
 
-1. Validate the generator and create a development pool.
-2. Calibrate structural cells with untuned LLMs.
-3. Freeze evaluation modules and prompts.
-4. Run the prompting baselines.
-5. Run answer-only, checked Natural/Symbolic, and corrupted Symbolic SFT.
-6. Run the propositional-data comparison.
-7. Scale only the selected training design.
-8. Test broader answer-contract training if it remains relevant.
-9. Attempt RL only after its go/no-go conditions pass.
+1. Generate and formally validate the nested 17K pool.
+2. Complete the source-blinded larger-of-2%-or-85 quality review.
+3. Freeze internal, depth, composition, and external evaluation artifacts.
+4. Freeze prompts and run the untuned baselines.
+5. Calibrate 4K/8K/17K checked Symbolic training with seed 42.
+6. Run the 12 central confirmatory SFT runs at the selected size.
+7. Run the four 4B mechanism runs.
+8. Evaluate matched, depth, composition, and external suites without retuning.
+9. Consider GRPO only after its go/no-go conditions pass.
 
 ## Open decisions
 
-- Final core and propositional evaluation cells
-- Dataset sizes and repeated-seed budget
-- Full factorial or staged representation comparison
-- Corpus-wide evidence mapping and Natural readability checks
-- Baseline LLMs and frozen prompting conditions
+- Exact held-out formula trees and rule compounds
+- Version-pinned judge model identifiers and frozen judge prompt
+- Frozen inference prompts and decoding settings
+- Corpus-wide evidence mapping and token-cost audit
 - Whether `ALL_POSSIBLE` is a core training objective
 - RL calibration thresholds and compute budget

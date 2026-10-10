@@ -1,8 +1,9 @@
 # FYP report
 
-This directory contains the buildable Typst dissertation draft. Part II methods
-are drafted from the current implementation; V2 SFT and model-evaluation results
-are explicitly marked as not run.
+This directory contains the buildable Typst dissertation draft. The report uses
+one seven-chapter narrative from benchmark diagnosis through SpatialEntail and
+its predeclared learning study. SFT, transfer, and quality-review results are
+explicitly marked as not run.
 
 ## Build
 
@@ -20,9 +21,15 @@ The generated `fyp-report/report.pdf` is ignored by Git.
 | --- | --- |
 | `report.typ` | Project metadata, global formatting, and document assembly |
 | `frontmatter/` | Cover, title page, abstract, acknowledgements, and contents |
-| `chapters/` | Sequentially numbered main-matter chapters |
+| `chapters/01-introduction.typ` | Motivation, scope, research questions, and contributions |
+| `chapters/02-related-work.typ` | Text spatial benchmarks, structured traces, maps, and verified reasoning |
+| `chapters/03-problem-formulation.typ` | All-model semantics and the SpatialEval diagnosis |
+| `chapters/04-spatialentail-method.typ` | Solver, certificates, provenance, curriculum, and admission |
+| `chapters/05-experimental-design.typ` | Models, supervision arms, depth ladder, transfer, and quality protocol |
+| `chapters/06-results-discussion.typ` | Completed audit evidence and frozen placeholders for unrun experiments |
+| `chapters/07-conclusion.typ` | Claims, limits, and remaining empirical work |
 | `figures/` | Reusable Typst diagram definitions and shared diagram styling |
-| `appendices/` | Appendices named by their actual subject |
+| `appendices/` | Formal correctness, dataset records, frozen configuration, and additional results |
 | `docs/` | Report-authoring notes such as the Typst diagram-package comparison |
 | `references.bib` | Bibliography used by the report |
 | `reference/` | Official formatting guidance and other non-source references |

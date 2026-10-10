@@ -1,108 +1,98 @@
 #pagebreak(weak: true)
 = Introduction
 
-== Background
+== Motivation
 
-Spatial reasoning requires a model to represent objects, preserve their
-relative positions, and compose relationships across multiple statements. In a
-language-only setting, the model cannot inspect the environment directly. It
-must reason from the information expressed in the prompt. This makes textual
-spatial tasks useful for studying reasoning independently of visual perception,
-object detection, and image grounding.
+Spatial reasoning from language requires a model to identify objects, preserve
+their relative positions, and compose relationships across several statements.
+Unlike visual spatial intelligence, this setting removes object detection and
+image grounding: the answer must follow from the information stated in text.
+It is therefore useful for studying reasoning, intermediate representations,
+and generalisation without conflating them with perception.
 
-Recent spatial-intelligence research increasingly includes images, video, 3D
-scenes, and embodied interaction. These settings are important, but they make
-it difficult to determine whether an error arose from perception or reasoning.
-This project focuses on large language models and qualitative spatial
-descriptions. Its formal domain uses eight compass directions over a finite set
-of named locations. Problems do not provide coordinates, distances, or metric
-measurements.
+Reliable evaluation requires more than an answer that is true in one hidden
+map. A benchmark may generate a complete world, expose only part of it as text,
+and retain an answer derived from the complete world. That answer is possible,
+but it is not necessarily entailed by the information available to the model.
+Scoring it as uniquely correct rewards guessing omitted state rather than
+reasoning from evidence.
 
-Reliable evaluation requires more than a plausible answer. A benchmark may be
-constructed from a complete latent map while exposing only a partial textual
-description to the model. An answer can be true in the latent map without being
-entailed by the text. Treating that answer as uniquely correct conflates
-spatial reasoning with guessing information that was never presented. This is
-not the ordinary closed-world rule that unrecorded claims are false; it is a
-mismatch between truth in one privileged latent world and entailment from the
-evidence available to the model.
+This project studies one formal response to that problem. It defines
+qualitative two-dimensional relations over finite named objects, interprets
+answers across every spatial world satisfying the visible premises, and uses
+the resulting semantics both to audit an existing benchmark and to construct
+checked supervision for large language models.
 
-== Problem and Objectives
+== Problem and Scope
 
-SpatialEval Spatial-Map TQA is the first case study in this work. Its released
-questions describe map relationships in text and provide four answer options.
-The public release contains generated data and evaluation code, but not the
-Spatial-Map generator. Consequently, the original latent coordinates and any
-undocumented generation assumptions cannot be reconstructed directly.
+SpatialEval Spatial-Map TQA is the motivating case study. Its 1,500 released
+text questions comprise Direction, Which, and Count queries. The source map is
+not available in the release, so this work does not attempt to recover it.
+Instead, it asks what follows from the released text under a declared
+open-world semantics: unstated relationships remain unknown, a candidate is
+possible when some satisfying map supports it, and it is entailed only when
+every satisfying map supports it.
 
-This project instead asks what follows from the released text under an explicit
-formal semantics. Unstated relationships are treated as unknown rather than
-false. Every complete spatial model satisfying the premises is considered. A
-candidate answer is possible when it holds in at least one such model and is
-entailed when it holds in all of them. If two satisfying models give different
-answers, the question does not have one textually determined answer under a
-single-answer contract.
+The same semantics underlies SpatialEntail, a controlled data and evaluation
+framework over all eight compass directions and finite Boolean combinations of
+spatial atoms. SpatialEntail generates typed answer certificates, renders
+Natural and Symbolic supervision, checks Symbolic model output by replay, and
+records constructive witnesses for audit. The project is text-only and does not
+claim unrestricted spatial language understanding, metric geometry, visual
+grounding, or embodied navigation.
 
-The project has four objectives:
+== Research Questions
 
-+ Define a qualitative spatial semantics for exact compass relations,
-  incomplete information, and finite propositional combinations of spatial
-  claims.
-+ Validate a solver that decides consistency, possibility, and entailment and
-  returns coordinate witnesses for audit purposes.
-+ Audit the untouched SpatialMap-TQA release and derive
-  SpatialMap-TQA-Corr by adding an explicit _Cannot be determined_ option where
-  the text does not entail one answer.
-+ Use the same semantics to construct SpatialEntail and test whether prompting,
-  supervised fine-tuning, reasoning representation, and optional
-  solver-verifiable reinforcement learning improve spatial reasoning in LLMs.
+The report addresses three questions.
 
-The main research question is:
-
-#quote[
-  Can formal spatial semantics improve both the validity of spatial-reasoning
-  benchmarks and the spatial reasoning learned by large language models?
-]
+#figure(
+  table(
+    columns: (auto, 1fr),
+    inset: (x: 7pt, y: 5pt),
+    stroke: .5pt + luma(120),
+    fill: (_, y) => if y == 0 { luma(235) } else { none },
+    table.header([*RQ*], [*Question*]),
+    [RQ1], [How does SpatialMap evaluation change when answers are defined over all worlds satisfying the visible premises rather than one latent generating world?],
+    [RQ2], [Do replay-checked reasoning traces improve answer accuracy and structural generalisation over answer-only and invalid-reasoning supervision?],
+    [RQ3], [How do Natural versus Symbolic traces, and local proofs versus proof-plus-rank-witness traces, affect accuracy, process validity, cost, and transfer?],
+  ),
+  caption: [Research questions linking benchmark validity, checked supervision, and representation.],
+) <research-questions>
 
 == Contributions
 
-First, this work separates truth in one selected map from entailment across all
-maps consistent with a prompt. The formal model represents each compass
-relation through X- and Y-axis comparisons and supports negation, conjunction,
-disjunction, implication, and equivalence. Satisfiability determines whether a
-claim is possible; unsatisfiability of its negation determines whether it is
-entailed.
+First, the project separates latent-world truth from textual entailment. Its
+solver represents each exact compass direction through X- and Y-axis
+comparisons, supports `NOT`, `AND`, `OR`, implication, and equivalence, and
+distinguishes consistency, possibility, entailment, ambiguity, and
+impossibility.
 
-Second, the formal model is applied to SpatialMap-TQA without modifying the
-original benchmark. The audit preserves each published question and oracle,
-classifies its answer status, and constructs alternative witnesses where the
-text admits more than one answer. SpatialMap-TQA-Corr is stored separately and
-adds a fifth option for questions that are undetermined under the declared
-single-answer semantics.
+Second, the semantics is applied to the untouched SpatialMap-TQA release. The
+audit preserves every published question and oracle, checks complete candidate
+domains, and records counter-witnesses where several answers remain possible.
+The corrected evaluation view adds an explicit _Cannot be determined_ option
+without overwriting the released benchmark.
 
-Third, the project introduces SpatialEntail as a controlled benchmark for LLM
-spatial reasoning. It extends the task to all eight compass directions,
-Direction, Which, and Count queries, explicit answer contracts, and measured
-structural difficulty. Generated questions are accepted only after they are
-rendered, parsed back into the formal representation, and solved again.
+Third, SpatialEntail turns the same formal contract into a generation and
+supervision pipeline. Accepted problems are solved, certificate-checked,
+rendered, parsed back, and re-solved. They carry explicit construction
+provenance, structural signatures, measured difficulty, and exact tokenizer
+admission metadata.
 
-Finally, the project uses SpatialEntail to compare direct and structured
-prompting, answer-only supervision, Natural reasoning traces, Symbolic
-reasoning traces, and proof-structure ablations. These comparisons are designed
-to determine whether intermediate reasoning supervision improves held-out
-spatial structure rather than only teaching answer format. A later
-reinforcement-learning experiment is conditional on the supervised model
-leaving sufficient headroom and producing usable reward variance.
+Finally, the planned learning study compares answer-only, checked Natural,
+checked Symbolic, corrupted Symbolic, and query-local Symbolic supervision over
+Qwen3.5-2B and Qwen3.5-4B. It separates matched interpolation, unseen-depth
+extrapolation, held-out formula composition, and external transfer. The model
+experiments remain unrun in this draft; implementation checks are not presented
+as learning results.
 
-== Report Structure
+== Report Organization
 
-The report is organised in two parts. The first develops the formal semantics,
-validates the solver, documents the end-to-end system architecture, and uses
-SpatialEval as a case study in benchmark auditing and correction. The second
-constructs SpatialEntail and evaluates prompting, supervised fine-tuning,
-reasoning representations, structural generalisation, and, if justified by the
-supervised results, reinforcement learning.
-
-This organisation follows the central methodological link of the project: the
-same semantics first determines what a benchmark may validly score and then
-determines what labels, traces, and rewards may be used to train an LLM.
+Chapter 2 positions the work against textual spatial benchmarks, spatial
+traces, explicit maps, and verified reasoning. Chapter 3 defines the formal
+problem and SpatialEval diagnosis. Chapter 4 presents SpatialEntail's solver,
+certificates, generator, difficulty taxonomy, and supervision views. Chapter 5
+predeclares the model, data, quality-review, and evaluation protocols. Chapter
+6 reports completed audit and artifact evidence and reserves the frozen model
+result analyses. Chapter 7 concludes. Formal proofs, complete artifact examples,
+configuration details, and extended results are placed in appendices.

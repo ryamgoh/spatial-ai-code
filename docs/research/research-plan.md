@@ -2,7 +2,7 @@
 
 Status: working research direction, not a fixed paper outline
 
-Last updated: 7 October 2026
+Last updated: 10 October 2026
 
 Raw contribution notes:
 [`What this project is trying to do`](../notes/raw-contribution-notes.md)
@@ -36,7 +36,7 @@ Use these terms consistently in experiments and the report:
 | `SpatialEntail` | The benchmark as a whole | “evaluated on SpatialEntail” |
 | Pilot | Preliminary data used to calibrate generation, difficulty, and protocols | SpatialEntail Pilot |
 | Suite | A fixed evaluation module | Core, Propositional, Depth, Ambiguity |
-| Arm | One prompting, training, or RL condition | Answer-Only, Checked Natural, Checked Symbolic, Mixed-SFT |
+| Arm | One prompting, training, or RL condition | Answer-Only, Checked Natural, Checked Symbolic, Symbolic Local Proof |
 | Version | Public artifact identity, used only when needed for reproducibility | SpatialEntail v1.0 |
 
 Do not rename the benchmark for each ablation. Natural/Symbolic traces, state
@@ -104,10 +104,10 @@ a verifier    -> score exact outcomes during optional RL
 ```
 
 Coordinates must not be a privileged hidden source from which both premises and
-gold answers are read. They remain valid post-solve existence certificates and
-may become a separately named trace arm if a pilot shows that coordinate-bearing
-supervision is useful. The current Natural and Symbolic traces remain
-coordinate-free by default; whether to add a coordinate-witness arm is open.
+gold answers are read. Numeric coordinates remain post-solve audit certificates,
+not SFT targets. The checked Symbolic arm may expose a qualitative rank-compressed
+witness; a 4B-only local-proof arm omits that witness. This comparison is limited
+to unique or entailed cells for which both targets are well-defined.
 
 ## Generation provenance: world-first, proof-template-first, certificate-first,
 and premise-first
@@ -341,8 +341,7 @@ predeclared holdout cells and a distribution audit after context admission.
 - How often does premise-first sampling yield concise replayable proofs?
 - How often does proof-template-first construction admit an unintended shorter proof?
 - What semantic-class imbalance appears before solve-and-bucket admission?
-- Do coordinate-witness traces add value beyond coordinate-free Natural and
-  Symbolic traces?
+- Does a qualitative rank witness add value beyond query-local Symbolic proof?
 - How much performance survives held-out formula trees and proof-rule
   compositions?
 - Should problems without a concise extracted proof remain answer-only
@@ -351,17 +350,18 @@ predeclared holdout cells and a distribution audit after context admission.
 ## Data boundary
 
 ```text
-Part I: released SpatialEval questions
-        -> semantic audit
-        -> separately stored SpatialMap-TQA-Corr labels and option E
+evaluation stream: released SpatialEval questions
+                   -> semantic audit
+                   -> separately stored SpatialMap-TQA-Corr labels and option E
 
-Part II: newly generated, solver-validated questions
-         -> prompting, SFT, ablations, and optional RL
+learning stream: newly generated, solver-validated SpatialEntail questions
+                 -> prompting, SFT, ablations, and optional RL
 ```
 
-Part I does not generate new spatial questions. Its coordinate witnesses are
-audit evidence for alternative models of the existing text. SpatialMap-TQA-Corr preserves
-the released 1,500 questions and derives a new evaluation view from them.
+The evaluation stream does not generate new spatial questions. Its coordinate
+witnesses are audit evidence for alternative models of the existing text.
+SpatialMap-TQA-Corr preserves the released 1,500 questions and derives a new
+evaluation view from them.
 
 ## Main research question
 
@@ -385,19 +385,37 @@ The first five questions form the intended study. RL is optional.
 
 Detailed plans:
 
-- [`Part I: evaluating LLM spatial reasoning`](part-1-evaluation.md)
-- [`Part II: improving LLM spatial reasoning`](part-2-training.md)
+- [`SpatialEval evaluation stream`](part-1-evaluation.md)
+- [`SpatialEntail learning study`](part-2-training.md)
 
 | Study | Design | Question answered |
 |---|---|---|
 | Formal validation and SpatialEval | Prove and validate the encoding; audit the untouched four-option release; validate counter-witnesses; create a separate five-option correction; compare general, reasoning, and compatible spatially fine-tuned LLMs on original, corrected, entailed-only, and ambiguous-only views | Does formal semantics expose consequential ambiguity and change conclusions about LLM capability? |
 | Benchmark calibration and prompting | Generate a development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, Natural-axis, and Symbolic-axis prompts; then freeze the benchmark | Is the benchmark valid, solvable, non-saturated, and structurally discriminative? |
-| SFT and representation | Compare prompt-matched untuned, answer-only, Natural, and Symbolic models on paired problems backed by the same certificate | Do checked reasoning traces add value beyond task exposure, and which representation works best? |
-| Generalisation, scale, and optional RL | Evaluate held-out structures and corrected-SpatialEval transfer; scale nested SFT data while informative; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains generalise, and does RL add anything beyond supervised optimisation? |
+| SFT and representation | Compare answer-only, checked Natural, and checked Symbolic on Qwen3.5-2B and Qwen3.5-4B; run corrupted Symbolic and Symbolic local-proof mechanisms on 4B | Do checked traces add value beyond task exposure, does evidence validity matter, and does a global qualitative witness help? |
+| Generalisation, scale, and optional RL | Calibrate nested 4K/8K/17K training; test matched cells, depth 1--8, held-out formula compositions, and five external datasets; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains extrapolate beyond training depth and construction families, and does RL add anything beyond supervised optimisation? |
 
 Difficulty is not an end in itself. The benchmark should contain solvable,
 discriminative, and hard cells whose performance changes for identifiable
 structural reasons.
+
+### Frozen learning-study design
+
+- The full pool contains four capability tiers, 17 task buckets, and 17,000
+  base problems, with deterministic nested 4K and 8K subsets.
+- The central arms are answer-only, checked Natural, and checked Symbolic on
+  Qwen3.5-2B and Qwen3.5-4B with seeds 42 and 43. Corrupted Symbolic and
+  Symbolic local proof are 4B-only mechanism arms: 16 confirmatory runs total.
+- Depth-controlled training stops at depth 4. Direction, Which, and Count are
+  tested separately at depths 1--8 with 100 clean examples per family-depth
+  cell and one paired noisy counterpart per item. Depths 5--8 are extrapolation.
+- External evaluation uses SpatialMap-TQA-Corr, StepGame, Text2Space,
+  SpartQA-Human, and ReSQ under their native semantics and metrics.
+- Every row receives formal checking. Source-blinded review uses the larger of
+  2% of the selected pool or 85 examples, with at least five per task. One
+  pinned OpenAI judge, one pinned Anthropic judge, and one human see only the
+  prompt and checked Natural trace.
+- SFT is the main study. GRPO is conditional future work.
 
 ## Evaluation commitments
 
@@ -414,7 +432,9 @@ structural reasons.
   fixes/regressions as secondary diagnostics.
 - Decompose Symbolic process validity into replayable reasoning, checked menu
   decision, cross-record domain agreement, and fully valid trace rates.
-- Report uncertainty across items and training seeds for main comparisons.
+- Report seeds 42 and 43 separately, with their mean and range; use paired
+  item-level bootstrap intervals within each seed rather than a strong
+  seed-level confidence claim.
 - Treat `SINGLE` as the primary contract, `ALL_POSSIBLE` as a strict set-valued
   extension, and `VISIBLE_POSSIBLE` as a menu-relative diagnostic.
 
@@ -441,15 +461,10 @@ low-priority KIV extension.
 
 - Final wording of the title and central claim
 - Final collision check and approval of the provisional `SpatialEntail` name
-- Exact scope of the propositional challenge track
-- Final proof-certificate schema and primitive rule vocabulary
 - Pilot balance between proof-template-first and premise-first generation
-- Whether coordinate witnesses become a distinct trace arm
 - Held-out proof compositions and formula structures for the final test
 - Manual case-selection and checking protocol
-- Baseline LLMs and prompting conditions
-- Final benchmark cells and sample counts
-- Training scales and number of repeated seeds
-- Full factorial or staged representation ablation
+- Frozen inference prompts and decoding conditions
+- Version-pinned OpenAI and Anthropic judge identifiers
 - Whether `ALL_POSSIBLE` belongs in the core benchmark
 - Go/no-go criteria and compute budget for RL

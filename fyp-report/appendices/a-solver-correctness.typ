@@ -175,6 +175,54 @@ formula. Answer modes such as `SINGLE` are deterministic policies over these
 exact possibility and entailment results; they are not part of the spatial
 encoding theorem.
 
+#heading(level: 2, numbering: none)[Reproducible SpatialEval Countermodel]
+
+Chapter 3 summarizes released item `spatialmap.tqa.2003.0`. For reproducibility,
+let R denote Recycle Center, S Sally's Salon, A Andy's Autos, U Unicorn
+Umbrellas, N Nightingale Novelties, and T Trail Hiking Gear. Apart from declaring
+R to be in the map, the released text contains these nine premises:
+
+#figure(
+  table(
+    columns: (auto, auto, auto, auto),
+    table.header([*No.*], [*Subject*], [*Relation*], [*Reference*]),
+    [1], [S], [Southeast], [R],
+    [2], [A], [Northwest], [S],
+    [3], [A], [Southeast], [R],
+    [4], [U], [Northwest], [S],
+    [5], [U], [Southwest], [A],
+    [6], [N], [Southwest], [A],
+    [7], [N], [Southwest], [S],
+    [8], [T], [Southeast], [R],
+    [9], [T], [Southwest], [S],
+  ),
+  caption: [Released relational premises for the paired-countermodel example.],
+) <appendix-spatialeval-counterexample-premises>
+
+The question asks for R relative to N. Both assignments below satisfy every
+premise, but they give different answers to that query.
+
+#figure(
+  table(
+    columns: (auto, auto, auto),
+    table.header([*Location*], [*Northeast witness*], [*Northwest witness*]),
+    [R], [$ (1,5) $], [$ (0,5) $],
+    [S], [$ (4,2) $], [$ (5,2) $],
+    [A], [$ (3,4) $], [$ (4,4) $],
+    [U], [$ (2,3) $], [$ (3,3) $],
+    [N], [$ (0,0) $], [$ (1,0) $],
+    [T], [$ (2,1) $], [$ (2,1) $],
+  ),
+  caption: [Two coordinate assignments satisfying the same released text.
+    They certify existence and are not recovered generator coordinates.],
+) <appendix-spatialeval-counterexample-coordinates>
+
+For example, S is southeast of R in both assignments. Applying the same two-axis
+check to the remaining eight rows validates the complete text. The first
+assignment has $R=(1,5)$ and $N=(0,0)$, so R is northeast of N; the second has
+$R=(0,5)$ and $N=(1,0)$, so R is northwest of N. The pair therefore proves
+non-uniqueness without claiming access to the hidden source map.
+
 #heading(level: 2, numbering: none)[Implementation Proposition: Propagation Safety]
 
 Let $"Req"(P)$ contain only positive relation atoms that occur as required

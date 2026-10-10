@@ -1,6 +1,6 @@
 # SpatialEntail annotated primary-source ledger
 
-*Checked through 7 October 2026. This is a report-writing ledger, not a claim
+*Checked through 10 October 2026. This is a report-writing ledger, not a claim
 that the search proves universal priority.*
 
 ## How to use this ledger
@@ -19,10 +19,10 @@ verified. `Preprint` means that this ledger verified an arXiv disclosure but not
 a peer-reviewed publication. An absence statement means “not found in the
 bounded primary-source search through the date above,” never “does not exist.”
 
-## Coverage of the current research-landscape chapter
+## Coverage of the current related-work chapter
 
-All 19 keys currently cited in
-`fyp-report/chapters/02-research-landscape.typ` resolve in
+The keys currently cited in
+`fyp-report/chapters/02-related-work.typ` resolve in
 `fyp-report/references.bib`.
 
 | Current key | Source | Group below |
@@ -32,19 +32,20 @@ All 19 keys currently cited in
 | `mirzaee2022spartun` | SpaRTUN / ReSQ | Text-only benchmarks |
 | `wang2024spatialeval` | SpatialEval | Text-only benchmarks |
 | `bai2026soda` | SODA / SPOD-143k | Text-only benchmarks |
-| `guo2026sitbench` | SiT-Bench | Text-only benchmarks |
 | `jiang2026spatialtext` | SpatialText | Text-only benchmarks |
 | `pan2026mentalmap` | MentalMap | Text-only benchmarks |
-| `mirzaee2023pistaq` | PistaQ | Verified paths and traces |
 | `rizvi2024sparp` | SpaRC / SpaRP | Verified paths and traces |
 | `premsri2025neurosymbolic` | Neuro-symbolic spatial training | Verified paths and traces |
 | `zhou2024graphsynthetic` | Graph-based synthetic reasoning data | Verified paths and traces |
 | `hu2024chainofsymbol` | Chain-of-Symbol | Verified paths and traces |
+| `huang2026text2space` | Text2Space | Maps and systematic generalisation |
+| `sinha2019clutrr` | CLUTRR | Maps and systematic generalisation |
+| `keysers2020cfq` | CFQ | Maps and systematic generalisation |
+| `tong2026shortestpath` | Shortest-path generalisation | Maps and systematic generalisation |
 | `tafjord2021proofwriter` | ProofWriter | Proof-first / theory-first generation |
 | `saparov2023prontoqa` | PrOntoQA | Proof-first / theory-first generation |
 | `lyu2023faithfulcot` | Faithful Chain-of-Thought | Formal verification / proof-carrying |
 | `poesia2024logicguide` | LogicGuide | Formal verification / proof-carrying |
-| `li2025pcrllm` | PCRLLM | Formal verification / proof-carrying |
 | `bhat2026interwhen` | `interwhen` | Newest direct counterclaims |
 
 ## Reference-file metadata corrections applied
@@ -390,6 +391,73 @@ before the report was recompiled.
 - **Suggested placement:** Trace representation; prompting baselines; novelty
   limitation.
 - **BibTeX key:** Existing, corrected `hu2024chainofsymbol`.
+
+## Explicit maps and systematic generalisation
+
+### Text2Space
+
+- **Full citation and status:** Shiyuan Huang, Li Liu, Jincheng He, and Leilani
+  H. Gilpin. “Learning to Draw ASCII Improves Spatial Reasoning in Language
+  Models.” arXiv:2604.14641, 2026. **Preprint.**
+  [arXiv](https://arxiv.org/abs/2604.14641).
+- **What it did:** Fine-tuned language models to construct ASCII spatial layouts
+  from descriptions and evaluated whether explicit construction improves later
+  text-only question answering.
+- **Supports:** A direct explicit-map SFT precedent and the empirical distinction
+  between reading a supplied map and constructing one.
+- **Safe report claim:** “Text2Space shows that explicit layout construction can
+  be trained and that map construction is harder than reading a supplied map.”
+- **Does not support / avoid:** One generated layout is not a complete certificate
+  for all models of an underdetermined prompt.
+- **Relationship to SpatialEntail:** Motivates the proof-plus-rank-witness versus
+  local-proof mechanism comparison.
+- **BibTeX key:** Existing `huang2026text2space`.
+
+### CLUTRR
+
+- **Full citation and status:** Koustuv Sinha, Shagun Sodhani, Jin Dong, Joelle
+  Pineau, and William L. Hamilton. “CLUTRR: A Diagnostic Benchmark for Inductive
+  Reasoning from Text.” EMNLP-IJCNLP 2019. **Published.**
+  [ACL Anthology](https://aclanthology.org/D19-1458/).
+- **What it did:** Tested relational reasoning across family-story chains,
+  including longer chains and held-out combinations beyond training.
+- **Supports:** Separating length extrapolation and compositional holdouts from
+  ordinary same-distribution evaluation.
+- **Does not support / avoid:** Kinship composition is not evidence that a
+  spatial certificate format will generalise.
+- **Relationship to SpatialEntail:** Precedent for explicit structural holdouts.
+- **BibTeX key:** Existing `sinha2019clutrr`.
+
+### CFQ
+
+- **Full citation and status:** Daniel Keysers et al. “Measuring Compositional
+  Generalization: A Comprehensive Method on Realistic Data.” ICLR 2020.
+  **Published.** [OpenReview](https://openreview.net/forum?id=SygcCnNKwr).
+- **What it did:** Introduced maximum-compound-divergence splits that retain
+  primitive coverage while separating their compositions.
+- **Supports:** Withholding formula trees and rule compounds while keeping every
+  primitive operator visible during training.
+- **Does not support / avoid:** MCD is not itself a spatial-depth measure and
+  does not replace a separately controlled depth ladder.
+- **Relationship to SpatialEntail:** Methodological precedent for the
+  premise-first composition holdout.
+- **BibTeX key:** Existing `keysers2020cfq`.
+
+### Shortest-path generalisation
+
+- **Full citation and status:** Yao Tong, Jiayuan Ye, Anastasia Borovykh, and
+  Reza Shokri. “Generalization in LLM Problem Solving: The Case of the Shortest
+  Path.” arXiv:2604.15306, 2026. **Preprint.**
+  [arXiv](https://arxiv.org/abs/2604.15306).
+- **What it did:** Distinguished transfer to unseen graph instances from scaling
+  to path lengths beyond those observed during training.
+- **Supports:** Reporting unseen-instance transfer separately from held-out
+  reasoning depth.
+- **Does not support / avoid:** Shortest-path length is not identical to
+  SpatialEntail's axis or membership proof depth.
+- **Relationship to SpatialEntail:** Supports separate interpolation, transfer,
+  and depth-extrapolation results.
+- **BibTeX key:** Existing `tong2026shortestpath`.
 
 ## Proof-first and theory-first generation
 

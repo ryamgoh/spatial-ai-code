@@ -41,15 +41,6 @@
 #set heading(numbering: "1.1")
 #show figure.caption: set text(size: 10pt)
 
-#let part(number, title) = {
-  pagebreak(weak: true)
-  heading(
-    level: 1,
-    numbering: none,
-    [Part #number — #title],
-  )
-}
-
 #set page(numbering: none)
 
 #cover(
@@ -85,27 +76,17 @@
 // The main report runs from Introduction through Conclusion and is limited to 55 pages.
 
 #include "chapters/01-introduction.typ"
-
-#part("I", [Formal Semantics and Benchmark Evaluation])
-
-#include "chapters/02-research-landscape.typ"
-#include "chapters/03-benchmark-diagnosis.typ"
-#include "chapters/04-solver-and-correction.typ"
-#include "chapters/05-system-architecture.typ"
-#include "chapters/06-corrected-benchmark-evaluation.typ"
-
-#part("II", [Learning from SpatialEntail Certificates])
-
-#include "chapters/07-certificate-supervision.typ"
-#include "chapters/08-dataset.typ"
-#include "chapters/09-training-methodology.typ"
-#include "chapters/10-results.typ"
-#include "chapters/11-discussion.typ"
-#include "chapters/12-conclusion.typ"
+#include "chapters/02-related-work.typ"
+#include "chapters/03-problem-formulation.typ"
+#include "chapters/04-spatialentail-method.typ"
+#include "chapters/05-experimental-design.typ"
+#include "chapters/06-results-discussion.typ"
+#include "chapters/07-conclusion.typ"
 
 #pagebreak(weak: true)
 #bibliography("references.bib", title: [References], style: "ieee")
 
 #include "appendices/a-solver-correctness.typ"
 #include "appendices/b-spatialentail-dataset.typ"
-#include "appendices/c-training-additional-results.typ"
+#include "appendices/c-experimental-configuration.typ"
+#include "appendices/d-additional-results.typ"

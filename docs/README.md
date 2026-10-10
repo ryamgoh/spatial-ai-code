@@ -16,21 +16,24 @@ authoritative technical references for the active V2 system.
 - [Trace formats](spatialentail/trace-formats.md) defines the Natural and
   Symbolic training/audit views and the replayable Symbolic grammar.
 
-The runnable bounded pilot is co-located with its code in
+The runnable bounded solver/data integration fixture is currently located in
 [`experiments/15-v2-ablation`](../experiments/15-v2-ablation/README.md).
 The package-level code map is [`spatial/v2/README.md`](../spatial/v2/README.md).
 
 ## Research
 
-- [Research plan](research/research-plan.md) is the main Part I/Part II canvas.
-- [Part I evaluation](research/part-1-evaluation.md) and
-  [Part II training](research/part-2-training.md) contain detailed study plans.
+- [Research plan](research/research-plan.md) is the unified FYP canvas.
+- [SpatialEval evaluation](research/part-1-evaluation.md) and the
+  [SpatialEntail learning study](research/part-2-training.md) contain the
+  detailed stream-specific plans.
 - [Literature landscape](research/literature-landscape.md) summarizes nearby
   textual-spatial and verified-reasoning work.
 - [Frontier assessment](research/frontier-assessment.md) records the calibrated
   novelty analysis.
 - [Annotated sources](research/annotated-sources.md) is the citation evidence
   ledger.
+- [Explicit world-state supervision review](research/rank-map-supervision-literature.md)
+  compares rank maps with ASCII-layout, graph, path, and latent-map precedents.
 
 ## Audits and notes
 
