@@ -124,7 +124,7 @@
       ), name: <consistent>),
       node((0, 2), diagram-panel(
         [Step 5 — Test query candidates],
-        [Direction: each relation \ Which: each entity \ Count: each count],
+        [Direction: each relation \ Selection: each entity \ Count: each count],
         width: 52mm,
         fill: core-fill,
       ), name: <candidates>),

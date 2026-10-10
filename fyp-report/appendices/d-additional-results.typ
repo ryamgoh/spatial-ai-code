@@ -5,8 +5,8 @@ No V2 model results are available in this draft. After execution, this appendix
 will contain the complete per-task and per-seed tables underlying Chapter 6,
 including:
 
-- all 17 task-bucket scores;
-- clean and noisy depth-1–8 results for Direction, Which, and Count;
+- all frozen benchmark-cell scores and query/capability marginals;
+- clean and noisy depth-1–8 results for Direction, Selection, and Count;
 - premise-first formula-composition cells;
 - external adapter-specific results;
 - Symbolic replay error stages and denominators;

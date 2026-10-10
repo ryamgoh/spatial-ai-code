@@ -13,11 +13,12 @@ checks and comparative model evaluation remain pending, so this is a
 conditional semantic audit.
 
 The same contract supports SpatialEntail, a generator and certificate-checking
-pipeline for Direction, Which, and correlated Count queries over eight
+pipeline for Direction, Entity Selection, and correlated Count queries over eight
 directions and finite Boolean formulas. Accepted certificates yield Natural and
 replayable Symbolic supervision. The predeclared study compares answer-only,
 checked Natural, and checked Symbolic targets on Qwen3.5-2B and Qwen3.5-4B, with
-4B controls for corrupted evidence and local proofs. Nested 4K/8K/17K sets and
+4B controls for corrupted evidence and local proofs. Candidate nested
+4K/8K/17K budgets and
 depth-1--8 tests separate matched reasoning from depth-5--8 extrapolation.
 Training, transfer, and quality-review results are not yet available.
 Certificate validity supports auditability, not claims about a model's internal

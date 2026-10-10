@@ -47,28 +47,29 @@ decision, and Natural/answer-only process metrics were correctly inapplicable.
 These checks establish that the proposed experimental interfaces execute; they
 do not estimate LLM performance.
 
-The final tiered 4K/8K/17K corpus, human-facing quality audit, and model training
-have not been executed. Their tables below are frozen placeholders rather than
-results.
+The final nested 4K/8K/17K corpus, human-facing quality audit, and model training
+have not been executed. Their tables below are explicit placeholders rather
+than results; cell-level rows are added only after the taxonomy allocation is
+frozen.
 
 == Dataset Yield and Quality — Not Run
 
 #figure(
   table(
     columns: (auto, auto, auto, auto, auto),
-    table.header([*Tier*], [*Requested*], [*Accepted*], [*Rejected*], [*Human acceptable*]),
-    [Foundations], [—], [—], [—], [—],
-    [Composition], [—], [—], [—], [—],
-    [Uncertainty], [—], [—], [—], [—],
-    [Logic/branching], [—], [—], [—], [—],
+    table.header([*Query family*], [*Requested*], [*Accepted*], [*Rejected*], [*Human acceptable*]),
+    [`DIR`], [—], [—], [—], [—],
+    [`SEL`], [—], [—], [—], [—],
+    [`CNT`], [—], [—], [—], [—],
   ),
-  caption: [Frozen dataset-yield and source-blinded quality table. No values are available before generation and review.],
+  caption: [Dataset-yield and source-blinded quality placeholder. No values are available before allocation, generation, and review.],
 ) <results-dataset-yield>
 
-The final analysis will report rejection reasons and length distributions rather
-than only accepted counts. Context admission can selectively remove the hardest
-Count or branching examples; the resulting distribution must therefore be
-compared with the requested curriculum.
+The final analysis will report the frozen cell registry, capability and semantic
+strata, rejection reasons, and length distributions rather than only accepted
+query totals. Context admission can selectively remove Count or branching
+examples; the accepted distribution must therefore be compared with the
+requested factorial allocation.
 
 == Main SFT Comparison — Not Run
 
@@ -92,7 +93,7 @@ different relative adapter capacity and only two model sizes are observed.
 
 == Depth Extrapolation and Distractor Robustness — Not Run
 
-The depth result will show separate Direction, Which, and Count curves over
+The depth result will show separate Direction, Selection, and Count curves over
 depths 1–8. Depths 1–4 are matched to training; depths 5–8 are extrapolation.
 For each point, the clean result is paired with an otherwise identical version
 containing two removable distractors.
@@ -103,8 +104,8 @@ containing two removable distractors.
     table.header([*Family*], [*d1*], [*d2*], [*d3*], [*d4*], [*d5*], [*d6*], [*d7*], [*d8*]),
     [Direction clean], [—], [—], [—], [—], [—], [—], [—], [—],
     [Direction noisy], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Which clean], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Which noisy], [—], [—], [—], [—], [—], [—], [—], [—],
+    [Selection clean], [—], [—], [—], [—], [—], [—], [—], [—],
+    [Selection noisy], [—], [—], [—], [—], [—], [—], [—], [—],
     [Count clean], [—], [—], [—], [—], [—], [—], [—], [—],
     [Count noisy], [—], [—], [—], [—], [—], [—], [—], [—],
   ),
@@ -147,12 +148,15 @@ Symbolic outputs are divided into malformed envelope, invalid reasoning,
 invalid decision, domain disagreement, wrong answer after valid evidence, and
 fully valid trace. Answer accuracy and process validity are reported separately.
 
-The corrupted-Symbolic comparison tests whether valid evidence matters beyond
-extra structured tokens. The local-proof comparison is restricted to
+The corrupted-Symbolic comparison estimates the effect of the predeclared typed
+semantic-mutation procedure within the Symbolic package; it is not a generic
+control for extra tokens or proof validity. Mutation classes, frequencies, and
+length changes must be reported. The local-proof comparison is restricted to
 unique/entailed cells and tests whether adding a complete qualitative rank
 witness improves performance or merely adds a difficult serialization burden.
 Ambiguous cells are excluded because witness removal would remove necessary
-evidence rather than isolate representation.
+evidence rather than isolate representation. This arm remains unimplemented
+until its consistency-evidence and process-acceptance contract is specified.
 
 == Discussion and Threats
 

@@ -44,6 +44,11 @@ exact directions, while Which/Count carry a set of exact directions describing
 the requested spatial region. This is structured query input, not a dataset
 mode inside the solver.
 
+Research tables call these query families Direction Identification (`DIR`),
+Entity Selection (`SEL`), and Cardinality Determination (`CNT`). `WhichQuery`
+remains the implementation and SpatialMap-adapter name for `SEL`; this naming
+alias does not change its singular selection contract.
+
 The implemented SpatialEval adapter reports `exact-match`,
 `underdetermined-oracle-possible`, `oracle-underinclusive`,
 `oracle-overinclusive`, `oracle-contradicted`, `partial-overlap`,

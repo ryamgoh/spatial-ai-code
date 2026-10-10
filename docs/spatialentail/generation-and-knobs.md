@@ -9,6 +9,13 @@ defined by [Semantics](semantics.md); certificates are defined by
 The controls below do not belong to the solver. They select, filter, render,
 split, or admit problems after the solver has established their semantics.
 
+The research-facing [task taxonomy](../research/task-taxonomy.md) composes query
+contract, reasoning structure, semantic status, and evidence burden into
+benchmark cells. The current generator exposes the lower-level controls listed
+here; it does not yet emit frozen `RR`/`LR`/`MTR` cell identifiers or implement
+the final allocation. Existing `boolean_shape` and depth fields must not be
+relabelled as verified capabilities without the taxonomy's admission checks.
+
 ## Knob classes
 
 The configuration surface contains four different kinds of control:
@@ -38,6 +45,10 @@ the accepted problem.
 The exact directions are North, Northeast, East, Southeast, South, Southwest,
 West, and Northwest. Direction-sensitive structural signatures do not identify
 rotated problems.
+
+The implementation value `which` maps to the research-facing Entity Selection
+(`SEL`) family. The alias makes the singular selection contract explicit; it
+does not alter stored schemas or source SpatialMap labels.
 
 ### Answer and menu contract
 

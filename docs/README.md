@@ -34,6 +34,13 @@ The package-level code map is [`spatial/v2/README.md`](../spatial/v2/README.md).
   ledger.
 - [Explicit world-state supervision review](research/rank-map-supervision-literature.md)
   compares rank maps with ASCII-layout, graph, path, and latent-map precedents.
+- [SpatialEntail task taxonomy](research/task-taxonomy.md) defines the three
+  query families, three capability lenses, compositional cell identifiers, and
+  the dimensions that must be frozen before corpus generation.
+- [Capability validation and framework](research/capability-validation-and-framework.md)
+  evaluates scope, external task alignment, and the proposed teachable evidence
+  procedure. The [SODA taxonomy check](research/soda-task-taxonomy.md) records
+  its exact primary-paper tier and task names.
 
 ## Audits and notes
 

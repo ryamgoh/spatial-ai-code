@@ -1,48 +1,88 @@
-# Spatial Reasoning Experiments
+# SpatialEntail
 
-This context defines the canonical language for generated spatial worlds,
-questions, and diagnostic dimensions.
+This context defines the canonical language for SpatialEntail problems,
+questions, evidence, and experimental dimensions.
 
 ## Language
 
-**World**:
-One set of objectively asserted spatial premises interpreted together. A world
-is either consistent or inconsistent independently of the question asked.
+**Spatial problem**:
+A finite set of named objects, one visible premise formula, and one declared
+query interpreted under the SpatialEntail semantic contract.
+_Avoid_: Hidden map as the problem
 
-**Question family**:
-The requested output form: `direction`, `which`, or `count`.
-_Avoid_: Cycle subtype
+**Spatial world**:
+One complete assignment of X/Y relations that satisfies the visible premises
+and the non-coincidence constraint.
+_Avoid_: Gold answer source
 
-**Semantic subtype**:
-One of the 12 base question semantics, such as `dir-1`, `which-2`, or
-`count-omit`. A generated row retains it when its world is made inconsistent;
-a prompt-only analysis may leave it unknown after global invalidation.
-_Avoid_: `dir-cycle`, `which-cycle`, `count-cycle`, base semantic subtype
+**Query family**:
+The requested projection of the shared entailment semantics: Direction
+Identification (`DIR`), Entity Selection (`SEL`), or Cardinality Determination
+(`CNT`). SpatialMap's source label `Which` adapts to `SEL`.
+_Avoid_: Capability, difficulty tier
 
-**World consistency**:
-Whether both strict-order graphs are acyclic. Any cycle on either axis makes
-the complete world inconsistent.
-_Avoid_: Cycle question type
+**Candidate status**:
+The all-model classification of one query claim as entailed, contingent, or
+impossible under consistent visible premises.
+_Avoid_: Answer label, confidence
 
-**Cycle specification**:
-The diagnostic description of an injected contradiction: axis, topology,
-length, and placement. It is orthogonal to question family and semantic
-subtype.
+**Answer contract**:
+The declared rule for turning candidate statuses into an output, such as one
+invariant answer or all possible values.
+_Avoid_: Output formatting alone
 
-**Ordinary consistent example**:
-A valid world generated to teach the normal direction, which-object, count,
-depth, or distractor task without a cycle-template intervention.
-_Avoid_: Non-cycle example
+**Capability lens**:
+A grouping used to present and evaluate related reasoning structures. It is not
+a chronological training stage, universal hardness tier, or independent latent
+cognitive module.
+_Avoid_: Capability tier, difficulty level
 
-**Closed-loop condition**:
-An inconsistent world in which the final relation returns to an already
-visited entity, closing a strict-order loop. The correct response is
-`Cannot be determined`.
-_Avoid_: Closed example, positive cycle example
+**Relational Reasoning (RR)**:
+Reasoning through relation access, inversion, decomposition, transitivity, and
+axis recomposition.
 
-**Open-chain control**:
-A consistent hard-negative condition with the same number of relations and
-matched structural settings as a closed-loop condition, except the final
-relation ends at a fresh entity instead of returning to the start. It must be
-solved normally.
-_Avoid_: Open example, non-cycle example
+**Logical Reasoning (LR)**:
+Reasoning governed by Boolean operators, licensed rule applications, and branch
+scope.
+
+**Model-Theoretic Reasoning (MTR)**:
+Reasoning about which query claims hold in every, some, or no satisfying
+spatial model.
+_Avoid_: Model-Based Reasoning, MR
+
+**Reasoning-structure tag**:
+An evidence-supported description of a relation or logical structure used in
+an accepted derivation, such as `TRC`, `AXC`, `MP`, or `CSR`.
+_Avoid_: Operator presence as verified use
+
+**Semantic-status tag**:
+A query-specific resolution condition such as unique/invariant, alternative
+answers, multiple certain selections, or no match.
+_Avoid_: Proof rule
+
+**Evidence obligation**:
+The claim that an explanation must establish, such as necessity,
+impossibility, possibility, consistency, or joint Count coverage.
+_Avoid_: Generic rationale, solver search log
+
+**Benchmark cell**:
+A predeclared combination of query contract, support or rule structure,
+semantic status, and evidence burden. Difficulty measurements annotate the
+cell rather than define its task identity.
+_Avoid_: Flat task bucket, depth tier
+
+**Structural difficulty**:
+Measured properties such as spatial support depth, formula nesting, live branch
+count, candidate-domain size, independent-axis support, distractors, and target
+length.
+_Avoid_: Trace length alone, depth as task identity
+
+**External capability alignment**:
+The relationship between an external task's native semantics and a declared
+capability. Alignment may be direct, restricted, or absent.
+_Avoid_: Shared spatial vocabulary as validation
+
+**Native benchmark contract**:
+An external dataset's stated input, assumptions, answer meanings, and scoring
+rules, distinct from any adapted or newly audited view.
+_Avoid_: Universal spatial answer contract

@@ -399,20 +399,26 @@ Difficulty is not an end in itself. The benchmark should contain solvable,
 discriminative, and hard cells whose performance changes for identifiable
 structural reasons.
 
-### Frozen learning-study design
+### Learning-study design status
 
-- The full pool contains four capability tiers, 17 task buckets, and 17,000
-  base problems, with deterministic nested 4K and 8K subsets.
+- The [canonical task taxonomy](task-taxonomy.md) defines three query families
+  (`DIR`, `SEL`, `CNT`), three capability lenses (`RR`, `LR`, `MTR`), and
+  factorial benchmark cells. The former four-tier, 17-bucket allocation is
+  withdrawn. The 4K/8K/17K sizes remain candidate maximum budgets; cell quotas
+  are frozen only after a bounded capability/yield pilot.
 - The central arms are answer-only, checked Natural, and checked Symbolic on
   Qwen3.5-2B and Qwen3.5-4B with seeds 42 and 43. Corrupted Symbolic and
-  Symbolic local proof are 4B-only mechanism arms: 16 confirmatory runs total.
-- Depth-controlled training stops at depth 4. Direction, Which, and Count are
+  Symbolic local proof are planned 4B-only mechanism arms: 16 confirmatory runs
+  total after the local-proof serializer and acceptance contract are implemented.
+- Depth-controlled training stops at depth 4. Direction, Selection, and Count are
   tested separately at depths 1--8 with 100 clean examples per family-depth
   cell and one paired noisy counterpart per item. Depths 5--8 are extrapolation.
+  Paired Selection/Count distractors remain an implementation prerequisite.
 - External evaluation uses SpatialMap-TQA-Corr, StepGame, Text2Space,
   SpartQA-Human, and ReSQ under their native semantics and metrics.
-- Every row receives formal checking. Source-blinded review uses the larger of
-  2% of the selected pool or 85 examples, with at least five per task. One
+- Every row receives formal checking. If `C` is the number of frozen reporting
+  cells, source-blinded review uses at least the larger of 2% of the selected
+  pool or `5C` examples, with at least five per cell. One
   pinned OpenAI judge, one pinned Anthropic judge, and one human see only the
   prompt and checked Natural trace.
 - SFT is the main study. GRPO is conditional future work.

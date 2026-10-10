@@ -27,20 +27,28 @@ properties differ.
 
 == Nested Data-Size Calibration
 
-One 17K base-problem pool is generated and deterministically nested:
+The maximum candidate budget is one 17K base-problem pool with deterministic
+subsets:
 
 $ 4"K" subset 8"K" subset 17"K". $
 
-Each subset preserves the task/tier proportions using stratified prefixes and
-largest-remainder integer allocation. Calibration trains only checked Symbolic
-using Qwen3.5-2B and Qwen3.5-4B with seed 42 and development data.
+The final benchmark-cell registry and quotas are frozen only after a bounded
+capability-coverage and generation-yield pilot. Once frozen, each subset
+preserves the query, reasoning-structure, semantic-status, and evidence-burden
+allocation using stratified prefixes and largest-remainder integer allocation.
+Calibration trains only checked Symbolic using Qwen3.5-2B and Qwen3.5-4B with
+seed 42 and development data.
 
 The selected size is the smallest for which the next size improves both macro
 answer accuracy and full Symbolic validity by less than two percentage points
-for both models. If 4K→8K saturates, 17K is not trained. Otherwise, 8K is
-selected only if 8K→17K saturates; 17K is the fallback. The selected-size
-calibration checkpoints are reused in the confirmatory matrix. Final test data
-are not accessed during this decision.
+for both models, without a material regression in a predeclared query family or
+capability lens. Sparse cells and uncertainty are reported rather than hidden by
+the aggregate. If 4K→8K saturates, 17K is not trained. Otherwise, 8K is selected
+only if 8K→17K saturates; 17K is the fallback. The selected-size calibration
+checkpoints are reused in the confirmatory matrix. Final test data are not
+accessed during this decision. Exact cell quotas and the material-regression
+threshold are not yet frozen; consequently, generation and calibration remain
+`Not Run`.
 
 == Models and Training Arms
 
@@ -69,6 +77,12 @@ and do not count as training runs. The local-proof comparison is evaluated only
 on unique or entailed cells, where removing the qualitative rank witness does
 not remove evidence required to express ambiguity.
 
+The local-proof arm is a planned mechanism condition, not an exposed current
+supervision variant. Before it enters the run matrix, its serializer and checker
+must specify which consistency evidence remains required, how eligible base IDs
+are paired, and which process-validity metrics remain comparable with the
+rank-witness condition.
+
 The same base IDs and epochs are used across arms. The experiment does not
 repeat short answer-only targets to match Symbolic tokens. It instead reports
 prompt tokens, supervised target tokens, optimizer updates, wall time, and peak
@@ -79,9 +93,11 @@ not equal-compute notation effects.
 
 === Matched interpolation
 
-A balanced interpolation test contains 200 accepted examples for each of the 17
-task buckets (3,400 total). These are new base problems under the training task
-and depth distributions.
+A balanced interpolation test will sample new base problems across every frozen
+reporting cell under the training distributions. Per-cell counts and the total
+are not fixed until the post-pilot registry is frozen; they must be identical
+across supervision arms and sufficient for separately reported query and
+capability results.
 
 === StepGame-style depth ladder
 
@@ -94,14 +110,14 @@ families from depth 1 through 8:
     columns: (auto, auto, auto, auto),
     table.header([*Family*], [*Depths*], [*Per depth*], [*Clean total*]),
     [Direction], [1–8], [100], [800],
-    [Which], [1–8], [100], [800],
+    [Selection], [1–8], [100], [800],
     [Count], [1–8], [100], [800],
     [*Total*], [], [], [*2,400*],
   ),
   caption: [Depth ladder. Depths 1–4 are matched; depths 5–8 are unseen-depth extrapolation.],
 ) <depth-ladder-design>
 
-Direction depth is the required X/Y support depth. Which depth is the entailed
+Direction depth is the required X/Y support depth. Selection depth is the entailed
 membership-proof depth. Count depth is the positive membership depth underlying
 a unique count; correlated-only counts without an entailed member remain in the
 uncertainty suite rather than receiving a fabricated depth.
@@ -110,6 +126,11 @@ Every clean item has one matched noisy counterpart with identical core premises,
 query, and answer plus two solver-verified removable distractors. The noisy set
 adds 2,400 examples. Clean depth accuracy is the headline extrapolation curve;
 the paired clean/noisy delta measures robustness separately.
+
+The current generator exposes controlled removable distractors only for
+Direction. The stated paired Selection/Count conditions are therefore implementation
+requirements, not completed artifacts; the depth suite cannot be frozen until
+those controls pass semantic and context-admission checks.
 
 Any family/depth cell that cannot produce 100 context-admitted examples fails
 before freezing. It is never backfilled with a shallower or different-family
@@ -148,9 +169,9 @@ comparator until a semantics-preserving public adapter can be frozen.
 
 == Metrics and Statistical Reporting
 
-Primary outcomes are macro strict accuracy across the 17 internal tasks,
+Primary outcomes are macro strict accuracy across the frozen benchmark cells,
 depth-5–8 extrapolation accuracy, premise-first holdout accuracy, and strict
-SpatialMap-TQA-Corr accuracy. Secondary metrics include per-tier/query results,
+SpatialMap-TQA-Corr accuracy. Secondary metrics include per-capability/query results,
 ambiguity precision/recall, option-position consistency, Symbolic parse and
 replay rates, decision/domain consistency, full-trace validity, rank-witness
 validity, generated tokens, runtime, and memory.
@@ -163,10 +184,10 @@ described as replicated only when its direction agrees across both seeds.
 == Source-Blinded Quality Review
 
 Automatic semantic, certificate, round-trip, split, menu, and context checks
-apply to every row. Human-facing quality is reviewed on the larger of 2% of the
-selected training pool or 85 examples. The sample is stratified across all 17
-tasks with at least five examples per task; the 85-example floor binds when 4K
-is selected.
+apply to every row. Let $C$ be the number of frozen reporting cells. Human-facing
+quality is reviewed on at least the larger of 2% of the selected training pool
+or $5 C$ examples, stratified with at least five examples per cell. The numeric
+floor is therefore determined only after the cell registry is frozen.
 
 The same anonymized prompt and checked Natural trace are judged independently
 by one version-pinned OpenAI model, one version-pinned Anthropic model, and one
@@ -197,9 +218,10 @@ when at least 98% pass. Its unequal final volumes range from roughly 1.5K to
 16K grid-control sets. The 98% threshold is a quality gate, not a difficulty
 weight.
 
-SpatialEntail instead uses predeclared task quotas, complete formal checking,
-and a smaller source-blinded readability sample. This makes curriculum balance
-an explicit experimental choice.
+SpatialEntail instead uses a predeclared factorial cell allocation, complete
+formal checking, and a smaller source-blinded readability sample. This makes
+coverage across queries, reasoning structures, semantic statuses, and evidence
+obligations an explicit experimental choice.
 
 == GRPO Gate
 

@@ -19,17 +19,21 @@ The three query families are:
     columns: (auto, 1fr),
     inset: (x: 7pt, y: 5pt),
     table.header([*Query*], [*Semantic question*]),
-    [Direction], [Which exact direction can hold between one target and reference?],
-    [Which], [Which declared candidates can or must satisfy a requested relation?],
-    [Count], [Which joint cardinalities are possible over the declared candidates?],
+    [`DIR` — Direction Identification], [Which exact direction can hold between one target and reference?],
+    [`SEL` — Entity Selection], [Which declared candidates can or must satisfy a requested relation?],
+    [`CNT` — Cardinality Determination], [Which joint cardinalities are possible over the declared candidates?],
   ),
   caption: [SpatialEntail query families. Count is evaluated jointly rather than by summing independent candidate possibilities.],
 ) <problem-query-families>
 
-Answer modes are explicit. `SINGLE` requests one invariant answer or _Cannot
-be determined_. `ALL_POSSIBLE` requests the complete possibility set.
-`VISIBLE_POSSIBLE` is a menu-relative diagnostic. The option menu cannot change
-which spatial values are possible.
+`SEL` is the generic research name for SpatialMap's source _Which_ questions.
+Answer modes are explicit and query-specific. Under `SINGLE`, Direction and
+Count require exactly one possible value, whereas Selection requires exactly
+one entailed entity and no other possible entity. `ALL_POSSIBLE` returns every
+possible candidate value; for Selection this is the union of individually
+possible entities, not possible complete membership sets. `VISIBLE_POSSIBLE`
+is a menu-relative diagnostic. The option menu cannot change which spatial
+values are possible.
 
 == Directions as Axis Comparisons
 

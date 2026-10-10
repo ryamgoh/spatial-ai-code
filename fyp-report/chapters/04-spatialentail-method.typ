@@ -31,7 +31,7 @@ discarded and the visible premises are re-solved before acceptance.
 == Semantic Solver and Answer Policy
 
 The solver receives objects, one finite premise formula, and a Direction,
-Which, or Count query. @spatialentail-solver-lifecycle summarizes the decision
+Selection, or Count query. @spatialentail-solver-lifecycle summarizes the decision
 path.
 
 #solver-lifecycle <spatialentail-solver-lifecycle>
@@ -61,7 +61,7 @@ SpatialEntail distinguishes deductive and constructive evidence:
     [Consistency witness], [Exhibit one world satisfying the premises so a positive proof is not vacuous.],
     [Possibility witness], [Exhibit one premise-satisfying world in which a candidate holds.],
     [Countermodel], [Exhibit a premise-satisfying world in which a proposed necessity fails.],
-    [Answer certificate], [Cover every declared Direction candidate, Which entity, or Count value.],
+    [Answer certificate], [Cover every declared Direction candidate, Selection entity, or Count value.],
   ),
   caption: [Complementary proof, refutation, and model evidence.],
 ) <spatialentail-evidence-types>
@@ -72,7 +72,7 @@ refutation assumptions, dead steps, and unsupported rule applications. Model
 certificates independently evaluate every premise and the expected claim value.
 
 Direction certificates distinguish unique entailment, contingency, and
-impossibility. Which certificates classify every candidate as entailed,
+impossibility. Selection certificates classify every candidate as entailed,
 contingent, or impossible. Count certificates preserve joint dependencies:
 fixed memberships are proved once, while only residual compatible assignments
 are enumerated. Count evidence can still grow exponentially in genuinely
@@ -105,78 +105,74 @@ Exact canonicalization is bounded; a conservative fallback may merge distinct
 structures. Signature separation is a leakage defence, not proof of
 compositional generalisation.
 
-== Four-Tier Curriculum
+== Task Taxonomy
 
-Difficulty is multi-dimensional. Spatial depth, propositional depth, branch
-count, ambiguity size, candidate count, independent-axis support, distractors,
-target length, and rejection rate remain separate manifest fields. The tiers
-organize training coverage; they do not replace those measurements.
-
-=== Tier 1: Foundations, depths 1–2
-
-#figure(
-  table(
-    columns: (1fr, auto),
-    table.header([*Task bucket*], [*17K quota*]),
-    [Cardinal Direction, depths 1–2], [600],
-    [Diagonal Direction, depths 1–2], [600],
-    [Which membership, depths 1–2], [600],
-    [Fixed Count, depths 1–2], [600],
-    [*Tier total*], [*2,400*],
-  ),
-  caption: [Foundation-task quotas in the full nested pool.],
-) <tier-one-curriculum>
-
-=== Tier 2: Composition, depths 3–4
+SpatialEntail applies one entailment-and-possibility semantics to three query
+families. Direction Identification (`DIR`) classifies exact directions, Entity
+Selection (`SEL`) classifies candidate memberships, and Cardinality
+Determination (`CNT`) classifies jointly compatible counts. `SEL` is the generic
+name for SpatialMap's _Which_ questions. Entailment is not a fourth query family.
 
 #figure(
   table(
-    columns: (1fr, auto),
-    table.header([*Task bucket*], [*17K quota*]),
-    [Direction depth 3], [1,000],
-    [Direction depth 4], [1,000],
-    [Independent or unequal axes, depths 2–4], [1,000],
-    [Which membership chains, depths 3–4], [1,000],
-    [Derived unique Count, depths 3–4], [1,000],
-    [*Tier total*], [*5,000*],
+    columns: (auto, 1fr, 1.35fr),
+    inset: (x: 6pt, y: 5pt),
+    table.header([*Query*], [*Candidate domain*], [*`SINGLE` contract*]),
+    [`DIR`], [Declared exact compass directions], [Exactly one possible direction.],
+    [`SEL`], [Declared candidate entities], [Exactly one entailed entity and no other possible entity.],
+    [`CNT`], [Integers from zero through the candidate count], [Exactly one possible count, preserving joint memberships.],
   ),
-  caption: [Compositional-task quotas.],
-) <tier-two-curriculum>
+  caption: [Three query projections governed by the same all-model semantics.],
+) <query-family-contracts>
 
-=== Tier 3: Uncertainty and Exclusion
+Selection is a singular contract. If two entities are both certainly in the
+requested relation, neither membership is unknown, but `SINGLE` cannot select
+one. `ALL_POSSIBLE` returns the union of individually possible entities rather
+than possible complete membership sets. Unique selection, multiple certain
+matches, contingent membership, and no match are therefore separate result
+strata.
+
+Three capability lenses organize the supported reasoning structures:
 
 #figure(
   table(
-    columns: (1fr, auto),
-    table.header([*Task bucket*], [*17K quota*]),
-    [Direction ambiguity size 2], [1,000],
-    [Direction ambiguity size 3], [1,000],
-    [Which contingent/no-match mixture], [1,000],
-    [Correlated Count ambiguity], [1,000],
-    [*Tier total*], [*4,000*],
+    columns: (auto, 1fr, 1.7fr),
+    inset: (x: 6pt, y: 5pt),
+    table.header([*Code*], [*Capability lens*], [*Scope*]),
+    [`RR`], [Relational Reasoning], [Relation access, inversion, decomposition, transitivity, and axis recomposition.],
+    [`LR`], [Logical Reasoning], [Negation, conjunction, disjunction, implication, equivalence, and branch scope.],
+    [`MTR`], [Model-Theoretic Reasoning], [Necessity, possibility, impossibility, and query-level invariance across satisfying worlds.],
   ),
-  caption: [Uncertainty-task quotas. These cells are described by semantic possibility and exclusion burden rather than fabricated positive-proof depth.],
-) <tier-three-curriculum>
+  caption: [Capability lenses. They are not chronological stages or universal hardness tiers.],
+) <capability-lenses>
 
-=== Tier 4: Logic and Branching
+The experimental source of truth is not one flat task list. A cell is the
+predeclared combination
 
-#figure(
-  table(
-    columns: (1fr, auto),
-    table.header([*Task bucket*], [*17K quota*]),
-    [Implication and IFF], [1,400],
-    [Double negation and disjunctive syllogism], [1,400],
-    [Case split], [1,400],
-    [Nested case split], [1,400],
-    [*Tier total*], [*5,600*],
-  ),
-  caption: [Logical-task quotas. Query families are balanced internally where the supported construction fragment permits.],
-) <tier-four-curriculum>
+$ "query contract" times "support/rule structure" times "semantic status" times "evidence burden". $
 
-The complete pool contains 17,000 unique base problems. Deterministic 4K and 8K
-subsets preserve the tier/task proportions. The unequal allocation is a
-predeclared curriculum choice: foundational tasks receive fewer examples,
-while composition, uncertainty, and branching receive more.
+Compact structure codes include atomic access (`ARC`), transitive composition
+(`TRC`), independent-axis composition (`AXC`), modus ponens (`MP`), equivalence
+elimination (`IFF`), negation (`NEG`), disjunctive elimination (`DJE`), and
+case-split reasoning (`CSR`). Semantic/evidence codes include unique or
+invariant resolution (`UNI`), alternative answers (`ALT`), multiple certain
+selections (`MUL`), no match (`NOM`), candidate exclusion (`EXC`), and joint
+Count reasoning (`JCR`). For example, `DIR-TRC-UNI` and `CNT-CSR-JCR-UNI`
+identify interpretable cells without claiming that all code combinations are
+valid.
+
+Depth, formula nesting, branch count, candidate and possibility-domain sizes,
+independent-axis support, distractors, token length, and rejection rate remain
+separate measured fields. Mixed logical-spatial composition is a holdout regime:
+every primitive appears during training while selected rule compounds or
+formula trees are withheld. Syntax exposure, replay-verified rule use, and a
+semantic change under a controlled intervention are reported separately; none
+alone proves that one rule is unavoidable across every derivation.
+
+The maximum `4K`/`8K`/`17K` nested sizes remain candidate calibration budgets,
+but cell quotas, matched-test totals, and quality-review strata must be frozen
+together after a capability-coverage and generation-yield pilot. No final 17K
+corpus or cell allocation is claimed in this draft.
 
 == Supervision Views
 
