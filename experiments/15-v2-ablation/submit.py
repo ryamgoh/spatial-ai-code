@@ -9,6 +9,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -20,6 +21,11 @@ import yaml
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = EXPERIMENT_DIR.parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from spatial.v2.matrix import load_experiment_matrix
+
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
@@ -40,6 +46,7 @@ class ArmSpec:
     cell: str | None
     train_overrides: dict[str, Any]
     eval_overrides: dict[str, Any]
+    train: bool = True
 
 
 @dataclass(frozen=True)
@@ -54,7 +61,6 @@ class RunSpec:
     train_overrides: dict[str, Any]
     eval_overrides: dict[str, Any]
     task_template: Path
-    retention_task: str
     arms: tuple[ArmSpec, ...]
     resources: dict[str, ResourceSpec]
 
@@ -63,12 +69,14 @@ class RunSpec:
 class PreparedArm:
     name: str
     train_view: Path
+    dev_view: Path
     test_view: Path
     train_config: Path
     eval_config: Path
     task_config: Path
     model_dir: Path
     result_dir: Path
+    train: bool
 
 
 @dataclass(frozen=True)
@@ -221,6 +229,7 @@ def _arms(value: Any) -> tuple[ArmSpec, ...]:
             "view",
             "scope",
             "cell",
+            "train",
             "train_overrides",
             "eval_overrides",
         }
@@ -240,6 +249,7 @@ def _arms(value: Any) -> tuple[ArmSpec, ...]:
                 cell,
                 _mapping(item.get("train_overrides", {}), "arm.train_overrides"),
                 _mapping(item.get("eval_overrides", {}), "arm.eval_overrides"),
+                item.get("train", True),
             )
         )
     if len({arm.name for arm in arms}) != len(arms):
@@ -259,7 +269,6 @@ def load_run_spec(path: str | Path, repo_root: str | Path = REPO_ROOT) -> RunSpe
         "base_model",
         "train",
         "eval",
-        "retention_task",
         "arms",
         "resources",
     }
@@ -301,7 +310,6 @@ def load_run_spec(path: str | Path, repo_root: str | Path = REPO_ROOT) -> RunSpe
         task_template=_resolve(
             base, evaluation.get("task_template"), "eval.task_template"
         ),
-        retention_task=str(root.get("retention_task") or "").strip(),
         arms=arms,
         resources={
             stage: _resource(resources_raw[stage], stage) for stage in required_stages
@@ -309,8 +317,6 @@ def load_run_spec(path: str | Path, repo_root: str | Path = REPO_ROOT) -> RunSpe
     )
     if not spec.base_model:
         raise ValueError("base_model is required")
-    if not spec.retention_task:
-        raise ValueError("retention_task is required")
     required_files = (
         spec.matrix,
         spec.train_template,
@@ -323,6 +329,7 @@ def load_run_spec(path: str | Path, repo_root: str | Path = REPO_ROOT) -> RunSpe
             "run inputs are missing: " + ", ".join(str(path) for path in missing_files)
         )
     _validate_overrides(spec)
+    _validate_training_contract(spec)
     return spec
 
 
@@ -342,7 +349,13 @@ def _deep_merge(*values: dict[str, Any]) -> dict[str, Any]:
 
 
 def _validate_overrides(spec: RunSpec) -> None:
-    protected_train = {"base_model", "datasets", "test_datasets", "output_dir"}
+    protected_train = {
+        "base_model",
+        "datasets",
+        "test_datasets",
+        "output_dir",
+        "revision_of_model",
+    }
     protected_eval = {"include_path", "tasks"}
     for label, overrides, protected in (
         ("train.overrides", spec.train_overrides, protected_train),
@@ -364,11 +377,47 @@ def _validate_overrides(spec: RunSpec) -> None:
         *((f"arm {arm.name}.eval_overrides", arm.eval_overrides) for arm in spec.arms),
     ):
         model_args = overrides.get("model_args", {})
-        forbidden = sorted(set(model_args) & {"pretrained", "lora_path", "choices"})
+        forbidden = sorted(
+            set(model_args)
+            & {"pretrained", "lora_path", "choices", "revision", "tokenizer_revision"}
+        )
         if forbidden:
             raise ValueError(
                 f"{label}.model_args cannot override: {', '.join(forbidden)}"
             )
+
+
+def _validate_training_contract(spec: RunSpec) -> None:
+    matrix = load_experiment_matrix(spec.matrix)
+    budget = matrix.context_budget
+    if budget is None or budget.tokenizer_name != spec.base_model:
+        raise ValueError("matrix admission tokenizer must match the run base_model")
+    if matrix.dev_split <= 0 or matrix.test_split <= 0:
+        raise ValueError("training runs require distinct nonempty dev and test splits")
+    train_template = yaml.safe_load(spec.train_template.read_text())
+    eval_template = yaml.safe_load(spec.eval_template.read_text())
+    for arm in spec.arms:
+        train = _deep_merge(train_template, spec.train_overrides, arm.train_overrides)
+        evaluation = _deep_merge(eval_template, spec.eval_overrides, arm.eval_overrides)
+        if (
+            train.get("sequence_len") != budget.train_max_tokens
+            or train.get("chat_template") != "tokenizer_default"
+        ):
+            raise ValueError(
+                "training sequence/template must match matrix context admission"
+            )
+        if evaluation["model_args"].get("max_model_len") != budget.eval_max_tokens:
+            raise ValueError("evaluation context must match matrix context admission")
+        if (
+            evaluation["model_args"].get("add_special_tokens") is not False
+            or evaluation.get("apply_chat_template") is not False
+            or evaluation.get("system_instruction") is not None
+        ):
+            raise ValueError(
+                "evaluation must consume the exact admitted prompt without retemplating"
+            )
+        if type(arm.train) is not bool:
+            raise ValueError("arm.train must be true or false")
 
 
 def _prepared_layout(
@@ -381,26 +430,29 @@ def _prepared_layout(
         spec.data_output.with_suffix("").name + "_views"
     )
 
-    def views(arm: ArmSpec) -> tuple[Path, Path]:
+    def views(arm: ArmSpec) -> tuple[Path, Path, Path]:
         directory = view_root / arm.scope
         if arm.cell:
             directory /= arm.cell
         return (
             directory / f"{arm.view}_train.jsonl",
+            directory / f"{arm.view}_dev.jsonl",
             directory / f"{arm.view}_test.jsonl",
         )
 
     def prepare_arm(arm: ArmSpec) -> PreparedArm:
-        train_view, test_view = views(arm)
+        train_view, dev_view, test_view = views(arm)
         return PreparedArm(
             name=arm.name,
             train_view=train_view,
+            dev_view=dev_view,
             test_view=test_view,
             train_config=run_dir / "configs" / f"train-{arm.name}.yaml",
             eval_config=run_dir / "configs" / f"eval-{arm.name}.yaml",
             task_config=run_dir / "tasks" / f"spatial_v2_{arm.name}.yaml",
             model_dir=run_dir / "models" / arm.name,
             result_dir=run_dir / "results" / arm.name,
+            train=arm.train,
         )
 
     arms = tuple(prepare_arm(arm) for arm in spec.arms)
@@ -415,6 +467,7 @@ def prepare_run(
     run_root: str | Path | None = None,
 ) -> PreparedRun:
     """Render immutable arm-specific training and evaluation configs."""
+    _validate_training_contract(spec)
     repo_root = Path(repo_root).resolve()
     root = Path(run_root).resolve() if run_root else spec.source.parent / "runs"
     prepared = _prepared_layout(spec, _safe_name(run_id, "run id"), root)
@@ -427,14 +480,15 @@ def prepare_run(
     shutil.copy2(
         repo_root / "experiments/tasks/utils.py", prepared.run_dir / "tasks/utils.py"
     )
-    retention_source = repo_root / "experiments/tasks" / f"{spec.retention_task}.yaml"
-    if not retention_source.exists():
-        raise FileNotFoundError(f"retention task not found: {retention_source}")
-    shutil.copy2(retention_source, prepared.run_dir / "tasks" / retention_source.name)
 
     train_template = yaml.safe_load(spec.train_template.read_text(encoding="utf-8"))
     eval_template = yaml.safe_load(spec.eval_template.read_text(encoding="utf-8"))
     task_template = spec.task_template.read_text(encoding="utf-8")
+    budget = load_experiment_matrix(spec.matrix).context_budget
+    assert budget is not None
+    task_template = task_template.replace(
+        "__MAX_NEW_TOKENS__", str(budget.max_new_tokens)
+    )
     finetune_dir = repo_root / "finetune"
     eval_dir = repo_root / "eval"
     choices = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -447,6 +501,7 @@ def prepare_run(
             arm_spec.train_overrides,
         )
         train["base_model"] = spec.base_model
+        train["revision_of_model"] = budget.tokenizer_revision
         train["output_dir"] = _relative(arm.model_dir, finetune_dir)
         train["datasets"] = [
             {
@@ -457,7 +512,7 @@ def prepare_run(
         ]
         train["test_datasets"] = [
             {
-                "path": _relative(arm.test_view, finetune_dir),
+                "path": _relative(arm.dev_view, finetune_dir),
                 "type": "chat_template",
                 "field_messages": "messages",
             }
@@ -480,10 +535,14 @@ def prepare_run(
         )
         evaluation["model_args"] = dict(evaluation["model_args"])
         evaluation["model_args"]["pretrained"] = spec.base_model
-        evaluation["model_args"]["lora_path"] = _relative(arm.model_dir, eval_dir)
+        evaluation["model_args"]["revision"] = budget.tokenizer_revision
+        evaluation["model_args"]["tokenizer_revision"] = budget.tokenizer_revision
+        evaluation["model_args"]["lora_path"] = (
+            _relative(arm.model_dir, eval_dir) if arm.train else None
+        )
         evaluation["model_args"]["choices"] = choices
         evaluation["include_path"] = _relative(prepared.run_dir / "tasks", eval_dir)
-        evaluation["tasks"] = [task_name, spec.retention_task]
+        evaluation["tasks"] = [task_name]
         arm.eval_config.write_text(
             yaml.safe_dump(evaluation, sort_keys=False), encoding="utf-8"
         )
@@ -590,7 +649,7 @@ def submit_experiment(
         arm for arm in predicted.arms if arm.name in selected_names
     )
     if options.skip_generation and not options.dry_run:
-        _validate_existing_views(predicted_selected, predicted.data_output)
+        _validate_existing_views(predicted_selected, predicted.data_output, spec.matrix)
     if options.dry_run:
         prepared = predicted
     elif options.resume and predicted.run_dir.exists():
@@ -624,7 +683,7 @@ def submit_experiment(
                 job_name=f"{spec.name}-generate",
                 log_dir=logs,
                 exports={
-                    "MATRIX": str(spec.matrix),
+                    "MATRIX": str(prepared.run_dir / "matrix.yaml"),
                     "DATA_OUTPUT": str(spec.data_output),
                     "REPLACE_DATA": "1" if options.replace_data else "0",
                 },
@@ -635,24 +694,26 @@ def submit_experiment(
         train_dependency = (
             f"afterok:{state.generate_job}" if state.generate_job else None
         )
-        train_job = state.issue(
-            "train",
-            arm.name,
-            _sbatch_command(
-                repo_root,
-                scripts / "train.sh",
-                spec.resources["train"],
-                job_name=f"{spec.name}-train-{arm.name}",
-                log_dir=logs,
-                dependency=train_dependency,
-                exports={
-                    "ARM": arm.name,
-                    "MODEL_DIR": str(arm.model_dir),
-                    "RESUME": "1" if options.resume else "0",
-                    "TRAIN_CONFIG": str(arm.train_config),
-                },
-            ),
-        )
+        train_job = None
+        if arm.train:
+            train_job = state.issue(
+                "train",
+                arm.name,
+                _sbatch_command(
+                    repo_root,
+                    scripts / "train.sh",
+                    spec.resources["train"],
+                    job_name=f"{spec.name}-train-{arm.name}",
+                    log_dir=logs,
+                    dependency=train_dependency,
+                    exports={
+                        "ARM": arm.name,
+                        "MODEL_DIR": str(arm.model_dir),
+                        "RESUME": "1" if options.resume else "0",
+                        "TRAIN_CONFIG": str(arm.train_config),
+                    },
+                ),
+            )
         state.issue(
             "eval",
             arm.name,
@@ -662,10 +723,11 @@ def submit_experiment(
                 spec.resources["eval"],
                 job_name=f"{spec.name}-eval-{arm.name}",
                 log_dir=logs,
-                dependency=f"afterok:{train_job}",
+                dependency=f"afterok:{train_job}" if train_job else train_dependency,
                 exports={
                     "ARM": arm.name,
                     "EVAL_CONFIG": str(arm.eval_config),
+                    "UNTUNED": "0" if arm.train else "1",
                     "MODEL_DIR": str(arm.model_dir),
                     "RESULT_DIR": str(arm.result_dir),
                 },
@@ -692,11 +754,13 @@ def submit_experiment(
     return state.result()
 
 
-def _validate_existing_views(arms: tuple[PreparedArm, ...], data_output: Path) -> None:
+def _validate_existing_views(
+    arms: tuple[PreparedArm, ...], data_output: Path, matrix_path: Path
+) -> None:
     missing = [
         path
         for arm in arms
-        for path in (arm.train_view, arm.test_view)
+        for path in (arm.train_view, arm.dev_view, arm.test_view)
         if not path.is_file()
     ]
     base = data_output.with_suffix("")
@@ -711,6 +775,23 @@ def _validate_existing_views(arms: tuple[PreparedArm, ...], data_output: Path) -
     payload = json.loads(manifest.read_text(encoding="utf-8"))
     if payload.get("validation", {}).get("status") != "passed":
         raise ValueError(f"dataset manifest is not validated: {manifest}")
+    configured = load_experiment_matrix(matrix_path).manifest_config()
+    recorded = payload.get("matrix", {})
+    if any(recorded.get(key) != value for key, value in configured.items()):
+        raise ValueError("existing dataset matrix configuration differs from this run")
+    if (
+        payload.get("context_admission", {}).get("config")
+        != configured["context_budget"]
+    ):
+        raise ValueError("existing dataset context admission differs from this run")
+    if not payload.get("context_admission", {}).get("accepted_groups"):
+        raise ValueError(f"dataset manifest lacks tokenizer admission: {manifest}")
+    if any(
+        path.stat().st_size == 0
+        for arm in arms
+        for path in (arm.train_view, arm.dev_view, arm.test_view)
+    ):
+        raise ValueError("selected train/dev/test views must all be nonempty")
 
 
 app = typer.Typer(add_completion=False)
@@ -753,7 +834,9 @@ def main(
     else:
         typer.echo(f"generate: {result.generate_job}")
         for arm, jobs in result.arms.items():
-            typer.echo(f"{arm}: train={jobs['train']} eval={jobs['eval']}")
+            typer.echo(
+                f"{arm}: train={jobs.get('train', 'not applicable')} eval={jobs['eval']}"
+            )
         typer.echo(f"summarize: {result.summary_job}")
 
 

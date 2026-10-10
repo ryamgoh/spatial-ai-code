@@ -1,6 +1,8 @@
 # FYP report
 
-This directory contains the complete buildable Typst dissertation project.
+This directory contains the buildable Typst dissertation draft. Part II methods
+are drafted from the current implementation; V2 SFT and model-evaluation results
+are explicitly marked as not run.
 
 ## Build
 
@@ -21,6 +23,7 @@ The generated `fyp-report/report.pdf` is ignored by Git.
 | `chapters/` | Sequentially numbered main-matter chapters |
 | `figures/` | Reusable Typst diagram definitions and shared diagram styling |
 | `appendices/` | Appendices named by their actual subject |
+| `docs/` | Report-authoring notes such as the Typst diagram-package comparison |
 | `references.bib` | Bibliography used by the report |
 | `reference/` | Official formatting guidance and other non-source references |
 

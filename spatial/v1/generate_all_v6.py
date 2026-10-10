@@ -5,7 +5,8 @@ Proposes a map + question. Gold is only whatever
 (errors, empty, 4-letter) is dropped. Optional ``inject_conflict``
 adds a reversing sentence so cycles can appear; the solver still labels.
 
-See docs/symbolic-cot.md.
+Historical V6 bucket semantics are documented in
+experiments/11-v6-synthetic/QUESTION_TYPES.md.
 """
 import json
 import itertools

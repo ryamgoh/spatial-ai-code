@@ -177,12 +177,13 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
         generate_matrix(matrix_path, tmp_path / "pilot.jsonl")
     assert stale.exists()
 
-    train_path, test_path, manifest_path = generate_matrix(
+    train_path, dev_path, test_path, manifest_path = generate_matrix(
         matrix_path,
         tmp_path / "pilot.jsonl",
         replace=True,
     )
 
+    assert dev_path.read_text() == ""
     rows = [
         json.loads(line)
         for path in (train_path, test_path)
@@ -207,7 +208,7 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
     manifest = json.loads(manifest_path.read_text())
     assert manifest["matrix"]["requested_base_problems"] == 4
     assert manifest["matrix"]["generated_rows"] == 24
-    assert manifest["matrix"]["cells"] == {"direction-depth-2": 4}
+    assert manifest["matrix"]["cell_counts"] == {"direction-depth-2": 4}
     assert not stale.exists()
     assert manifest["base_distributions"]["matrix_cell"] == {"direction-depth-2": 4}
     assert manifest["answer_distributions"]["matrix_answer_variant"] == {
@@ -217,7 +218,7 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
     }
     views = manifest["views"]
     assert views["split_fingerprint"]["train"] != views["split_fingerprint"]["test"]
-    variant = views["by_variant"]["single__natural"]
+    variant = views["by_variant"]["single__natural__checked-trace"]
     assert variant["train_rows"] == 3
     assert variant["test_rows"] == 1
     assert (tmp_path / variant["train"]).exists()
@@ -234,7 +235,9 @@ def test_matrix_generates_exact_paired_variant_counts(tmp_path) -> None:
         )
         for row in variant_rows
     } == {("single", "natural")}
-    cell_variant = views["by_cell"]["direction-depth-2"]["single__natural"]
+    cell_variant = views["by_cell"]["direction-depth-2"][
+        "single__natural__checked-trace"
+    ]
     assert cell_variant["train_rows"] == 3
     assert cell_variant["test_rows"] == 1
     assert (tmp_path / cell_variant["train"]).exists()
@@ -281,7 +284,7 @@ cells:
 """
     )
 
-    train_path, _, _ = generate_matrix(matrix_path, tmp_path / "answers.jsonl")
+    train_path, _, _, _ = generate_matrix(matrix_path, tmp_path / "answers.jsonl")
 
     rows = [json.loads(line) for line in train_path.read_text().splitlines()]
     assert len({row["metadata"]["base_id"] for row in rows}) == 1
@@ -289,3 +292,127 @@ cells:
     assert by_mode["single"]["metadata"]["menu_status"] == "undetermined"
     assert len(by_mode["all-possible"]["metadata"]["oracle_letters"]) == 2
     assert len(by_mode["visible-possible"]["metadata"]["oracle_letters"]) == 1
+
+
+class FramingTokenizer:
+    """Deterministic tokenizer double to test orchestration, not model lengths."""
+
+    def apply_chat_template(self, messages, *, tokenize, add_generation_prompt):
+        assert tokenize is False
+        return (
+            "<chat>"
+            + "".join(
+                "<" + message["role"] + ">" + message["content"] for message in messages
+            )
+            + ("<assistant>" if add_generation_prompt else "</chat>")
+        )
+
+    def encode(self, text, *, add_special_tokens):
+        assert add_special_tokens is False
+        return list(range(len(text) // 20 + 1))
+
+
+def test_matrix_routes_controls_through_paired_context_admission(tmp_path):
+    import yaml
+
+    raw = yaml.safe_load(MATRIX_YAML)
+    raw["dev_split"] = 0.25
+    raw["variants"]["answers"] = raw["variants"]["answers"][:1]
+    raw["variants"]["supervision_arms"] = [
+        "checked-trace",
+        "answer-only",
+        "corrupted-trace",
+    ]
+    raw["cells"][0]["answer_variants"] = ["single"]
+    raw["context_budget"] = {
+        "tokenizer_name": "test-tokenizer",
+        "train_max_tokens": 4096,
+        "eval_max_tokens": 8192,
+        "max_new_tokens": 4096,
+    }
+    path = tmp_path / "matrix.yaml"
+    path.write_text(yaml.safe_dump(raw))
+    train, dev, test, manifest = generate_matrix(
+        path, tmp_path / "admitted.jsonl", tokenizer=FramingTokenizer()
+    )
+    payload = json.loads(manifest.read_text())
+    assert payload["context_admission"]["accepted_groups"] == 4
+    assert payload["context_admission"]["accepted_rows"] == 16
+    rows = [
+        json.loads(line)
+        for split in (train, dev, test)
+        for line in split.read_text().splitlines()
+    ]
+    assert all(
+        row["metadata"]["evaluation_prompt"].startswith("<chat>") for row in rows
+    )
+    assert set(payload["views"]["by_variant"]) == {
+        "single__natural__checked-trace",
+        "single__symbolic__checked-trace",
+        "single__natural__answer-only",
+        "single__symbolic__corrupted-trace",
+    }
+    split_ids = [
+        {
+            json.loads(line)["metadata"]["base_id"]
+            for line in split.read_text().splitlines()
+        }
+        for split in (train, dev, test)
+    ]
+    assert all(split_ids)
+    assert all(
+        not left & right
+        for i, left in enumerate(split_ids)
+        for right in split_ids[i + 1 :]
+    )
+    raw["context_budget"]["train_max_tokens"] = 1
+    path.write_text(yaml.safe_dump(raw))
+    with pytest.raises(
+        ValueError, match="cell direction-depth-2: paired context admission failed"
+    ):
+        generate_matrix(path, tmp_path / "rejected.jsonl", tokenizer=FramingTokenizer())
+    assert not (tmp_path / "rejected_train.jsonl").exists()
+    rejection = json.loads((tmp_path / "rejected_rejected.json").read_text())
+    assert rejection["rejected_groups"] == 1
+    assert rejection["rejection_reasons"]["train_context_exceeded"] == 1
+    with pytest.raises(FileExistsError):
+        generate_matrix(path, tmp_path / "rejected.jsonl", tokenizer=FramingTokenizer())
+
+
+def test_failed_replacement_preserves_previous_validated_workload(tmp_path):
+    import yaml
+
+    matrix = tmp_path / "matrix.yaml"
+    matrix.write_text(MATRIX_YAML)
+    output = tmp_path / "preserved.jsonl"
+    paths = generate_matrix(matrix, output)
+    before = {path: path.read_bytes() for path in paths}
+    raw = yaml.safe_load(MATRIX_YAML)
+    raw["split_strategy"] = "holdout"
+    raw["holdout_cells"] = {"dev": ["direction-depth-2"], "test": ["direction-depth-2"]}
+    matrix.write_text(yaml.safe_dump(raw))
+    with pytest.raises(ValueError, match="disjoint"):
+        generate_matrix(matrix, output, replace=True)
+    assert {path: path.read_bytes() for path in paths} == before
+
+
+def test_workload_cli_path_persists_context_rejection(tmp_path, monkeypatch):
+    from spatial.v2 import generate_all
+    from spatial.v2.context_budget import ContextBudget
+
+    monkeypatch.setattr(
+        generate_all, "load_tokenizer", lambda _budget: FramingTokenizer()
+    )
+    spec = generate_all.WorkloadSpec(
+        samples_per_cell=1,
+        query_kinds=(QueryKind.DIRECTION,),
+        semantic_shapes=(SemanticShape.UNIQUE,),
+        test_split=0,
+        context_budget=ContextBudget("test-tokenizer", 1, 8192, 4096),
+    )
+    with pytest.raises(ValueError, match="paired context admission failed"):
+        generate_all.generate_workload(tmp_path / "workload.jsonl", spec)
+    diagnostic = json.loads((tmp_path / "workload_rejected.json").read_text())
+    assert diagnostic["rejected_groups"] == 1
+    assert diagnostic["failed_rows"]
+    assert not (tmp_path / "workload_train.jsonl").exists()

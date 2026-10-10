@@ -198,8 +198,8 @@ separate derivation object. This work therefore uses a typed proof certificate.
 Each step has a unique identifier, a rule name, an ordered list of dependencies,
 and one conclusion. Premise steps additionally identify their source premise.
 Derived steps may occur in the global scope or inside one explicitly named case
-branch. Natural and Symbolic traces are deterministic renderings of this same
-object.
+branch. Natural narrates these checked step identifiers, dependencies and scopes;
+Symbolic serializes the typed records. Only the latter has a model-output parser.
 
 Let $Gamma$ denote the visible premise formulas of one `SpatialProblem`. The
 judgement $Gamma tack.r phi$ means that formula $phi$ has a checked derivation
@@ -260,7 +260,10 @@ $
 The checker requires one distinct scoped result for every disjunct, verifies
 that every branch concludes the same $psi$, and only then returns $psi$ to the
 global scope. These conditions prevent assumptions or intermediate results from
-leaking between cases.
+leaking between cases. A positive Direction certificate cannot contain a
+refutation-assumption step, and its designated conclusion must be global.
+Consequently, a branch-local result cannot be presented directly as the answer
+or laundered through case analysis using a refutation-only assumption.
 
 #heading(level: 3, numbering: none)[Spatial rules]
 
@@ -283,7 +286,10 @@ comparison because their composition is not uniquely determined. Finally, one
 checked X fact and one checked Y fact about the same ordered pair may be
 recomposed into $R_D(a,b)$ exactly when their sign pair is the row assigned to
 $D$ in @solver-direction-table. The checker also permits the equivalent reversed
-orientation and negates its comparison sign before recomposition.
+orientation and negates its comparison sign before recomposition. When an exact
+relation atom has already been derived by the Boolean calculus, direction
+introduction may lift that atom directly into the query-level `DirectionClaim`;
+this avoids a redundant decompose--recompose round trip.
 
 #heading(level: 2, numbering: none)[Theorem 3: Certificate Soundness]
 
@@ -316,7 +322,9 @@ $square$
 The theorem does not require $Gamma$ to be consistent: under classical
 semantics an inconsistent premise set has no models. Operationally, the pipeline
 checks consistency separately and does not emit an ordinary answer for an
-inconsistent problem.
+inconsistent problem. Unique Direction training includes a checked model witness
+as well as the positive proof, so the emitted evidence establishes non-vacuous
+entailment. A model without a proof establishes only possibility.
 
 #heading(level: 3, numbering: none)[Scope of the claim]
 
@@ -336,6 +344,9 @@ sign table with the solver, then independently validates local dependencies and
 rule applications. This reduces correlated implementation risk but is not a
 formally verified trusted kernel. Theorem 3 establishes the intended calculus;
 tests establish only that the Python implementation conforms on covered cases.
+The adversarial scope tests include branch-local positive conclusions,
+refutation assumptions inside positive proofs, and attempted case-split
+discharge of refutation assumptions.
 
 #heading(level: 3, numbering: none)[Corollary 3.1: Refutation Soundness]
 
@@ -349,7 +360,11 @@ $
 so $Gamma |= not R_D(a,b)$. The result follows from Theorem 3's step argument:
 the premise-derived axis fact is true in every model of $Gamma$, the assumed
 candidate supplies a different exact comparison on the same axis pair, and
-trichotomy prevents both comparisons from holding in one world.
+trichotomy prevents both comparisons from holding in one world. The checker
+requires exactly one refutation-assumption step, requires it to be the declared
+$R_D(a,b)$ assumption, and requires that assumption to open a root scope rather
+than reuse a selected disjunct's branch. This prevents an unrelated or
+case-local assumption from manufacturing the contradiction.
 
 #heading(level: 2, numbering: none)[Constructive Model Certificates]
 
@@ -409,10 +424,11 @@ exact directions are possible, their mutual exclusivity makes each contingent;
 if exactly one is possible, exhaustive exclusion of all alternatives plus its
 positive proof makes it the unique entailed direction. $square$
 
-For a unique answer, the renderer prints the positive derivation once and then
-summarises the other exact directions as mutually exclusive exclusions. Their
-individual refutation certificates are still checked before rendering; this
-compression removes repeated proof prefixes without weakening the evidence.
+For a unique answer, both training views include the positive derivation and a
+consistency witness. Mutual exclusivity rules out the remaining exact directions.
+The full certificate's individual refutations are checked before rendering.
+Natural narrates the proof dependencies; Symbolic serializes replayable records.
+The ambiguous case retains explicit evidence for every candidate.
 
 This is completeness relative to the query's declared candidate set. A dataset
 adapter that exposes only four ordinal directions is making a narrower contract
@@ -483,12 +499,13 @@ $
 $
 
 A Count answer-set certificate covers every $k$ from zero through $n$ exactly
-once. A possible count carries an accepted model satisfying $P and C_k$. An
-impossible count carries one accepted contradiction for every assignment $A_T$
-with $|T| = k$. The contradiction may be a formula-refutation certificate for
-the whole assignment, or a checked membership classification that contradicts
-one of its literals. The checker requires exactly the $binom(n, k)$ canonical
-assignments and validates the problem, claim, and contradiction in each entry.
+once. A possible count carries an accepted model satisfying $P and C_k$.
+Fixed membership certificates are stored once: Proposition 6 establishes each
+fixed candidate as entailed or impossible. Assignments contradicting a fixed
+classification need no repeated exclusion entry. Each remaining impossible-count
+assignment compatible with all fixed classifications requires a checked
+refutation. The checker verifies exact coverage of those compatible assignments,
+as well as each fixed classification, problem, and claim.
 
 #heading(level: 2, numbering: none)[Proposition 7: Count-Domain Completeness]
 
@@ -496,25 +513,29 @@ If a Count answer-set certificate is accepted, the values marked by model
 certificates are exactly the possible counts among $0, ..., n$.
 
 _Proof._ Each model-backed count is possible by Proposition 4. For an
-impossible count $k$, every spatial world has one complete membership assignment
-$A_T$ with $|T| = k$ exactly when it satisfies $C_k$. Each assignment entry
-either directly establishes $P and A_T |= bot$, or identifies a literal of
-$A_T$ contradicted by Proposition 6. Hence no model of $P and C_k$ exists.
-Exact coverage of all count values leaves precisely the model-backed values as
-possible. $square$
+impossible count $k$, every model of $P and C_k$ would induce some assignment
+$A_T$ with $|T| = k$. If that assignment contradicts a fixed membership, it is
+impossible by Proposition 6. Otherwise it is among the compatible assignments
+whose checked refutations establish $P and A_T |= bot$. No model of
+$P and C_k$ therefore exists. Exact coverage of all count values leaves precisely
+the model-backed values as possible. $square$
 
 This construction preserves correlations. For example, if $M_A equiv not M_B$,
 both individual memberships are contingent, but assignments with neither or
 both members are refutable and the only possible count is one. No independent
 summation of Which statuses can establish that result.
 
-The evidence size is potentially exponential: excluding count $k$ requires
-$binom(n, k)$ assignment entries. The generator automatically uses contradictory
-entailed or impossible memberships where available. The current automatic proof
-builder does not synthesize every genuinely correlated Boolean refutation; a
-constructor may supply checked Boolean proof steps. A missing certificate is a
-construction limitation rather than semantic evidence that the count is
-possible.
+The evidence size remains potentially exponential in the number of contingent
+candidates, although fixed classifications no longer appear in every assignment.
+Compression therefore does not guarantee that a trace fits a model context.
+The automatic builder cannot synthesize every correlated Boolean refutation;
+missing evidence is a construction limitation rather than proof of possibility.
+
+Generated proofs retain steps supporting the designated conclusion. The local
+checker establishes validity of supplied rule applications; relevance is a
+separate construction property. Neither property establishes that a model used
+the emitted steps internally. Only Symbolic model output has a replay parser;
+Natural prose is not covered by these output-validation claims.
 
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 

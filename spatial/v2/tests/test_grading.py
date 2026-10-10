@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+import json
+
+import pytest
+
 from spatial.v2.grading import (
+    AnswerDecisionCheckError,
     AnswerMode,
     ResolutionStatus,
+    check_symbolic_answer_decision,
     encode_menu_answer,
+    parse_symbolic_answer_decision,
+    render_symbolic_answer_decision,
     resolve_answer,
     score_response,
 )
@@ -228,3 +236,47 @@ def test_response_scoring_uses_exact_set_equality_and_reports_partial_metrics() 
     assert partial.recall == 0.5
     assert partial.f1 == 2 / 3
     assert exact.exact_match
+
+
+def test_symbolic_answer_decision_round_trips_and_rejects_tampering() -> None:
+    analysis = DirectionAnalysis(
+        consistent=True,
+        target="A",
+        reference="B",
+        possible_directions=(Direction.NORTHEAST,),
+    )
+    resolution = resolve_answer(analysis, AnswerMode.SINGLE)
+    expected = encode_menu_answer(
+        resolution,
+        {"A": "North", "B": "Northeast"},
+    )
+    rendered = render_symbolic_answer_decision(resolution, expected)
+    parsed = parse_symbolic_answer_decision(rendered)
+
+    check_symbolic_answer_decision(parsed, expected)
+    payload = json.loads(rendered)
+    payload["select"] = ["A"]
+    tampered = parse_symbolic_answer_decision(json.dumps(payload))
+    with pytest.raises(AnswerDecisionCheckError, match="does not match"):
+        check_symbolic_answer_decision(tampered, expected)
+
+
+@pytest.mark.parametrize("mode", tuple(AnswerMode))
+def test_menu_permutation_preserves_semantic_selection_for_every_answer_mode(mode):
+    analysis = DirectionAnalysis(
+        consistent=True,
+        target="A",
+        reference="B",
+        possible_directions=(Direction.NORTH, Direction.SOUTH),
+    )
+    resolution = resolve_answer(analysis, mode)
+    labels = ("North", "Cannot be determined", "East", "South", "None of the Options")
+    expected_values = (
+        {"Cannot be determined"} if mode is AnswerMode.SINGLE else {"North", "South"}
+    )
+    for offset in range(len(labels)):
+        rotated = labels[offset:] + labels[:offset]
+        options = dict(zip("ABCDE", rotated))
+        answer = encode_menu_answer(resolution, options)
+        assert {options[letter] for letter in answer.letters} == expected_values
+        assert score_response(answer.letters, answer).exact_match

@@ -245,4 +245,5 @@ Answer: E
 | incomplete pair | 200 | none listed | 400 | | |
 | live dir omitted | 200 | | | | |
 
-Solver: `spatial/v1/solver.py`. Generator: `spatial/v1/generate_all_v6.py`. CoT format: `docs/symbolic-cot.md`.
+Solver: `spatial/v1/solver.py`. Generator and historical trace format:
+`spatial/v1/generate_all_v6.py`.

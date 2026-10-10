@@ -134,8 +134,10 @@ def process_docs_v6_sft(dataset):
 
 def process_docs_v2_sft(dataset):
     """Spatial V2 chat rows → lm-eval docs using solver-authored metadata gold."""
+    from spatial.v2.context_budget import validate_context_admission
 
     def convert(doc):
+        validate_context_admission(doc)
         user_content = next(
             (
                 str(message.get("content") or "")
@@ -145,26 +147,106 @@ def process_docs_v2_sft(dataset):
             "",
         )
         metadata = dict(doc.get("metadata") or {})
+        evaluation_prompt = metadata["evaluation_prompt"]
         letters = [
             str(letter).strip().upper()
             for letter in metadata.get("oracle_letters") or []
             if str(letter).strip()
         ]
-        if not letters or any(
-            len(letter) != 1 or letter not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            for letter in letters
+        if (
+            not letters
+            or letters != sorted(set(letters))
+            or any(
+                len(letter) != 1 or letter not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                for letter in letters
+            )
         ):
             raise ValueError("Spatial V2 row has invalid metadata.oracle_letters")
         return {
             "text": user_content,
             "oracle_option": ",".join(letters),
+            "evaluation_prompt": evaluation_prompt,
             "matrix_cell": str(metadata.get("matrix_cell") or ""),
             "answer_mode": str(metadata.get("answer_mode") or ""),
             "trace_format": str(metadata.get("trace_format") or ""),
+            "supervision_arm": str(metadata.get("supervision_arm") or "checked-trace"),
             "difficulty": dict(metadata.get("difficulty") or {}),
         }
 
     return dataset.map(convert)
+
+
+def applicable_process_rate(items):
+    """Conditional replay rate; null means this format has no process checker."""
+    applicable = sum(item[1] for item in items)
+    return sum(item[0] for item in items) / applicable if applicable else None
+
+
+def process_results_v2(doc, results):
+    """Score the final answer and replay emitted Symbolic evidence separately."""
+    response = results[0]
+    footer = re.search(r"(?:^|\n)Answer:\s*([A-Z](?:\s*,\s*[A-Z])*)\s*$", response)
+    letters = (
+        tuple(part.strip() for part in footer.group(1).split(",")) if footer else ()
+    )
+    canonical = bool(letters) and letters == tuple(sorted(set(letters)))
+    predicted = set(letters) if canonical else set()
+    gold = _answer_letter_set(doc["oracle_option"])
+    exact = int(bool(predicted) and predicted == gold)
+    applicable = (
+        doc["trace_format"] == "symbolic" and doc["supervision_arm"] != "answer-only"
+    )
+    metrics = {
+        "strict_acc": exact,
+        "loose_acc": int(bool(predicted) and gold.issubset(predicted)),
+        "process_applicable": int(applicable),
+        **{
+            name: (0, int(applicable))
+            for name in (
+                "reasoning_valid",
+                "decision_valid",
+                "domain_consistent",
+                "fully_valid",
+            )
+        },
+    }
+    if not applicable:
+        return metrics
+
+    from spatial.v2.grading import AnswerMode, encode_menu_answer, resolve_answer
+    from spatial.v2.solver import SpatialSolverV2
+    from spatial.v2.symbolic_trace_codec import score_symbolic_training_trace
+    from spatial.v2.text import SpatialTextAdapter
+
+    parsed = SpatialTextAdapter().parse(doc["text"])
+    analysis = SpatialSolverV2(backend="z3").analyze(parsed.problem)
+    expected = encode_menu_answer(
+        resolve_answer(analysis, AnswerMode(doc["answer_mode"])), parsed.options
+    )
+    if expected.letters != frozenset(gold):
+        raise ValueError(
+            "evaluation metadata gold disagrees with visible-premise semantics"
+        )
+    # Some chat templates prefill <think>; its opening tag is then outside the response.
+    if response.count("</think>") != 1:
+        return metrics
+    reasoning, answer_tail = response.split("</think>", 1)
+    reasoning = reasoning.strip()
+    if reasoning.startswith("<think>"):
+        reasoning = reasoning[len("<think>") :].strip()
+    score = score_symbolic_training_trace(parsed.problem, reasoning, expected)
+    metrics.update(
+        {
+            name: (int(getattr(score, name)), 1)
+            for name in ("reasoning_valid", "decision_valid", "domain_consistent")
+        }
+    )
+    clean_footer = re.fullmatch(r"\s*Answer:\s*[A-Z](?:\s*,\s*[A-Z])*\s*", answer_tail)
+    metrics["fully_valid"] = (
+        int(score.fully_valid and exact and bool(clean_footer)),
+        1,
+    )
+    return metrics
 
 
 def process_docs_v13_sft(dataset):
@@ -174,6 +256,7 @@ def process_docs_v13_sft(dataset):
     at the top level.  Preserve that gold and the structural analysis instead
     of re-extracting an answer from the supervised assistant trace.
     """
+
     def convert(doc):
         user_content = ""
         for msg in doc.get("messages") or []:

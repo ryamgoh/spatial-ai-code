@@ -3,7 +3,7 @@
 Status: living experimental plan
 
 This document develops the evaluation half of the project. It is subordinate to
-the main [`FYP research canvas`](v2-fyp-research-canvas.md) and does not fix the
+the main [`FYP research plan`](research-plan.md) and does not fix the
 dissertation chapter structure or experiment numbering.
 
 ## Purpose

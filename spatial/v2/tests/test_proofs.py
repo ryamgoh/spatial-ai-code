@@ -1,4 +1,4 @@
-"""Contracts for proof-first SpatialEntail Direction certificates."""
+"""Contracts for replayable SpatialEntail Direction certificates."""
 
 from __future__ import annotations
 
@@ -11,12 +11,16 @@ import pytest
 from spatial.v2.proof_renderers import (
     render_direction_proof,
     render_direction_refutation,
+    render_direction_training_proof,
+    render_direction_training_refutation,
+    render_formula_refutation,
 )
 from spatial.v2.proofs import (
     AxisFact,
     Contradiction,
     DirectionClaim,
     DirectionProofCertificate,
+    DirectionRefutationCertificate,
     OrderRelation,
     ProofAxis,
     ProofCheckError,
@@ -44,6 +48,12 @@ from spatial.v2.solver import (
     SpatialFormula,
     SpatialProblem,
     direction_signs,
+)
+from spatial.v2.symbolic_trace_codec import (
+    SymbolicProofError,
+    parse_symbolic_direction_proof,
+    parse_symbolic_direction_refutation,
+    parse_symbolic_formula_refutation,
 )
 from spatial.v2.text import SpatialTextAdapter
 from spatial.v2.trace import TraceFormat
@@ -121,7 +131,10 @@ def test_direct_certificate_supports_all_eight_directions(direction: Direction) 
     check_direction_proof(proof)
     assert proof.conclusion == DirectionClaim("A", direction, "B")
     assert proof.support_premise_indices == (0,)
-    assert proof.steps[-1].rule is ProofRule.DIRECTION_RECOMPOSITION
+    assert proof.steps[-1].rule.value == "direction-introduction"
+    assert not any(
+        step.rule is ProofRule.DIRECTION_DECOMPOSITION for step in proof.steps
+    )
     json.dumps(proof_to_dict(proof))
 
 
@@ -142,10 +155,15 @@ def test_refutation_certificate_excludes_every_other_direction(
         check_direction_refutation(refutation)
         assert next(iter(refutation.claim.allowed)) is candidate
         assert refutation.support_premise_indices == (0,)
-        assert "Impossible:" in render_direction_refutation(
+        symbolic = render_direction_refutation(
             refutation,
             TraceFormat.SYMBOLIC,
         )
+        training = render_direction_training_refutation(refutation)
+        assert parse_symbolic_direction_refutation(problem, symbolic) == refutation
+        assert "From P1 on the" in training
+        assert "From A-REFUTE on the" in training
+        assert all(f"{step.id}:" in training for step in refutation.steps)
         json.dumps(refutation_to_dict(refutation))
 
 
@@ -333,6 +351,13 @@ def test_automatic_builder_handles_nested_case_splits() -> None:
         if step.rule is ProofRule.CASE_SPLIT and step.branch is not None
     )
     assert nested.branch.startswith("case-")
+    natural = render_direction_training_proof(proof)
+    assert f"[{nested.branch}] {nested.id}: Every case" in natural
+    for step in proof.steps:
+        line = next(line for line in natural.splitlines() if f"{step.id}:" in line)
+        assert all(dependency in line for dependency in step.inputs)
+        if step.branch is not None:
+            assert f"[{step.branch}]" in line
 
 
 def test_nested_case_search_is_bounded_by_formula_structure_not_magic_depth() -> None:
@@ -396,6 +421,8 @@ def test_automatic_formula_refutation_preserves_boolean_correlation() -> None:
     refutation = build_formula_refutation(problem, claim)
 
     check_formula_refutation(refutation)
+    symbolic = render_formula_refutation(refutation, TraceFormat.SYMBOLIC)
+    assert parse_symbolic_formula_refutation(problem, symbolic) == refutation
     assert refutation.claim == claim
     assert any(step.rule is ProofRule.IFF_ELIMINATION for step in refutation.steps)
     assert refutation.steps[-1].rule is ProofRule.CONTRADICTION
@@ -422,16 +449,59 @@ def test_transitive_certificate_renders_one_checked_proof_in_two_forms() -> None
 
     proof = build_direction_proof(problem)
     natural = render_direction_proof(proof, TraceFormat.NATURAL)
+    training = render_direction_training_proof(proof)
     symbolic = render_direction_proof(proof, TraceFormat.SYMBOLIC)
+    parsed = parse_symbolic_direction_proof(problem, symbolic)
 
     assert proof.conclusion.direction is Direction.NORTHEAST
+    assert parsed == proof
     assert proof.support_premise_indices == (0, 1)
     assert "By X-axis transitivity" in natural
     assert "By Y-axis transitivity" in natural
-    assert "Combining the X and Y conclusions gives A is Northeast of C" in natural
-    assert "DIR_NORTHEAST(A,C)" in symbolic
-    assert "[direction-recomposition" in symbolic
+    assert "gives A is Northeast of C" in natural
+    assert training == natural
+    for step in proof.steps:
+        assert f"{step.id}:" in training
+        for dependency in step.inputs:
+            assert dependency in training
+    assert '"schema":"spatial-direction-proof-v1"' in symbolic
+    assert '"direction":"NORTHEAST"' in symbolic
+    assert '"rule":"direction-recomposition"' in symbolic
     assert re.search(r"=\(-?\d+,\s*-?\d+\)", natural + symbolic) is None
+
+
+def test_symbolic_proof_parser_replays_tampered_output() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=atom("A", Direction.NORTHEAST, "B"),
+        query=DirectionQuery("A", "B"),
+    )
+    rendered = render_direction_proof(
+        build_direction_proof(problem),
+        TraceFormat.SYMBOLIC,
+    )
+    payload = json.loads(rendered)
+    payload["steps"][-1]["conclusion"]["direction"] = "SOUTHWEST"
+
+    with pytest.raises(ProofCheckError, match="wrong direction"):
+        parse_symbolic_direction_proof(problem, json.dumps(payload))
+
+
+def test_symbolic_proof_parser_rejects_unknown_fields() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=atom("A", Direction.NORTH, "B"),
+        query=DirectionQuery("A", "B"),
+    )
+    rendered = render_direction_proof(
+        build_direction_proof(problem),
+        TraceFormat.SYMBOLIC,
+    )
+    payload = json.loads(rendered)
+    payload["unexpected"] = True
+
+    with pytest.raises(SymbolicProofError, match="unexpected or missing fields"):
+        parse_symbolic_direction_proof(problem, json.dumps(payload))
 
 
 def test_certificate_can_use_independent_x_and_y_support() -> None:
@@ -506,7 +576,7 @@ def test_disjunctive_syllogism_derives_a_spatial_atom_and_direction() -> None:
     natural = render_direction_proof(proof, TraceFormat.NATURAL)
     symbolic = render_direction_proof(proof, TraceFormat.SYMBOLIC)
     assert "by disjunctive syllogism" in natural
-    assert "[disjunctive-syllogism P1,P2]" in symbolic
+    assert '"rule":"disjunctive-syllogism"' in symbolic
     assert proof.conclusion.direction is Direction.NORTHEAST
 
 
@@ -568,10 +638,13 @@ def test_conjunction_rules_and_double_negation_are_replayable() -> None:
     proof = certificate_from_atom_step(
         problem,
         (
-            *premise_steps(northeast, west, problem.premise.operands[2]),
-            ProofStep("S1", ProofRule.AND_INTRODUCTION, conjunction, ("P1", "P2")),
-            ProofStep("S2", ProofRule.AND_ELIMINATION, northeast, ("S1",)),
+            ProofStep("P2", ProofRule.PREMISE, west, premise_index=1),
+            ProofStep(
+                "P3", ProofRule.PREMISE, problem.premise.operands[2], premise_index=2
+            ),
             ProofStep("S3", ProofRule.DOUBLE_NEGATION, northeast, ("P3",)),
+            ProofStep("S1", ProofRule.AND_INTRODUCTION, conjunction, ("S3", "P2")),
+            ProofStep("S2", ProofRule.AND_ELIMINATION, northeast, ("S1",)),
         ),
         "S2",
         northeast,
@@ -604,8 +677,8 @@ def test_explicit_contradiction_step_is_checked() -> None:
         northeast,
     )
 
-    check_direction_proof(proof)
-    assert "CONTRADICTION" in render_direction_proof(proof, TraceFormat.SYMBOLIC)
+    with pytest.raises(ProofCheckError, match="dead steps"):
+        check_direction_proof(proof)
 
 
 def test_checker_rejects_invalid_boolean_rule_applications() -> None:
@@ -679,6 +752,243 @@ def test_checker_rejects_invalid_boolean_rule_applications() -> None:
             check_direction_proof(proof)
 
 
+def test_positive_proof_rejects_a_refutation_assumption() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=atom("A", Direction.NORTH, "B"),
+        query=DirectionQuery("A", "B"),
+    )
+    assumed = atom("A", Direction.EAST, "B")
+    proof = DirectionProofCertificate(
+        problem,
+        (
+            ProofStep(
+                "A",
+                ProofRule.REFUTATION_ASSUMPTION,
+                assumed,
+                branch="fake",
+            ),
+            ProofStep(
+                "X",
+                ProofRule.DIRECTION_DECOMPOSITION,
+                AxisFact(
+                    ProofAxis.X,
+                    "A",
+                    OrderRelation.GREATER,
+                    "B",
+                ),
+                ("A",),
+                branch="fake",
+            ),
+            ProofStep(
+                "Y",
+                ProofRule.DIRECTION_DECOMPOSITION,
+                AxisFact(
+                    ProofAxis.Y,
+                    "A",
+                    OrderRelation.EQUAL,
+                    "B",
+                ),
+                ("A",),
+                branch="fake",
+            ),
+            ProofStep(
+                "Q",
+                ProofRule.DIRECTION_RECOMPOSITION,
+                DirectionClaim("A", Direction.EAST, "B"),
+                ("X", "Y"),
+                branch="fake",
+            ),
+        ),
+        "Q",
+    )
+
+    with pytest.raises(
+        ProofCheckError,
+        match="positive proofs cannot use refutation assumptions",
+    ):
+        check_direction_proof(proof)
+
+
+def test_positive_proof_requires_a_global_conclusion() -> None:
+    east = atom("A", Direction.EAST, "B")
+    north = atom("A", Direction.NORTH, "B")
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=Or((east, north)),
+        query=DirectionQuery("A", "B"),
+    )
+    proof = certificate_from_atom_step(
+        problem,
+        (
+            *premise_steps(problem.premise),
+            ProofStep(
+                "A",
+                ProofRule.ASSUMPTION,
+                east,
+                ("P1",),
+                branch="east-case",
+            ),
+        ),
+        "A",
+        east,
+    )
+    proof = replace(
+        proof,
+        steps=tuple(
+            replace(step, branch="east-case")
+            if step.id in {"Q-X", "Q-Y", "Q-DIR"}
+            else step
+            for step in proof.steps
+        ),
+    )
+
+    with pytest.raises(ProofCheckError, match="conclusion must be global"):
+        check_direction_proof(proof)
+
+
+def test_refutation_rejects_an_additional_refutation_assumption() -> None:
+    east = atom("A", Direction.EAST, "B")
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=east,
+        query=DirectionQuery("A", "B"),
+    )
+    refutation = DirectionRefutationCertificate(
+        problem,
+        east,
+        (
+            ProofStep(
+                "A",
+                ProofRule.REFUTATION_ASSUMPTION,
+                east,
+                branch="refutation",
+            ),
+            ProofStep(
+                "B",
+                ProofRule.REFUTATION_ASSUMPTION,
+                Not(east),
+                branch="refutation",
+            ),
+            ProofStep(
+                "C",
+                ProofRule.CONTRADICTION,
+                Contradiction(),
+                ("A", "B"),
+                branch="refutation",
+            ),
+        ),
+        "A",
+        "C",
+    )
+
+    with pytest.raises(
+        ProofCheckError,
+        match="exactly one declared refutation assumption",
+    ):
+        check_direction_refutation(refutation)
+
+
+def test_refutation_assumption_must_open_a_root_scope() -> None:
+    east = atom("A", Direction.EAST, "B")
+    premise = Or((Not(east), east))
+    problem = SpatialProblem(
+        objects=("A", "B"),
+        premise=premise,
+        query=DirectionQuery("A", "B"),
+    )
+    refutation = DirectionRefutationCertificate(
+        problem,
+        east,
+        (
+            *premise_steps(premise),
+            ProofStep(
+                "B-A",
+                ProofRule.ASSUMPTION,
+                Not(east),
+                ("P1",),
+                branch="negative-case",
+            ),
+            ProofStep(
+                "R",
+                ProofRule.REFUTATION_ASSUMPTION,
+                east,
+                branch="negative-case",
+            ),
+            ProofStep(
+                "C",
+                ProofRule.CONTRADICTION,
+                Contradiction(),
+                ("B-A", "R"),
+                branch="negative-case",
+            ),
+        ),
+        "R",
+        "C",
+    )
+
+    with pytest.raises(ProofCheckError, match="open a root scope"):
+        check_direction_refutation(refutation)
+
+
+def test_case_split_cannot_discharge_refutation_assumptions() -> None:
+    north = atom("A", Direction.NORTH, "B")
+    south = atom("A", Direction.SOUTH, "B")
+    east = atom("C", Direction.EAST, "D")
+    disjunction = Or((north, south))
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D"),
+        premise=disjunction,
+        query=DirectionQuery("C", "D"),
+    )
+    proof = certificate_from_atom_step(
+        problem,
+        (
+            *premise_steps(disjunction),
+            ProofStep(
+                "B1-A",
+                ProofRule.ASSUMPTION,
+                north,
+                ("P1",),
+                branch="north-case",
+            ),
+            ProofStep(
+                "B1-R",
+                ProofRule.REFUTATION_ASSUMPTION,
+                east,
+                branch="north-case",
+            ),
+            ProofStep(
+                "B2-A",
+                ProofRule.ASSUMPTION,
+                south,
+                ("P1",),
+                branch="south-case",
+            ),
+            ProofStep(
+                "B2-R",
+                ProofRule.REFUTATION_ASSUMPTION,
+                east,
+                branch="south-case",
+            ),
+            ProofStep(
+                "CASE",
+                ProofRule.CASE_SPLIT,
+                east,
+                ("P1", "B1-R", "B2-R"),
+            ),
+        ),
+        "CASE",
+        east,
+    )
+
+    with pytest.raises(
+        ProofCheckError,
+        match="positive proofs cannot use refutation assumptions",
+    ):
+        check_direction_proof(proof)
+
+
 def test_case_split_recombines_two_spatial_proof_branches() -> None:
     northeast = atom("A", Direction.NORTHEAST, "B")
     northwest = atom("A", Direction.NORTHWEST, "B")
@@ -741,7 +1051,7 @@ def test_case_split_recombines_two_spatial_proof_branches() -> None:
     symbolic = render_direction_proof(proof, TraceFormat.SYMBOLIC)
     assert "[northeast-case] B1-A: Assume" in natural
     assert "Every case from P1 concludes" in natural
-    assert "branch=northwest-case" in symbolic
+    assert '"branch":"northwest-case"' in symbolic
     assert proof.conclusion.direction is Direction.EAST
 
 
@@ -1040,3 +1350,52 @@ def test_renderer_uses_display_labels_without_changing_certificate() -> None:
 
     assert "Bakery is Southwest of Library" in rendered
     assert "obj_0" not in rendered
+
+
+@pytest.mark.parametrize("after_conclusion", (False, True))
+def test_direction_proof_rejects_unused_valid_steps(after_conclusion: bool) -> None:
+    problem = SpatialProblem(
+        ("A", "B"), atom("A", Direction.NORTH, "B"), DirectionQuery("A", "B")
+    )
+    proof = build_direction_proof(problem)
+    dead = ProofStep("UNUSED", ProofRule.PREMISE, problem.premise, premise_index=0)
+    steps = (*proof.steps, dead) if after_conclusion else (dead, *proof.steps)
+    with pytest.raises(ProofCheckError, match="dead steps"):
+        check_direction_proof(replace(proof, steps=steps))
+    payload = json.loads(render_direction_proof(proof, TraceFormat.SYMBOLIC))
+    extra = {**payload["steps"][0], "id": "UNUSED"}
+    payload["steps"].insert(len(payload["steps"]) if after_conclusion else 0, extra)
+    with pytest.raises(ProofCheckError, match="dead steps"):
+        parse_symbolic_direction_proof(problem, json.dumps(payload))
+
+
+def test_refutation_rejects_valid_step_after_contradiction() -> None:
+    problem = SpatialProblem(
+        ("A", "B"), atom("A", Direction.NORTH, "B"), DirectionQuery("A", "B")
+    )
+    refutation = build_direction_refutation(problem, Direction.SOUTH)
+    dead = ProofStep("UNUSED", ProofRule.PREMISE, problem.premise, premise_index=0)
+    with pytest.raises(ProofCheckError, match="dead steps"):
+        check_direction_refutation(replace(refutation, steps=(*refutation.steps, dead)))
+
+
+def test_formula_rule_cannot_hide_unused_axis_evidence_as_an_extra_input():
+    ab = atom("A", Direction.NORTHEAST, "B")
+    bc = atom("B", Direction.NORTH, "C")
+    conjunction = And((ab, bc))
+    problem = SpatialProblem(
+        ("A", "B", "C"), And((conjunction, ab)), DirectionQuery("A", "B")
+    )
+    steps = (
+        *premise_steps(conjunction, ab),
+        ProofStep(
+            "unused-axis",
+            ProofRule.DIRECTION_DECOMPOSITION,
+            AxisFact(ProofAxis.X, "A", OrderRelation.GREATER, "B"),
+            ("P2",),
+        ),
+        ProofStep("eliminate", ProofRule.AND_ELIMINATION, ab, ("P1", "unused-axis")),
+    )
+    certificate = certificate_from_atom_step(problem, steps, "eliminate", ab)
+    with pytest.raises(ProofCheckError, match="only formula inputs"):
+        check_direction_proof(certificate)

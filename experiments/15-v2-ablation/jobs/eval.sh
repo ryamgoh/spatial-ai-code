@@ -11,7 +11,7 @@ source "$SLURM_SUBMIT_DIR/experiments/15-v2-ablation/jobs/common.bash"
 : "${MODEL_DIR:?MODEL_DIR is required}"
 : "${RESULT_DIR:?RESULT_DIR is required}"
 
-[[ -f "$MODEL_DIR/COMPLETED" ]] && has_adapter "$MODEL_DIR" || {
+[[ "${UNTUNED:-0}" == "1" ]] || { [[ -f "$MODEL_DIR/COMPLETED" ]] && has_adapter "$MODEL_DIR"; } || {
   echo "Arm $ARM has no verified adapter"
   exit 1
 }
@@ -24,6 +24,7 @@ normalize_single_cuda_device
 
 mkdir -p "$RESULT_DIR"
 sync_uv_project "$SLURM_SUBMIT_DIR/eval"
+export PYTHONPATH="$SLURM_SUBMIT_DIR${PYTHONPATH:+:$PYTHONPATH}"
 cd eval
 uv run python eval_new.py \
   --config "$EVAL_CONFIG" \

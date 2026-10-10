@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
+from dataclasses import asdict, dataclass, fields
 from enum import Enum
 from itertools import product
 from pathlib import Path
@@ -10,8 +10,17 @@ from typing import TypeVar
 
 import typer
 
+from spatial.v2.context_budget import (
+    ContextBudget,
+    admit_row_group,
+    load_tokenizer,
+    rejection_output_path,
+    summarize_admissions,
+    write_rejection_report,
+)
 from spatial.v2.generation import (
     BooleanShape,
+    GenerationMode,
     GenerationPolicy,
     MenuCoverage,
     QueryKind,
@@ -20,8 +29,13 @@ from spatial.v2.generation import (
 )
 from spatial.v2.grading import AnswerMode
 from spatial.v2.solver import Direction
+from spatial.v2.supervision_controls import (
+    SupervisionArm,
+    build_supervision_variants,
+)
 from spatial.v2.trace import TraceFormat
 from spatial.v2.workload_manifest import (
+    SplitStrategy,
     check_output_paths,
     remove_output_paths,
     workload_output_paths,
@@ -34,6 +48,7 @@ EnumType = TypeVar("EnumType", bound=Enum)
 
 @dataclass(frozen=True)
 class WorkloadSpec:
+    generation_mode: GenerationMode = GenerationMode.AUTO
     samples_per_cell: int = 100
     query_kinds: tuple[QueryKind, ...] = tuple(QueryKind)
     answer_modes: tuple[AnswerMode, ...] = (AnswerMode.SINGLE,)
@@ -43,6 +58,7 @@ class WorkloadSpec:
     )
     menu_coverages: tuple[MenuCoverage, ...] = (MenuCoverage.FULL,)
     trace_formats: tuple[TraceFormat, ...] = tuple(TraceFormat)
+    supervision_arms: tuple[SupervisionArm, ...] = (SupervisionArm.CHECKED_TRACE,)
     boolean_shapes: tuple[BooleanShape, ...] = (BooleanShape.ATOMIC,)
     query_directions: tuple[Direction, ...] | None = None
     target_directions: tuple[Direction, ...] | None = None
@@ -57,16 +73,25 @@ class WorkloadSpec:
     max_membership_depth: int | None = None
     distractor_premises: int = 0
     max_attempts_per_sample: int = 2_000
+    dev_split: float = 0
+    context_budget: ContextBudget | None = None
     test_split: float = 0.2
+    split_strategy: SplitStrategy = SplitStrategy.RANDOM
     seed: int = 42
     include_audit: bool = False
     replace: bool = False
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, "split_strategy", SplitStrategy(self.split_strategy))
+        object.__setattr__(
+            self, "generation_mode", GenerationMode(self.generation_mode)
+        )
         if self.samples_per_cell < 0:
             raise ValueError("samples_per_cell cannot be negative")
         if self.max_attempts_per_sample <= 0:
             raise ValueError("max_attempts_per_sample must be positive")
+        if not 0 <= self.dev_split < 1 or self.dev_split + self.test_split >= 1:
+            raise ValueError("dev_split and test_split must sum to less than 1")
         if not 0 <= self.test_split < 1:
             raise ValueError("test_split must be in [0, 1)")
         dimensions = {
@@ -75,18 +100,32 @@ class WorkloadSpec:
             "semantic shape": self.semantic_shapes,
             "menu coverage": self.menu_coverages,
             "trace format": self.trace_formats,
+            "supervision arm": self.supervision_arms,
             "Boolean shape": self.boolean_shapes,
         }
         empty = [name for name, values in dimensions.items() if not values]
         if empty:
             raise ValueError("empty workload dimensions: " + ", ".join(empty))
-        if any(shape is not BooleanShape.ATOMIC for shape in self.boolean_shapes) and (
-            set(self.semantic_shapes) != {SemanticShape.UNIQUE}
+        normalized_arms = tuple(SupervisionArm(arm) for arm in self.supervision_arms)
+        if len(normalized_arms) != len(set(normalized_arms)):
+            raise ValueError("supervision arms must be unique")
+        object.__setattr__(self, "supervision_arms", normalized_arms)
+        if (
+            SupervisionArm.CORRUPTED_TRACE in normalized_arms
+            and TraceFormat.SYMBOLIC not in self.trace_formats
+        ):
+            raise ValueError("corrupted-trace requires a symbolic trace variant")
+        if (
+            self.generation_mode != "premise-first"
+            and any(shape is not BooleanShape.ATOMIC for shape in self.boolean_shapes)
+            and (set(self.semantic_shapes) != {SemanticShape.UNIQUE})
         ):
             raise ValueError("non-atomic Boolean shapes require unique semantic cells")
 
     def manifest_config(self) -> dict:
         def serialize(value):
+            if isinstance(value, ContextBudget):
+                return asdict(value)
             if isinstance(value, Enum):
                 return value.value
             if isinstance(value, tuple):
@@ -121,12 +160,18 @@ def _enum_values(
 def generate_workload(
     output_file: str | Path,
     spec: WorkloadSpec,
-) -> tuple[Path, Path]:
+) -> tuple[Path, Path, Path]:
     """Generate each requested policy cell equally, then shuffle and split."""
-    output_paths = workload_output_paths(output_file)
+    output_paths = (
+        *workload_output_paths(output_file),
+        rejection_output_path(output_file),
+    )
     check_output_paths(output_paths, replace=spec.replace)
+    tokenizer = load_tokenizer(spec.context_budget) if spec.context_budget else None
+    admissions = []
     generator = SpatialGeneratorV2(seed=spec.seed)
     row_groups: list[list[dict]] = []
+    expected_variants_by_base = {}
     for dimensions in product(
         spec.query_kinds,
         spec.answer_modes,
@@ -152,6 +197,7 @@ def generate_workload(
         for query_direction, target_direction in direction_pairs:
             try:
                 policy = GenerationPolicy(
+                    generation_mode=spec.generation_mode,
                     query_kind=query_kind,
                     answer_mode=answer_mode,
                     semantic_shape=shape,
@@ -181,37 +227,102 @@ def generate_workload(
                 sample = generator.generate(
                     policy, max_attempts=spec.max_attempts_per_sample
                 )
-                row_groups.append(
-                    [
-                        sample.with_trace(trace_format).as_sft_row(
-                            include_audit=spec.include_audit
+                checked_rows = [
+                    sample.with_trace(trace_format).as_sft_row(
+                        include_audit=spec.include_audit
+                    )
+                    for trace_format in spec.trace_formats
+                ]
+                variants = []
+                for index, row in enumerate(checked_rows):
+                    arms = tuple(
+                        arm
+                        for arm in spec.supervision_arms
+                        if (arm is not SupervisionArm.ANSWER_ONLY or index == 0)
+                        and (
+                            arm is not SupervisionArm.CORRUPTED_TRACE
+                            or row["metadata"]["trace_format"] == "symbolic"
                         )
-                        for trace_format in spec.trace_formats
-                    ]
-                )
+                    )
+                    if arms:
+                        variants.extend(
+                            build_supervision_variants(
+                                row,
+                                arms,
+                                problem=sample.problem,
+                                expected=sample.menu_answer,
+                            )
+                        )
+                if spec.context_budget:
+                    admission = admit_row_group(
+                        variants, tokenizer, spec.context_budget
+                    )
+                    admissions.append(admission)
+                    if not admission.accepted:
+                        write_rejection_report(
+                            output_file,
+                            admissions,
+                            spec.context_budget,
+                            cell="/".join(str(value.value) for value in dimensions),
+                        )
+                        raise ValueError(
+                            f"cell {dimensions}: paired context admission failed: {admission.row_rejections}"
+                        )
+                    variants = list(admission.rows)
+                row_groups.append(variants)
+                expected_variants_by_base[sample.base_id] = {
+                    (answer_mode, coverage, trace, arm)
+                    for index, trace in enumerate(spec.trace_formats)
+                    for arm in spec.supervision_arms
+                    if (arm is not SupervisionArm.ANSWER_ONLY or index == 0)
+                    and (
+                        arm is not SupervisionArm.CORRUPTED_TRACE
+                        or trace is TraceFormat.SYMBOLIC
+                    )
+                }
 
-    if spec.replace:
-        remove_output_paths(output_paths)
-    train_path, test_path, _manifest_path = write_workload(
+    train_path, dev_path, test_path, _manifest_path = write_workload(
         output_file,
         row_groups,
         test_split=spec.test_split,
+        dev_split=spec.dev_split,
         seed=spec.seed,
-        expected_trace_variants=spec.trace_formats,
-        manifest_metadata={"generation": spec.manifest_config()},
+        split_strategy=spec.split_strategy,
+        expected_trace_variants={
+            variant[2]
+            for variants in expected_variants_by_base.values()
+            for variant in variants
+        },
+        expected_variants_by_base=expected_variants_by_base,
+        manifest_metadata={
+            "generation": spec.manifest_config(),
+            **(
+                {
+                    "context_admission": summarize_admissions(
+                        admissions, spec.context_budget
+                    )
+                }
+                if spec.context_budget
+                else {}
+            ),
+        },
     )
-    return train_path, test_path
+    if spec.replace:
+        remove_output_paths((rejection_output_path(output_file),))
+    return train_path, dev_path, test_path
 
 
 @app.command()
 def main(
     out: Path = typer.Option(..., help="Output JSONL base path."),  # noqa: B008
+    generation_mode: GenerationMode = typer.Option(GenerationMode.AUTO),  # noqa: B008
     samples_per_cell: int = typer.Option(100, min=0),
     query_kinds: str = typer.Option("direction,which,count"),
     answer_modes: str = typer.Option("single"),
     semantic_shapes: str = typer.Option("unique,ambiguous"),
     menu_coverages: str = typer.Option("full"),
     trace_formats: str = typer.Option("natural,symbolic"),
+    supervision_arms: str = typer.Option("checked-trace"),
     boolean_shapes: str = typer.Option("atomic"),
     query_directions: str = typer.Option(
         "north,northeast,east,southeast,south,southwest,west,northwest",
@@ -232,7 +343,13 @@ def main(
     max_membership_depth: int | None = typer.Option(None, min=1),
     distractor_premises: int = typer.Option(0, min=0),
     max_attempts_per_sample: int = typer.Option(2_000, min=1),
+    dev_split: float = typer.Option(0, min=0.0, max=0.999999),
+    tokenizer_name: str | None = typer.Option(None),
+    train_max_tokens: int = typer.Option(4096, min=1),
+    eval_max_tokens: int = typer.Option(8192, min=1),
+    max_new_tokens: int = typer.Option(4096, min=1),
     test_split: float = typer.Option(0.2, min=0.0, max=0.999999),
+    split_strategy: SplitStrategy = typer.Option(SplitStrategy.RANDOM),  # noqa: B008
     seed: int = typer.Option(42),
     include_audit: bool = typer.Option(
         False,
@@ -244,9 +361,10 @@ def main(
 ) -> None:
     """Write balanced train/test workloads over the requested policy cells."""
     try:
-        train_path, test_path = generate_workload(
+        train_path, dev_path, test_path = generate_workload(
             out,
             WorkloadSpec(
+                generation_mode=generation_mode,
                 samples_per_cell=samples_per_cell,
                 query_kinds=_enum_values(query_kinds, QueryKind, "query kinds"),
                 answer_modes=_enum_values(answer_modes, AnswerMode, "answer modes"),
@@ -257,6 +375,11 @@ def main(
                     menu_coverages, MenuCoverage, "menu coverages"
                 ),
                 trace_formats=_enum_values(trace_formats, TraceFormat, "trace formats"),
+                supervision_arms=_enum_values(
+                    supervision_arms,
+                    SupervisionArm,
+                    "supervision arms",
+                ),
                 boolean_shapes=_enum_values(
                     boolean_shapes,
                     BooleanShape,
@@ -280,6 +403,13 @@ def main(
                 distractor_premises=distractor_premises,
                 max_attempts_per_sample=max_attempts_per_sample,
                 test_split=test_split,
+                dev_split=dev_split,
+                context_budget=ContextBudget(
+                    tokenizer_name, train_max_tokens, eval_max_tokens, max_new_tokens
+                )
+                if tokenizer_name
+                else None,
+                split_strategy=split_strategy,
                 seed=seed,
                 include_audit=include_audit,
                 replace=replace,
@@ -288,8 +418,9 @@ def main(
     except (RuntimeError, ValueError) as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(f"train: {train_path}")
+    typer.echo(f"dev: {dev_path}")
     typer.echo(f"test: {test_path}")
-    typer.echo(f"manifest: {workload_output_paths(out)[2]}")
+    typer.echo(f"manifest: {workload_output_paths(out)[3]}")
 
 
 if __name__ == "__main__":

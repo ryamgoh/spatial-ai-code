@@ -8,10 +8,13 @@ from enum import Enum
 from typing import Any
 
 from spatial.v2.solver import (
+    And,
     CountQuery,
     Direction,
     DirectionAnalysis,
     DirectionQuery,
+    Not,
+    Or,
     QueryAnalysis,
     SpatialProblem,
     SpatialSolverV2,
@@ -206,7 +209,13 @@ def measure_difficulty(
     analysis: QueryAnalysis,
     solver: SpatialSolverV2,
 ) -> dict[str, Any]:
-    """Measure proof support and distractors without building diagnostics."""
+    """Measure positive axis paths and sufficient complete-answer support.
+
+    Distractors are jointly removable while preserving possible answers and
+    candidate membership statuses. Support protects the reported axis paths;
+    it is sufficient rather than globally minimal and may depend on input order.
+    Boolean depths are not inferred from these positive atomic path metrics.
+    """
     query = problem.query
     direct_query_relation = False
     x_depth: int | None = None
@@ -274,10 +283,45 @@ def measure_difficulty(
                     }
                 )
 
-    support = x_support | y_support
+    positive_support = x_support | y_support
+    units = conjunctive_atoms(problem.premise)
+    if units is None:
+        units = (
+            problem.premise.operands
+            if isinstance(problem.premise, And)
+            else (problem.premise,)
+        )
+    support = set(range(len(units)))
+    try:
+        expected = solver.semantic_signature(problem)
+    except RuntimeError:
+        expected = None
+    support_checks_complete = expected is not None
+    for index in range(len(units)):
+        if expected is None:
+            break
+        if index in positive_support:
+            continue
+        retained = support - {index}
+        # The formula schema forbids an empty And; represent no constraints by
+        # excluded middle without adding any spatial assumptions.
+        premise = (
+            And(tuple(units[item] for item in sorted(retained)))
+            if retained
+            else Or((units[0], Not(units[0])))
+        )
+        reduced = SpatialProblem(problem.objects, premise, problem.query)
+        try:
+            unchanged = solver.semantic_signature(reduced) == expected
+        except RuntimeError:
+            # A timeout cannot establish removability. Keep this premise.
+            support_checks_complete = False
+            continue
+        if unchanged:
+            support = retained
     membership_x_depths = [proof["x_depth"] for proof in membership_proofs]
     membership_y_depths = [proof["y_depth"] for proof in membership_proofs]
-    premise_count = len(conjunctive_atoms(problem.premise) or ())
+    premise_count = len(units)
     return {
         "possibility_count": _possibility_count(analysis),
         "direct_query_relation": direct_query_relation,
@@ -292,5 +336,11 @@ def measure_difficulty(
         "min_membership_y_depth": min(membership_y_depths, default=None),
         "max_membership_y_depth": max(membership_y_depths, default=None),
         "supporting_premise_indices": sorted(support),
+        "positive_axis_premise_indices": sorted(positive_support),
+        "support_semantics": "jointly-sufficient-answer-and-membership",
+        "support_checks_complete": support_checks_complete,
+        "premise_indexing": "flattened-atoms"
+        if conjunctive_atoms(problem.premise) is not None
+        else "top-level-formulas",
         "num_distractor_premises": premise_count - len(support),
     }

@@ -32,7 +32,7 @@ Retired implementations live under `v1/`:
 
 V2 deliberately remains separate from the V13 data contract. Its semantics,
 including exact cardinals, coarse `*ward` relations, and negation, are defined
-in `docs/spatial-solver-v2-contract.md`. The structured core supports
+in `docs/spatialentail/semantics.md`. The structured core supports
 Direction, Which, and Count queries over arbitrary finite propositional spatial
 formulas; dataset adapters choose the formula/query subset they expose.
 
@@ -144,7 +144,7 @@ For a heterogeneous ablation, use the checked-in matrix example:
       experiments/spatial-v2-ablation.example.yaml \
       --out data/spatial_v2_ablation.jsonl
 
-See `docs/spatial-v2-matrix.md` for the matrix contract and exact row-count
+See `docs/spatialentail/generation-and-knobs.md` for the matrix contract and exact row-count
 semantics. Matrix runs also create `*_views/by_variant` and `*_views/by_cell`
 train/test pairs that can be passed directly to trainers and evaluators.
 Existing matrix outputs are preserved unless `--replace` is explicitly passed.

@@ -1,0 +1,44 @@
+version: 1
+seed: 1516
+dev_split: 0.2
+test_split: 0.2
+split_strategy: holdout
+holdout_cells:
+  dev: [premise-first-iff]
+  test: [premise-first-implication]
+context_budget:
+  tokenizer_name: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  train_max_tokens: 4096
+  eval_max_tokens: 8192
+  max_new_tokens: 4096
+defaults:
+  num_entities: 3
+  num_premises: 2
+  max_attempts_per_sample: 2000
+variants:
+  answers:
+    - {name: single, mode: single, menu_coverage: full}
+  traces:
+    - {format: natural}
+    - {format: symbolic}
+  supervision_arms: [checked-trace, answer-only, corrupted-trace]
+cells:
+  - name: atomic-train
+    count: 8
+    query_kind: direction
+    semantic_shape: unique
+    depth: 1
+    distractor_premises: 1
+  - name: premise-first-iff
+    count: 4
+    query_kind: direction
+    semantic_shape: any
+    generation_mode: premise-first
+    boolean_shape: iff
+  - name: premise-first-implication
+    count: 4
+    query_kind: direction
+    semantic_shape: any
+    generation_mode: premise-first
+    boolean_shape: modus-ponens

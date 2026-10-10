@@ -11,7 +11,8 @@ reasoning, but that is an absence-of-evidence claim, not proof of priority.**
 The strongest defensible position is that SpatialEntail occupies an
 **underexplored integration frontier**:
 
-1. proof-first generation produces a replayable certificate before prose;
+1. implemented proof-template-first generation selects a controlled obligation
+   before solving, then constructs and replays the resulting certificate;
 2. premise-first generation samples the visible premises and query without a
    target answer, then solves and buckets the actual semantics;
 3. a small proof checker replays local derivations while an independently
@@ -41,7 +42,7 @@ programme at the intersection of established lines,” not “a wholly new field
 
 ### Question
 
-Do proof-first or proof-carrying generation, premise-first evaluation,
+Do proof-template-first or proof-carrying generation, premise-first evaluation,
 independent proof checking plus SMT validation, and paired Natural/Symbolic
 proof traces together constitute a novel research direction for text-only LLM
 spatial reasoning?
@@ -75,11 +76,12 @@ like-for-like benchmark for static qualitative entailment.
 
 ## What the proposed combination means
 
-The four terms are used operationally here, not asserted as standard names.
+The terms are used operationally here, not asserted as standard names.
 
 | Component | Required property |
 |---|---|
-| **Proof-first generation** | Sample a typed proof structure first; derive the exact visible premises, query, answer, and certificate from it; replay the certificate; then re-solve the resulting problem to detect unintended alternatives or shorter proofs. |
+| **Proof-template-first generation (implemented)** | Select and instantiate a controlled proof or formula family; solve the resulting visible problem; construct and replay the actual certificate; then measure unintended alternatives or shorter proofs. This is weaker than constructing the final typed certificate first. |
+| **Certificate-first generation (proposed)** | Sample and instantiate the final typed certificate before rendering the problem. SpatialEntail reserves this provenance but does not currently implement it. |
 | **Premise-first evaluation** | Sample visible premises `P` and query `Q` without selecting an answer; classify every candidate under declared open-world semantics; search for proofs or countermodels; admit the instance to the semantic and difficulty bucket discovered after solving. |
 | **Independent proof checker + SMT** | A small checker validates the certificate's local rule applications and dependencies. A separately implemented SMT encoding decides global semantics, including `SAT(P & A)` and `UNSAT(P & not A)`. Neither component merely calls the other. |
 | **Paired Natural/Symbolic traces** | Both traces are deterministic renderings of one proof object, with identical base problem, supporting premises, conclusion, and split assignment. They are experimental views, not separately authored rationales. |
@@ -200,7 +202,7 @@ with this paper.
 
 SpatialEntail can remain distinct if its artifact demonstrably adds all of:
 
-- proof-first problem construction rather than post-hoc paths over inherited
+- proof-template-first problem construction rather than post-hoc paths over inherited
   context-question-answer tuples;
 - premise-first solve-and-bucket evaluation under explicit open-world,
   all-model semantics;
@@ -218,7 +220,7 @@ the feasibility and prior disclosure of Z3-backed checking on SpatialMap.
 Its object of verification is a claim extracted from a free-form reasoning
 stream. It does not require a proof step to cite dependencies or a rule, does
 not replay a complete certificate, and does not build the training/evaluation
-instance by proof-first or premise-first provenance. SpatialEntail should cite
+instance by proof-template-first or premise-first provenance. SpatialEntail should cite
 it prominently and define “proof checking” more narrowly than “claim
 consistency checking.”
 
@@ -327,9 +329,10 @@ a paper, or a method described under different terminology.
 Use:
 
 > To our knowledge, SpatialEntail is the first text-only qualitative spatial
-> reasoning framework to combine proof-first certificate generation,
-> premise-first open-world evaluation, independent proof replay and SMT
-> semantics, and matched natural/symbolic renderings of the same derivation.
+> reasoning framework to combine proof-template-first problem generation with
+> replay-checked certificates, premise-first open-world evaluation, independent
+> proof replay and SMT semantics, and matched natural/symbolic renderings of the
+> same derivation.
 
 Immediately follow it with:
 
@@ -378,16 +381,19 @@ Avoid:
 
 2. **Name the contribution as an integration.** A suitable phrase is
    “proof-carrying qualitative spatial entailment under partial information.”
-   Treat `proof-first` and `premise-first` as clearly defined provenance classes,
-   not claims that the terms themselves are novel.
+   Treat `proof-template-first` and `premise-first` as the implemented
+   provenance classes; reserve `certificate-first` for the unimplemented
+   stronger design.
+   Use generic `proof-first` only for the prior-art category.
 
 3. **Make the trust boundary an artifact.** Publish the certificate schema,
    small replay checker, SMT encoding, agreement tests, parser round trips,
    witnesses/countermodels, and a manifest recording construction provenance.
    The novelty claim is much weaker if “independent” cannot be audited.
 
-4. **Use proof-first for controlled supervision and premise-first for the main
-   generalisation test.** This directly answers the template-leakage objection.
+4. **Use proof-template-first for controlled supervision and premise-first for
+   the main generalisation test.** This directly answers the template-leakage
+   objection.
    A secondary premise-first training pool is defensible only when extracted
    proofs also replay successfully.
 
@@ -426,7 +432,8 @@ Avoid:
 SpatialEntail should not be sold as inventing proofs, symbolic spatial
 reasoning, SMT-backed checking, trace supervision, or text-only spatial
 training. Those are established. The credible frontier is the **joint research
-design**: distinguish proof-first training from premise-first evaluation;
+design**: distinguish proof-template-first training from premise-first
+evaluation;
 attach replayable certificates to qualitative spatial problems; validate local
 proof structure separately from global SMT semantics; and compare Natural and
 Symbolic views without changing the underlying derivation.

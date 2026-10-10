@@ -47,20 +47,25 @@ def test_checked_in_run_spec_renders_two_arm_configs(tmp_path) -> None:
     assert [arm.name for arm in prepared.arms] == [
         "single-natural",
         "single-symbolic",
+        "answer-only",
+        "corrupted-symbolic",
+        "untuned-natural",
+        "untuned-symbolic",
+        "untuned-answer-only",
     ]
     natural = yaml.safe_load(prepared.arms[0].train_config.read_text())
     assert natural["datasets"][0]["path"].endswith(
-        "spatial_v2_pilot_views/by_variant/single__natural__delta_train.jsonl"
+        "spatial_v2_pilot_views/by_variant/single__natural__checked-trace_train.jsonl"
     )
     assert natural["test_datasets"][0]["path"].endswith(
-        "spatial_v2_pilot_views/by_variant/single__natural__delta_test.jsonl"
+        "spatial_v2_pilot_views/by_variant/single__natural__checked-trace_dev.jsonl"
     )
     assert natural["output_dir"].endswith("test-run/models/single-natural")
     assert natural["num_epochs"] == 2
     evaluation = yaml.safe_load(prepared.arms[0].eval_config.read_text())
     assert evaluation["model_args"]["choices"] == list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    assert evaluation["model_args"]["max_thinking_tokens"] == 2048
-    assert len(evaluation["tasks"]) == 2
+    assert evaluation["model_args"]["max_thinking_tokens"] == 4096
+    assert len(evaluation["tasks"]) == 1
     assert prepared.arms[0].task_config.exists()
 
 
@@ -73,7 +78,9 @@ def test_arm_overrides_merge_without_replacing_protected_paths(tmp_path) -> None
 
     config = yaml.safe_load(prepared.arms[0].train_config.read_text())
     assert config["learning_rate"] == 0.00003
-    assert config["datasets"][0]["path"].endswith("single__natural__delta_train.jsonl")
+    assert config["datasets"][0]["path"].endswith(
+        "single__natural__checked-trace_train.jsonl"
+    )
 
 
 def test_run_spec_rejects_protected_config_overrides(tmp_path) -> None:
@@ -108,8 +115,16 @@ def test_dry_run_builds_graph_without_sbatch_or_run_directory(tmp_path) -> None:
         "eval",
         "train",
         "eval",
+        "train",
+        "eval",
+        "train",
+        "eval",
+        "eval",
+        "eval",
+        "eval",
         "summarize",
     ]
+    assert any("/dry-run/matrix.yaml" in part for part in result.jobs[0].command)
     assert "--dependency=afterok:<generate>" in result.jobs[1].command
     assert "--dependency=afterok:<train:single-natural>" in result.jobs[2].command
 
@@ -127,7 +142,7 @@ def test_skip_generation_requires_existing_selected_views(tmp_path) -> None:
 
 def test_submission_wires_independent_arm_dependencies(tmp_path) -> None:
     commands: list[list[str]] = []
-    ids = iter(("8100", "8101", "8102", "8103", "8104", "8105"))
+    ids = iter(str(value) for value in range(8100, 8120))
 
     def runner(command: list[str]) -> str:
         commands.append(command)
@@ -143,14 +158,14 @@ def test_submission_wires_independent_arm_dependencies(tmp_path) -> None:
     assert receipt.generate_job == "8100"
     assert receipt.arms["single-natural"] == {"train": "8101", "eval": "8102"}
     assert receipt.arms["single-symbolic"] == {"train": "8103", "eval": "8104"}
-    assert receipt.summary_job == "8105"
+    assert receipt.summary_job == "8112"
     assert "--dependency=afterok:8100" in commands[1]
     assert "--dependency=afterok:8101" in commands[2]
     assert "--dependency=afterok:8100" in commands[3]
     assert "--dependency=afterok:8103" in commands[4]
-    assert any(value.startswith("--dependency=afterany:") for value in commands[5])
+    assert any(value.startswith("--dependency=afterany:") for value in commands[-1])
     stored = json.loads((tmp_path / "submitted" / "jobs.json").read_text())
-    assert stored["summary"] == "8105"
+    assert stored["summary"] == "8112"
 
 
 def test_partial_submission_failure_preserves_job_ids(tmp_path) -> None:
@@ -183,14 +198,14 @@ def test_partial_submission_failure_preserves_job_ids(tmp_path) -> None:
 
 def test_resume_reuses_configs_and_preserves_previous_receipt(tmp_path) -> None:
     spec = Path(__file__).with_name("run.yaml")
-    first_ids = iter(str(value) for value in range(9200, 9206))
+    first_ids = iter(str(value) for value in range(9200, 9220))
     SUBMIT.submit_experiment(
         spec,
         REPO,
         options(tmp_path, "retry"),
         runner=lambda _command: next(first_ids),
     )
-    second_ids = iter(str(value) for value in range(9300, 9306))
+    second_ids = iter(str(value) for value in range(9300, 9320))
 
     result = SUBMIT.submit_experiment(
         spec,
@@ -255,3 +270,41 @@ def test_summary_reports_partial_arm_completion(tmp_path) -> None:
     assert summary["arms"]["natural"]["eval_complete"] is True
     assert summary["arms"]["symbolic"]["train_complete"] is False
     assert (tmp_path / "SUMMARY.md").exists()
+
+
+def test_generation_views_feed_dev_selection_and_final_test(tmp_path):
+    from spatial.v2.matrix import generate_matrix
+    from spatial.v2.tests.test_matrix import FramingTokenizer
+
+    spec = SUBMIT.load_run_spec(Path(__file__).with_name("run.yaml"), REPO)
+    matrix = yaml.safe_load(spec.matrix.read_text())
+    matrix["cells"] = matrix["cells"][:1]
+    matrix["cells"][0]["count"] = 1
+    matrix_path = tmp_path / "small.yaml"
+    matrix_path.write_text(yaml.safe_dump(matrix))
+    spec = replace(spec, matrix=matrix_path, data_output=tmp_path / "pilot.jsonl")
+    generate_matrix(spec.matrix, spec.data_output, tokenizer=FramingTokenizer())
+    prepared = SUBMIT.prepare_run(spec, REPO, "smoke", run_root=tmp_path)
+    SUBMIT._validate_existing_views(prepared.arms, spec.data_output, spec.matrix)
+    for arm in prepared.arms:
+        train = yaml.safe_load(arm.train_config.read_text())
+        evaluation = yaml.safe_load(arm.eval_config.read_text())
+        assert train["test_datasets"][0]["path"].endswith("_dev.jsonl")
+        assert "_test.jsonl" in arm.task_config.read_text()
+        assert "utils.process_results_v2" in arm.task_config.read_text()
+        assert "filter_list" not in arm.task_config.read_text()
+        assert "max_gen_toks: 4096" in arm.task_config.read_text()
+        assert evaluation["apply_chat_template"] is False
+        assert evaluation["model_args"]["add_special_tokens"] is False
+        assert bool(evaluation["model_args"]["lora_path"]) == arm.train
+    matrix["seed"] += 1
+    matrix_path.write_text(yaml.safe_dump(matrix))
+    with pytest.raises(ValueError, match="matrix configuration differs"):
+        SUBMIT._validate_existing_views(prepared.arms, spec.data_output, spec.matrix)
+
+
+def test_run_rejects_context_contract_drift(tmp_path):
+    spec = SUBMIT.load_run_spec(Path(__file__).with_name("run.yaml"), REPO)
+    spec = replace(spec, train_overrides={"sequence_len": 2048})
+    with pytest.raises(ValueError, match="training sequence/template"):
+        SUBMIT._validate_training_contract(spec)

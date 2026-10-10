@@ -20,7 +20,7 @@ Held-out test: 4k (seed 43), same mix × 1/5. SpatialMap eval:
 | 20,000 | 2,000 | 1,667 | 1,000 | 667 | 667 | 666 | 2,000 | 1,667 | 1,000 | 667 | 1,333 | 5,333 | 1,333 |
 | test 4k | 400 | 333 | 200 | 133 | 133 | 134 | 400 | 333 | 200 | 133 | 267 | 1,067 | 267 |
 
-See `docs/question-types.md` for what each bucket is.
+See [`QUESTION_TYPES.md`](QUESTION_TYPES.md) for what each bucket is.
 
 ## Cells (6)
 

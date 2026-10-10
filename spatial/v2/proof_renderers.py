@@ -28,6 +28,11 @@ from spatial.v2.solver import (
     RelationConstraint,
     SpatialFormula,
 )
+from spatial.v2.symbolic_trace_codec import (
+    render_symbolic_direction_proof,
+    render_symbolic_direction_refutation,
+    render_symbolic_formula_refutation,
+)
 from spatial.v2.trace import TraceFormat
 
 
@@ -126,12 +131,6 @@ def _axis_text(fact: AxisFact, labels: Mapping[str, str]) -> str:
     return f"{subject} is {relation} of {reference}"
 
 
-def _axis_symbol(fact: AxisFact, labels: Mapping[str, str]) -> str:
-    subject = _label(fact.subject, labels)
-    reference = _label(fact.reference, labels)
-    return f"{subject} {fact.relation.value}{fact.axis.value} {reference}"
-
-
 def _claim_text(claim: DirectionClaim, labels: Mapping[str, str]) -> str:
     return (
         f"{_label(claim.subject, labels)} is {claim.direction.value} of "
@@ -186,7 +185,7 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
         assert isinstance(conclusion, SpatialFormula)
         branches = ", ".join(step.inputs[1:])
         return (
-            f"{step.id}: Every case from {step.inputs[0]} concludes "
+            f"{scope}{step.id}: Every case from {step.inputs[0]} concludes "
             f"{_formula_text(conclusion, labels, symbolic=False)} via {branches}."
         )
     if step.rule is ProofRule.DIRECTION_DECOMPOSITION:
@@ -197,7 +196,7 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
         )
     if step.rule is ProofRule.AXIS_INVERSION:
         assert isinstance(conclusion, AxisFact)
-        return f"{scope}{step.id}: Equivalently, {_axis_text(conclusion, labels)}."
+        return f"{scope}{step.id}: Equivalently from {step.inputs[0]}, {_axis_text(conclusion, labels)}."
     if step.rule is ProofRule.AXIS_TRANSITIVITY:
         assert isinstance(conclusion, AxisFact)
         return (
@@ -210,36 +209,18 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
             f"{scope}{step.id}: {step.inputs[0]} and {step.inputs[1]} assign "
             "different relations to the same axis pair, so the assumption is impossible."
         )
+    if step.rule is ProofRule.DIRECTION_INTRODUCTION:
+        assert isinstance(conclusion, DirectionClaim)
+        return (
+            f"{scope}{step.id}: Therefore {_claim_text(conclusion, labels)}, "
+            f"as established by {step.inputs[0]}."
+        )
     assert step.rule is ProofRule.DIRECTION_RECOMPOSITION
     assert isinstance(conclusion, DirectionClaim)
     return (
-        f"{scope}{step.id}: Combining the X and Y conclusions gives "
+        f"{scope}{step.id}: Combining {step.inputs[0]} and {step.inputs[1]} gives "
         f"{_claim_text(conclusion, labels)}."
     )
-
-
-def _symbolic_step(step, labels: Mapping[str, str]) -> str:
-    conclusion = step.conclusion
-    if isinstance(conclusion, SpatialFormula):
-        rendered = _formula_text(conclusion, labels, symbolic=True)
-    elif isinstance(conclusion, AxisFact):
-        rendered = _axis_symbol(conclusion, labels)
-    elif isinstance(conclusion, DirectionClaim):
-        rendered = (
-            f"DIR_{conclusion.direction.name}({_label(conclusion.subject, labels)},"
-            f"{_label(conclusion.reference, labels)})"
-        )
-    else:
-        assert isinstance(conclusion, Contradiction)
-        rendered = "CONTRADICTION"
-    if step.rule is ProofRule.PREMISE:
-        annotation = f"premise {step.premise_index + 1}"
-    else:
-        dependencies = ",".join(step.inputs)
-        annotation = f"{step.rule.value} {dependencies}".rstrip()
-    if step.branch is not None:
-        annotation = f"branch={step.branch}; {annotation}"
-    return f"{step.id}: {rendered}    [{annotation}]"
 
 
 def render_direction_proof(
@@ -252,9 +233,30 @@ def render_direction_proof(
     trace_format = TraceFormat(trace_format)
     labels = labels or {}
     if trace_format is TraceFormat.SYMBOLIC:
-        return "\n".join(_symbolic_step(step, labels) for step in certificate.steps)
+        if labels:
+            raise ValueError(
+                "symbolic proof traces use certificate identifiers and do not "
+                "accept display labels"
+            )
+        return render_symbolic_direction_proof(certificate)
 
     return "\n".join(_natural_step(step, labels) for step in certificate.steps)
+
+
+def render_direction_training_proof(
+    certificate: DirectionProofCertificate,
+    labels: Mapping[str, str] | None = None,
+) -> str:
+    """Narrate the same checked derivation dependencies as the symbolic trace."""
+    return render_direction_proof(certificate, TraceFormat.NATURAL, labels)
+
+
+def render_direction_training_refutation(
+    certificate: DirectionRefutationCertificate,
+    labels: Mapping[str, str] | None = None,
+) -> str:
+    """Narrate scoped assumptions and every dependency of the contradiction."""
+    return render_direction_refutation(certificate, TraceFormat.NATURAL, labels)
 
 
 def render_direction_refutation(
@@ -266,17 +268,16 @@ def render_direction_refutation(
     check_direction_refutation(certificate)
     trace_format = TraceFormat(trace_format)
     labels = labels or {}
-    lines = (
-        [_symbolic_step(step, labels) for step in certificate.steps]
-        if trace_format is TraceFormat.SYMBOLIC
-        else [_natural_step(step, labels) for step in certificate.steps]
-    )
+    if trace_format is TraceFormat.SYMBOLIC:
+        if labels:
+            raise ValueError(
+                "symbolic refutation traces use certificate identifiers and do not "
+                "accept display labels"
+            )
+        return render_symbolic_direction_refutation(certificate)
+    lines = [_natural_step(step, labels) for step in certificate.steps]
     claim = render_formula(certificate.claim, trace_format, labels)
-    lines.append(
-        f"Impossible: {claim}"
-        if trace_format is TraceFormat.SYMBOLIC
-        else f"Therefore {claim} is impossible."
-    )
+    lines.append(f"Therefore the claim that {claim} is impossible.")
     return "\n".join(lines)
 
 
@@ -289,15 +290,14 @@ def render_formula_refutation(
     check_formula_refutation(certificate)
     trace_format = TraceFormat(trace_format)
     labels = labels or {}
-    lines = (
-        [_symbolic_step(step, labels) for step in certificate.steps]
-        if trace_format is TraceFormat.SYMBOLIC
-        else [_natural_step(step, labels) for step in certificate.steps]
-    )
+    if trace_format is TraceFormat.SYMBOLIC:
+        if labels:
+            raise ValueError(
+                "symbolic refutation traces use certificate identifiers and do not "
+                "accept display labels"
+            )
+        return render_symbolic_formula_refutation(certificate)
+    lines = [_natural_step(step, labels) for step in certificate.steps]
     claim = render_formula(certificate.claim, trace_format, labels)
-    lines.append(
-        f"Impossible: {claim}"
-        if trace_format is TraceFormat.SYMBOLIC
-        else f"Therefore {claim} is impossible."
-    )
+    lines.append(f"Therefore the claim that {claim} is impossible.")
     return "\n".join(lines)

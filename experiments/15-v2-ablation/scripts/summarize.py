@@ -15,7 +15,9 @@ def summarize(run_dir: Path) -> dict:
     for arm, job_ids in sorted(jobs.get("arms", {}).items()):
         model_dir = run_dir / "models" / arm
         result_dir = run_dir / "results" / arm
-        train_complete = (model_dir / "COMPLETED").exists()
+        train_complete = (
+            (model_dir / "COMPLETED").exists() if "train" in job_ids else None
+        )
         eval_complete = (result_dir / "COMPLETED").exists() and (
             result_dir / "results.json"
         ).exists()
@@ -32,7 +34,7 @@ def summarize(run_dir: Path) -> dict:
     lines = ["# V2 Ablation Run", ""]
     for arm, status in arms.items():
         lines.append(
-            f"- {arm}: train={'complete' if status['train_complete'] else 'missing'}, "
+            f"- {arm}: train={'not applicable' if status['train_complete'] is None else ('complete' if status['train_complete'] else 'missing')}, "
             f"eval={'complete' if status['eval_complete'] else 'missing'}"
         )
     (run_dir / "SUMMARY.md").write_text("\n".join(lines) + "\n")

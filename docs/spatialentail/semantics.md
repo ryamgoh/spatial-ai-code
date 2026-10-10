@@ -1,7 +1,7 @@
-# Spatial solver V2 semantic contract
+# SpatialEntail semantic contract
 
-V2 is an experimental exact-direction solver. It does not replace or change
-the V13 dataset contract.
+This is the active semantic contract for SpatialEntail V2. Historical V13
+behaviour is documented beside Experiment 13 and does not override this file.
 
 ## Module seams
 
@@ -18,11 +18,12 @@ dataset row or synthetic spec
 
 - `spatial/v2/solver.py` owns the spatial theory, model search, and coordinate
   witnesses. It accepts structured problems only.
-- `spatial/v2/difficulty.py` measures axis-path depth, proof support, and
-  distractors for generated workloads.
-- `spatial_*_certificates_v2.py` builds and independently checks Direction,
-  Which, and correlated Count evidence; their renderers emit Natural or
-  Symbolic training traces from the same accepted certificate.
+- `spatial/v2/difficulty.py` measures positive axis-path depth and semantic
+  premise-deletion support, including exclusion and membership effects.
+- `spatial/v2/*_certificates.py` builds and independently checks Direction,
+  Which, and correlated Count evidence. `render_training_trace` emits compact
+  Natural or Symbolic supervision, while `render_audit_certificate` emits the
+  exhaustive checked evidence from the same certificate.
 - `spatial/v2/audit_spatialeval.py` validates and records coordinate witnesses
   for benchmark auditing.
 - `spatial/v2/text.py` adapts the current prompt grammar into a
@@ -33,8 +34,8 @@ dataset row or synthetic spec
   their oracle metadata, and classifies the oracle against the model set.
 
 The core solver has no knowledge of JSONL rows, chat messages, prompt wording,
-option letters, oracle labels, or dataset-specific answer semantics. A future
-synthetic generator and the implemented SpatialEval adapter both produce the same
+option letters, oracle labels, or dataset-specific answer semantics. The synthetic
+generator and SpatialEval adapter both produce the same
 `SpatialProblem` interface.
 
 `SpatialProblem.query` selects `DirectionQuery`, `WhichQuery`, or `CountQuery`.
@@ -80,8 +81,8 @@ receive the all-eight default.
 - Use `spatial/v2/solver.py` when the caller already has structured objects,
   formulas, and a query.
 - Use `spatial/v2/difficulty.py` for structural generation metrics.
-- Use the answer-certificate builders and renderers for proof-first training
-  traces without exposing coordinates.
+- Use the answer-certificate builders and renderers for checked Natural or
+  Symbolic proof-trace supervision without exposing numeric coordinates.
 - Use `spatial/v2/audit_spatialeval.py` for coordinate-bearing benchmark audits.
 - Use `spatial/v2/text.py` only to adapt the current rendered prompt grammar.
 - Use `spatial/v2/grading.py` after semantic analysis to resolve answer
@@ -365,8 +366,10 @@ written directly by `audit_spatialeval.py` from checked analyses and witnesses.
 
 Training and audit output are deliberately separate. `TraceFormat.NATURAL` and
 `TraceFormat.SYMBOLIC` are deterministic views of one checked certificate.
-They expose the same premises, rule dependencies, candidate classifications,
-and correlated Count cases. There is no independent state-update mode: such a
+Natural narrates checked step IDs, inputs, branch scopes, candidate evidence,
+and correlated Count cases. Symbolic serializes typed evidence. This aligns
+intended dependencies but does not establish corpus-wide rendered-information
+or token matching; only Symbolic model output has a replay parser. There is no independent state-update mode: such a
 mode belonged to the removed post-hoc renderer and could change presentation
 without preserving a one-to-one relation with checked proof steps.
 Audit artifacts may include normalized coordinate witnesses; they are not SFT
@@ -385,9 +388,7 @@ row = {
     "prompt": prompt_renderer.render(problem),
     "answer": menu_answer.raw,
     "proof": answer_certificate_to_dict(certificate),
-    "explanation": render_answer_certificate(
-        certificate, trace_format, labels=labels, include_coordinates=False
-    ),
+    "explanation": render_training_trace(certificate, trace_format, labels=labels),
     "metadata": {
         "answer_mode": answer_mode.value,
         "trace_format": trace_format.value,
@@ -437,10 +438,8 @@ solver.
 
 ## Dataset scale
 
-There is no existing repository-wide maximum of 30 entities. The default V13
-entity pool contains 20 names, the challenge pool contains 48, and Experiment
-14 includes 32-entity worlds. A new generator may choose a cap of 30, but it
-should be an explicit generation-policy limit rather than a solver axiom.
+The solver has no semantic 30-entity axiom. The active generator currently caps
+`num_entities` at its 30-name pool; that is a generation-policy boundary.
 
 ## Option grading
 
@@ -501,123 +500,7 @@ The Which exact count requires the oracle object to be entailed and every other
 menu object to be impossible. A singleton `possible_entities` result is not an
 exact answer when that entity is absent in another valid world.
 
-## V2 generation pipeline
-
-`spatial/v2/generation.py` keeps synthetic-data policy above the
-solver. A `GenerationPolicy` chooses the query family, answer mode, semantic
-shape, Boolean proof shape, menu coverage, trace format, entity count, and
-premise count. The solver sees only the resulting `SpatialProblem`.
-
-The proof-first Boolean shapes are `modus-ponens`, `iff`, `double-negation`,
-`disjunctive-syllogism`, `case-split`, and `nested-case-split`. They currently
-target unique Direction, Which, and Count questions. Which and Count cells prove
-one member and explicitly exclude every other declared candidate; Count then
-certifies the resulting joint cardinality. `atomic` retains the ordinary
-spatial generation path. Each Boolean template constructs a logical proof
-obligation before solving; it is not derived from a privileged coordinate
-answer map.
-
-Each accepted item follows one fail-closed path:
-
-1. Sample distinct audit coordinates and derive true compass-8 premises.
-2. Construct a Direction, Which, or Count query over the structured objects.
-3. Analyze the complete model set with `SpatialSolverV2`.
-4. Reject candidates that do not match the requested `unique`, `ambiguous`, or
-   `no-match` semantic shape.
-5. Build and replay a complete Direction, Which, or Count answer certificate;
-   reject the candidate if the proof constructor cannot cover it.
-6. Resolve `SINGLE`, `ALL_POSSIBLE`, or `VISIBLE_POSSIBLE`, then construct the
-   requested full, partial, or zero-coverage menu.
-7. Render the question, parse it back through `SpatialTextAdapter`, re-solve
-   it, and require the problem, options, resolution, menu status, and gold
-   letters to match.
-8. Render coordinate-free Natural CoT or Symbolic CoS from the accepted
-   certificate. Coordinates and
-   coordinate-bearing evidence remain available only as audit metadata. The
-   trace ends with an explicit answer-mode and menu-selection deduction so the
-   option letters follow from the proved semantic domain.
-
-For V2 Which questions, the wording says "object in the map" and the adapter
-therefore treats every non-reference map object as a candidate, including
-objects omitted from the menu. This lets `ALL_POSSIBLE` detect a hidden valid
-object instead of silently redefining the candidate set to displayed choices.
-Original SpatialEval wording retains its existing option-scoped parsing.
-
-The reporting roles remain distinct:
-
-| Mode | Reporting role |
-|---|---|
-| `SINGLE` | Primary strict metric for original SpatialEval |
-| `ALL_POSSIBLE` | Strict complete-ambiguity metric |
-| `VISIBLE_POSSIBLE` | Loose menu-conditioned diagnostic; never headline accuracy |
-
-`spatial/v2/generate_all.py` crosses requested policy dimensions into balanced
-cells, assigns deterministic unique IDs, shuffles deterministically, and writes
-train/test JSONL splits. Which and Count cells can additionally be balanced
-across all eight query directions, while Direction cells can be balanced across
-all eight target answers. Its entity limit is 30 because that is the current
-name pool, not because the solver has a 30-object axiom.
-
-### Measured difficulty controls
-
-Difficulty labels come from the accepted structured explanation, not from the
-generator's intended construction. `GenerationPolicy` can require:
-
-- omission of a direct query-answer relation;
-- minimum and maximum X/Y proof depth for Direction;
-- minimum and maximum positive-membership depth for Which and Count;
-- disjoint X-axis and Y-axis supporting premises;
-- an exact number of possible answers for ambiguous questions; and
-- for Direction, an exact number of premises outside the retained proof
-  support.
-
-Candidates are rejected when the measured proof fails a requested constraint.
-For Count, membership-depth controls require at least one positively entailed
-member; a unique count caused only by correlated contingent memberships does
-not falsely receive a positive proof-depth label.
-
-Impossible ambiguity sizes and proof/premise budgets fail during policy
-validation. Feasible but selective cells retain rejection counts by reason on
-each accepted base problem. If the attempt budget is exhausted, the exception
-includes the complete rejection histogram instead of only the final failure.
-Standard controlled Direction and positive-membership cells use constructive
-proof skeletons, avoiding rejection sampling when their premise budgets can be
-filled without shortening the requested proof. Other valid combinations fall
-back to measured rejection sampling and remain visible in the efficiency data.
-
-### Paired trace variants and manifests
-
-Natural and Symbolic variants are rendered from the same checked certificate in
-one `GeneratedSpatialSample`. They share a `base_id`, prompt, problem, options,
-and gold answer while retaining distinct row IDs. Variant groups are split as a
-unit, preventing the same problem from appearing in both train and test.
-
-Every CLI run also writes a `*_manifest.json`. The manifest validates unique
-row IDs, verified round trips, complete trace-variant groups, one base ID per
-prompt, and the absence of base-ID or prompt leakage across splits. It reports
-trace-variant distributions, overall and per-split base-problem distributions,
-and base-level difficulty histograms. Base-level reporting prevents paired
-trace variants from double-counting the underlying problem distribution.
-The manifest also reports total candidate attempts, rejected candidates,
-acceptance rate, maximum rejections before acceptance, and rejection reasons.
-
-## Ablation matrices
-
-`spatial/v2/matrix.py` parses a strict versioned YAML experiment matrix.
-Named cells set exact base-problem counts and structural controls. Named answer
-variants and trace variants are expanded from each accepted base problem, so
-changing answer semantics or trace representation does not silently change the
-underlying map. Cells may select only the answer variants compatible with their
-semantics—for example, partial visible menus on ambiguous cells but full menus
-on unique cells.
-
-The matrix runner records the requested and generated base count for every
-cell. It passes each expected answer/trace Cartesian product to the workload
-validator, keeps the entire `base_id` group in one split, and stores the parsed
-matrix in the combined manifest for reproducibility.
-
-After validating the master train/test pair, the runner materializes two sets
-of trainer-ready views: an aggregate view per answer/trace variant and a finer
-view per matrix cell and answer/trace variant. All views inherit the master
-base-ID split. Their paths, row counts, and split fingerprints are recorded in
-the manifest.
+Dataset construction and experimental controls do not belong to the solver
+contract. They are documented in [Generation and experiment knobs](generation-and-knobs.md).
+Certificate construction and replay are documented in
+[Certificate system](certificates.md).

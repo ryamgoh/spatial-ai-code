@@ -45,7 +45,7 @@ information, state tracking, and logical composition.
   *Draft status.* This related-work section records the present literature
   interpretation before the SpatialEntail suites and proof schema are frozen.
   Its novelty language is intentionally conservative. The underlying search
-  ledger is `docs/spatialentail-research-frontier.md`.
+  ledger is `docs/research/frontier-assessment.md`.
 ]
 
 Controlled text-only spatial reasoning predates current LLMs. StepGame provides
@@ -139,23 +139,30 @@ problem has been solved.
 
 == DRAFT — Generation Provenance and the Remaining Gap
 
-This project distinguishes three construction orders:
+This project distinguishes four construction orders:
 
 + *World-first:* sample a complete coordinate world, render some relations, and
   read the answer from that same world. This proves possibility in one selected
   model, not entailment from the visible text.
-+ *Proof-first:* sample a typed derivation, instantiate its spatial and Boolean
-  atoms, replay the certificate, and independently re-solve the emitted problem.
++ *Proof-template-first:* choose a rule/path template, instantiate a problem,
+  then construct and replay the resulting certificate. This is the current
+  controlled generator.
++ *Certificate-first:* sample a complete typed derivation before constructing
+  the problem text, then replay and independently re-solve it. This stricter
+  provenance is not claimed for the current generator.
 + *Premise-first:* sample visible premises and a query without selecting an
   answer, discover the complete semantic class after solving, and admit the
   problem to the resulting evaluation bucket.
 
-The proposed design uses proof-first problems for controlled trace supervision
-and premise-first problems for the main structural-generalisation test. Natural
-and Symbolic traces are rendered from one typed proof object rather than authored
-separately. A small rule checker validates local proof steps; a separately
-implemented SMT encoding checks global possibility, entailment, ambiguity, and
-inconsistency.
+The implemented design uses proof-template-first problems for controlled trace
+supervision and records world-first rows separately. A distinct premise-first
+route now proposes visible relations without coordinates, then solves and
+classifies them. Its value for structural generalisation remains untested.
+Natural and Symbolic targets originate from accepted certificates and expose
+checked dependencies through prose or typed records. Their corpus-wide evidence
+mapping and token costs remain to be audited.
+A small rule checker validates local steps; a separately implemented SMT
+encoding checks global possibility, entailment, ambiguity, and inconsistency.
 
 #figure(
   table(

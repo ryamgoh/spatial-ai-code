@@ -238,4 +238,6 @@ def test_model_renderer_can_hide_coordinates_without_losing_status() -> None:
 
     assert "supporting model" in rendered
     assert "Coordinates" not in rendered
+    assert "X west to east: Library < Bakery." in rendered
+    assert "Y south to north: Library < Bakery." in rendered
     assert "obj_0" not in rendered

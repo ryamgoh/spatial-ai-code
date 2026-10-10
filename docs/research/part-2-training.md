@@ -3,7 +3,7 @@
 Status: living experimental plan
 
 This document develops the learning half of the project. It is subordinate to
-the main [`FYP research canvas`](v2-fyp-research-canvas.md) and does not fix the
+the main [`FYP research plan`](research-plan.md) and does not fix the
 dissertation chapter structure or experiment numbering.
 
 ## Purpose
@@ -57,18 +57,21 @@ as SFT training data.
 
 ## Generation provenance
 
-The main research canvas distinguishes
-[world-first, proof-first, and premise-first generation](v2-fyp-research-canvas.md#generation-provenance-world-first-proof-first-and-premise-first).
-Part II inherits that distinction:
+The main research canvas distinguishes world-first, proof-template-first,
+certificate-first, and premise-first generation. Part II inherits that
+distinction:
 
 - world-first answers read from a privileged coordinate map are not valid gold
   labels;
-- proof-first problems are the initial source of controlled, replayable trace
-  supervision;
+- proof-template-first problems are the current source of controlled,
+  replayable trace supervision;
+- certificate-first generation remains a stricter future provenance in which
+  the typed proof exists before the problem text;
 - premise-first solve-and-bucket problems are the preferred basis for testing
   generalisation beyond construction templates; and
-- a secondary premise-first training pool may be added when concise proofs can
-  be extracted and replayed.
+- premise-first generation is implemented for supported atomic and Boolean operator-family cells, with
+  acceptance conditioned on solver classification and replayable evidence; its
+  distribution and extraction success still need empirical characterization.
 
 Every track uses the same solver semantics, proof-checking boundary, and text
 round trip. Z3 supplies an independent answer oracle; it does not by itself
@@ -183,8 +186,9 @@ Use the same underlying training problems and compare:
 |---|---|
 | Untuned, prompt-matched | No parameter update |
 | Answer-only SFT | Final answer only |
-| Natural Delta SFT | Natural-language derivation and incremental state |
-| Symbolic Delta SFT | Symbolic derivation and incremental state |
+| Checked Natural SFT | Natural-language narration of checked steps and witnesses |
+| Checked Symbolic SFT | Replayable typed evidence and menu decision |
+| Corrupted Symbolic SFT | Invalid semantic evidence with the same gold answer |
 
 The answer-only arm controls for learning the task distribution and output
 format. Each reasoning-SFT arm must also be compared with the untuned model
@@ -197,24 +201,25 @@ similar.
 
 ## SFT study 2: reasoning representation
 
-The representation comparison has two checked trace forms: Natural and
-Symbolic. Both are rendered from the same certificate, so changing the view
-does not change proof dependencies or the accepted answer evidence.
+The checked formats share base problems, labels, and accepted source
+certificates. Natural now narrates each checked step with its identifier,
+dependencies and branch scope, while Symbolic serializes typed records. Both
+include query-specific model and exclusion evidence. This repairs the earlier
+compact-versus-exhaustive mismatch, but the complete mapping of rendered
+information and actual token lengths still need auditing across the frozen
+corpus. Output validation also differs: only Symbolic can be replayed. Report
+this pilot as a supervision-package comparison, not a proven isolation of
+notation alone.
 
-Keep the base problems, row order, model, optimizer, effective batch, epochs,
-context limit, decoding, and evaluation prompts fixed. Report target-token
-counts and training time because representation length is part of the proposed
-mechanism.
+Keep base problems, model initialization, optimizer, and evaluation decisions
+paired. Report actual prompt and target tokens, optimizer updates, repeats, and
+runtime. Equal examples and equal target tokens are distinct comparisons;
+repeating shorter arms changes task exposure and does not alone match compute.
 
-**Hypotheses:**
-
-- Delta will be more robust than Full at large depth because it avoids repeated
-  state serialization.
-- Symbolic traces may improve token efficiency and deep composition.
-- Natural traces may transfer better to naturally worded external data.
-
-The final two hypotheses are comparative, not assumptions that Symbolic or
-Natural must win overall.
+**Hypotheses:** checked evidence may improve over answer-only task exposure;
+valid Symbolic evidence may improve over corrupted Symbolic evidence; Natural
+and Symbolic packages may trade off accuracy, output validity, and cost. All
+remain untested in the V2 pilot. No token-efficiency advantage is assumed.
 
 ## SFT study 3: propositional training
 
@@ -251,7 +256,7 @@ retaining core relational performance. It need not improve the original
 SpatialEval case study, whose premises use a narrower language.
 
 Before trace SFT, propositional generation must support deterministic text
-round trips and faithful branched explanations. A satisfying coordinate model
+round trips and replayed branch-scoped evidence. A satisfying coordinate model
 is evidence that a formula is possible; it is not by itself a valid CoT proof.
 
 ## SFT study 4: data scale
@@ -300,17 +305,73 @@ retention.
 
 ## Experimental controls
 
-- Split base problems before expanding answer or trace variants.
-- Keep paired variants in the same split.
-- Prevent overlap by canonical world as well as prompt text.
-- Hold model, training recipe, data order, and decoding fixed within each
-  ablation.
-- Use one seed for screening and repeated seeds for reported comparisons.
-- Use strict exact-answer-set accuracy as the primary metric.
-- Macro-average declared structural cells.
-- Report paired fixes and regressions, uncertainty intervals, output validity,
-  and token cost.
-- Never tune on the final test.
+- Split base problems before expanding paired variants. Train, development, and
+  test must have no overlapping base IDs, prompts, or canonical source signatures.
+- Structural signatures canonicalize visible formulas and queries, ignoring
+  entity names and premise or commutative ordering. Exact canonicalization has a
+  permutation budget; its conservative fallback may merge distinct problems.
+  Signature separation is not a guarantee of unseen proof compositions. Reserve
+  explicit cells before model selection for each structural generalisation claim.
+- Shuffle special and ordinary options together and report answer-position counts.
+- Hold model, training recipe, and decoding fixed within each comparison; select
+  checkpoints on development data only. Use repeated seeds for reported results.
+- Report strict exact-answer-set accuracy, cell macro-averages, paired changes,
+  uncertainty, output validity, and token/resource costs.
+- Replay model-produced Symbolic evidence against the visible prompt. Report
+  reasoning, decision, cross-record domain, and full validity separately; full
+  validity also requires a correct final answer footer. Natural and answer-only
+  process scores are not applicable, not invalid or zero.
+- `checked-trace` contains checked evidence. `answer-only` omits it and records
+  `expected_process_valid: null` with `process_status: absent`.
+  `corrupted-trace` is Symbolic-only: mutate a semantic evidence value, preserve
+  syntactically valid NDJSON and its record order, require replay rejection,
+  and retain the valid decision and gold answer. It tests evidence validity
+  within that package; it is not a generic extra-text control.
+- Use `ContextBudget` with the selected tokenizer and chat template. Admit the
+  full training chat, the evaluation prompt plus generation reserve, and any
+  configured target limit. Reject the whole paired base group when any required
+  variant overflows. Record rejected groups and exact lengths; never truncate.
+  Evaluation consumes `metadata.evaluation_prompt` without retemplating or
+  adding special tokens. Character and whitespace counts are only diagnostics.
+- Report actual updates and runtime alongside token-matching multipliers; those
+  multipliers do not establish matched training compute.
+
+Admission also checks that the training chat begins with the exact evaluation
+prompt, and measures the remaining rendered completion including termination
+tokens against the generation limit. Raw assistant-text token counts alone do
+not capture that cost. Lossy or incompatible chat templates are rejected.
+
+## Implemented pilot and unrun studies
+
+`experiments/15-v2-ablation` wires four trained arms: checked Natural, checked
+Symbolic, answer-only, and corrupted Symbolic. Three prompt-matched untuned
+baselines are evaluation-only. The pilot uses unique depth-2 and two-way
+ambiguous Direction cells with three entities and two premises. Its configured
+limits are 4,096 training tokens, 8,192 evaluation-context tokens, and a 4,096-token
+generation reserve. Development and test each reserve 20% of base groups.
+
+This bounded configuration does not exercise all Which, Count, Boolean, transfer,
+or retention conditions described in the longer research plan. Retention is
+deferred until its prompt/scoring contract is integrated. Preparation and
+local smoke checks are software validation; SFT and model evaluation have not
+been run. See the experiment README for executable commands and the
+[remediation audit](../audits/critique-remediation.md) for implementation verification.
+
+The separate `matrix-premise-holdout.yaml` reserves premise-first IFF development
+cells and premise-first implication test cells against atomic training data.
+Its 8/4/4 base counts and common three-entity/two-premise budgets are a preparation
+check, not an empirical training comparison. Consult the remediation ledger for
+the executed tokenizer smoke status.
+
+The final tokenizer/generator smoke admitted all 80 pilot bases (320 rows):
+48 training, 16 development, and 16 test bases. Maximum full training lengths
+were 4,032 tokens for checked/corrupted Symbolic, 1,863 for Natural, and 129 for
+answer-only; the maximum reserved evaluation length was 4,218 and maximum
+rendered generation target was 3,910. The 16-base holdout configuration also
+passed, with maximum training length 965 and reserved evaluation length 4,265.
+These are preparation diagnostics for the executed configuration, not model
+accuracy or learning results. The earlier four-entity/three-premise proposal
+failed admission and was narrowed equally across arms.
 
 ## Decision order
 
@@ -318,7 +379,7 @@ retention.
 2. Calibrate structural cells with untuned LLMs.
 3. Freeze evaluation modules and prompts.
 4. Run the prompting baselines.
-5. Run answer-only, Natural, and Symbolic SFT.
+5. Run answer-only, checked Natural/Symbolic, and corrupted Symbolic SFT.
 6. Run the propositional-data comparison.
 7. Scale only the selected training design.
 8. Test broader answer-contract training if it remains relevant.
@@ -329,7 +390,7 @@ retention.
 - Final core and propositional evaluation cells
 - Dataset sizes and repeated-seed budget
 - Full factorial or staged representation comparison
-- Exact Natural and Symbolic trace grammars for propositional proofs
+- Corpus-wide evidence mapping and Natural readability checks
 - Baseline LLMs and frozen prompting conditions
 - Whether `ALL_POSSIBLE` is a core training objective
 - RL calibration thresholds and compute budget

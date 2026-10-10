@@ -13,8 +13,17 @@ from typing import Any, TypeVar
 
 import yaml
 
+from spatial.v2.context_budget import (
+    ContextBudget,
+    admit_row_group,
+    load_tokenizer,
+    rejection_output_path,
+    summarize_admissions,
+    write_rejection_report,
+)
 from spatial.v2.generation import (
     BooleanShape,
+    GenerationMode,
     GenerationPolicy,
     MenuCoverage,
     QueryKind,
@@ -23,8 +32,10 @@ from spatial.v2.generation import (
 )
 from spatial.v2.grading import AnswerMode
 from spatial.v2.solver import Direction
+from spatial.v2.supervision_controls import SupervisionArm, build_supervision_variants
 from spatial.v2.trace import TraceFormat
 from spatial.v2.workload_manifest import (
+    SplitStrategy,
     check_output_paths,
     remove_output_paths,
     workload_output_paths,
@@ -36,6 +47,10 @@ _ROOT_KEYS = {
     "version",
     "seed",
     "test_split",
+    "dev_split",
+    "split_strategy",
+    "holdout_cells",
+    "context_budget",
     "include_audit",
     "defaults",
     "variants",
@@ -47,6 +62,7 @@ _CELL_KEYS = {
     "query_kind",
     "semantic_shape",
     "boolean_shape",
+    "generation_mode",
     "depth",
     "ambiguity_size",
     "num_entities",
@@ -82,6 +98,7 @@ class MatrixCell:
     query_kind: QueryKind
     semantic_shape: SemanticShape
     boolean_shape: BooleanShape
+    generation_mode: GenerationMode
     depth: int | None
     ambiguity_size: int | None
     num_entities: int
@@ -99,6 +116,11 @@ class MatrixCell:
 class ExperimentMatrix:
     seed: int
     test_split: float
+    dev_split: float
+    split_strategy: SplitStrategy
+    holdout_cells: dict[str, list[str]] | None
+    context_budget: ContextBudget | None
+    supervision_arms: tuple[SupervisionArm, ...]
     include_audit: bool
     answer_variants: tuple[AnswerVariant, ...]
     trace_variants: tuple[TraceVariant, ...]
@@ -226,6 +248,9 @@ def _cell(raw: dict[str, Any], defaults: dict[str, Any]) -> MatrixCell:
         count=count,
         query_kind=query_kind,
         semantic_shape=semantic_shape,
+        generation_mode=_enum(
+            values.get("generation_mode", "auto"), GenerationMode, "generation mode"
+        ),
         boolean_shape=_enum(
             values.get("boolean_shape", "atomic"),
             BooleanShape,
@@ -283,7 +308,7 @@ def load_experiment_matrix(path: str | Path) -> ExperimentMatrix:
     if unknown_defaults:
         raise ValueError("unknown default keys: " + ", ".join(sorted(unknown_defaults)))
     variants = _mapping(root.get("variants"), "variants")
-    unknown_variants = set(variants) - {"answers", "traces"}
+    unknown_variants = set(variants) - {"answers", "traces", "supervision_arms"}
     if unknown_variants:
         raise ValueError("unknown variant keys: " + ", ".join(sorted(unknown_variants)))
     cells = tuple(
@@ -296,9 +321,33 @@ def load_experiment_matrix(path: str | Path) -> ExperimentMatrix:
     test_split = float(root.get("test_split", 0.2))
     if not 0 <= test_split < 1:
         raise ValueError("test_split must be in [0, 1)")
+    dev_split = float(root.get("dev_split", 0))
+    if not 0 <= dev_split < 1 or dev_split + test_split >= 1:
+        raise ValueError(
+            "dev_split and test_split must be nonnegative and sum to less than 1"
+        )
+    arms = tuple(
+        _enum(item, SupervisionArm, "supervision arm")
+        for item in _sequence(
+            variants.get("supervision_arms", ["checked-trace"]), "supervision_arms"
+        )
+    )
+    if len(set(arms)) != len(arms):
+        raise ValueError("duplicate supervision arms")
+    budget_raw = root.get("context_budget")
+    budget = (
+        ContextBudget(**_mapping(budget_raw, "context_budget"))
+        if budget_raw is not None
+        else None
+    )
     matrix = ExperimentMatrix(
         seed=int(root.get("seed", 42)),
         test_split=test_split,
+        dev_split=dev_split,
+        split_strategy=SplitStrategy(root.get("split_strategy", "random")),
+        holdout_cells=root.get("holdout_cells"),
+        context_budget=budget,
+        supervision_arms=arms,
         include_audit=_boolean(root.get("include_audit", False), "include_audit"),
         answer_variants=_answer_variants(variants),
         trace_variants=_trace_variants(variants),
@@ -342,6 +391,7 @@ def _policy(
             }
         )
     return GenerationPolicy(
+        generation_mode=cell.generation_mode,
         query_kind=cell.query_kind,
         answer_mode=answer.mode,
         semantic_shape=cell.semantic_shape,
@@ -379,6 +429,10 @@ def _answers_for_cell(
 
 def _validate_matrix_cells(matrix: ExperimentMatrix) -> None:
     first_trace = matrix.trace_variants[0]
+    if SupervisionArm.CORRUPTED_TRACE in matrix.supervision_arms and not any(
+        trace.trace_format is TraceFormat.SYMBOLIC for trace in matrix.trace_variants
+    ):
+        raise ValueError("corrupted-trace requires a symbolic trace variant")
     for cell in matrix.cells:
         answers = _answers_for_cell(matrix, cell)
         if cell.query_kind is QueryKind.DIRECTION and cell.query_directions:
@@ -408,22 +462,44 @@ def _validate_matrix_cells(matrix: ExperimentMatrix) -> None:
                 raise ValueError(f"cell {cell.name}: {exc}") from exc
 
 
+def _supervision_arms(
+    matrix: ExperimentMatrix, trace: TraceVariant
+) -> tuple[SupervisionArm, ...]:
+    return tuple(
+        arm
+        for arm in matrix.supervision_arms
+        if (arm is not SupervisionArm.ANSWER_ONLY or trace is matrix.trace_variants[0])
+        and (
+            arm is not SupervisionArm.CORRUPTED_TRACE
+            or trace.trace_format is TraceFormat.SYMBOLIC
+        )
+    )
+
+
 def generate_matrix(
     matrix_path: str | Path,
     output_file: str | Path,
     *,
     replace: bool = False,
-) -> tuple[Path, Path, Path]:
+    tokenizer: Any = None,
+) -> tuple[Path, Path, Path, Path]:
     """Generate all requested matrix cells and their paired variants."""
     matrix = load_experiment_matrix(matrix_path)
-    output_paths = (*workload_output_paths(output_file), _view_root(output_file))
+    output_paths = (
+        *workload_output_paths(output_file),
+        _view_root(output_file),
+        rejection_output_path(output_file),
+    )
     check_output_paths(output_paths, replace=replace)
+    if matrix.context_budget is not None and tokenizer is None:
+        tokenizer = load_tokenizer(matrix.context_budget)
+    admissions = []
     generator = SpatialGeneratorV2(matrix.seed)
     row_groups: list[list[dict]] = []
     cell_counts: dict[str, int] = {}
     first_trace = matrix.trace_variants[0]
     expected_variants_by_base: dict[
-        str, set[tuple[AnswerMode, MenuCoverage, TraceFormat]]
+        str, set[tuple[AnswerMode, MenuCoverage, TraceFormat, SupervisionArm]]
     ] = {}
 
     for cell in matrix.cells:
@@ -444,52 +520,99 @@ def generate_matrix(
                     max_attempts=cell.max_attempts_per_sample,
                 )
                 rows = []
+                answer_samples = {
+                    answer.name: generator.with_answer_mode(
+                        base, answer.mode, answer.menu_coverage
+                    )
+                    for answer in answers
+                }
                 for answer, trace in product(
                     answers,
                     matrix.trace_variants,
                 ):
-                    answer_sample = generator.with_answer_mode(
-                        base,
-                        answer.mode,
-                        answer.menu_coverage,
-                    )
+                    answer_sample = answer_samples[answer.name]
                     variant = answer_sample.with_trace(trace.trace_format)
                     row = variant.as_sft_row(include_audit=matrix.include_audit)
                     row["metadata"]["matrix_cell"] = cell.name
                     row["metadata"]["matrix_answer_variant"] = answer.name
-                    rows.append(row)
+                    arms = _supervision_arms(matrix, trace)
+                    if arms:
+                        rows.extend(
+                            build_supervision_variants(
+                                row,
+                                arms,
+                                problem=variant.problem,
+                                expected=variant.menu_answer,
+                            )
+                        )
+                if matrix.context_budget is not None:
+                    admission = admit_row_group(rows, tokenizer, matrix.context_budget)
+                    admissions.append(admission)
+                    if not admission.accepted:
+                        write_rejection_report(
+                            output_file,
+                            admissions,
+                            matrix.context_budget,
+                            cell=cell.name,
+                        )
+                        raise ValueError(
+                            f"cell {cell.name}: paired context admission failed: {admission.row_rejections}"
+                        )
+                    rows = list(admission.rows)
                 row_groups.append(rows)
                 expected_variants_by_base[base.base_id] = {
                     (
                         answer.mode,
                         answer.menu_coverage,
                         trace.trace_format,
+                        arm,
                     )
                     for answer, trace in product(answers, matrix.trace_variants)
+                    for arm in _supervision_arms(matrix, trace)
                 }
                 generated += 1
         cell_counts[cell.name] = generated
 
-    trace_variants = tuple(variant.trace_format for variant in matrix.trace_variants)
+    trace_variants = tuple(
+        variant.trace_format
+        for variant in matrix.trace_variants
+        if _supervision_arms(matrix, variant)
+    )
     matrix_config = matrix.manifest_config()
     matrix_config.update(
         {
             "requested_base_problems": sum(cell_counts.values()),
             "generated_rows": sum(len(group) for group in row_groups),
-            "cells": cell_counts,
+            "cell_counts": cell_counts,
         }
     )
-    if replace:
-        remove_output_paths(output_paths)
     paths = write_workload(
         output_file,
         row_groups,
         test_split=matrix.test_split,
+        dev_split=matrix.dev_split,
+        split_strategy=matrix.split_strategy,
+        holdout_cells=matrix.holdout_cells,
         seed=matrix.seed,
         expected_trace_variants=trace_variants,
         expected_variants_by_base=expected_variants_by_base,
-        manifest_metadata={"matrix": matrix_config},
+        manifest_metadata={
+            "matrix": matrix_config,
+            **(
+                {
+                    "context_admission": summarize_admissions(
+                        admissions, matrix.context_budget
+                    )
+                }
+                if matrix.context_budget is not None
+                else {}
+            ),
+        },
     )
+    if replace:
+        remove_output_paths(
+            (_view_root(output_file), rejection_output_path(output_file))
+        )
     _materialize_views(*paths, _view_root(output_file))
     return paths
 
@@ -521,6 +644,7 @@ def _variant_key(row: dict[str, Any]) -> str:
         (
             metadata["matrix_answer_variant"],
             metadata["trace_format"],
+            metadata["supervision_arm"],
         )
     )
 
@@ -532,21 +656,28 @@ def _split_fingerprint(rows: list[dict[str, Any]]) -> str:
 
 def _materialize_views(
     train_path: Path,
+    dev_path: Path,
     test_path: Path,
     manifest_path: Path,
     view_root: Path,
 ) -> None:
-    splits = {"train": _read_jsonl(train_path), "test": _read_jsonl(test_path)}
+    splits = {
+        "train": _read_jsonl(train_path),
+        "dev": _read_jsonl(dev_path),
+        "test": _read_jsonl(test_path),
+    }
     by_variant: dict[str, dict[str, list[dict[str, Any]]]] = {}
     by_cell: dict[str, dict[str, dict[str, list[dict[str, Any]]]]] = {}
     for split, rows in splits.items():
         for row in rows:
             variant = _variant_key(row)
             cell = row["metadata"]["matrix_cell"]
-            by_variant.setdefault(variant, {"train": [], "test": []})[split].append(row)
-            by_cell.setdefault(cell, {}).setdefault(variant, {"train": [], "test": []})[
+            by_variant.setdefault(variant, {"train": [], "dev": [], "test": []})[
                 split
             ].append(row)
+            by_cell.setdefault(cell, {}).setdefault(
+                variant, {"train": [], "dev": [], "test": []}
+            )[split].append(row)
 
     def write_views(
         directory: Path,
@@ -556,14 +687,16 @@ def _materialize_views(
         for name, rows_by_split in sorted(groups.items()):
             paths = {
                 split: directory / f"{name}_{split}.jsonl"
-                for split in ("train", "test")
+                for split in ("train", "dev", "test")
             }
             for split, path in paths.items():
                 _write_jsonl(path, rows_by_split[split])
             outputs[name] = {
                 "train": str(paths["train"].relative_to(manifest_path.parent)),
+                "dev": str(paths["dev"].relative_to(manifest_path.parent)),
                 "test": str(paths["test"].relative_to(manifest_path.parent)),
                 "train_rows": len(rows_by_split["train"]),
+                "dev_rows": len(rows_by_split["dev"]),
                 "test_rows": len(rows_by_split["test"]),
             }
         return outputs

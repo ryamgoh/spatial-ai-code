@@ -8,7 +8,7 @@ from dataclasses import replace
 import pytest
 
 from spatial.v2.certificate_generation import build_answer_certificate
-from spatial.v2.count_certificate_renderers import render_count_answer_set
+from spatial.v2.count_certificate_renderers import render_count_training_trace
 from spatial.v2.count_certificates import (
     CountAnswerSetCertificate,
     CountCertificateCheckError,
@@ -39,6 +39,7 @@ from spatial.v2.solver import (
     SpatialProblem,
     SpatialSolverV2,
 )
+from spatial.v2.symbolic_trace_codec import parse_symbolic_count_trace
 from spatial.v2.trace import TraceFormat
 
 
@@ -182,6 +183,40 @@ def test_oracle_assisted_builder_constructs_correlated_refutations() -> None:
         )
 
 
+def test_symbolic_count_trace_replays_fixed_memberships() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B", "R"),
+        premise=And(
+            (
+                atom("A", Direction.NORTHEAST, "R"),
+                atom("B", Direction.SOUTHWEST, "R"),
+            )
+        ),
+        query=CountQuery(
+            frozenset({Direction.NORTHEAST}),
+            "R",
+            ("A", "B"),
+        ),
+    )
+    solver = SpatialSolverV2("reference")
+    certificate = build_answer_certificate(problem, solver.analyze(problem), solver)
+
+    symbolic = render_count_training_trace(certificate, TraceFormat.SYMBOLIC)
+    natural = render_count_training_trace(certificate, TraceFormat.NATURAL)
+    parsed = parse_symbolic_count_trace(problem, symbolic)
+
+    assert parsed.possible_counts == (1,)
+    assert tuple(item.candidate for item in parsed.fixed_memberships) == ("A", "B")
+    assert all(
+        not item.evidence.assignments
+        for item in parsed.values
+        if isinstance(item.evidence, CountImpossibilityCertificate)
+    )
+    assert "Fixed membership: A is entailed" in natural
+    assert "Fixed membership: B is impossible" in natural
+    assert "No joint assignment of this size agrees" in natural
+
+
 def test_count_renderer_preserves_joint_evidence() -> None:
     problem, coordinates = correlated_problem()
     certificate = build_count_answer_set(
@@ -193,21 +228,22 @@ def test_count_renderer_preserves_joint_evidence() -> None:
         },
     )
 
-    natural = render_count_answer_set(
+    natural = render_count_training_trace(
         certificate,
         TraceFormat.NATURAL,
-        include_coordinates=False,
     )
-    symbolic = render_count_answer_set(
+    symbolic = render_count_training_trace(
         certificate,
         TraceFormat.SYMBOLIC,
-        include_coordinates=False,
     )
+    parsed = parse_symbolic_count_trace(problem, symbolic)
 
     assert "Count 0: impossible" in natural
     assert "membership assignment {}" in natural
+    assert natural.index("X west to east:") < natural.index("Count 1: possible")
+    assert '"schema":"spatial-count-trace-v2"' in symbolic
+    assert parsed.possible_counts == (1,)
     assert "unique count is 1" in natural
-    assert "Count-Domain: {1}" in symbolic
 
 
 def test_count_certificate_can_retain_multiple_possible_counts() -> None:
@@ -356,3 +392,70 @@ def test_checker_rejects_missing_assignment_and_corrupted_refutation() -> None:
                 (corrupted_count, *certificate.values[1:]),
             )
         )
+
+
+def test_compact_count_preserves_correlated_contingent_assignments() -> None:
+    problem = SpatialProblem(
+        objects=("A", "B", "C", "D", "R"),
+        premise=And(
+            (
+                atom("A", Direction.NORTHEAST, "R"),
+                atom("B", Direction.SOUTHWEST, "R"),
+                Iff(
+                    atom("C", Direction.NORTHEAST, "R"),
+                    Not(atom("D", Direction.NORTHEAST, "R")),
+                ),
+            )
+        ),
+        query=CountQuery(frozenset({Direction.NORTHEAST}), "R", ("A", "B", "C", "D")),
+    )
+    solver = SpatialSolverV2("z3")
+    certificate = build_answer_certificate(problem, solver.analyze(problem), solver)
+    assert certificate.possible_counts == (2,)
+    assert tuple(item.candidate for item in certificate.fixed_memberships) == ("A", "B")
+    assert certificate.values[1].evidence.assignments[0].members == ("A",)
+    assert certificate.values[3].evidence.assignments[0].members == ("A", "C", "D")
+    assert (
+        sum(
+            len(item.evidence.assignments)
+            for item in certificate.values
+            if isinstance(item.evidence, CountImpossibilityCertificate)
+        )
+        == 2
+    )
+    symbolic = render_count_training_trace(certificate, TraceFormat.SYMBOLIC)
+    assert parse_symbolic_count_trace(problem, symbolic) == certificate
+
+    # Individual possibility of C and D does not establish joint count 1 or 3.
+    missing = replace(certificate.values[1], evidence=CountImpossibilityCertificate(()))
+    with pytest.raises(CountCertificateCheckError, match="every membership assignment"):
+        check_count_answer_set(
+            replace(
+                certificate,
+                values=(certificate.values[0], missing, *certificate.values[2:]),
+            )
+        )
+    # Fixed evidence cannot simply be omitted to bypass exhaustive coverage.
+    with pytest.raises(CountCertificateCheckError, match="every membership assignment"):
+        check_count_answer_set(replace(certificate, fixed_memberships=()))
+    with pytest.raises(CountCertificateCheckError, match="unique and in query order"):
+        check_count_answer_set(
+            replace(certificate, fixed_memberships=certificate.fixed_memberships * 2)
+        )
+    corrupted = replace(certificate.fixed_memberships[0], candidate="C")
+    with pytest.raises(CountCertificateCheckError):
+        check_count_answer_set(replace(certificate, fixed_memberships=(corrupted,)))
+
+
+def test_count_compact_parser_rejects_claim_injection_and_old_schema() -> None:
+    problem, _ = correlated_problem()
+    solver = SpatialSolverV2("z3")
+    certificate = build_answer_certificate(problem, solver.analyze(problem), solver)
+    payload = json.loads(render_count_training_trace(certificate, TraceFormat.SYMBOLIC))
+    payload["evidence"][1]["evidence"]["claim"] = {"kind": "and", "operands": []}
+    with pytest.raises(ValueError, match="unexpected or missing fields"):
+        parse_symbolic_count_trace(problem, json.dumps(payload))
+    del payload["evidence"][1]["evidence"]["claim"]
+    payload["schema"] = "spatial-count-trace-v1"
+    with pytest.raises(ValueError, match="unsupported symbolic Count trace schema"):
+        parse_symbolic_count_trace(problem, json.dumps(payload))

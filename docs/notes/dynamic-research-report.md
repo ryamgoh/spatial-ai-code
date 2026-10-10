@@ -308,4 +308,3 @@ Here is the one-page design." (This report's §2–§4 is that one page.)
 > plus one SFT+RL experiment (does the structured procedure transfer to
 > state tracking?) and a difficulty-length scaling analysis, which closes
 > the "do LLMs maintain world models?" question from the introduction.
-

@@ -3,7 +3,6 @@ name: v2-trace-pilot
 matrix: matrix.yaml
 data_output: data/spatial_v2_pilot.jsonl
 base_model: Qwen/Qwen3.5-4B
-retention_task: spatial_eval_v6_spatialmap
 
 train:
   template: templates/train.yaml
@@ -13,15 +12,26 @@ train:
 eval:
   template: templates/eval.yaml
   task_template: templates/task.yaml
-  overrides:
-    model_args:
-      max_thinking_tokens: 2048
+  overrides: {}
 
 arms:
   - name: single-natural
-    view: single__natural__delta
+    view: single__natural__checked-trace
   - name: single-symbolic
-    view: single__symbolic__delta
+    view: single__symbolic__checked-trace
+  - name: answer-only
+    view: single__natural__answer-only
+  - name: corrupted-symbolic
+    view: single__symbolic__corrupted-trace
+  - name: untuned-natural
+    view: single__natural__checked-trace
+    train: false
+  - name: untuned-symbolic
+    view: single__symbolic__checked-trace
+    train: false
+  - name: untuned-answer-only
+    view: single__natural__answer-only
+    train: false
 
 resources:
   generate:

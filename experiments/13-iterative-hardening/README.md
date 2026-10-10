@@ -102,7 +102,7 @@ evaluation does not fit in the allocation, rerun with
 `results/SFT-1500-SUMMARY.md`; train 6K only if all six scaling gates pass.
 
 The authoritative v13 meaning of worlds, questions, and special options is
-[`docs/v13-semantic-contract.md`](../../docs/v13-semantic-contract.md). V6/v12
+[`SEMANTIC_CONTRACT.md`](SEMANTIC_CONTRACT.md). V6/v12
 are frozen comparison suites, not semantic dependencies of v13.
 
 ### Native V13 nested 6K scaling run

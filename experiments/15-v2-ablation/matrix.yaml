@@ -1,9 +1,19 @@
 version: 1
 seed: 1515
 test_split: 0.2
+dev_split: 0.2
+split_strategy: structural
 include_audit: false
+context_budget:
+  tokenizer_name: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  train_max_tokens: 4096
+  eval_max_tokens: 8192
+  max_new_tokens: 4096
 
 defaults:
+  num_entities: 3
+  num_premises: 2
   max_attempts_per_sample: 2000
 
 variants:
@@ -14,61 +24,20 @@ variants:
   traces:
     - format: natural
     - format: symbolic
+  supervision_arms: [checked-trace, answer-only, corrupted-trace]
 
 cells:
   - name: direction-depth-2
-    count: 20
+    count: 5
     query_kind: direction
     semantic_shape: unique
     depth: 2
-    num_entities: 6
-    num_premises: 7
     omit_direct_query_relation: true
-    distractor_premises: 5
+    distractor_premises: 0
     target_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
 
-  - name: which-depth-2
-    count: 20
-    query_kind: which
-    semantic_shape: unique
-    depth: 2
-    num_entities: 7
-    num_premises: 10
-    omit_direct_query_relation: true
-    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
-
-  - name: count-depth-2
-    count: 20
-    query_kind: count
-    semantic_shape: unique
-    depth: 2
-    num_entities: 7
-    num_premises: 10
-    omit_direct_query_relation: true
-    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
-
   - name: direction-ambiguity-2
-    count: 10
+    count: 40
     query_kind: direction
     semantic_shape: ambiguous
     ambiguity_size: 2
-    num_entities: 6
-    num_premises: 5
-
-  - name: which-ambiguity-2
-    count: 10
-    query_kind: which
-    semantic_shape: ambiguous
-    ambiguity_size: 2
-    num_entities: 6
-    num_premises: 5
-    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]
-
-  - name: count-ambiguity-2
-    count: 10
-    query_kind: count
-    semantic_shape: ambiguous
-    ambiguity_size: 2
-    num_entities: 6
-    num_premises: 5
-    query_directions: [North, Northeast, East, Southeast, South, Southwest, West, Northwest]

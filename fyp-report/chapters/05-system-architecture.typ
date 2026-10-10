@@ -75,10 +75,12 @@ produce the same typed semantic analysis.
 
 The output path deliberately branches only after semantic analysis. Answer
 policy can map the result into a single answer or a set-valued answer. The
-proof layer can produce coordinate-free training traces. The audit layer
-can retain witness coordinates and provenance for researcher inspection. This
-separation prevents audit-only coordinates from leaking into supervised
-training targets.
+proof layer exposes separate renderers for compact training traces and
+exhaustive audit certificates. Training traces omit numeric coordinates but may
+show qualitative X/Y rank orders when possibility requires a constructive
+model. Audit certificates retain the full per-candidate evidence, witness
+coordinates, and provenance. This separation prevents arbitrary coordinate
+values from being presented as deductive reasoning.
 
 == Inside the Reasoning Core
 
@@ -151,20 +153,44 @@ The implemented schemas cover modus ponens, equivalence elimination, double
 negation, disjunctive syllogism, case split, and bounded nested case split over
 ordinary directional atoms. Thus the target conclusion is fixed by the proof
 obligation rather than selected from a previously sampled coordinate world.
-Direction cells prove one exact relation; Which and Count cells prove one
-membership, exclude every other declared candidate, and certify the resulting
-entity or cardinality answer.
+Rows identify this path as `proof-template-first`. The stricter
+`certificate-first` label would require the typed certificate before the problem.
+The distinct `premise-first` route samples visible relation premises and a query
+without a coordinate map, solves and classifies the problem, then constructs
+checked evidence. World-first proposals remain labelled separately and their
+answers are also recomputed from visible premises.
 
-The SpatialEntail generator renders Natural or Symbolic reasoning from one
-replayable certificate. Direction certificates support spatial chains and
-bounded Boolean case proofs; complete Direction, Which, and correlated Count
-certificates support unique and ambiguous answer sets. The former post-hoc
-training renderer and its independent state-snapshot modes have been removed.
-Automatic construction performs deterministic Boolean closure and bounded case
-splits but is not complete for arbitrary nesting, so unsupported candidates are
-rejected rather than routed through a fallback.
-Training rows exclude coordinate witnesses by default. Coordinates can be added
-only as separate audit metadata for diagnostic use.
+Canonical signatures describe source formulas and queries under object renaming
+and premise or commutative ordering. Exact canonicalization has a permutation
+budget; its conservative fallback may merge distinct structures. Structural
+clustering and three-way overlap validation keep related variants in one split.
+They do not establish a withheld composition: explicit holdout cells must be
+reserved before development selection.
+
+Natural narrates checked dependencies and scopes, while Symbolic serializes
+typed records from the same accepted evidence. Corpus-wide information and cost
+matching remains to be audited. Only Symbolic model output
+has a strict parser: it reconstructs typed evidence, replays proof and model
+checks, validates the menu decision, and checks the final answer footer.
+Natural process validity is unavailable. Neither gold certificate checking nor
+model-output replay demonstrates the model's internal reasoning process.
+
+Count stores fixed membership classifications once and excludes only the
+remaining compatible assignments. Correlated contingent memberships still
+require joint reasoning, with potentially exponential evidence. Unique Direction
+training includes a consistency witness, since a proof alone need not establish
+that the premise set has a model. Training witnesses use qualitative axis ranks;
+audit views expose coordinates for all query kinds. Automatic proof construction
+is incomplete and unsupported candidates fail closed.
+
+The workload derives checked-trace, answer-only, and Symbolic-only corrupted
+controls. Corruption mutates semantic evidence while preserving syntax and the
+gold decision, and is admitted only if reasoning replay rejects it. Answer-only
+has absent evidence, not invalid evidence. Exact tokenizer/template admission
+checks full training chats and evaluation prompts plus generation reserve, then
+rejects entire paired groups on overflow. Inference receives the admitted prompt
+without retemplating. The bounded pilot and unrun research comparisons are
+specified in Part II.
 
 == Failure and Output Contracts
 

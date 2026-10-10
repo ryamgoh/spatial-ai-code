@@ -5,10 +5,10 @@ Status: working research direction, not a fixed paper outline
 Last updated: 7 October 2026
 
 Raw contribution notes:
-[`What this project is trying to do`](spatialentail-raw-contribution-notes.md)
+[`What this project is trying to do`](../notes/raw-contribution-notes.md)
 
 Annotated literature ledger:
-[`What each source supports and does not support`](spatialentail-annotated-sources.md)
+[`What each source supports and does not support`](annotated-sources.md)
 
 ## Working title
 
@@ -36,7 +36,7 @@ Use these terms consistently in experiments and the report:
 | `SpatialEntail` | The benchmark as a whole | “evaluated on SpatialEntail” |
 | Pilot | Preliminary data used to calibrate generation, difficulty, and protocols | SpatialEntail Pilot |
 | Suite | A fixed evaluation module | Core, Propositional, Depth, Ambiguity |
-| Arm | One prompting, training, or RL condition | Answer-Only, Natural-Delta, Symbolic-Delta, Mixed-SFT |
+| Arm | One prompting, training, or RL condition | Answer-Only, Checked Natural, Checked Symbolic, Mixed-SFT |
 | Version | Public artifact identity, used only when needed for reproducibility | SpatialEntail v1.0 |
 
 Do not rename the benchmark for each ablation. Natural/Symbolic traces, state
@@ -109,14 +109,16 @@ may become a separately named trace arm if a pilot shows that coordinate-bearing
 supervision is useful. The current Natural and Symbolic traces remain
 coordinate-free by default; whether to add a coordinate-witness arm is open.
 
-## Generation provenance: world-first, proof-first, and premise-first
+## Generation provenance: world-first, proof-template-first, certificate-first,
+and premise-first
 
 Status: provisional design decision for SpatialEntail, retained here for further
 iteration before the benchmark suites are frozen.
 
 The order in which a synthetic problem is constructed changes what its answer
-and reasoning trace mean. Three generation families must therefore be named and
-tracked explicitly.
+and reasoning trace mean. Four generation families must therefore be named and
+tracked explicitly. Generated V2 rows record this choice in
+`metadata.generation_provenance`.
 
 ### World-first generation
 
@@ -151,7 +153,21 @@ returned for `P AND A` is a valid certificate that `A` is possible. Two such
 assignments can certify ambiguity. A single assignment cannot establish that an
 answer is entailed.
 
-### Proof-first generation
+### Proof-template-first generation
+
+```text
+choose a proof-rule or path template
+-> instantiate premises and a query expected to exercise that template
+-> solve the resulting problem
+-> construct and replay the actual certificate
+```
+
+This is the provenance of the current Boolean curricula and controlled
+Direction/Which/Count paths. It controls the intended proof shape before the
+problem is solved, but it does not instantiate the final typed certificate
+first. The name therefore avoids overstating the implementation.
+
+### Certificate-first generation
 
 ```text
 sample a typed proof structure
@@ -171,9 +187,11 @@ P2: NOT NW(A,B)
 therefore: NE(A,B)
 ```
 
-Proof-first generation is the strongest initial source of trace-supervised
-training data because it guarantees a structured derivation and directly
-controls:
+Certificate-first generation would be the strongest source of trace-supervised
+training data because it guarantees a structured derivation before the problem
+text exists. It remains a distinct target provenance rather than a label for
+the current proof-template-first generator. Together, the two controlled
+families can directly control:
 
 - Boolean and spatial proof depth;
 - rule family and rule composition;
@@ -213,23 +231,22 @@ admission rather than balancing by planting a target answer.
 
 ### Comparison
 
-| Criterion | World-first | Proof-first | Premise-first |
-|---|---|---|---|
-| Gold-label basis | One complete sampled world unless recomputed | Checked derivation from emitted premises | Semantics discovered from emitted premises |
-| Trace availability | Post-hoc and potentially unfaithful | Guaranteed certificate | Requires proof search |
-| Difficulty control | Indirect and unreliable | Direct, then remeasured | Post-hoc only |
-| Rule coverage | Accidental | Explicitly balanceable | Emergent and potentially sparse |
-| Template leakage | Hidden-world and construction bias | Main risk | Lower, though sampler artifacts remain |
-| Rejection rate | Usually low before semantic correction | Low to moderate | Potentially high |
-| Best role | Not a gold-label source | Controlled trace supervision | Generalisation and robustness evaluation |
+| Criterion | World-first | Proof-template-first | Certificate-first | Premise-first |
+|---|---|---|---|---|
+| Gold-label basis | One sampled world unless recomputed | Solver semantics plus extracted checked certificate | Certificate fixed before problem construction | Semantics discovered from emitted premises |
+| Trace availability | Post-hoc and potentially unfaithful | Checked after instantiation | Guaranteed by construction | Requires proof search |
+| Difficulty control | Indirect and unreliable | Intended template, then remeasured | Direct, then remeasured | Post-hoc only |
+| Rule coverage | Accidental | Explicitly balanceable | Explicitly balanceable | Emergent and potentially sparse |
+| Template leakage | Hidden-world and construction bias | Main risk | Main risk | Lower, though sampler artifacts remain |
+| Best role | Proposal source only after re-solving | Current controlled supervision | Stricter future supervision | Generalisation and robustness evaluation |
 
 ### Provisional SpatialEntail design
 
-The working recommendation is not proof-first everywhere.
+The working recommendation is not template-controlled generation everywhere.
 
 ```text
 Trace-supervised training:
-  proof-first problems with replayable certificates
+  proof-template-first problems with replayable certificates
 
 Secondary training pool:
   premise-first problems for which concise proofs are successfully extracted
@@ -241,11 +258,12 @@ External transfer:
   untouched SpatialMap-TQA-Corr
 ```
 
-Proof-first data supplies controlled coverage and reliable Natural or Symbolic
-targets. Premise-first evaluation tests whether any gain transfers beyond the
-construction templates seen during supervision. A proof-first-only final test
-would risk measuring template recognition; a premise-first-only trace corpus
-would make faithful supervision unnecessarily expensive and selective.
+Proof-template-first data supplies controlled coverage and checked Natural or
+Symbolic targets. Premise-first evaluation tests whether any gain transfers
+beyond the construction templates seen during supervision. A
+proof-template-only final test would risk measuring template recognition; a
+premise-first-only trace corpus would make checked supervision unnecessarily
+expensive and selective.
 
 No fixed mixture is assumed. The balance must be chosen from a pilot measuring
 rejection rates, proof-search success, trace length, class balance, duplicate
@@ -280,9 +298,15 @@ impossible  -> UNSAT(P AND A) and a checked contradiction certificate
 contingent  -> SAT(P AND A) and SAT(P AND NOT A), with evidence for both
 ```
 
-Natural and Symbolic traces must be rendered from the same proof object. They
-must not be generated independently or by asking an LLM to rationalise a known
-answer.
+Natural and Symbolic targets originate from the same accepted certificate.
+Natural now narrates the checked dependencies and scopes that Symbolic encodes,
+with query-specific witnesses and exclusions in both views. Shared provenance
+and step coverage do not establish equal information load or token cost. Audit
+the mapping across the frozen corpus before claiming a notation-only effect;
+only Symbolic model outputs have replay-based process validation. Generated Natural
+targets inherit checked source evidence, but arbitrary model-produced Natural
+prose has no replay parser. External evidence validity does not establish
+faithfulness to a model's internal computation.
 
 ### Leakage and split commitments
 
@@ -301,12 +325,21 @@ Proof-first training and premise-first evaluation must not share exact
 normalised problems. The strongest structural test also withholds selected rule
 compositions rather than merely renaming entities or shuffling premises.
 
+The workload supports random interpolation splits and structural clustering.
+Canonical signatures describe the visible source formulas and query, ignoring
+entity names, premise order, and commutative operand order. Canonicalization is
+exact within its permutation budget; a conservative invariant fallback can
+merge distinct structures. Three-way overlap validation keeps train,
+development, and test separate under that identity. This does not automatically
+hold out a rule composition, depth, or provenance. Such claims require explicit
+predeclared holdout cells and a distribution audit after context admission.
+
 ### Pilot questions
 
 - Which primitive Boolean and spatial rules belong in the first proof schema?
 - Can the proof checker remain small enough to audit independently?
 - How often does premise-first sampling yield concise replayable proofs?
-- How often does proof-first construction admit an unintended shorter proof?
+- How often does proof-template-first construction admit an unintended shorter proof?
 - What semantic-class imbalance appears before solve-and-bucket admission?
 - Do coordinate-witness traces add value beyond coordinate-free Natural and
   Symbolic traces?
@@ -343,7 +376,7 @@ the released 1,500 questions and derives a new evaluation view from them.
 | Does semantic correction change how LLM spatial reasoning is measured? | Original and corrected evaluation will produce different scores and error interpretations; ranking changes are possible but not assumed. |
 | Can a generated benchmark measure meaningful spatial difficulty? | Accuracy will decline systematically with proof depth, independent-axis composition, and relevant distractors rather than only with prompt length. |
 | Does formal reasoning supervision teach more than answer imitation? | Natural or Symbolic trace SFT will outperform answer-only SFT on at least some structurally held-out conditions. |
-| Which representation supports the strongest generalisation? | Delta state will be more robust than Full state at high depth. Symbolic and Natural traces may trade token efficiency against transfer to natural language. |
+| Which representation supports the strongest generalisation? | Natural and Symbolic supervision packages may trade accuracy, validity, and token cost; information-matched notation effects remain a separate experiment. |
 | Does solver-verifiable RL add value after SFT? | Unknown; it is viable only if hard prompts produce within-group reward variance and SFT leaves headroom. |
 
 The first five questions form the intended study. RL is optional.
@@ -352,8 +385,8 @@ The first five questions form the intended study. RL is optional.
 
 Detailed plans:
 
-- [`Part I: evaluating LLM spatial reasoning`](v2-fyp-part-1-evaluation.md)
-- [`Part II: improving LLM spatial reasoning`](v2-fyp-part-2-sft.md)
+- [`Part I: evaluating LLM spatial reasoning`](part-1-evaluation.md)
+- [`Part II: improving LLM spatial reasoning`](part-2-training.md)
 
 | Study | Design | Question answered |
 |---|---|---|
@@ -379,6 +412,8 @@ structural reasons.
 - Macro-average predeclared structural cells so easy mass cannot hide failures.
 - Report ambiguity recognition, output validity, token cost, and paired
   fixes/regressions as secondary diagnostics.
+- Decompose Symbolic process validity into replayable reasoning, checked menu
+  decision, cross-record domain agreement, and fully valid trace rates.
 - Report uncertainty across items and training seeds for main comparisons.
 - Treat `SINGLE` as the primary contract, `ALL_POSSIBLE` as a strict set-valued
   extension, and `VISIBLE_POSSIBLE` as a menu-relative diagnostic.
@@ -408,7 +443,7 @@ low-priority KIV extension.
 - Final collision check and approval of the provisional `SpatialEntail` name
 - Exact scope of the propositional challenge track
 - Final proof-certificate schema and primitive rule vocabulary
-- Pilot balance between proof-first and premise-first generation
+- Pilot balance between proof-template-first and premise-first generation
 - Whether coordinate witnesses become a distinct trace arm
 - Held-out proof compositions and formula structures for the final test
 - Manual case-selection and checking protocol

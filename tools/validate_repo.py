@@ -160,18 +160,20 @@ def check_layout(errors: list[str]) -> None:
         errors.append(f"root launchers must live with their experiment: {names}")
 
     expected_spatial_files = {
-        "generate_all.py",
-        "generate_all_v6.py",
-        "generate_grpo.py",
-        "spatial_solver.py",
-        "test_spatial_laws.py",
+        Path("spatial/v1/generate_all.py"),
+        Path("spatial/v1/generate_all_v6.py"),
+        Path("spatial/v1/generate_grpo.py"),
+        Path("spatial/v1/solver.py"),
+        Path("spatial/v1/tests/test_laws.py"),
+        Path("spatial/v2/generate_all.py"),
+        Path("spatial/v2/solver.py"),
+        Path("spatial/v2/tests/test_solver.py"),
     }
-    actual_spatial_files = {
-        path.name for path in (ROOT / "spatial").glob("*.py")
-    }
-    missing = sorted(expected_spatial_files - actual_spatial_files)
+    missing = sorted(
+        str(path) for path in expected_spatial_files if not (ROOT / path).is_file()
+    )
     if missing:
-        errors.append(f"spatial/: missing domain files: {', '.join(missing)}")
+        errors.append(f"missing versioned domain files: {', '.join(missing)}")
 
     legacy_locations = [
         ROOT / "eval" / "spatial_solver.py",
@@ -186,7 +188,7 @@ def check_layout(errors: list[str]) -> None:
 
 
 def check_documented_launchers(errors: list[str]) -> None:
-    paths = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+    paths = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
     paths += sorted(EXPERIMENTS.glob("**/README.md"))
     paths += sorted(EXPERIMENTS.glob("**/RESULTS.md"))
     pattern = r"sbatch(?:\s+--[^\s]+)*\s+(experiments/[^\s`]+\.sh)"

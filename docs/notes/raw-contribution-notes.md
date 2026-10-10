@@ -4,7 +4,7 @@ Status: deliberately raw working notes, not contribution claims ready for the
 report or abstract.
 
 Primary-source annotations:
-[`What each source supports and does not support`](spatialentail-annotated-sources.md)
+[`What each source supports and does not support`](../research/annotated-sources.md)
 
 ## The central discomfort
 
@@ -246,10 +246,10 @@ The benchmark and solver are infrastructure for empirical questions:
 2. Does proof-backed supervision improve more than answer-only exposure?
 3. Do gains survive premise-first problems and held-out proof compositions, or
    only matched generation templates?
-4. Is a compact Symbolic trace more useful than a Natural trace when both encode
-   exactly the same derivation?
-5. Are Delta traces better than Full state serialization because they preserve
-   the inferential step without repeatedly copying the entire world state?
+4. Do checked Natural and Symbolic supervision packages differ in accuracy,
+   validity, or cost after auditing their rendered evidence coverage?
+5. How does certificate compression affect context admission and the retained
+   structural distribution?
 6. Can models distinguish possible, entailed, impossible, contingent, and
    inconsistent conclusions?
 7. Does solver-verifiable RL add anything after strong proof-backed SFT, or does

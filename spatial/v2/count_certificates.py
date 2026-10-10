@@ -31,7 +31,6 @@ from spatial.v2.solver import (
     membership_constraint,
 )
 from spatial.v2.which_certificates import (
-    MembershipEvidence,
     MembershipStatus,
     WhichCandidateCertificate,
     WhichCertificateCheckError,
@@ -46,13 +45,7 @@ class CountCertificateCheckError(ValueError):
 @dataclass(frozen=True)
 class CountAssignmentRefutation:
     members: tuple[str, ...]
-    refutation: FormulaRefutationCertificate | CountMembershipConflict
-
-
-@dataclass(frozen=True)
-class CountMembershipConflict:
-    candidate: str
-    evidence: MembershipEvidence
+    refutation: FormulaRefutationCertificate
 
 
 @dataclass(frozen=True)
@@ -74,6 +67,7 @@ class CountValueCertificate:
 class CountAnswerSetCertificate:
     problem: SpatialProblem
     values: tuple[CountValueCertificate, ...]
+    fixed_memberships: tuple[WhichCandidateCertificate, ...] = ()
 
     @property
     def possible_counts(self) -> tuple[int, ...]:
@@ -92,6 +86,26 @@ def count_assignments(
     if not 0 <= count <= len(query.candidates):
         raise ValueError(f"count must be between 0 and {len(query.candidates)}")
     return tuple(combinations(query.candidates, count))
+
+
+def remaining_count_assignments(
+    query: CountQuery,
+    count: int,
+    fixed_memberships: tuple[WhichCandidateCertificate, ...],
+) -> tuple[tuple[str, ...], ...]:
+    """Enumerate joint assignments only among memberships not already fixed."""
+    fixed = {item.candidate: item.status for item in fixed_memberships}
+    required = {
+        name for name, status in fixed.items() if status is MembershipStatus.ENTAILED
+    }
+    contingent = tuple(name for name in query.candidates if name not in fixed)
+    remaining = count - len(required)
+    if not 0 <= remaining <= len(contingent):
+        return ()
+    return tuple(
+        tuple(name for name in query.candidates if name in required or name in members)
+        for members in combinations(contingent, remaining)
+    )
 
 
 def count_assignment_formula(
@@ -130,6 +144,24 @@ def check_count_answer_set(certificate: CountAnswerSetCertificate) -> None:
     query = problem.query
     if not isinstance(query, CountQuery):
         raise CountCertificateCheckError("Count certificates require a CountQuery")
+    which_query = WhichQuery(query.directions, query.reference, query.candidates)
+    which_problem = SpatialProblem(problem.objects, problem.premise, which_query)
+    fixed_names = tuple(item.candidate for item in certificate.fixed_memberships)
+    if fixed_names != tuple(name for name in query.candidates if name in fixed_names):
+        raise CountCertificateCheckError(
+            "fixed memberships must be unique and in query order"
+        )
+    for fixed in certificate.fixed_memberships:
+        try:
+            check_which_candidate_certificate(which_problem, which_query, fixed)
+        except WhichCertificateCheckError as exc:
+            raise CountCertificateCheckError(
+                f"invalid fixed membership: {exc}"
+            ) from exc
+        if fixed.status is MembershipStatus.CONTINGENT:
+            raise CountCertificateCheckError(
+                "fixed membership must be entailed or impossible"
+            )
     expected_counts = tuple(range(len(query.candidates) + 1))
     actual_counts = tuple(item.count for item in certificate.values)
     if actual_counts != expected_counts:
@@ -161,7 +193,9 @@ def check_count_answer_set(certificate: CountAnswerSetCertificate) -> None:
             raise CountCertificateCheckError(
                 f"count {item.count} has unsupported evidence"
             )
-        expected_assignments = count_assignments(query, item.count)
+        expected_assignments = remaining_count_assignments(
+            query, item.count, certificate.fixed_memberships
+        )
         actual_assignments = tuple(
             assignment.members for assignment in item.evidence.assignments
         )
@@ -186,43 +220,9 @@ def check_count_answer_set(certificate: CountAnswerSetCertificate) -> None:
                     ) from exc
                 continue
 
-            if not isinstance(refutation, CountMembershipConflict):
-                raise CountCertificateCheckError(
-                    f"count {item.count} has unsupported assignment evidence"
-                )
-            which_query = WhichQuery(
-                query.directions,
-                query.reference,
-                query.candidates,
+            raise CountCertificateCheckError(
+                f"count {item.count} has unsupported assignment evidence"
             )
-            which_problem = SpatialProblem(
-                problem.objects,
-                problem.premise,
-                which_query,
-            )
-            candidate_evidence = WhichCandidateCertificate(
-                refutation.candidate,
-                refutation.evidence,
-            )
-            try:
-                check_which_candidate_certificate(
-                    which_problem,
-                    which_query,
-                    candidate_evidence,
-                )
-            except WhichCertificateCheckError as exc:
-                raise CountCertificateCheckError(
-                    f"count {item.count} has an invalid membership conflict: {exc}"
-                ) from exc
-            assigned_true = refutation.candidate in assignment.members
-            status = candidate_evidence.status
-            if (assigned_true and status is not MembershipStatus.IMPOSSIBLE) or (
-                not assigned_true and status is not MembershipStatus.ENTAILED
-            ):
-                raise CountCertificateCheckError(
-                    f"count {item.count} membership evidence does not contradict "
-                    "the assignment"
-                )
 
     if not certificate.possible_counts:
         raise CountCertificateCheckError(
@@ -236,8 +236,9 @@ def build_count_answer_set(
     possible_models: Mapping[int, Mapping[str, tuple[int, int]]],
     impossible_refutations: Mapping[
         int,
-        Sequence[FormulaRefutationCertificate | CountMembershipConflict],
+        Sequence[FormulaRefutationCertificate],
     ],
+    fixed_memberships: tuple[WhichCandidateCertificate, ...] = (),
 ) -> CountAnswerSetCertificate:
     """Build complete Count evidence from models and assignment refutations."""
     query = problem.query
@@ -274,7 +275,7 @@ def build_count_answer_set(
                     f"invalid model for count {count}: {exc}"
                 ) from exc
         elif refutations is not None:
-            assignments = count_assignments(query, count)
+            assignments = remaining_count_assignments(query, count, fixed_memberships)
             if len(refutations) != len(assignments):
                 raise ProofConstructionError(
                     f"count {count} needs one refutation for every membership assignment"
@@ -289,7 +290,7 @@ def build_count_answer_set(
             raise ProofConstructionError(f"missing evidence for count {count}")
         values.append(CountValueCertificate(count, evidence))
 
-    certificate = CountAnswerSetCertificate(problem, tuple(values))
+    certificate = CountAnswerSetCertificate(problem, tuple(values), fixed_memberships)
     try:
         check_count_answer_set(certificate)
     except CountCertificateCheckError as exc:

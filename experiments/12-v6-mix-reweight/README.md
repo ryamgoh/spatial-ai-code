@@ -14,7 +14,7 @@ three. SpatialMap v6 is unmatched transfer. The old seed-43 synth file
 is **not** the Exp 12 headline.
 
 **Split vs distribution** (what is matched, what is leakage, what is
-cited): [`docs/split-and-distribution.md`](../../docs/split-and-distribution.md).
+cited): [`SPLIT_AND_DISTRIBUTION.md`](SPLIT_AND_DISTRIBUTION.md).
 
 ## What changed vs the previous mix
 

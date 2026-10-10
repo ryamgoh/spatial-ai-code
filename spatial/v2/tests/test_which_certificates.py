@@ -18,8 +18,9 @@ from spatial.v2.solver import (
     WhichQuery,
     direction_signs,
 )
+from spatial.v2.symbolic_trace_codec import parse_symbolic_which_trace
 from spatial.v2.trace import TraceFormat
-from spatial.v2.which_certificate_renderers import render_which_answer_set
+from spatial.v2.which_certificate_renderers import render_which_training_trace
 from spatial.v2.which_certificates import (
     MembershipEntailmentCertificate,
     MembershipImpossibilityCertificate,
@@ -96,6 +97,11 @@ def test_unique_which_certificate_classifies_every_candidate() -> None:
         MembershipImpossibilityCertificate,
     )
     assert len(certificate.candidates[1].evidence.refutations) == 1
+    symbolic = render_which_training_trace(certificate, TraceFormat.SYMBOLIC)
+    parsed = parse_symbolic_which_trace(problem, symbolic)
+    assert parsed.possible_entities == ("A",)
+    assert parsed.entailed_entities == ("A",)
+    assert parsed.impossible_entities == ("B",)
     json.dumps(which_answer_set_to_dict(certificate))
 
 
@@ -129,20 +135,21 @@ def test_contingent_which_membership_requires_two_models() -> None:
     assert certificate.impossible_entities == ()
     assert not certificate.is_exact_single
     assert isinstance(certificate.candidates[0].evidence, ContingencyCertificate)
-    natural = render_which_answer_set(
+    natural = render_which_training_trace(
         certificate,
         TraceFormat.NATURAL,
-        include_coordinates=False,
     )
-    symbolic = render_which_answer_set(
+    symbolic = render_which_training_trace(
         certificate,
         TraceFormat.SYMBOLIC,
-        include_coordinates=False,
     )
+    parsed = parse_symbolic_which_trace(problem, symbolic)
     assert "R: contingent" in natural
+    assert natural.index("X west to east:") < natural.index("R: contingent")
+    assert '"schema":"spatial-which-trace-v1"' in symbolic
+    assert parsed.possible_entities == ("R",)
+    assert parsed.contingent_entities == ("R",)
     assert "possible candidates are R" in natural
-    assert "Which-Possible: {R}" in symbolic
-    assert "Which-Entailed: {}" in symbolic
 
 
 def test_which_certificate_matches_independent_solver_analysis() -> None:

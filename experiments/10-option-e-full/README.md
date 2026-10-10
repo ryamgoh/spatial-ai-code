@@ -25,7 +25,7 @@ proven, gold is **E**.
 which-4 is remapped to E. The type-1 fallback had labeled every
 in-passage name `A,B,C,D` when first pass proved none of them.
 
-**What E means.** See `docs/option-e-semantics.md` — the provable-vs-consistent
+**What E means.** See [`SEMANTICS.md`](SEMANTICS.md) — the provable-vs-consistent
 semantics, worked proofs/counterexamples for all three subtypes (dir-75,
 which-198, count-96), and the distribution difference vs the original 1500.
 

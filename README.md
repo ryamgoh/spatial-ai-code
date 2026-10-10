@@ -11,7 +11,7 @@ LM Evaluation Harness with a custom one- or two-stage vLLM backend.
 | data/ | Versioned source and evaluation datasets |
 | spatial/ | Spatial solver, synthetic generators, and contract tests |
 | fyp-report/ | Buildable Typst dissertation project and official format reference |
-| docs/ | Working research notes, source annotations, and experiment plans |
+| [docs/](docs/README.md) | Indexed implementation contracts, research plans, audits, and notes |
 | finetune/ | Axolotl training, model merging, and reward functions |
 | eval/ | Evaluation backend and dataset cleaners |
 | experiments/<id>/ | One experiment's configs, notes, scripts, logs, and results |

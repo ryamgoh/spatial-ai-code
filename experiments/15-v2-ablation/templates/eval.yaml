@@ -8,10 +8,12 @@ model_args:
   gpu_memory_utilization: 0.85
   max_model_len: 8192
   choices: []
+  add_special_tokens: false
 include_path: null
 tasks: []
-apply_chat_template: true
-system_instruction: "Solve the spatial reasoning problem from the stated relations. Follow the question's answer contract and end with Answer: followed by the exact option letter set."
+apply_chat_template: false
+bootstrap_iters: 0
+system_instruction: null
 batch_size: 4
 device: cuda:0
 log_samples: true

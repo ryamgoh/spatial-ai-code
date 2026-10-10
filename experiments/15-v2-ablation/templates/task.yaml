@@ -7,23 +7,36 @@ dataset_kwargs:
 test_split: test
 output_type: generate_until
 process_docs: !function utils.process_docs_v2_sft
-doc_to_text: "{{text}}"
+process_results: !function utils.process_results_v2
+doc_to_text: "{{evaluation_prompt}}"
 doc_to_target: "{{oracle_option}}"
 generation_kwargs:
+  max_gen_toks: __MAX_NEW_TOKENS__
+  temperature: 0
+  repetition_penalty: 1
   until: []
-filter_list:
-  - name: extract-answer
-    filter:
-      - function: regex
-        regex_pattern: "Answer:\\s*([A-Z](?:\\s*,\\s*[A-Z])*)"
-        group_select: -1
 metric_list:
-  - metric: !function utils.strict_acc
+  - metric: strict_acc
     aggregation: mean
     higher_is_better: true
-  - metric: !function utils.loose_acc
+  - metric: loose_acc
     aggregation: mean
+    higher_is_better: true
+  - metric: process_applicable
+    aggregation: mean
+    higher_is_better: true
+  - metric: reasoning_valid
+    aggregation: !function utils.applicable_process_rate
+    higher_is_better: true
+  - metric: decision_valid
+    aggregation: !function utils.applicable_process_rate
+    higher_is_better: true
+  - metric: domain_consistent
+    aggregation: !function utils.applicable_process_rate
+    higher_is_better: true
+  - metric: fully_valid
+    aggregation: !function utils.applicable_process_rate
     higher_is_better: true
 metadata:
-  version: 1.0
-  note: "Spatial V2 generated heldout view"
+  version: 2.0
+  note: "Spatial V2 final test; development split selects checkpoints"

@@ -11,11 +11,10 @@ from spatial.v2.answer_certificates import (
 )
 from spatial.v2.count_certificates import (
     CountAnswerSetCertificate,
-    CountMembershipConflict,
     build_count_answer_set,
     count_answer_set_to_dict,
     count_assignment_formula,
-    count_assignments,
+    remaining_count_assignments,
 )
 from spatial.v2.proofs import ProofConstructionError, build_formula_refutation
 from spatial.v2.solver import (
@@ -90,44 +89,25 @@ def _build_count_certificate(
     which_query = WhichQuery(query.directions, query.reference, query.candidates)
     which_problem = SpatialProblem(problem.objects, problem.premise, which_query)
     memberships = _build_which_certificate(which_problem, which_query, solver)
+    fixed = tuple(
+        item
+        for item in memberships.candidates
+        if item.status is not MembershipStatus.CONTINGENT
+    )
     possible = set(analysis.possible_counts)
-    impossible_refutations = {}
-    for count in range(len(query.candidates) + 1):
-        if count in possible:
-            continue
-        conflicts = []
-        for members in count_assignments(query, count):
-            conflict = next(
-                (
-                    candidate
-                    for candidate in memberships.candidates
-                    if (
-                        candidate.candidate in members
-                        and candidate.status is MembershipStatus.IMPOSSIBLE
-                    )
-                    or (
-                        candidate.candidate not in members
-                        and candidate.status is MembershipStatus.ENTAILED
-                    )
-                ),
-                None,
-            )
-            if conflict is None:
-                conflicts.append(
-                    build_formula_refutation(
-                        problem,
-                        count_assignment_formula(query, members),
-                    )
-                )
-            else:
-                conflicts.append(
-                    CountMembershipConflict(conflict.candidate, conflict.evidence)
-                )
-        impossible_refutations[count] = tuple(conflicts)
+    impossible_refutations = {
+        count: tuple(
+            build_formula_refutation(problem, count_assignment_formula(query, members))
+            for members in remaining_count_assignments(query, count, fixed)
+        )
+        for count in range(len(query.candidates) + 1)
+        if count not in possible
+    }
     return build_count_answer_set(
         problem,
         possible_models=analysis.witnesses,
         impossible_refutations=impossible_refutations,
+        fixed_memberships=fixed,
     )
 
 

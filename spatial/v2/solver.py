@@ -389,6 +389,8 @@ class _ConstraintEngine(Protocol):
         target: str,
         reference: str,
         candidate_directions: frozenset[Direction],
+        *,
+        include_witnesses: bool = True,
     ) -> dict[Direction, dict[str, tuple[int, int]]] | None: ...
 
     def analyze_which(
@@ -396,6 +398,8 @@ class _ConstraintEngine(Protocol):
         objects: tuple[str, ...],
         premise: SpatialFormula,
         query: WhichQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> (
         tuple[
             tuple[str, ...],
@@ -410,6 +414,8 @@ class _ConstraintEngine(Protocol):
         objects: tuple[str, ...],
         premise: SpatialFormula,
         query: CountQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> dict[int, dict[str, tuple[int, int]]] | None: ...
 
     def satisfy(
@@ -709,6 +715,8 @@ class _ReferenceEngine:
         target: str,
         reference: str,
         candidate_directions: frozenset[Direction],
+        *,
+        include_witnesses: bool = True,
     ) -> dict[Direction, dict[str, tuple[int, int]]] | None:
         constraints = conjunctive_atoms(premise)
         if constraints is None:
@@ -728,7 +736,7 @@ class _ReferenceEngine:
                 witnesses[direction] = witness
         return witnesses
 
-    def analyze_which(self, objects, premise, query):
+    def analyze_which(self, objects, premise, query, *, include_witnesses=True):
         if (
             self._find_formula_witness(
                 objects, premise, query.candidates[0], query.reference
@@ -760,7 +768,7 @@ class _ReferenceEngine:
                 entailed.append(candidate)
         return tuple(possible), tuple(entailed), witnesses
 
-    def analyze_count(self, objects, premise, query):
+    def analyze_count(self, objects, premise, query, *, include_witnesses=True):
         if (
             self._find_formula_witness(
                 objects, premise, query.candidates[0], query.reference
@@ -912,6 +920,26 @@ class _Z3Engine:
         }
         return {obj: (x_ranks[raw_x[obj]], y_ranks[raw_y[obj]]) for obj in objects}
 
+    def _canonical_coordinates(self, solver, objects, x, y):
+        """Choose one deterministic qualitative completion before ranking it."""
+        for index, first in enumerate(objects):
+            for second in objects[index + 1 :]:
+                selected = None
+                for direction in Direction:
+                    solver.push()
+                    solver.add(self._atom(x, y, first, second, direction))
+                    possible = self._check(solver)
+                    solver.pop()
+                    if possible:
+                        selected = direction
+                        break
+                if selected is None:
+                    raise RuntimeError("satisfiable model has no pairwise direction")
+                solver.add(self._atom(x, y, first, second, selected))
+        if not self._check(solver):
+            raise RuntimeError("canonical qualitative completion became unsatisfiable")
+        return self._normalize_coordinates(objects, solver.model(), x, y)
+
     def _build_solver(self, objects: tuple[str, ...], premise: SpatialFormula):
         propagated = _propagate(objects, _required_atoms(premise))
         if propagated is None:
@@ -953,6 +981,8 @@ class _Z3Engine:
         target: str,
         reference: str,
         candidate_directions: frozenset[Direction],
+        *,
+        include_witnesses: bool = True,
     ) -> dict[Direction, dict[str, tuple[int, int]]] | None:
         built = self._build_solver(objects, premise)
         if built is None:
@@ -968,8 +998,10 @@ class _Z3Engine:
             solver.push()
             solver.add(self._atom(x, y, target, reference, direction))
             if self._check(solver):
-                witnesses[direction] = self._normalize_coordinates(
-                    objects, solver.model(), x, y
+                witnesses[direction] = (
+                    self._canonical_coordinates(solver, objects, x, y)
+                    if include_witnesses
+                    else {}
                 )
             solver.pop()
         return witnesses
@@ -979,6 +1011,8 @@ class _Z3Engine:
         objects: tuple[str, ...],
         premise: SpatialFormula,
         query: WhichQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> (
         tuple[
             tuple[str, ...],
@@ -1003,8 +1037,10 @@ class _Z3Engine:
             solver.add(predicate)
             if self._check(solver):
                 possible.append(candidate)
-                witnesses[candidate] = self._normalize_coordinates(
-                    objects, solver.model(), x, y
+                witnesses[candidate] = (
+                    self._canonical_coordinates(solver, objects, x, y)
+                    if include_witnesses
+                    else {}
                 )
             solver.pop()
 
@@ -1020,6 +1056,8 @@ class _Z3Engine:
         objects: tuple[str, ...],
         premise: SpatialFormula,
         query: CountQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> dict[int, dict[str, tuple[int, int]]] | None:
         built = self._build_solver(objects, premise)
         if built is None:
@@ -1043,8 +1081,10 @@ class _Z3Engine:
             solver.push()
             solver.add(count == candidate_count)
             if self._check(solver):
-                witnesses[candidate_count] = self._normalize_coordinates(
-                    objects, solver.model(), x, y
+                witnesses[candidate_count] = (
+                    self._canonical_coordinates(solver, objects, x, y)
+                    if include_witnesses
+                    else {}
                 )
             solver.pop()
         return witnesses
@@ -1060,7 +1100,7 @@ class _Z3Engine:
         solver, x, y = built
         if not self._check(solver):
             return None
-        return self._normalize_coordinates(objects, solver.model(), x, y)
+        return self._canonical_coordinates(solver, objects, x, y)
 
 
 class SpatialSolverV2:
@@ -1111,6 +1151,46 @@ class SpatialSolverV2:
                 engine=self._engine.name,
                 error=error,
             )
+
+    def semantic_signature(self, problem: SpatialProblem) -> tuple:
+        """Query possibilities and membership statuses without Z3 witness rendering.
+
+        This reuses the ordinary backend query checks. The reference backend
+        still searches for witnesses internally; Z3 skips qualitative completion.
+        Timeout/unknown raises RuntimeError and never becomes an impossible label.
+        Count includes individual memberships as well as joint count possibilities.
+        """
+        if not isinstance(problem, SpatialProblem):
+            raise TypeError("semantic_signature expects a SpatialProblem")
+        query = problem.query
+        if isinstance(query, DirectionQuery):
+            result = self._engine.analyze(
+                problem.objects,
+                problem.premise,
+                query.target,
+                query.reference,
+                query.candidate_directions,
+                include_witnesses=False,
+            )
+            return (False,) if result is None else (True, tuple(result))
+        membership = self._engine.analyze_which(
+            problem.objects,
+            problem.premise,
+            WhichQuery(query.directions, query.reference, query.candidates),
+            include_witnesses=False,
+        )
+        if membership is None:
+            return (False,)
+        possible, entailed, _ = membership
+        if isinstance(query, WhichQuery):
+            return (True, possible, entailed)
+        counts = self._engine.analyze_count(
+            problem.objects,
+            problem.premise,
+            query,
+            include_witnesses=False,
+        )
+        return (False,) if counts is None else (True, tuple(counts), possible, entailed)
 
     def assess(self, problem: SpatialProblem, claim: SpatialFormula) -> ClaimAnalysis:
         """Classify a formula under ``problem.premise`` and retain both models."""

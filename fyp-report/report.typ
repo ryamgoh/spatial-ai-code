@@ -94,9 +94,9 @@
 #include "chapters/05-system-architecture.typ"
 #include "chapters/06-corrected-benchmark-evaluation.typ"
 
-#part("II", [Training Spatial Reasoning with AxisDecomposition])
+#part("II", [Learning from SpatialEntail Certificates])
 
-#include "chapters/07-axis-decomposition.typ"
+#include "chapters/07-certificate-supervision.typ"
 #include "chapters/08-dataset.typ"
 #include "chapters/09-training-methodology.typ"
 #include "chapters/10-results.typ"
@@ -107,5 +107,5 @@
 #bibliography("references.bib", title: [References], style: "ieee")
 
 #include "appendices/a-solver-correctness.typ"
-#include "appendices/b-axis-decomposition-dataset.typ"
+#include "appendices/b-spatialentail-dataset.typ"
 #include "appendices/c-training-additional-results.typ"

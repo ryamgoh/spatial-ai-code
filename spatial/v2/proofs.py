@@ -34,7 +34,7 @@ from spatial.v2.solver import (
 
 
 class ProofConstructionError(ValueError):
-    """The requested problem is outside the supported proof-first fragment."""
+    """The problem is outside the supported automatic proof fragment."""
 
 
 class ProofCheckError(ValueError):
@@ -58,6 +58,7 @@ class ProofRule(str, Enum):
     AXIS_INVERSION = "axis-inversion"
     AXIS_TRANSITIVITY = "axis-transitivity"
     AXIS_CONTRADICTION = "axis-contradiction"
+    DIRECTION_INTRODUCTION = "direction-introduction"
     DIRECTION_RECOMPOSITION = "direction-recomposition"
 
 
@@ -333,6 +334,17 @@ def _check_step(
         for item in resolved_inputs
         if isinstance(item.conclusion, SpatialFormula)
     )
+    if step.rule in {
+        ProofRule.ASSUMPTION,
+        ProofRule.AND_ELIMINATION,
+        ProofRule.AND_INTRODUCTION,
+        ProofRule.MODUS_PONENS,
+        ProofRule.DISJUNCTIVE_SYLLOGISM,
+        ProofRule.IFF_ELIMINATION,
+        ProofRule.DOUBLE_NEGATION,
+        ProofRule.CONTRADICTION,
+    } and len(input_formulas) != len(resolved_inputs):
+        raise ProofCheckError(f"{step.id} requires only formula inputs")
 
     if step.rule is ProofRule.ASSUMPTION:
         if (
@@ -561,6 +573,27 @@ def _check_step(
             raise ProofCheckError(f"{step.id} does not contain an axis contradiction")
         return
 
+    if step.rule is ProofRule.DIRECTION_INTRODUCTION:
+        if len(resolved_inputs) != 1 or not isinstance(
+            resolved_inputs[0].conclusion,
+            RelationConstraint,
+        ):
+            raise ProofCheckError(f"{step.id} must introduce one exact direction atom")
+        source = resolved_inputs[0].conclusion
+        if len(source.allowed) != 1 or not isinstance(
+            step.conclusion,
+            DirectionClaim,
+        ):
+            raise ProofCheckError(f"{step.id} must conclude one exact direction")
+        expected = DirectionClaim(
+            source.subject,
+            next(iter(source.allowed)),
+            source.reference,
+        )
+        if step.conclusion != expected:
+            raise ProofCheckError(f"{step.id} introduces the wrong direction claim")
+        return
+
     if step.rule is ProofRule.DIRECTION_RECOMPOSITION:
         if len(resolved_inputs) != 2 or not all(
             isinstance(item.conclusion, AxisFact) for item in resolved_inputs
@@ -611,10 +644,14 @@ def check_direction_proof(certificate: DirectionProofCertificate) -> None:
     query = problem.query
     if not isinstance(query, DirectionQuery):
         raise ProofCheckError("Direction certificates require a DirectionQuery")
+    if any(step.rule is ProofRule.REFUTATION_ASSUMPTION for step in certificate.steps):
+        raise ProofCheckError("positive proofs cannot use refutation assumptions")
     previous = _replay_steps(problem, certificate.steps)
 
     if certificate.conclusion_step not in previous:
         raise ProofCheckError("conclusion_step does not identify a proof step")
+    if previous[certificate.conclusion_step].branch is not None:
+        raise ProofCheckError("positive proof conclusion must be global")
     conclusion = certificate.conclusion
     if (
         conclusion.subject != query.target
@@ -622,7 +659,11 @@ def check_direction_proof(certificate: DirectionProofCertificate) -> None:
         or conclusion.direction not in query.candidate_directions
     ):
         raise ProofCheckError("proof conclusion does not answer the DirectionQuery")
-    _reachable_step_ids(certificate.steps, certificate.conclusion_step)
+    reachable = _reachable_step_ids(certificate.steps, certificate.conclusion_step)
+    if reachable != set(previous):
+        raise ProofCheckError(
+            "proof contains dead steps outside the conclusion dependencies"
+        )
 
 
 def _check_refutation(
@@ -633,6 +674,13 @@ def _check_refutation(
     contradiction_step: str,
 ) -> None:
     steps = _replay_steps(problem, proof_steps)
+    refutation_assumptions = tuple(
+        step.id for step in proof_steps if step.rule is ProofRule.REFUTATION_ASSUMPTION
+    )
+    if refutation_assumptions != (assumption_step,):
+        raise ProofCheckError(
+            "a refutation must use exactly one declared refutation assumption"
+        )
     assumption = steps.get(assumption_step)
     if (
         assumption is None
@@ -640,6 +688,11 @@ def _check_refutation(
         or assumption.conclusion != claim
     ):
         raise ProofCheckError("assumption_step does not assume the refuted claim")
+    if any(
+        step.rule is ProofRule.ASSUMPTION and step.branch == assumption.branch
+        for step in proof_steps
+    ):
+        raise ProofCheckError("the refutation assumption must open a root scope")
     contradiction = steps.get(contradiction_step)
     if contradiction is None or not isinstance(contradiction.conclusion, Contradiction):
         raise ProofCheckError("contradiction_step does not close the refutation")
@@ -648,6 +701,10 @@ def _check_refutation(
             "refutation assumption and contradiction use different scopes"
         )
     reachable = _reachable_step_ids(proof_steps, contradiction_step)
+    if reachable != set(steps):
+        raise ProofCheckError(
+            "refutation contains dead steps outside the contradiction dependencies"
+        )
     if assumption_step not in reachable:
         raise ProofCheckError("contradiction does not depend on the refuted claim")
 
@@ -1228,11 +1285,14 @@ def build_direction_proof(
     candidates = [item for item in candidates if item in query.candidate_directions]
     steps = _premise_steps(problem)
     _saturate_formula_steps(steps)
+    formula_steps = {}
     for candidate in candidates:
-        _derive_formula(
+        result = _derive_formula(
             steps,
             direction_constraint(query.target, query.reference, candidate),
         )
+        if result is not None:
+            formula_steps[candidate] = result
     paths_by_direction = _direction_paths(problem, steps, candidates)
 
     if direction is not None and direction not in paths_by_direction:
@@ -1246,22 +1306,34 @@ def build_direction_proof(
             f"derived candidates: {names}"
         )
     conclusion_direction = direction or next(iter(paths_by_direction))
-    paths = paths_by_direction[conclusion_direction]
-    x_step = _derive_axis_path(ProofAxis.X, paths[ProofAxis.X], steps)
-    y_step = _derive_axis_path(ProofAxis.Y, paths[ProofAxis.Y], steps)
     conclusion_id = "Q-DIR"
-    steps.append(
-        ProofStep(
-            conclusion_id,
-            ProofRule.DIRECTION_RECOMPOSITION,
-            DirectionClaim(
-                query.target,
-                conclusion_direction,
-                query.reference,
-            ),
-            (x_step, y_step),
-        )
+    conclusion = DirectionClaim(
+        query.target,
+        conclusion_direction,
+        query.reference,
     )
+    formula_step = formula_steps.get(conclusion_direction)
+    if formula_step is not None:
+        steps.append(
+            ProofStep(
+                conclusion_id,
+                ProofRule.DIRECTION_INTRODUCTION,
+                conclusion,
+                (formula_step,),
+            )
+        )
+    else:
+        paths = paths_by_direction[conclusion_direction]
+        x_step = _derive_axis_path(ProofAxis.X, paths[ProofAxis.X], steps)
+        y_step = _derive_axis_path(ProofAxis.Y, paths[ProofAxis.Y], steps)
+        steps.append(
+            ProofStep(
+                conclusion_id,
+                ProofRule.DIRECTION_RECOMPOSITION,
+                conclusion,
+                (x_step, y_step),
+            )
+        )
     reachable = _reachable_step_ids(tuple(steps), conclusion_id)
     certificate = DirectionProofCertificate(
         problem,

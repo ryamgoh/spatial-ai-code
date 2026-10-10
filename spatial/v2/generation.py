@@ -3,11 +3,15 @@
 This module owns synthetic-data choices.  It constructs structured problems,
 asks the data-agnostic solver for their complete semantics, builds a menu under
 an explicit answer contract, and round-trips the rendered prompt before a row
-may be emitted.  Coordinates are retained only as audit witnesses.
+may be emitted.  Coordinates are retained only as audit witnesses.  Every row
+records the actual proposal route: world-first, premise-first, or proof-template-first.
+Premise-first labels come only from solving the proposed visible constraints.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 import random
 from collections import Counter
 from dataclasses import dataclass, replace
@@ -16,7 +20,7 @@ from itertools import combinations, pairwise
 from string import ascii_uppercase
 from typing import Any
 
-from spatial.v2.answer_certificate_renderers import render_answer_certificate
+from spatial.v2.answer_certificate_renderers import render_training_trace
 from spatial.v2.certificate_generation import (
     AnswerCertificate,
     answer_certificate_to_dict,
@@ -29,12 +33,12 @@ from spatial.v2.grading import (
     MenuAnswer,
     ResolutionStatus,
     encode_menu_answer,
+    render_symbolic_answer_decision,
     resolve_answer,
 )
 from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.solver import (
     And,
-    CountAnalysis,
     CountQuery,
     Direction,
     DirectionAnalysis,
@@ -53,6 +57,8 @@ from spatial.v2.solver import (
     direction_constraint,
     direction_signs,
 )
+from spatial.v2.structure import canonical_structure_profile
+from spatial.v2.supervision_controls import SupervisionArm, apply_supervision_arm
 from spatial.v2.text import (
     SpatialTextAdapter,
     render_spatial_formula,
@@ -99,6 +105,20 @@ class QueryKind(str, Enum):
     DIRECTION = "direction"
     WHICH = "which"
     COUNT = "count"
+
+
+class GenerationProvenance(str, Enum):
+    WORLD_FIRST = "world-first"
+    PREMISE_FIRST = "premise-first"
+    PROOF_TEMPLATE_FIRST = "proof-template-first"
+    CERTIFICATE_FIRST = "certificate-first"
+
+
+class GenerationMode(str, Enum):
+    AUTO = "auto"
+    PREMISE_FIRST = "premise-first"
+    WORLD_FIRST = "world-first"
+    PROOF_TEMPLATE_FIRST = "proof-template-first"
 
 
 class SemanticShape(str, Enum):
@@ -154,6 +174,7 @@ class GenerationPolicy:
     min_membership_depth: int = 1
     max_membership_depth: int | None = None
     distractor_premises: int = 0
+    generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:
         self._normalize_enums()
@@ -162,6 +183,9 @@ class GenerationPolicy:
         self._validate_difficulty()
 
     def _normalize_enums(self) -> None:
+        object.__setattr__(
+            self, "generation_mode", GenerationMode(self.generation_mode)
+        )
         object.__setattr__(self, "query_kind", QueryKind(self.query_kind))
         object.__setattr__(self, "answer_mode", AnswerMode(self.answer_mode))
         object.__setattr__(self, "semantic_shape", SemanticShape(self.semantic_shape))
@@ -187,6 +211,11 @@ class GenerationPolicy:
             raise ValueError("ordinary_option_target must be between 1 and 25")
 
     def _validate_answer_contract(self) -> None:
+        if (
+            self.generation_mode is GenerationMode.WORLD_FIRST
+            and self.boolean_shape is not BooleanShape.ATOMIC
+        ):
+            raise ValueError("world-first mode supports atomic premises only")
         if self.query_kind is QueryKind.DIRECTION and self.query_direction is not None:
             raise ValueError("query_direction applies only to Which and Count queries")
         if (
@@ -211,7 +240,10 @@ class GenerationPolicy:
             raise ValueError("no-match is only realizable for Which queries")
 
     def _validate_difficulty(self) -> None:
-        if self.boolean_shape is not BooleanShape.ATOMIC:
+        if (
+            self.boolean_shape is not BooleanShape.ATOMIC
+            and self.generation_mode is not GenerationMode.PREMISE_FIRST
+        ):
             if self.semantic_shape not in {SemanticShape.ANY, SemanticShape.UNIQUE}:
                 raise ValueError("Boolean proof shapes require unique semantics")
             minimum_entities = (
@@ -350,10 +382,9 @@ def _render_trace(
     menu_answer: MenuAnswer,
     policy: GenerationPolicy,
 ) -> str:
-    reasoning = render_answer_certificate(
+    reasoning = render_training_trace(
         certificate,
         policy.trace_format,
-        include_coordinates=False,
     )
     decision = _render_answer_decision(
         resolution,
@@ -374,6 +405,7 @@ class GeneratedSpatialSample:
     prompt: str
     trace: str
     policy: GenerationPolicy
+    generation_provenance: GenerationProvenance
     seed: int
     sample_index: int
     attempt: int
@@ -384,6 +416,19 @@ class GeneratedSpatialSample:
     @property
     def base_id(self) -> str:
         return f"spatial-v2-{self.seed}-{self.sample_index}-{self.attempt}"
+
+    @property
+    def structure_profile(self) -> dict[str, Any]:
+        return canonical_structure_profile(self.problem)
+
+    @property
+    def structure_signature(self) -> str:
+        encoded = json.dumps(
+            self.structure_profile,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+        return hashlib.sha256(encoded).hexdigest()
 
     @property
     def audit_metadata(self) -> dict[str, Any]:
@@ -428,6 +473,10 @@ class GeneratedSpatialSample:
                 "attempt": self.attempt,
                 "rejection_counts": dict(sorted(self.rejection_counts.items())),
                 "query_kind": self.policy.query_kind.value,
+                "generation_provenance": self.generation_provenance.value,
+                "generation_mode": self.policy.generation_mode.value,
+                "structure_signature": self.structure_signature,
+                "structure_profile": self.structure_profile,
                 "query_direction": query_direction,
                 "target_direction": target_direction,
                 "answer_mode": self.policy.answer_mode.value,
@@ -450,7 +499,7 @@ class GeneratedSpatialSample:
         }
         if include_audit:
             row["audit"] = self.audit_metadata
-        return row
+        return apply_supervision_arm(row, SupervisionArm.CHECKED_TRACE)
 
     def with_trace(
         self,
@@ -611,20 +660,33 @@ class SpatialGeneratorV2:
         boolean_problem = policy.boolean_shape is not BooleanShape.ATOMIC
         controlled_direction = self._uses_controlled_direction(policy)
         controlled_membership = self._uses_controlled_membership(policy)
-        if boolean_problem:
+        use_templates = policy.generation_mode is not GenerationMode.WORLD_FIRST
+        if policy.generation_mode is GenerationMode.PREMISE_FIRST:
+            problem = self._premise_first_problem(policy, objects)
+            coordinates = {}
+            provenance = GenerationProvenance.PREMISE_FIRST
+        elif use_templates and boolean_problem:
             problem = self._boolean_problem(policy, objects)
             coordinates = {}
-        elif controlled_direction:
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
+        elif use_templates and controlled_direction:
             problem = self._controlled_direction_problem(policy, objects)
             coordinates: dict[str, tuple[int, int]] = {}
-        elif controlled_membership:
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
+        elif use_templates and controlled_membership:
             problem = self._controlled_membership_problem(policy, objects)
             coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         else:
+            if policy.generation_mode is GenerationMode.PROOF_TEMPLATE_FIRST:
+                raise ValueError(
+                    "proof-template-first mode requires Boolean or controlled proof policy"
+                )
             coordinates = self._coordinates(objects)
             query = self._query(policy, objects, coordinates)
             premise = self._premise(policy, objects, coordinates, query)
             problem = SpatialProblem(objects, premise, query)
+            provenance = GenerationProvenance.WORLD_FIRST
         analysis = self._solver.analyze(problem)
         if analysis.error or not analysis.consistent:
             raise _RetryGeneration(
@@ -632,27 +694,29 @@ class SpatialGeneratorV2:
             )
         if not self._shape_matches(analysis, policy.semantic_shape):
             raise _RetryGeneration("semantic shape did not match")
+        if (
+            policy.ambiguity_size is not None
+            and len(_answer_values(analysis)) != policy.ambiguity_size
+        ):
+            raise _RetryGeneration("difficulty controls did not match")
+        if (
+            policy.target_direction is not None
+            and isinstance(analysis, DirectionAnalysis)
+            and analysis.possible_directions != (policy.target_direction,)
+        ):
+            raise _RetryGeneration("target direction did not match")
         difficulty = measure_difficulty(problem, analysis, self._solver)
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
-        if boolean_problem:
+        if provenance is not GenerationProvenance.WORLD_FIRST:
             if isinstance(analysis, DirectionAnalysis):
                 coordinates = analysis.coordinates or {}
             else:
-                assert isinstance(analysis, (WhichAnalysis, CountAnalysis))
                 coordinates = next(iter(analysis.witnesses.values()), {})
-        elif controlled_direction:
-            assert isinstance(analysis, DirectionAnalysis)
-            coordinates = analysis.coordinates or {}
-        elif controlled_membership:
-            assert isinstance(analysis, (WhichAnalysis, CountAnalysis))
-            coordinates = next(iter(analysis.witnesses.values()), {})
         try:
             certificate = build_answer_certificate(problem, analysis, self._solver)
         except ProofConstructionError as exc:
-            raise _RetryGeneration(
-                f"proof-first certificate construction failed: {exc}"
-            ) from exc
+            raise _RetryGeneration(f"certificate construction failed: {exc}") from exc
 
         resolution = resolve_answer(analysis, policy.answer_mode)
         options = self._menu(policy, analysis, resolution)
@@ -678,6 +742,7 @@ class SpatialGeneratorV2:
             prompt,
             trace,
             policy,
+            provenance,
             self.seed,
             self._emitted,
             attempt,
@@ -685,6 +750,64 @@ class SpatialGeneratorV2:
             difficulty,
             {},
         )
+
+    def _premise_first_problem(
+        self,
+        policy: GenerationPolicy,
+        objects: tuple[str, ...],
+    ) -> SpatialProblem:
+        """Sample syntax before choosing a query, without latent-world labels.
+
+        Boolean shapes select operator families here, not promised proof rules.
+        Inconsistency and unsupported certificates use the bounded rejection loop.
+        """
+        pairs = self._spanning_pairs(objects, set())
+        used = {frozenset(pair) for pair in pairs}
+        remaining = [
+            pair for pair in combinations(objects, 2) if frozenset(pair) not in used
+        ]
+        self._random.shuffle(remaining)
+        pairs.extend(remaining[: policy.num_premises - len(pairs)])
+
+        def atom(pair):
+            return _exact_relation(
+                pair[0], self._random.choice(tuple(Direction)), pair[1]
+            )
+
+        formulas = []
+        for pair in pairs:
+            first = atom(pair)
+            second = atom(self._random.choice(pairs))
+            shape = policy.boolean_shape
+            if shape is BooleanShape.ATOMIC:
+                formula = first
+            elif shape is BooleanShape.DOUBLE_NEGATION:
+                formula = Not(Not(first))
+            elif shape is BooleanShape.MODUS_PONENS:
+                formula = Implies(first, second)
+            elif shape is BooleanShape.IFF:
+                formula = Iff(first, second)
+            elif shape is BooleanShape.DISJUNCTIVE_SYLLOGISM:
+                formula = Or((first, Not(second)))
+            elif shape is BooleanShape.CASE_SPLIT:
+                formula = Or((first, second))
+            else:
+                formula = Or((first, And((second, atom(self._random.choice(pairs))))))
+            formulas.append(formula)
+        self._random.shuffle(formulas)
+        reference = self._random.choice(objects)
+        candidates = tuple(name for name in objects if name != reference)
+        if policy.query_kind is QueryKind.DIRECTION:
+            query = DirectionQuery(self._random.choice(candidates), reference)
+        else:
+            directions = frozenset(
+                {policy.query_direction or self._random.choice(tuple(Direction))}
+            )
+            query_type = (
+                WhichQuery if policy.query_kind is QueryKind.WHICH else CountQuery
+            )
+            query = query_type(directions, reference, candidates)
+        return SpatialProblem(objects, And(tuple(formulas)), query)
 
     def _boolean_problem(
         self,
@@ -1254,7 +1377,6 @@ class SpatialGeneratorV2:
         self._random.shuffle(distractors)
         ordinary_target = max(policy.ordinary_option_target, len(visible))
         visible.extend(distractors[: max(0, ordinary_target - len(visible))])
-        self._random.shuffle(visible)
         rendered = [_render_value(value) for value in visible]
 
         if resolution.status is ResolutionStatus.AMBIGUOUS or (
@@ -1266,6 +1388,7 @@ class SpatialGeneratorV2:
             rendered.append("None of the Options")
         if len(rendered) > len(ascii_uppercase):
             raise _RetryGeneration("menu exceeds available option letters")
+        self._random.shuffle(rendered)
         return dict(zip(ascii_uppercase, rendered))
 
     @staticmethod
@@ -1373,12 +1496,7 @@ def _render_answer_decision(
         _render_value(value) for value in _answer_values(resolution.analysis)
     )
     if trace_format is TraceFormat.SYMBOLIC:
-        return (
-            f"Answer-Mode={resolution.mode.value}; "
-            f"Possible={{{possible}}}; "
-            f"Resolution={resolution.status.value}; "
-            f"Menu-Status={menu_answer.status}; Select={{{letters}}}"
-        )
+        return render_symbolic_answer_decision(resolution, menu_answer)
     contract = {
         AnswerMode.SINGLE: "The question requires one invariant answer.",
         AnswerMode.ALL_POSSIBLE: "The question requires the complete possibility set.",

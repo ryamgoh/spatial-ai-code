@@ -9,7 +9,7 @@ adapter. Numbering skips 4 deliberately so 0–3 stay aligned with H036660 Ch. 4
 **Status: inconclusive / not very useful.** The 20-step probe showed the RL
 loop is no longer degenerate (reward variance > 0), but no measured accuracy
 gain over SFT was achieved. **Do not present the probe as a SpatialMap gain.**
-Full discussion: `../../docs/grpo-training-approach.md`.
+Full discussion: [`APPROACH.md`](APPROACH.md).
 
 **Setup.** GRPO on the SFT QLoRA (or on the merged SFT weights for the
 vLLM-serve variant). Prompts only; `oracle_option` used for rewards, not fed

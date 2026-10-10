@@ -17,6 +17,7 @@ from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
 from spatial.v2.generation import (
     BooleanShape,
     GenerationPolicy,
+    GenerationProvenance,
     MenuCoverage,
     QueryKind,
     SemanticShape,
@@ -31,6 +32,15 @@ from spatial.v2.solver import (
     SpatialSolverV2,
     WhichQuery,
 )
+from spatial.v2.supervision_controls import (
+    SupervisionArm,
+    annotate_model_token_counts,
+    build_supervision_variants,
+)
+from spatial.v2.symbolic_trace_codec import (
+    parse_symbolic_training_trace,
+    score_symbolic_training_trace,
+)
 from spatial.v2.text import SpatialTextAdapter
 from spatial.v2.trace import TraceFormat
 from spatial.v2.which_certificates import WhichAnswerSetCertificate
@@ -43,19 +53,19 @@ from spatial.v2.which_certificates import WhichAnswerSetCertificate
             QueryKind.DIRECTION,
             DirectionQuery,
             DirectionAnswerSetCertificate,
-            "Direction-Domain:",
+            '"schema":"spatial-direction-trace-v2"',
         ),
         (
             QueryKind.WHICH,
             WhichQuery,
             WhichAnswerSetCertificate,
-            "Which-Possible:",
+            '"schema":"spatial-which-trace-v1"',
         ),
         (
             QueryKind.COUNT,
             CountQuery,
             CountAnswerSetCertificate,
-            "Count-Domain:",
+            '"schema":"spatial-count-trace-v2"',
         ),
     ],
 )
@@ -83,6 +93,11 @@ def test_generated_rows_round_trip_for_every_query_and_answer_mode(
     sample = SpatialGeneratorV2(seed=1701).generate(policy)
     row = sample.as_sft_row()
     parsed = SpatialTextAdapter().parse(row["messages"][1]["content"])
+    checked_trace = parse_symbolic_training_trace(
+        sample.problem,
+        sample.trace,
+        sample.menu_answer,
+    )
 
     assert isinstance(parsed.problem.query, query_type)
     assert isinstance(sample.certificate, certificate_type)
@@ -91,10 +106,13 @@ def test_generated_rows_round_trip_for_every_query_and_answer_mode(
     assert row["metadata"]["answer_mode"] == answer_mode.value
     assert row["metadata"]["round_trip_verified"] is True
     assert row["metadata"]["oracle_letters"] == sorted(sample.menu_answer.letters)
+    assert checked_trace.decision.selected_letters == tuple(
+        sorted(sample.menu_answer.letters)
+    )
     assert row["messages"][2]["content"].endswith(
         "Answer: " + ", ".join(sorted(sample.menu_answer.letters))
     )
-    assert "Answer-Mode=" in sample.trace
+    assert '"schema":"spatial-answer-decision-v1"' in sample.trace
     assert domain_marker in sample.trace
 
 
@@ -130,6 +148,152 @@ def test_generator_can_target_every_direction_answer() -> None:
         )
         assert sample.analysis.possible_directions == (direction,)
         assert sample.as_sft_row()["metadata"]["target_direction"] == direction.value
+
+
+def test_generated_rows_record_actual_construction_provenance() -> None:
+    world_first = SpatialGeneratorV2(seed=1718).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.UNIQUE,
+            num_entities=3,
+            num_premises=2,
+        )
+    )
+    proof_template_first = SpatialGeneratorV2(seed=1719).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            semantic_shape=SemanticShape.UNIQUE,
+            num_entities=3,
+            num_premises=2,
+            omit_direct_query_relation=True,
+            min_axis_depth=2,
+            max_axis_depth=2,
+        )
+    )
+
+    assert world_first.generation_provenance is GenerationProvenance.WORLD_FIRST
+    assert (
+        proof_template_first.generation_provenance
+        is GenerationProvenance.PROOF_TEMPLATE_FIRST
+    )
+    assert world_first.as_sft_row()["metadata"]["generation_provenance"] == (
+        "world-first"
+    )
+    assert (
+        proof_template_first.as_sft_row()["metadata"]["generation_provenance"]
+        == "proof-template-first"
+    )
+
+
+def test_structure_signature_is_direction_sensitive() -> None:
+    def generated(seed: int, direction: Direction):
+        return SpatialGeneratorV2(seed=seed).generate(
+            GenerationPolicy(
+                query_kind=QueryKind.DIRECTION,
+                target_direction=direction,
+                semantic_shape=SemanticShape.UNIQUE,
+                num_entities=3,
+                num_premises=2,
+                omit_direct_query_relation=True,
+                min_axis_depth=2,
+                max_axis_depth=2,
+            )
+        )
+
+    northeast = generated(1720, Direction.NORTHEAST)
+    southwest = generated(1721, Direction.SOUTHWEST)
+
+    assert northeast.problem.objects != southwest.problem.objects
+    assert northeast.structure_signature != southwest.structure_signature
+    assert len(northeast.structure_signature) == 64
+    assert northeast.as_sft_row()["metadata"]["structure_signature"] == (
+        northeast.structure_signature
+    )
+
+
+def test_symbolic_process_score_separates_reasoning_from_decision_errors() -> None:
+    sample = SpatialGeneratorV2(seed=1723).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=AnswerMode.SINGLE,
+            semantic_shape=SemanticShape.UNIQUE,
+            trace_format=TraceFormat.SYMBOLIC,
+            num_entities=3,
+            num_premises=2,
+        )
+    )
+    valid = score_symbolic_training_trace(
+        sample.problem,
+        sample.trace,
+        sample.menu_answer,
+    )
+    reasoning, decision = sample.trace.splitlines()
+    decision_payload = json.loads(decision)
+    wrong = next(
+        letter for letter in sample.options if letter not in sample.menu_answer.letters
+    )
+    decision_payload["select"] = [wrong]
+    invalid = score_symbolic_training_trace(
+        sample.problem,
+        reasoning + "\n" + json.dumps(decision_payload),
+        sample.menu_answer,
+    )
+
+    assert valid.fully_valid
+    assert invalid.reasoning_valid
+    assert not invalid.decision_valid
+    assert not invalid.fully_valid
+    assert invalid.error_stage == "decision"
+
+
+def test_answer_only_and_corrupted_trace_controls_preserve_the_gold_answer() -> None:
+    sample = SpatialGeneratorV2(seed=1724).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=AnswerMode.SINGLE,
+            semantic_shape=SemanticShape.UNIQUE,
+            trace_format=TraceFormat.SYMBOLIC,
+            num_entities=3,
+            num_premises=2,
+        )
+    )
+    checked, answer_only, corrupted = build_supervision_variants(
+        sample.as_sft_row(),
+        (
+            SupervisionArm.CHECKED_TRACE,
+            SupervisionArm.ANSWER_ONLY,
+            SupervisionArm.CORRUPTED_TRACE,
+        ),
+        problem=sample.problem,
+        expected=sample.menu_answer,
+    )
+    expected_suffix = "Answer: " + ", ".join(sorted(sample.menu_answer.letters))
+
+    assert checked["messages"][2]["content"].endswith(expected_suffix)
+    assert answer_only["messages"][2]["content"] == expected_suffix
+    assert corrupted["messages"][2]["content"].endswith(expected_suffix)
+    assert "<think>" not in answer_only["messages"][2]["content"]
+    corrupted_trace = (
+        corrupted["messages"][2]["content"]
+        .split("<think>\n", 1)[1]
+        .split("\n</think>", 1)[0]
+    )
+    assert not score_symbolic_training_trace(
+        sample.problem,
+        corrupted_trace,
+        sample.menu_answer,
+    ).fully_valid
+    assert checked["metadata"]["expected_process_valid"] is True
+    assert corrupted["metadata"]["expected_process_valid"] is False
+    tokenized = annotate_model_token_counts(
+        (checked, answer_only, corrupted),
+        lambda text: len(text.encode("utf-8")),
+    )
+    assert all(
+        row["metadata"]["target_model_tokens"]
+        == len(row["messages"][2]["content"].encode("utf-8"))
+        for row in tokenized
+    )
 
 
 @pytest.mark.parametrize(
@@ -241,10 +405,10 @@ def test_boolean_curriculum_supports_membership_query_families(
         assert sample.analysis.entailed_entities == (
             sample.problem.query.candidates[0],
         )
-        assert "Which-Possible:" in sample.trace
+        assert '"schema":"spatial-which-trace-v1"' in sample.trace
     else:
         assert sample.analysis.possible_counts == (1,)
-        assert "Count-Domain: {1}" in sample.trace
+        assert '"schema":"spatial-count-trace-v2"' in sample.trace
 
 
 def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
@@ -654,7 +818,7 @@ def test_generator_failure_reports_rejection_breakdown() -> None:
 
 
 def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -> None:
-    train_path, test_path = generate_workload(
+    train_path, dev_path, test_path = generate_workload(
         tmp_path / "workload.jsonl",
         WorkloadSpec(
             samples_per_cell=2,
@@ -670,7 +834,7 @@ def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -
 
     rows = [
         json.loads(line)
-        for path in (train_path, test_path)
+        for path in (train_path, dev_path, test_path)
         for line in path.read_text().splitlines()
     ]
     assert len(rows) == 8
@@ -705,7 +869,7 @@ def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -
 
 
 def test_workload_emits_each_requested_boolean_shape(tmp_path) -> None:
-    train_path, _ = generate_workload(
+    train_path, _, _ = generate_workload(
         tmp_path / "boolean.jsonl",
         WorkloadSpec(
             samples_per_cell=1,
@@ -729,7 +893,8 @@ def test_workload_emits_each_requested_boolean_shape(tmp_path) -> None:
         "nested-case-split",
     }
     assert all(
-        "Direction-Domain: {North}" in row["messages"][2]["content"] for row in rows
+        '"schema":"spatial-direction-trace-v2"' in row["messages"][2]["content"]
+        for row in rows
     )
 
 
@@ -772,7 +937,7 @@ def test_workload_requires_explicit_replace_for_existing_outputs(tmp_path) -> No
 
 
 def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:
-    train_path, _ = generate_workload(
+    train_path, _, _ = generate_workload(
         tmp_path / "directions.jsonl",
         WorkloadSpec(
             samples_per_cell=1,
@@ -795,7 +960,7 @@ def test_workload_can_balance_which_queries_across_directions(tmp_path) -> None:
 
 
 def test_workload_can_balance_direction_answers(tmp_path) -> None:
-    train_path, _ = generate_workload(
+    train_path, _, _ = generate_workload(
         tmp_path / "answers.jsonl",
         WorkloadSpec(
             samples_per_cell=1,
@@ -815,3 +980,163 @@ def test_workload_can_balance_direction_answers(tmp_path) -> None:
         "East",
         "Northwest",
     }
+
+
+@pytest.mark.parametrize(
+    "coverage,special",
+    [
+        (MenuCoverage.FULL, "Cannot be determined"),
+        (MenuCoverage.ZERO, "None of the Options"),
+    ],
+)
+def test_special_menu_options_participate_in_seeded_permutation(coverage, special):
+    from spatial.v2.solver import DirectionAnalysis
+
+    analysis = DirectionAnalysis(
+        consistent=True,
+        target="A",
+        reference="B",
+        possible_directions=(
+            (Direction.NORTH, Direction.SOUTH)
+            if coverage is MenuCoverage.FULL
+            else (Direction.NORTH,)
+        ),
+    )
+    policy = GenerationPolicy(menu_coverage=coverage)
+    resolution = resolve_answer(analysis, policy.answer_mode)
+    positions = set()
+    for seed in range(40):
+        first = SpatialGeneratorV2(seed)._menu(policy, analysis, resolution)
+        assert first == SpatialGeneratorV2(seed)._menu(policy, analysis, resolution)
+        positions.add(
+            next(letter for letter, value in first.items() if value == special)
+        )
+        assert encode_menu_answer(resolution, first).letters == {
+            next(letter for letter, value in first.items() if value == special)
+        }
+    assert positions == set("ABCDE")
+
+
+@pytest.mark.parametrize("query_kind", tuple(QueryKind))
+def test_premise_first_samples_without_world_or_proof_template(monkeypatch, query_kind):
+    generator = SpatialGeneratorV2(712)
+
+    def forbidden(*args):
+        raise AssertionError("premise-first requested a privileged construction")
+
+    for name in (
+        "_coordinates",
+        "_boolean_problem",
+        "_controlled_direction_problem",
+        "_controlled_membership_problem",
+    ):
+        monkeypatch.setattr(generator, name, forbidden)
+    sample = generator.generate(
+        GenerationPolicy(
+            generation_mode="premise-first",
+            query_kind=query_kind,
+            num_entities=4,
+            num_premises=3,
+            trace_format=TraceFormat.SYMBOLIC,
+        )
+    )
+    assert sample.generation_provenance is GenerationProvenance.PREMISE_FIRST
+    parsed = SpatialTextAdapter().parse(sample.prompt)
+    assert parsed.problem == sample.problem
+    assert (
+        encode_menu_answer(
+            resolve_answer(
+                SpatialSolverV2().analyze(parsed.problem), sample.policy.answer_mode
+            ),
+            parsed.options,
+        )
+        == sample.menu_answer
+    )
+    assert sample.certificate
+
+
+def test_structure_key_ignores_renaming_and_commutative_orders():
+    from spatial.v2.solver import (
+        And,
+        Iff,
+        Implies,
+        Not,
+        Or,
+        SpatialProblem,
+        direction_constraint,
+    )
+    from spatial.v2.structure import canonical_structure_profile
+
+    a = direction_constraint("A", "R", Direction.NORTH)
+    b = direction_constraint("B", "C", Direction.EAST)
+    c = direction_constraint("C", "R", Direction.SOUTHWEST)
+    problem = SpatialProblem(
+        ("A", "B", "C", "R"),
+        And((Iff(a, b), Or((Not(b), c)), Implies(c, a))),
+        WhichQuery(frozenset({Direction.NORTH}), "R", ("A", "B", "C")),
+    )
+    renamed_a = direction_constraint("Zulu", "Anchor", Direction.NORTH)
+    renamed_b = direction_constraint("Beta", "Alpha", Direction.EAST)
+    renamed_c = direction_constraint("Alpha", "Anchor", Direction.SOUTHWEST)
+    renamed = SpatialProblem(
+        ("Anchor", "Alpha", "Beta", "Zulu"),
+        And(
+            (
+                Implies(renamed_c, renamed_a),
+                Or((renamed_c, Not(renamed_b))),
+                Iff(renamed_b, renamed_a),
+            )
+        ),
+        WhichQuery(frozenset({Direction.NORTH}), "Anchor", ("Beta", "Zulu", "Alpha")),
+    )
+    assert canonical_structure_profile(problem) == canonical_structure_profile(renamed)
+    reversed_implication = replace(
+        problem, premise=And((Iff(a, b), Or((Not(b), c)), Implies(a, c)))
+    )
+    assert canonical_structure_profile(problem) != canonical_structure_profile(
+        reversed_implication
+    )
+
+
+def test_structure_key_marks_bounded_coarse_fallback_and_keeps_invariance():
+    from spatial.v2.solver import And, SpatialProblem, direction_constraint
+    from spatial.v2.structure import canonical_structure_profile
+
+    def star(names):
+        reference, *candidates = names
+        return SpatialProblem(
+            tuple(names),
+            And(
+                tuple(
+                    direction_constraint(name, reference, Direction.EAST)
+                    for name in candidates
+                )
+            ),
+            WhichQuery(frozenset({Direction.EAST}), reference, tuple(candidates)),
+        )
+
+    first = star(("R", "A", "B", "C", "D"))
+    second = star(("Center", "Zulu", "Yankee", "Xray", "Whiskey"))
+    exact = canonical_structure_profile(first)
+    coarse = canonical_structure_profile(first, max_permutations=1)
+    assert exact["canonicalization"] == "exact"
+    assert coarse["canonicalization"] == "coarse-refinement"
+    assert coarse == canonical_structure_profile(second, max_permutations=1)
+
+
+@pytest.mark.parametrize("shape", tuple(BooleanShape))
+def test_premise_first_boolean_families_replay_without_target_templates(shape):
+    sample = SpatialGeneratorV2(713).generate(
+        GenerationPolicy(
+            generation_mode="premise-first",
+            boolean_shape=shape,
+            num_entities=4,
+            num_premises=3,
+            trace_format=TraceFormat.SYMBOLIC,
+        ),
+        max_attempts=100,
+    )
+    assert sample.generation_provenance is GenerationProvenance.PREMISE_FIRST
+    assert score_symbolic_training_trace(
+        sample.problem, sample.trace, sample.menu_answer
+    ).fully_valid

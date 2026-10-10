@@ -10,7 +10,7 @@ if [[ "${REPLACE_DATA:-0}" == "1" ]]; then
   args+=(--replace)
 fi
 
-uv run --no-project --with typer --with pyyaml --with z3-solver \
+uv run --no-project --with typer --with pyyaml --with z3-solver --with transformers --with jinja2 \
   python -m spatial.v2.generate_matrix \
   "$MATRIX" \
   --out "$DATA_OUTPUT" \

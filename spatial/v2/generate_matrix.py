@@ -16,7 +16,7 @@ def main(
     replace: bool = typer.Option(False, help="Replace this matrix's existing outputs."),
 ) -> None:
     try:
-        train_path, test_path, manifest_path = generate_matrix(
+        train_path, dev_path, test_path, manifest_path = generate_matrix(
             matrix,
             out,
             replace=replace,
@@ -24,6 +24,7 @@ def main(
     except (OSError, RuntimeError, ValueError) as exc:
         raise typer.BadParameter(str(exc)) from exc
     typer.echo(f"train: {train_path}")
+    typer.echo(f"dev: {dev_path}")
     typer.echo(f"test: {test_path}")
     typer.echo(f"manifest: {manifest_path}")
 
