@@ -33,6 +33,9 @@ outside this goal.
   budget, prepare matched Train/Dev views, and exclude Bench from Axolotl.
   Slurm scripts use repository-relative paths and the existing finetune
   environment; one H200 on `gpu` for three hours is the default request.
+  Matching Experiment 14, every script emails BEGIN, END, FAIL, TIME_LIMIT, and
+  TIME_LIMIT_90 events to `e0958116@u.nus.edu` and writes `%x-%j` logs beneath
+  the prepared job directory.
   W&B online logging records training and system metrics under project
   `spatialentail-sft`, with stable arm/seed run IDs for resumed allocations;
   credentials remain external to the repository and model upload is disabled.

@@ -1,10 +1,16 @@
 #!/bin/bash
 #SBATCH --job-name=spatialentail-answer-only-seed-42
 #SBATCH --partition=gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
 #SBATCH --gres=gpu:h200-141:1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
+#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90
+#SBATCH --mail-user=e0958116@u.nus.edu
+#SBATCH --output=experiments/spatialentail-sft/prepared-final/logs/%x-%j.out
+#SBATCH --error=experiments/spatialentail-sft/prepared-final/logs/%x-%j.err
 set -euo pipefail
 : "${SLURM_SUBMIT_DIR:?Submit this script from the repository root}"
 cd "$SLURM_SUBMIT_DIR"

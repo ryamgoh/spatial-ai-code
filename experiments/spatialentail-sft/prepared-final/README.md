@@ -11,4 +11,6 @@ system metrics are logged to the `spatialentail-sft` project; stable run IDs and
 `WANDB_RESUME=allow` keep resumed allocations in the same run. Model checkpoints
 are not uploaded to W&B. Training uses the existing finetune environment and
 fixed final-epoch checkpoints. Bench data is absent from the Axolotl
-configurations. The data/config hashes are in jobs.json.
+configurations. Slurm sends BEGIN, END, FAIL, TIME_LIMIT, and TIME_LIMIT_90
+notifications to the same NUS address used by Experiments 13/14. Logs are
+written under `logs/`. The data/config hashes are in jobs.json.

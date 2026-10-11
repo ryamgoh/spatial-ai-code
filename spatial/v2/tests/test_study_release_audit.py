@@ -239,6 +239,10 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
         assert str(tmp_path) not in script
         assert "#SBATCH --partition=gpu" in script
         assert "#SBATCH --time=03:00:00" in script
+        assert "#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90" in script
+        assert "#SBATCH --mail-user=e0958116@u.nus.edu" in script
+        assert "/logs/%x-%j.out" in script
+        assert "/logs/%x-%j.err" in script
         assert "WANDB_RESUME=allow" in script
         import subprocess
 
@@ -252,6 +256,7 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
     shutil.copy(template, moved_template)
     copied = prepare_jobs(moved / "release", moved / "jobs", repo_root=moved)
     assert len(copied["jobs"]) == 6
+    assert (moved / "jobs/logs/.gitkeep").is_file()
 
 
 def test_nested_partial_group_cannot_pass_with_rehashed_artifact(tmp_path):

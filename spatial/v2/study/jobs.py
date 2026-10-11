@@ -143,10 +143,16 @@ def prepare_jobs(release: Path, output: Path, *, repo_root: Path | None = None) 
             files[f"slurm/{name}.sh"] = f"""#!/bin/bash
 #SBATCH --job-name=spatialentail-{name}
 #SBATCH --partition=gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
 #SBATCH --gres=gpu:h200-141:1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --time=03:00:00
+#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90
+#SBATCH --mail-user=e0958116@u.nus.edu
+#SBATCH --output={output.relative_to(root)}/logs/%x-%j.out
+#SBATCH --error={output.relative_to(root)}/logs/%x-%j.err
 set -euo pipefail
 : "${{SLURM_SUBMIT_DIR:?Submit this script from the repository root}}"
 cd "$SLURM_SUBMIT_DIR"
@@ -210,6 +216,8 @@ bash experiments/15-v2-ablation/jobs/train.sh
         path = output / filename
         path.parent.mkdir(exist_ok=True)
         path.write_text(content)
+    (output / "logs").mkdir()
+    (output / "logs/.gitkeep").write_text("")
     (output / "jobs.json").write_text(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n"
     )
@@ -226,7 +234,9 @@ system metrics are logged to the `spatialentail-sft` project; stable run IDs and
 `WANDB_RESUME=allow` keep resumed allocations in the same run. Model checkpoints
 are not uploaded to W&B. Training uses the existing finetune environment and
 fixed final-epoch checkpoints. Bench data is absent from the Axolotl
-configurations. The data/config hashes are in jobs.json.
+configurations. Slurm sends BEGIN, END, FAIL, TIME_LIMIT, and TIME_LIMIT_90
+notifications to the same NUS address used by Experiments 13/14. Logs are
+written under `logs/`. The data/config hashes are in jobs.json.
 """)
     return receipt
 

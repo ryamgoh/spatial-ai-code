@@ -53,6 +53,9 @@ Slurm jobs or train a model locally.
    artifacts together. Scripts assume the Slurm submission directory is the
    repository root and reuse the existing `finetune` environment. Their default
    request is one H200 on `gpu` for three hours; verify that against the server.
+   The scripts follow the Experiment 14 convention and email BEGIN, END, FAIL,
+   TIME_LIMIT, and TIME_LIMIT_90 events to `e0958116@u.nus.edu`; stdout and
+   stderr are written under `prepared-final/logs/`.
    Authenticate once with `wandb login` or export `WANDB_API_KEY` before
    submission. The generated configurations use project `spatialentail-sft`,
    deterministic per-arm/seed run IDs, and resumable online logging. They do
