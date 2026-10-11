@@ -74,7 +74,12 @@ def prepare_jobs(release: Path, output: Path, *, repo_root: Path | None = None) 
             if len(ids) != len(set(ids)) or set(ids) != set(groups):
                 raise ValueError(f"{role}/{package} lacks one paired target per base")
             views[role, package] = "".join(
-                json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
+                json.dumps(
+                    {"messages": row["messages"]},
+                    sort_keys=True,
+                    ensure_ascii=False,
+                )
+                + "\n"
                 for row in selected
             )
     train_ids = {r["metadata"]["base_id"] for r in rows_by_role["train"]}

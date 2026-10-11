@@ -222,6 +222,10 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
     )
     report = prepare_jobs(release, tmp_path / "jobs", repo_root=tmp_path)
     assert len(report["jobs"]) == 6 and not report["submitted"]
+    for path in (tmp_path / "jobs/data").glob("*.jsonl"):
+        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        assert rows
+        assert all(set(row) == {"messages"} for row in rows)
     for job in report["jobs"]:
         cfg = yaml.safe_load((tmp_path / job["config"]).read_text())
         assert cfg["seed"] in (42, 43)

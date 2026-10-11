@@ -235,3 +235,8 @@ unreviewed depth configuration.
 Six Qwen3.5-4B SFT jobs were created for answer-only, Natural, and Symbolic at
 seeds 42 and 43. Their receipt records `submitted: false`; Bench data is absent
 from every training configuration.
+
+The prepared Axolotl JSONL views contain only the `messages` field. The sealed
+release retains the complete heterogeneous audit metadata. This separation
+prevents Arrow schema inference from failing when later task families introduce
+additional nested difficulty fields such as `composition`.

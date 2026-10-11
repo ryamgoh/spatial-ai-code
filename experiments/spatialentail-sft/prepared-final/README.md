@@ -14,3 +14,8 @@ fixed final-epoch checkpoints. Bench data is absent from the Axolotl
 configurations. Slurm sends BEGIN, END, FAIL, TIME_LIMIT, and TIME_LIMIT_90
 notifications to the same NUS address used by Experiments 13/14. Logs are
 written under `logs/`. The data/config hashes are in jobs.json.
+
+The six training files intentionally contain only the uniform `messages`
+column. Full audit metadata remains in the sealed release; excluding it from
+the Axolotl inputs prevents Hugging Face Datasets from inferring incompatible
+nested Arrow schemas across benchmark families.
