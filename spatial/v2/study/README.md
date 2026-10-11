@@ -56,10 +56,12 @@ Slurm jobs or train a model locally.
    The scripts follow the Experiment 14 convention and email BEGIN, END, FAIL,
    TIME_LIMIT, and TIME_LIMIT_90 events to `e0958116@u.nus.edu`; stdout and
    stderr are written under `prepared-final/logs/`.
-   Authenticate once with `wandb login` or export `WANDB_API_KEY` before
-   submission. The generated configurations use project `spatialentail-sft`,
-   deterministic per-arm/seed run IDs, and resumable online logging. They do
-   not upload model checkpoints to W&B.
+   Put `export WANDB_API_KEY=...` in the server-local, mode-600 file
+   `~/.config/spatialentail/wandb.env`. The shared launcher loads it for every
+   job, while still accepting an already-exported key or a custom path through
+   `WANDB_ENV_FILE`. The generated configurations use project
+   `spatialentail-sft`, deterministic per-arm/seed run IDs, and resumable online
+   logging. They do not upload model checkpoints to W&B.
 
 The candidate build may fail on diversity or token admission. It never replaces
 existing output, silently relaxes uniqueness, backfills a different depth, or

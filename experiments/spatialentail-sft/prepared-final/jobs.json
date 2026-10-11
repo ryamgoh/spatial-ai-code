@@ -7,7 +7,7 @@
     "train_max_tokens": 12288
   },
   "environment_sha256": {
-    "experiments/15-v2-ablation/jobs/common.bash": "980d6d70da8108571c521113466068d4e2830a85e3cefb06f1704b5f25c88e42",
+    "experiments/15-v2-ablation/jobs/common.bash": "d4fd9b8c59de470ea814412a8ad14d21b086893abe16a4764036a41d48763a39",
     "experiments/15-v2-ablation/jobs/train.sh": "5f1c1f2c69d84a58e9206f3514b4de56cac8a2dd83134c4222ddf6253aefef53",
     "finetune/finetune.py": "0719d45c389754772205eb15d6aaba02caf11ff878e0583f0ea439d0110a1e91",
     "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
@@ -27,12 +27,12 @@
     "data/train-answer-only.jsonl": "6b6aabe07fa485521d46b09bd5cc688862f812967baae2fffc33de319e84a072",
     "data/train-natural.jsonl": "a9688f2aa9d04299810c77029588c9d100b347de2bde13229ee7c26655b50d26",
     "data/train-symbolic.jsonl": "4bb904384e1bf3d5c2363d2041021c03ad441a17afd644efb144a9141c376f1b",
-    "slurm/answer-only-seed-42.sh": "d67ebde90ee19780e091c7d833f37021f62b1468e0320bf32528f73e3fed2850",
-    "slurm/answer-only-seed-43.sh": "d89dab5c0c8f0159be32f364c0600cfca4c234246754ee8a509f174ac9138f34",
-    "slurm/natural-seed-42.sh": "db6be0b57016731b124be223b5eddc125d9703d1764cd0d76f1e1fb3df982525",
-    "slurm/natural-seed-43.sh": "9c93b4ced3921f2b46f92990f6e8bd66b7360f65f99b8bd4180cfc525120c685",
-    "slurm/symbolic-seed-42.sh": "e76fc91874bc8d112bb58f30f51458cc12364d96a4fc5d8378794d45cd8193ce",
-    "slurm/symbolic-seed-43.sh": "d81674036a427c7b217c951fd80e954d50fa8375eeb445fcce413ac55e2c5764"
+    "slurm/answer-only-seed-42.sh": "010273cc9966405b84b32f09a9d4524cae80f4b75fc500cb2c422489c0f4ba40",
+    "slurm/answer-only-seed-43.sh": "08e478214f4dca25a4e48fae55c3ac95a866fe082934886b071eb7360646f8ef",
+    "slurm/natural-seed-42.sh": "dd0b34fc827fe90336883f594e9945609701b8bb19d00548fcfe2e2c04afbdd6",
+    "slurm/natural-seed-43.sh": "6283034115e08b87cd69c43d6706ec4f5c92eb74cb74ede14c4e56675f6eee76",
+    "slurm/symbolic-seed-42.sh": "a76dacfd6482eb4da0ca4aaac9e122f828ece82fd265c267fc13b22d5e054090",
+    "slurm/symbolic-seed-43.sh": "038360cbb9a400b99c78096a6208266e31569ae57ebcaa94d4e035a445b9fe5f"
   },
   "jobs": [
     {

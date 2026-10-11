@@ -17,6 +17,7 @@ cd "$SLURM_SUBMIT_DIR"
 export ARM=natural-seed-43
 export TRAIN_CONFIG="$SLURM_SUBMIT_DIR/experiments/spatialentail-sft/prepared-final/configs/natural-seed-43.yaml"
 export MODEL_DIR="$SLURM_SUBMIT_DIR/experiments/spatialentail-sft/prepared-final/models/natural-seed-43"
+load_wandb_credentials
 export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-spatialentail-qwen3.5-4b}"
 export WANDB_JOB_TYPE=natural
 export WANDB_RESUME=allow

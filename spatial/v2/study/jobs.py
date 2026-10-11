@@ -164,6 +164,7 @@ cd "$SLURM_SUBMIT_DIR"
 export ARM={name}
 export TRAIN_CONFIG="$SLURM_SUBMIT_DIR/{config_relative}"
 export MODEL_DIR="$SLURM_SUBMIT_DIR/{model_relative}"
+load_wandb_credentials
 export WANDB_RUN_GROUP="${{WANDB_RUN_GROUP:-spatialentail-qwen3.5-4b}}"
 export WANDB_JOB_TYPE={package}
 export WANDB_RESUME=allow

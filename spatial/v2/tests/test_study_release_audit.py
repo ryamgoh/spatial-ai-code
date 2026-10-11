@@ -247,6 +247,7 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
         assert "#SBATCH --mail-user=e0958116@u.nus.edu" in script
         assert "/logs/%x-%j.out" in script
         assert "/logs/%x-%j.err" in script
+        assert "load_wandb_credentials" in script
         assert "WANDB_RESUME=allow" in script
         import subprocess
 
