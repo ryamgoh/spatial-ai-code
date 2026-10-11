@@ -16,11 +16,12 @@ The same contract supports SpatialEntail, a generator and certificate-checking
 pipeline for Direction, Entity Selection, and correlated Count queries over eight
 directions and finite Boolean formulas. Accepted certificates yield Natural and
 replayable Symbolic supervision. The predeclared study compares answer-only,
-checked Natural, and checked Symbolic targets on Qwen3.5-2B and Qwen3.5-4B, with
-4B controls for corrupted evidence and local proofs. Candidate nested
-4K/8K/17K budgets and
-depth-1--8 tests separate matched reasoning from depth-5--8 extrapolation.
-Training, transfer, and quality-review results are not yet available.
+checked Natural, and checked Symbolic targets on Qwen3.5-4B with two training
+seeds. Secondary model sizes and mechanism studies are optional. Candidate
+nested 4K/8K budgets, matched capabilities, reserved composition families, and
+depth-3--8 answer tests separate task exposure from structural extrapolation.
+Production training and transfer results remain unavailable; the completed
+quality screen concerns the bounded capability pilot only.
 Certificate validity supports auditability, not claims about a model's internal
 reasoning.
 

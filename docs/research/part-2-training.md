@@ -85,27 +85,14 @@ witnesses. The checked Symbolic core arm may render their qualitative rank
 compression; the 4B local-proof mechanism arm omits that global witness. Neither
 arm may read its label from a hidden generating map.
 
-## Evaluation suites
+## Authoritative execution scope
 
-Do not combine every case into one arbitrarily weighted test. Freeze separate
-modules and report each module directly.
-
-| Suite | Purpose |
-|---|---|
-| Core relational | Positive spatial premises with Direction, Selection, and Count queries |
-| Spatial depth | Multi-hop X/Y proofs at increasing held-out depths |
-| Independent axes | X and Y conclusions supported by different premise chains |
-| Distractors | None, disconnected branches, and query-connected interference |
-| Ambiguity | Unique answers and controlled possibility-set sizes |
-| Answer contracts | `SINGLE`, `ALL_POSSIBLE`, and diagnostic `VISIBLE_POSSIBLE` |
-| Propositional | Negation, disjunction, implication, equivalence, and mixed formulas |
-| Language shift | Held-out templates and entity-name domains |
-| External transfer | SpatialMap-TQA-Corr, StepGame, Text2Space, SpartQA-Human, and ReSQ under their native contracts |
-
-Use development data for generator and prompt decisions, a validation split for
-checkpoint selection, and untouched final tests for reported claims. External
-datasets are never pooled into one aggregate score. If RL is designed after SFT
-errors are inspected, reserve a separate RL holdout.
+The reviewed [corpus and benchmark protocol](size-freeze-protocol.md) controls
+all sizes, roles, composition reservations, and central contrasts. Its candidate
+allocations supersede the former 17K and 5.8K-test programme. The primary study
+is one 4B model, three supervision packages, two seeds, and separately reported
+matched, held-out-composition, and depth evaluations. Final quotas remain
+conditional on unique structures, context admission, and coverage audits.
 
 ## Baseline prompting study
 
@@ -198,16 +185,10 @@ Use the same underlying training problems and compare:
 | Corrupted Symbolic SFT (4B only) | Invalid semantic evidence with the same gold answer |
 | Symbolic local-proof SFT (4B only) | Replayable local proof without the global qualitative rank witness |
 
-The answer-only, checked Natural, and checked Symbolic arms run on
-`Qwen/Qwen3.5-2B` and `Qwen/Qwen3.5-4B` with training seeds 42 and 43. The two
-mechanism arms run only on 4B. This yields 12 central and four mechanism runs.
-The answer-only arm controls for task exposure and output format. Each trained
-arm is also compared with its prompt-matched untuned checkpoint.
-
-The local-proof arm is not yet an exposed supervision variant. Before it enters
-the run matrix, define its eligible base IDs, retained consistency evidence,
-serializer/checker contract, and process metrics. Removing a required rank
-witness from the current Symbolic grammar would not constitute a valid arm.
+The three central arms run on Qwen3.5-4B with seeds 42 and 43: six SFT runs.
+Use fixed epochs and the final checkpoint. Qwen3.5-2B, corrupted traces, and
+local-proof supervision remain optional after the central study. Local-proof is
+not an exposed valid variant and must not be produced by deleting witness data.
 
 **Hypothesis:** at least one reasoning-trace condition will outperform
 answer-only SFT on structurally held-out problems, even if matched accuracy is
@@ -237,55 +218,18 @@ output validity, and cost. The corruption comparison estimates that procedure's
 effect within the Symbolic package, not semantic validity in general. All remain
 untested in the V2 pilot. No token-efficiency advantage is assumed.
 
-## Propositional coverage and composition holdout
+## Composition, scale, and depth
 
-The maximum candidate pool is intended to include explicit negation,
-disjunction, implication, equivalence, case split, and nested case split. Final
-counts are not assigned until the benchmark-cell registry and a bounded
-generation-yield pilot are frozen. Spatial proof depth, propositional depth, and
-branch count remain separate fields. Every primitive operator appears in
-training, while a separate 1,000-example premise-first test withholds selected
-formula trees and rule compounds. This is a composition holdout, not a claim of
-generalisation to unseen operators. The unchanged relational cells measure
-retention.
+See [size-freeze-protocol.md](size-freeze-protocol.md) for the executable twelve
+seen composition cells and nine held-out cells, paired semantic interventions,
+775-base candidate Dev set, and 4,300-base candidate benchmark. These allocations
+are targets subject to uniqueness and coverage, not frozen results.
 
-## Data-size calibration
-
-After freezing the cell registry and quotas, generate at most one stratified
-17K base-problem pool with deterministic `4K ⊂ 8K ⊂ 17K` subsets. Calibrate
-checked Symbolic on both model sizes with seed 42. Select the smallest size for
-which the next size improves both macro answer accuracy and full Symbolic
-validity by less than two percentage points for both models, without a material
-regression in a predeclared query family or capability lens. The regression
-threshold must be frozen before calibration. If 4K to 8K saturates, do not train
-17K; otherwise 17K is the fallback when 8K to 17K does not saturate. Final test
-data are not used for this choice.
-
-**Hypothesis:** additional validated data will first improve matched accuracy,
-then plateau unless the added examples cover the structures responsible for
-held-out errors.
-
-Scaling should use the selected representation. Do not multiply every data
-size by every exploratory trace condition.
-
-## Depth extrapolation and distractor robustness
-
-Depth-controlled training contains only depths 1--4 in every central arm,
-mechanism arm, and auxiliary demonstration. The frozen clean test has 100
-Direction, 100 Selection, and 100 Count examples at each depth from 1 through 8,
-for 2,400 examples. Depths 1--4 are matched and depths 5--8 are extrapolative.
-Every clean item has one paired noisy counterpart with the same core problem
-and answer plus two solver-verified removable distractors, adding 2,400
-examples. Clean accuracy is the headline depth curve; the paired clean/noisy
-delta is reported separately as robustness.
-
-Controlled removable distractors are implemented for Direction and
-controlled-depth Selection. The Count pairs remain requirements for the final
-suite, not completed artifacts; they must pass semantic and context-admission
-checks before freezing.
-
-Any family-depth cell that cannot produce 100 context-admitted examples fails
-before freezing rather than being backfilled with a different depth or family.
+The 4K→8K comparison is a bounded budget ablation. No two-point saturation or
+optimal-size claim is made. Depth 3/4 anchors and 5–8 extrapolation are scored
+separately; deep answers use a common direct-answer instruction, with process
+validity not applicable. Full Natural/Symbolic targets are admitted only where
+all paired representations fit. Sixteen thousand is optional expansion.
 
 ## Answer-contract study
 
@@ -431,12 +375,12 @@ the final cell allocation, human acceptability, data-size sufficiency, or learni
    distractors and the local-proof acceptance contract.
 4. Freeze cell quotas, matched-test totals, quality strata, and external
    adapter ledgers.
-5. Generate and formally validate the nested 4K/8K/17K candidate pool.
+5. Generate and formally validate the reviewed candidate release and nested subsets.
 6. Complete the source-blinded larger-of-2%-or-`5C` quality review.
 7. Freeze prompts and run the untuned baselines.
-8. Calibrate 4K/8K/17K checked Symbolic training with seed 42.
-9. Run the 12 central confirmatory SFT runs at the selected size.
-10. Run the four 4B mechanism runs only after their implementations pass.
+8. Run the bounded 4K/8K budget comparison on development data.
+9. Run the six central 4B SFT runs at the approved budget.
+10. Treat mechanism runs as optional after the primary study.
 11. Evaluate matched, depth, composition, and external suites without retuning.
 12. Consider GRPO only after its go/no-go conditions pass.
 

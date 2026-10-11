@@ -65,7 +65,7 @@ representative feasibility registry and automated Natural-trace screen only.
 They do not estimate human acceptability, determine the final allocation, or
 measure LLM task performance.
 
-The final nested 4K/8K/17K corpus, human-facing quality audit, and model training
+The final nested 4K/8K (16K optional) corpus, human-facing quality audit, and model training
 have not been executed. Their tables below are explicit placeholders rather
 than results; cell-level rows are added only after the taxonomy allocation is
 frozen.
@@ -95,9 +95,6 @@ requested factorial allocation.
   table(
     columns: (auto, auto, auto, auto, auto),
     table.header([*Model*], [*Arm*], [*Seed 42*], [*Seed 43*], [*Mean / range*]),
-    [2B], [Answer-only], [—], [—], [—],
-    [2B], [Checked Natural], [—], [—], [—],
-    [2B], [Checked Symbolic], [—], [—], [—],
     [4B], [Answer-only], [—], [—], [—],
     [4B], [Checked Natural], [—], [—], [—],
     [4B], [Checked Symbolic], [—], [—], [—],
@@ -105,41 +102,38 @@ requested factorial allocation.
   caption: [Primary internal macro-accuracy table. Placeholder cells must not be interpreted as zero.],
 ) <results-main-sft>
 
-The primary claim requires consistent direction across both seeds. Model size is
-reported as robustness, not as a scaling law, because equal LoRA rank represents
-different relative adapter capacity and only two model sizes are observed.
+Results are reported individually for each seed and with descriptive mean/range.
+Item-level uncertainty conditions on the trained checkpoints. A second model
+size is optional, not a prerequisite for the main result.
 
-== Depth Extrapolation and Distractor Robustness — Not Run
+== Depth Extrapolation — Not Run
 
-The depth result will show separate Direction, Selection, and Count curves over
-depths 1–8. Depths 1–4 are matched to training; depths 5–8 are extrapolation.
-For each point, the clean result is paired with an otherwise identical version
-containing two removable distractors.
+The common direct-answer protocol reports Direction, Selection, and Count at
+depths 3–8. Depths 3/4 are matched anchors and 5–8 are extrapolation. Full-trace
+process scores are not applicable to this module; gold certificates are checked
+offline. No paired noisy suite is promised in the central study.
 
 #figure(
   table(
-    columns: (auto, auto, auto, auto, auto, auto, auto, auto, auto),
-    table.header([*Family*], [*d1*], [*d2*], [*d3*], [*d4*], [*d5*], [*d6*], [*d7*], [*d8*]),
-    [Direction clean], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Direction noisy], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Selection clean], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Selection noisy], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Count clean], [—], [—], [—], [—], [—], [—], [—], [—],
-    [Count noisy], [—], [—], [—], [—], [—], [—], [—], [—],
+    columns: (auto, auto, auto, auto, auto, auto, auto),
+    table.header([*Family*], [*d3*], [*d4*], [*d5*], [*d6*], [*d7*], [*d8*]),
+    [Direction], [—], [—], [—], [—], [—], [—],
+    [Selection], [—], [—], [—], [—], [—], [—],
+    [Count], [—], [—], [—], [—], [—], [—],
   ),
-  caption: [StepGame-style matched and extrapolative depth ladder.],
+  caption: [Matched anchors and answer-only depth extrapolation.],
 ) <results-depth-ladder>
 
-A decline from depth 5 is evidence of length extrapolation failure only if all
-training and auxiliary supervision exclude depths 5–8. A clean/noisy gap is a
-separate robustness result and must not be folded into the depth effect.
+Depth results also report input length, premise count, and entity count. A drop
+is not interpreted as a length-independent effect of logical depth alone.
 
-== Premise-First Composition — Not Run
+== Held-Out Composition — Not Run
 
-The premise-first table will separate conditional, negation/disjunction,
-branching, and mixed formula holdouts. Every primitive operator occurs in
-training; only selected compounds are unseen. This prevents operator novelty
-from being misreported as compositional extrapolation.
+MP→TRC→MP, MP→DJE→TRC, and TRC→MP→TRC are the reserved skeletons,
+each instantiated across DIR/SEL/CNT. They share the
+construction provenance of the seen compositions, so the comparison does not
+introduce a simultaneous premise-first shift. Results support transfer to those
+three skeleton families only. No combined composition/depth SHIFT score is reported.
 
 == External Transfer — Not Run
 

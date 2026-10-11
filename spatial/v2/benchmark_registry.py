@@ -14,7 +14,6 @@ import yaml
 
 from spatial.v2.generation import (
     BooleanShape,
-    GenerationMode,
     GenerationPolicy,
     QueryKind,
     SemanticShape,
@@ -126,6 +125,7 @@ _CELL_KEYS = {
     "prerequisites",
 }
 _GENERATION_KEYS = {
+    "composition",
     "semantic_shape",
     "boolean_shape",
     "generation_mode",
@@ -232,6 +232,13 @@ def _cell(raw: dict[str, Any]) -> BenchmarkCell:
             raw.get("reasoning_structures"),
             ReasoningStructure,
             "reasoning structure",
+        )
+        if generation.get("composition") is None
+        else tuple(
+            _enum(item, ReasoningStructure, "reasoning structure")
+            for item in _sequence(
+                raw.get("reasoning_structures"), "reasoning structures"
+            )
         ),
         semantic_status=_enum(
             raw.get("semantic_status"), SemanticStatus, "semantic status"
@@ -286,17 +293,35 @@ def _validate_cell(cell: BenchmarkCell) -> None:
         BooleanShape,
         "boolean_shape",
     )
-    for structure in cell.reasoning_structures:
-        expected = _STRUCTURE_SHAPE[structure]
-        if boolean_shape is not expected:
-            raise ValueError(
-                f"cell {cell.id}: {structure.value} requires "
-                f"boolean_shape {expected.value}"
+    composition = cell.generation.get("composition")
+    if composition is not None:
+        from spatial.v2.composition import COMPOSITIONS, composition_structures
+
+        expected = (
+            tuple(
+                _enum(code, ReasoningStructure, "composition structure")
+                for code in composition_structures(composition)
             )
-    if len(cell.reasoning_structures) > 1 and cell.readiness is CellReadiness.READY:
-        raise ValueError(
-            f"cell {cell.id}: mixed structures need an explicit blocked prerequisite"
+            if composition in COMPOSITIONS
+            else ()
         )
+        if composition not in COMPOSITIONS or cell.reasoning_structures != expected:
+            raise ValueError(
+                f"cell {cell.id}: composition disagrees with ordered structures"
+            )
+        if boolean_shape is not BooleanShape.ATOMIC:
+            raise ValueError(f"cell {cell.id}: composition requires atomic base shape")
+    else:
+        for structure in cell.reasoning_structures:
+            expected_shape = _STRUCTURE_SHAPE[structure]
+            if boolean_shape is not expected_shape:
+                raise ValueError(
+                    f"cell {cell.id}: {structure.value} requires boolean_shape {expected_shape.value}"
+                )
+        if len(cell.reasoning_structures) > 1 and cell.readiness is CellReadiness.READY:
+            raise ValueError(
+                f"cell {cell.id}: mixed structures need an explicit blocked prerequisite"
+            )
 
     structures = set(cell.reasoning_structures)
     lenses = set(cell.capability_lenses)
@@ -318,7 +343,7 @@ def _validate_cell(cell: BenchmarkCell) -> None:
     depth = cell.generation.get("depth")
     if ReasoningStructure.ATOMIC in structures and depth not in {None, 1}:
         raise ValueError(f"cell {cell.id}: ARC requires depth 1 or omitted")
-    if ReasoningStructure.TRANSITIVE in structures:
+    if ReasoningStructure.TRANSITIVE in structures and composition is None:
         if depth is None or int(depth) < 2:
             raise ValueError(f"cell {cell.id}: TRC requires depth at least 2")
         if not cell.generation.get("omit_direct_query_relation", False):
@@ -342,8 +367,7 @@ def _validate_cell(cell: BenchmarkCell) -> None:
         and cell.semantic_status is SemanticStatus.UNIQUE
         and (
             EvidenceObligation.POSITIVE_PROOF not in cell.evidence_obligations
-            or EvidenceObligation.CONSISTENCY_WITNESS
-            not in cell.evidence_obligations
+            or EvidenceObligation.CONSISTENCY_WITNESS not in cell.evidence_obligations
         )
     ):
         raise ValueError(

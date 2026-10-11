@@ -101,3 +101,16 @@ An untuned arm has `train: false`. Dataset paths, adapter paths, output paths,
 and evaluation tasks are computed by the submitter; model/context/template
 settings must agree with matrix admission. The generated data and evaluation
 prompts must be regenerated after changing the model or tokenizer template.
+
+## CORE engineering smoke
+
+`run-core-smoke.yaml` uses all thirteen existing CORE cells via
+`matrix-core-smoke.yaml`. It trains one Symbolic engineering checkpoint with
+non-reportable dev/test splits. This run does not initialize central SFT and
+is not the sealed study benchmark.
+
+Dry-run the engineering graph with:
+
+```sh
+python experiments/15-v2-ablation/submit.py --config experiments/15-v2-ablation/run-core-smoke.yaml --dry-run
+```

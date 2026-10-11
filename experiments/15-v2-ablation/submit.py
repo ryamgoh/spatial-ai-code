@@ -799,6 +799,7 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def main(
+    config: Path = typer.Option(EXPERIMENT_DIR / "run.yaml", help="Run specification."),
     dry_run: bool = typer.Option(
         False, help="Print the graph without sbatch or files."
     ),
@@ -815,7 +816,7 @@ def main(
     )
     identifier = run_id or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     result = submit_experiment(
-        EXPERIMENT_DIR / "run.yaml",
+        config,
         REPO_ROOT,
         SubmissionOptions(
             run_id=identifier,

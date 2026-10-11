@@ -15,7 +15,7 @@ benchmark cells. The current generator exposes the lower-level controls listed
 here. The versioned `spatial/v2/benchmark-cells.yaml` registry maps selected
 taxonomy cells to representative generator policies; `benchmark_registry.py`
 validates declarations and can probe one checked example per ready cell. The
-registry contains no quotas and does not yet annotate generated workload rows.
+registry contains no quotas; the study assembler adds role and cell metadata.
 Existing `boolean_shape` and depth fields must not be relabelled as verified
 capabilities without the taxonomy's admission checks.
 
@@ -299,3 +299,12 @@ The runnable training/evaluation orchestration is documented beside its code in
 [`experiments/15-v2-ablation`](../../experiments/15-v2-ablation/README.md).
 Training benefits, readable explanation quality, and internal reasoning
 faithfulness remain empirical questions.
+
+## Bounded study compositions
+
+`GenerationPolicy.composition` selects MP→TRC, IFF→TRC, TRC→MP, or DJE→TRC seen
+families across all query contracts. MP→TRC→MP, MP→DJE→TRC, and
+TRC→MP→TRC are separately reserved. Admission requires
+replay-valid ordered dependencies and individual logical-premise removal to
+change query semantics. These are bounded interventions, not global shortest
+proof claims. See [study protocol](../research/size-freeze-protocol.md).

@@ -392,8 +392,8 @@ Detailed plans:
 |---|---|---|
 | Formal validation and SpatialEval | Prove and validate the encoding; audit the untouched four-option release; validate counter-witnesses; create a separate five-option correction; compare general, reasoning, and compatible spatially fine-tuned LLMs on original, corrected, entailed-only, and ambiguous-only views | Does formal semantics expose consequential ambiguity and change conclusions about LLM capability? |
 | Benchmark calibration and prompting | Generate a development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, Natural-axis, and Symbolic-axis prompts; then freeze the benchmark | Is the benchmark valid, solvable, non-saturated, and structurally discriminative? |
-| SFT and representation | Compare answer-only, checked Natural, and checked Symbolic on Qwen3.5-2B and Qwen3.5-4B; run corrupted Symbolic and Symbolic local-proof mechanisms on 4B | Do checked traces add value beyond task exposure, does evidence validity matter, and does a global qualitative witness help? |
-| Generalisation, scale, and optional RL | Calibrate nested 4K/8K/17K training; test matched cells, depth 1--8, held-out formula compositions, and five external datasets; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains extrapolate beyond training depth and construction families, and does RL add anything beyond supervised optimisation? |
+| SFT and representation | Compare answer-only, checked Natural, and checked Symbolic on the primary Qwen3.5-4B; secondary sizes and mechanisms are optional | Do checked traces add value beyond task exposure, does evidence validity matter, and does a global qualitative witness help? |
+| Generalisation, scale, and optional RL | Calibrate nested 4K/8K (16K optional) training; test matched cells, depth 3--8, held-out formula compositions, and SpatialMap-TQA-Corr, with StepGame optional; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains extrapolate beyond training depth and construction families, and does RL add anything beyond supervised optimisation? |
 
 Difficulty is not an end in itself. The benchmark should contain solvable,
 discriminative, and hard cells whose performance changes for identifiable
@@ -404,18 +404,16 @@ structural reasons.
 - The [canonical task taxonomy](task-taxonomy.md) defines three query families
   (`DIR`, `SEL`, `CNT`), three capability lenses (`RR`, `LR`, `MTR`), and
   factorial benchmark cells. The former four-tier, 17-bucket allocation is
-  withdrawn. The 4K/8K/17K sizes remain candidate maximum budgets; cell quotas
+  withdrawn. The 4K/8K (16K optional) sizes remain candidate maximum budgets; cell quotas
   are frozen only after a bounded capability/yield pilot.
 - The central arms are answer-only, checked Natural, and checked Symbolic on
-  Qwen3.5-2B and Qwen3.5-4B with seeds 42 and 43. Corrupted Symbolic and
-  Symbolic local proof are planned 4B-only mechanism arms: 16 confirmatory runs
-  total after the local-proof serializer and acceptance contract are implemented.
-- Depth-controlled training stops at depth 4. Direction, Selection, and Count are
-  tested separately at depths 1--8 with 100 clean examples per family-depth
-  cell and one paired noisy counterpart per item. Depths 5--8 are extrapolation.
-  Paired Count distractors remain an implementation prerequisite.
-- External evaluation uses SpatialMap-TQA-Corr, StepGame, Text2Space,
-  SpartQA-Human, and ReSQ under their native semantics and metrics.
+  Qwen3.5-4B with seeds 42 and 43: six central runs. Secondary sizes,
+  corrupted evidence, local proof, and GRPO are optional.
+- Training contains controlled depth-3/4 anchor strata; the test ladder spans
+  depths 3–8, fifty per family/depth. Deep answers use a common direct-answer
+  protocol; full-trace validity is not applicable. No noisy suite is mandatory.
+- SpatialMap-TQA-Corr is essential external evaluation; StepGame is next
+  priority. Additional adapters are optional and retain native scores.
 - Every row receives formal checking. If `C` is the number of frozen reporting
   cells, source-blinded review uses at least the larger of 2% of the formally
   admitted maximum candidate pool or `5C` examples, with at least five per cell. Sequential isolated
@@ -474,3 +472,7 @@ low-priority KIV extension.
 - Frozen quality-judge prompt and any provider-exposed model revision metadata
 - Whether `ALL_POSSIBLE` belongs in the core benchmark
 - Go/no-go criteria and compute budget for RL
+
+The reviewed executable scope and all allocation decisions are governed by
+[size-freeze-protocol.md](size-freeze-protocol.md); earlier larger experiment
+counts and seven-composition proposals are withdrawn.

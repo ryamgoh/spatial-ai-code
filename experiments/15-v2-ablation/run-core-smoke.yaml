@@ -1,0 +1,45 @@
+version: 1
+name: p0-core-engineering
+matrix: matrix-core-smoke.yaml
+data_output: data/spatialentail_p0_core.jsonl
+base_model: Qwen/Qwen3.5-4B
+train:
+  template: templates/train.yaml
+  overrides:
+    num_epochs: 1
+    load_best_model_at_end: false
+eval:
+  template: templates/eval.yaml
+  task_template: templates/task.yaml
+  overrides: {}
+arms:
+- name: single-symbolic
+  view: single__symbolic__checked-trace
+- name: untuned-symbolic
+  view: single__symbolic__checked-trace
+  train: false
+resources:
+  generate:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 8
+    memory: 64G
+    time: 03:00:00
+  train:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 16
+    memory: 128G
+    time: 03:00:00
+  eval:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 16
+    memory: 128G
+    time: 03:00:00
+  summarize:
+    partition: gpu
+    gres: gpu:h200-141:1
+    cpus: 4
+    memory: 16G
+    time: 00:30:00

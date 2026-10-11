@@ -339,6 +339,14 @@ relation atom has already been derived by the Boolean calculus, direction
 introduction may lift that atom directly into the query-level `DirectionClaim`;
 this avoids a redundant decompose--recompose round trip.
 
+The automatic builder also uses checked spatial-atom recomposition to satisfy
+logical antecedents. Its X/Y paths produce an exact relation atom, which can
+then license modus ponens or equivalence elimination. The same sign-pair check
+governs this bridge, so spatial and Boolean inference may alternate without
+reading a solver verdict into a proof step. Automatic antecedent materialization
+is currently restricted to the unscoped context; arbitrary spatial deductions
+inside nested assumption branches are not claimed complete.
+
 #heading(level: 2, numbering: none)[Theorem 3: Certificate Soundness]
 
 Let $C$ be a Direction proof certificate accepted by the replay checker for

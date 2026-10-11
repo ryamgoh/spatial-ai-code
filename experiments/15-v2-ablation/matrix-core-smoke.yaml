@@ -1,0 +1,135 @@
+version: 1
+seed: 21911
+test_split: 0.2
+dev_split: 0.2
+split_strategy: structural
+include_audit: false
+context_budget:
+  tokenizer_name: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  train_max_tokens: 4096
+  eval_max_tokens: 8192
+  max_new_tokens: 4096
+defaults:
+  num_entities: 3
+  num_premises: 2
+  max_attempts_per_sample: 2000
+variants:
+  answers:
+  - name: single
+    mode: single
+    menu_coverage: full
+  traces:
+  - format: natural
+  - format: symbolic
+  supervision_arms:
+  - checked-trace
+  - answer-only
+cells:
+- semantic_shape: unique
+  boolean_shape: atomic
+  num_entities: 3
+  num_premises: 2
+  depth: 1
+  name: DIR-ARC-UNI
+  query_kind: direction
+  count: 5
+- semantic_shape: unique
+  boolean_shape: atomic
+  num_entities: 4
+  num_premises: 4
+  depth: 2
+  omit_direct_query_relation: true
+  name: DIR-TRC-UNI
+  query_kind: direction
+  count: 5
+- semantic_shape: unique
+  boolean_shape: atomic
+  num_entities: 6
+  num_premises: 7
+  depth: 2
+  require_independent_axes: true
+  name: CNT-AXC-UNI
+  query_kind: count
+  count: 5
+- semantic_shape: unique
+  boolean_shape: modus-ponens
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  name: DIR-MP-UNI
+  query_kind: direction
+  count: 5
+- semantic_shape: unique
+  boolean_shape: iff
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  name: SEL-IFF-UNI
+  query_kind: which
+  count: 5
+- semantic_shape: unique
+  boolean_shape: double-negation
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  name: CNT-NEG-UNI
+  query_kind: count
+  count: 5
+- semantic_shape: unique
+  boolean_shape: disjunctive-syllogism
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  name: DIR-DJE-UNI
+  query_kind: direction
+  count: 5
+- semantic_shape: unique
+  boolean_shape: case-split
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  name: SEL-CSR-UNI
+  query_kind: which
+  count: 5
+- semantic_shape: ambiguous
+  boolean_shape: atomic
+  num_entities: 4
+  num_premises: 3
+  ambiguity_size: 2
+  name: DIR-ARC-ALT
+  query_kind: direction
+  count: 5
+- semantic_shape: no-match
+  boolean_shape: atomic
+  num_entities: 4
+  num_premises: 3
+  name: SEL-ARC-NOM
+  query_kind: which
+  count: 5
+- semantic_shape: multiple-certain
+  boolean_shape: atomic
+  num_entities: 6
+  num_premises: 5
+  name: SEL-ARC-MUL
+  query_kind: which
+  count: 5
+- semantic_shape: unique
+  boolean_shape: case-split
+  generation_mode: proof-template-first
+  num_entities: 6
+  num_premises: 7
+  require_joint_count_dependency: true
+  name: CNT-CSR-JCR-UNI
+  query_kind: count
+  count: 5
+- semantic_shape: unique
+  boolean_shape: atomic
+  num_entities: 7
+  num_premises: 9
+  depth: 2
+  omit_direct_query_relation: true
+  distractor_premises: 2
+  name: SEL-TRC-UNI-NOISE
+  query_kind: which
+  count: 5

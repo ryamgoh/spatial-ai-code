@@ -171,7 +171,7 @@ subsets, and unsupported portions remain separate.
 ## Allocation status
 
 The former four-tier, 17-bucket allocation is withdrawn. The maximum nested
-pool sizes `4K ⊂ 8K ⊂ 17K` remain candidate calibration budgets, not generated
+pool sizes `4K ⊂ 8K` (16K optional) remain candidate calibration budgets, not generated
 corpora or finalized cell quotas. Before generation, freeze:
 
 1. the supported cell registry;
@@ -197,3 +197,7 @@ Primary supporting analysis:
 [framework literature review](capability-framework-literature-review.md),
 [relational external review](external-relational-capability-review.md), and
 [human external review](external-human-capability-review.md).
+
+The reviewed executable scope and all allocation decisions are governed by
+[size-freeze-protocol.md](size-freeze-protocol.md); earlier larger experiment
+counts and seven-composition proposals are withdrawn.

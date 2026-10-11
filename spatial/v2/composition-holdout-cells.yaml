@@ -1,0 +1,209 @@
+version: 1
+cells:
+- id: DIR-MP-TRC-MP-UNI
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - TRC
+  - MP
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-trc-mp
+    num_entities: 7
+    num_premises: 12
+- id: SEL-MP-TRC-MP-UNI
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - TRC
+  - MP
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-trc-mp
+    num_entities: 7
+    num_premises: 12
+- id: CNT-MP-TRC-MP-UNI
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - TRC
+  - MP
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-trc-mp
+    num_entities: 7
+    num_premises: 12
+- id: DIR-MP-DJE-TRC-UNI
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - DJE
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-dje-trc
+    num_entities: 6
+    num_premises: 10
+- id: SEL-MP-DJE-TRC-UNI
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - DJE
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-dje-trc
+    num_entities: 6
+    num_premises: 10
+- id: CNT-MP-DJE-TRC-UNI
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  - DJE
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: mp-dje-trc
+    num_entities: 6
+    num_premises: 10
+- id: DIR-TRC-MP-TRC-UNI
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - TRC
+  - MP
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: trc-mp-trc
+    num_entities: 6
+    num_premises: 10
+- id: SEL-TRC-MP-TRC-UNI
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - TRC
+  - MP
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - consistency-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: trc-mp-trc
+    num_entities: 6
+    num_premises: 10
+- id: CNT-TRC-MP-TRC-UNI
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - RR
+  - LR
+  - MTR
+  reasoning_structures:
+  - TRC
+  - MP
+  - TRC
+  semantic_status: UNI
+  evidence_obligations:
+  - positive-proof
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    semantic_shape: unique
+    boolean_shape: atomic
+    generation_mode: proof-template-first
+    composition: trc-mp-trc
+    num_entities: 6
+    num_premises: 10

@@ -1,0 +1,422 @@
+version: 1
+name: spatialentail-release-candidate
+engineering_only: false
+seed: 21911
+context_budget:
+  tokenizer_name: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  train_max_tokens: 12288
+  eval_max_tokens: 16384
+  max_new_tokens: 12288
+registries:
+- ../benchmark-cells.yaml
+- ../composition-cells.yaml
+- ../composition-holdout-cells.yaml
+contamination_files:
+- ../../../results/spatialentail-capability-pilot/v3/pilot.jsonl
+attempts_per_base: 50
+train_fractions:
+- 0.5
+- 1
+roles:
+  train:
+  - count: 200
+    stratum: DIR-ARC-UNI
+    policy: &id001
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 6
+      num_premises: 7
+  - cell: DIR-TRC-UNI
+    count: 200
+  - cell: CNT-AXC-UNI
+    count: 200
+  - cell: DIR-MP-UNI
+    count: 200
+  - cell: SEL-IFF-UNI
+    count: 200
+  - cell: CNT-NEG-UNI
+    count: 200
+  - cell: DIR-DJE-UNI
+    count: 200
+  - cell: SEL-CSR-UNI
+    count: 200
+  - cell: DIR-ARC-ALT
+    count: 200
+  - cell: SEL-ARC-NOM
+    count: 200
+  - cell: SEL-ARC-MUL
+    count: 200
+  - cell: CNT-CSR-JCR-UNI
+    count: 200
+  - cell: SEL-TRC-UNI-NOISE
+    count: 200
+  - cell: DIR-MP-TRC-UNI
+    count: 350
+  - cell: SEL-MP-TRC-UNI
+    count: 350
+  - cell: CNT-MP-TRC-UNI
+    count: 350
+  - cell: DIR-IFF-TRC-UNI
+    count: 350
+  - cell: SEL-IFF-TRC-UNI
+    count: 350
+  - cell: CNT-IFF-TRC-UNI
+    count: 350
+  - cell: DIR-TRC-MP-UNI
+    count: 350
+  - cell: SEL-TRC-MP-UNI
+    count: 350
+  - cell: CNT-TRC-MP-UNI
+    count: 350
+  - cell: DIR-DJE-TRC-UNI
+    count: 350
+  - cell: SEL-DJE-TRC-UNI
+    count: 350
+  - cell: CNT-DJE-TRC-UNI
+    count: 350
+  - stratum: direction-depth-3
+    count: 200
+    policy: &id002
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 9
+      num_premises: 11
+      omit_direct_query_relation: true
+      min_axis_depth: 3
+      max_axis_depth: 3
+  - stratum: direction-depth-4
+    count: 200
+    policy: &id003
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 10
+      num_premises: 12
+      omit_direct_query_relation: true
+      min_axis_depth: 4
+      max_axis_depth: 4
+  - stratum: which-depth-3
+    count: 200
+    policy: &id004
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 11
+      num_premises: 16
+      omit_direct_query_relation: true
+      min_membership_depth: 3
+      max_membership_depth: 3
+  - stratum: which-depth-4
+    count: 200
+    policy: &id005
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 13
+      num_premises: 18
+      omit_direct_query_relation: true
+      min_membership_depth: 4
+      max_membership_depth: 4
+  - stratum: count-depth-3
+    count: 200
+    policy: &id006
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 11
+      num_premises: 16
+      omit_direct_query_relation: true
+      min_membership_depth: 3
+      max_membership_depth: 3
+  - stratum: count-depth-4
+    count: 200
+    policy: &id007
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 13
+      num_premises: 18
+      omit_direct_query_relation: true
+      min_membership_depth: 4
+      max_membership_depth: 4
+  dev:
+  - count: 25
+    stratum: DIR-ARC-UNI
+    policy: *id001
+  - cell: DIR-TRC-UNI
+    count: 25
+  - cell: CNT-AXC-UNI
+    count: 25
+  - cell: DIR-MP-UNI
+    count: 25
+  - cell: SEL-IFF-UNI
+    count: 25
+  - cell: CNT-NEG-UNI
+    count: 25
+  - cell: DIR-DJE-UNI
+    count: 25
+  - cell: SEL-CSR-UNI
+    count: 25
+  - cell: DIR-ARC-ALT
+    count: 25
+  - cell: SEL-ARC-NOM
+    count: 25
+  - cell: SEL-ARC-MUL
+    count: 25
+  - cell: CNT-CSR-JCR-UNI
+    count: 25
+  - cell: SEL-TRC-UNI-NOISE
+    count: 25
+  - cell: DIR-MP-TRC-UNI
+    count: 25
+  - cell: SEL-MP-TRC-UNI
+    count: 25
+  - cell: CNT-MP-TRC-UNI
+    count: 25
+  - cell: DIR-IFF-TRC-UNI
+    count: 25
+  - cell: SEL-IFF-TRC-UNI
+    count: 25
+  - cell: CNT-IFF-TRC-UNI
+    count: 25
+  - cell: DIR-TRC-MP-UNI
+    count: 25
+  - cell: SEL-TRC-MP-UNI
+    count: 25
+  - cell: CNT-TRC-MP-UNI
+    count: 25
+  - cell: DIR-DJE-TRC-UNI
+    count: 25
+  - cell: SEL-DJE-TRC-UNI
+    count: 25
+  - cell: CNT-DJE-TRC-UNI
+    count: 25
+  - stratum: direction-depth-3
+    count: 25
+    policy: *id002
+  - stratum: direction-depth-4
+    count: 25
+    policy: *id003
+  - stratum: which-depth-3
+    count: 25
+    policy: *id004
+  - stratum: which-depth-4
+    count: 25
+    policy: *id005
+  - stratum: count-depth-3
+    count: 25
+    policy: *id006
+  - stratum: count-depth-4
+    count: 25
+    policy: *id007
+  bench-core:
+  - count: 100
+    stratum: DIR-ARC-UNI
+    policy:
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 6
+      num_premises: 7
+  - cell: DIR-TRC-UNI
+    count: 100
+  - cell: CNT-AXC-UNI
+    count: 100
+  - cell: DIR-MP-UNI
+    count: 100
+  - cell: SEL-IFF-UNI
+    count: 100
+  - cell: CNT-NEG-UNI
+    count: 100
+  - cell: DIR-DJE-UNI
+    count: 100
+  - cell: SEL-CSR-UNI
+    count: 100
+  - cell: DIR-ARC-ALT
+    count: 100
+  - cell: SEL-ARC-NOM
+    count: 100
+  - cell: SEL-ARC-MUL
+    count: 100
+  - cell: CNT-CSR-JCR-UNI
+    count: 100
+  - cell: SEL-TRC-UNI-NOISE
+    count: 100
+  bench-comp:
+  - cell: DIR-MP-TRC-UNI
+    count: 100
+  - cell: SEL-MP-TRC-UNI
+    count: 100
+  - cell: CNT-MP-TRC-UNI
+    count: 100
+  - cell: DIR-IFF-TRC-UNI
+    count: 100
+  - cell: SEL-IFF-TRC-UNI
+    count: 100
+  - cell: CNT-IFF-TRC-UNI
+    count: 100
+  - cell: DIR-TRC-MP-UNI
+    count: 100
+  - cell: SEL-TRC-MP-UNI
+    count: 100
+  - cell: CNT-TRC-MP-UNI
+    count: 100
+  - cell: DIR-DJE-TRC-UNI
+    count: 100
+  - cell: SEL-DJE-TRC-UNI
+    count: 100
+  - cell: CNT-DJE-TRC-UNI
+    count: 100
+  bench-composition:
+  - cell: DIR-MP-TRC-MP-UNI
+    count: 100
+  - cell: SEL-MP-TRC-MP-UNI
+    count: 100
+  - cell: CNT-MP-TRC-MP-UNI
+    count: 100
+  - cell: DIR-MP-DJE-TRC-UNI
+    count: 100
+  - cell: SEL-MP-DJE-TRC-UNI
+    count: 100
+  - cell: CNT-MP-DJE-TRC-UNI
+    count: 100
+  - cell: DIR-TRC-MP-TRC-UNI
+    count: 100
+  - cell: SEL-TRC-MP-TRC-UNI
+    count: 100
+  - cell: CNT-TRC-MP-TRC-UNI
+    count: 100
+  bench-depth:
+  - stratum: direction-depth-3
+    count: 50
+    policy: *id002
+  - stratum: direction-depth-4
+    count: 50
+    policy: *id003
+  - stratum: direction-depth-5
+    count: 50
+    policy:
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 11
+      num_premises: 13
+      omit_direct_query_relation: true
+      min_axis_depth: 5
+      max_axis_depth: 5
+  - stratum: direction-depth-6
+    count: 50
+    policy:
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 12
+      num_premises: 14
+      omit_direct_query_relation: true
+      min_axis_depth: 6
+      max_axis_depth: 6
+  - stratum: direction-depth-7
+    count: 50
+    policy:
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 13
+      num_premises: 15
+      omit_direct_query_relation: true
+      min_axis_depth: 7
+      max_axis_depth: 7
+  - stratum: direction-depth-8
+    count: 50
+    policy:
+      query_kind: direction
+      semantic_shape: unique
+      num_entities: 14
+      num_premises: 16
+      omit_direct_query_relation: true
+      min_axis_depth: 8
+      max_axis_depth: 8
+  - stratum: which-depth-3
+    count: 50
+    policy: *id004
+  - stratum: which-depth-4
+    count: 50
+    policy: *id005
+  - stratum: which-depth-5
+    count: 50
+    policy:
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 15
+      num_premises: 20
+      omit_direct_query_relation: true
+      min_membership_depth: 5
+      max_membership_depth: 5
+  - stratum: which-depth-6
+    count: 50
+    policy:
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 17
+      num_premises: 22
+      omit_direct_query_relation: true
+      min_membership_depth: 6
+      max_membership_depth: 6
+  - stratum: which-depth-7
+    count: 50
+    policy:
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 19
+      num_premises: 24
+      omit_direct_query_relation: true
+      min_membership_depth: 7
+      max_membership_depth: 7
+  - stratum: which-depth-8
+    count: 50
+    policy:
+      query_kind: which
+      semantic_shape: unique
+      num_entities: 21
+      num_premises: 26
+      omit_direct_query_relation: true
+      min_membership_depth: 8
+      max_membership_depth: 8
+  - stratum: count-depth-3
+    count: 50
+    policy: *id006
+  - stratum: count-depth-4
+    count: 50
+    policy: *id007
+  - stratum: count-depth-5
+    count: 50
+    policy:
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 15
+      num_premises: 20
+      omit_direct_query_relation: true
+      min_membership_depth: 5
+      max_membership_depth: 5
+  - stratum: count-depth-6
+    count: 50
+    policy:
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 17
+      num_premises: 22
+      omit_direct_query_relation: true
+      min_membership_depth: 6
+      max_membership_depth: 6
+  - stratum: count-depth-7
+    count: 50
+    policy:
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 19
+      num_premises: 24
+      omit_direct_query_relation: true
+      min_membership_depth: 7
+      max_membership_depth: 7
+  - stratum: count-depth-8
+    count: 50
+    policy:
+      query_kind: count
+      semantic_shape: unique
+      num_entities: 21
+      num_premises: 26
+      omit_direct_query_relation: true
+      min_membership_depth: 8
+      max_membership_depth: 8

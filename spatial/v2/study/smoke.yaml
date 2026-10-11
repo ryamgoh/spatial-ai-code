@@ -1,0 +1,89 @@
+attempts_per_base: 50
+contamination_files: []
+context_budget:
+  eval_max_tokens: 8192
+  max_new_tokens: 4096
+  tokenizer_name: Qwen/Qwen3.5-4B
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  train_max_tokens: 4096
+engineering_only: true
+name: composition-release-smoke
+registries:
+- ../benchmark-cells.yaml
+- ../composition-cells.yaml
+- ../composition-holdout-cells.yaml
+roles:
+  train:
+  - cell: DIR-MP-TRC-UNI
+    count: 2
+  - cell: SEL-MP-TRC-UNI
+    count: 2
+  - cell: CNT-MP-TRC-UNI
+    count: 2
+  - cell: DIR-IFF-TRC-UNI
+    count: 2
+  - cell: SEL-IFF-TRC-UNI
+    count: 2
+  - cell: CNT-IFF-TRC-UNI
+    count: 2
+  - cell: DIR-TRC-MP-UNI
+    count: 2
+  - cell: SEL-TRC-MP-UNI
+    count: 2
+  - cell: CNT-TRC-MP-UNI
+    count: 2
+  - cell: DIR-DJE-TRC-UNI
+    count: 2
+  - cell: SEL-DJE-TRC-UNI
+    count: 2
+  - cell: CNT-DJE-TRC-UNI
+    count: 2
+  dev:
+  - cell: DIR-MP-TRC-UNI
+    count: 1
+  - cell: SEL-MP-TRC-UNI
+    count: 1
+  - cell: CNT-MP-TRC-UNI
+    count: 1
+  - cell: DIR-IFF-TRC-UNI
+    count: 1
+  - cell: SEL-IFF-TRC-UNI
+    count: 1
+  - cell: CNT-IFF-TRC-UNI
+    count: 1
+  - cell: DIR-TRC-MP-UNI
+    count: 1
+  - cell: SEL-TRC-MP-UNI
+    count: 1
+  - cell: CNT-TRC-MP-UNI
+    count: 1
+  - cell: DIR-DJE-TRC-UNI
+    count: 1
+  - cell: SEL-DJE-TRC-UNI
+    count: 1
+  - cell: CNT-DJE-TRC-UNI
+    count: 1
+  bench-composition:
+  - cell: DIR-MP-TRC-MP-UNI
+    count: 1
+  - cell: SEL-MP-TRC-MP-UNI
+    count: 1
+  - cell: CNT-MP-TRC-MP-UNI
+    count: 1
+  - cell: DIR-MP-DJE-TRC-UNI
+    count: 1
+  - cell: SEL-MP-DJE-TRC-UNI
+    count: 1
+  - cell: CNT-MP-DJE-TRC-UNI
+    count: 1
+  - cell: DIR-TRC-MP-TRC-UNI
+    count: 1
+  - cell: SEL-TRC-MP-TRC-UNI
+    count: 1
+  - cell: CNT-TRC-MP-TRC-UNI
+    count: 1
+seed: 21911
+train_fractions:
+- 0.5
+- 1
+version: 1

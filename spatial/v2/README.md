@@ -59,3 +59,9 @@ It separates train/development/test groups, supports explicit holdout cells, and
 uses the admitted evaluation prompt verbatim. Which and Count API support does
 not imply that all query families fit or are included in that pilot. No model
 training result is established by generation smoke checks.
+
+The `study/` release assembler handles explicit role quotas, paired context
+admission, contamination inputs, nested pools, and candidate manifests.
+`composition-cells.yaml` and `composition-holdout-cells.yaml` keep seen and
+reserved dependency families distinct. Production quotas fail on insufficient
+unique structure; engineering smoke permits repeat structures explicitly.

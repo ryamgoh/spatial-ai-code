@@ -60,6 +60,7 @@ class ProofRule(str, Enum):
     AXIS_CONTRADICTION = "axis-contradiction"
     DIRECTION_INTRODUCTION = "direction-introduction"
     DIRECTION_RECOMPOSITION = "direction-recomposition"
+    ATOM_RECOMPOSITION = "spatial-atom-recomposition"
 
 
 class ProofAxis(str, Enum):
@@ -602,19 +603,25 @@ def _check_step(
             raise ProofCheckError(f"{step.id} introduces the wrong direction claim")
         return
 
-    if step.rule is ProofRule.DIRECTION_RECOMPOSITION:
+    if step.rule in {ProofRule.DIRECTION_RECOMPOSITION, ProofRule.ATOM_RECOMPOSITION}:
         if len(resolved_inputs) != 2 or not all(
             isinstance(item.conclusion, AxisFact) for item in resolved_inputs
         ):
             raise ProofCheckError(f"{step.id} must combine two axis facts")
-        if not isinstance(step.conclusion, DirectionClaim):
+        claim = step.conclusion
+        if step.rule is ProofRule.ATOM_RECOMPOSITION:
+            if not isinstance(claim, RelationConstraint) or len(claim.allowed) != 1:
+                raise ProofCheckError(f"{step.id} must conclude an exact spatial atom")
+            claim = DirectionClaim(
+                claim.subject, next(iter(claim.allowed)), claim.reference
+            )
+        if not isinstance(claim, DirectionClaim):
             raise ProofCheckError(f"{step.id} must conclude a direction claim")
         facts = {item.conclusion.axis: item.conclusion for item in resolved_inputs}
         if set(facts) != {ProofAxis.X, ProofAxis.Y}:
             raise ProofCheckError(f"{step.id} requires one X and one Y fact")
         x_fact = facts[ProofAxis.X]
         y_fact = facts[ProofAxis.Y]
-        claim = step.conclusion
         actual_signs = []
         for fact in (x_fact, y_fact):
             sign = _relation_sign(fact.relation)
@@ -1039,6 +1046,29 @@ def _saturate_formula_steps(
                 )
 
         known = _accessible_formula_steps(steps, branch)
+        if branch is None:
+            # Only materialize spatial atoms demanded by logical premises.
+            # Each new atom can unlock another Boolean step in this fixed point.
+            demanded = set()
+            for formula in known:
+                sides = (
+                    (formula.antecedent,)
+                    if isinstance(formula, Implies)
+                    else (formula.left, formula.right)
+                    if isinstance(formula, Iff)
+                    else ()
+                )
+                for side in sides:
+                    operands = side.operands if isinstance(side, And) else (side,)
+                    demanded.update(
+                        atom
+                        for atom in operands
+                        if isinstance(atom, RelationConstraint)
+                        and len(atom.allowed) == 1
+                    )
+            for atom in sorted(demanded - set(known), key=repr):
+                changed |= _append_demanded_spatial_atom(steps, atom)
+            known = _accessible_formula_steps(steps, branch)
         for formula, source_id in tuple(known.items()):
             if isinstance(formula, Implies) and formula.antecedent in known:
                 changed |= _append_formula_step(
@@ -1084,6 +1114,60 @@ def _saturate_formula_steps(
                         branch,
                     )
     return _accessible_formula_steps(steps, branch)
+
+
+def _append_demanded_spatial_atom(
+    steps: list[ProofStep], atom: RelationConstraint
+) -> bool:
+    """Derive a logical antecedent from checked axis paths, without an SMT oracle."""
+    _append_axis_decompositions(steps)
+    objects = tuple(
+        sorted(
+            {
+                name
+                for step in steps
+                if isinstance(step.conclusion, AxisFact)
+                for name in (step.conclusion.subject, step.conclusion.reference)
+            }
+            | {atom.subject, atom.reference}
+        )
+    )
+    paths = {}
+    for axis, sign in zip(
+        ProofAxis, direction_signs(next(iter(atom.allowed))), strict=True
+    ):
+        path = _find_axis_path(
+            _proof_graph(objects, tuple(steps), axis),
+            atom.subject,
+            atom.reference,
+            sign,
+        )
+        if not path:
+            return False
+        paths[axis] = path
+    inputs = []
+    for axis in ProofAxis:
+        start = len(steps)
+        result = _derive_axis_path(axis, paths[axis], steps)
+        # Axis-path builders use local IDs; give appended steps fresh global IDs.
+        appended = steps[start:]
+        del steps[start:]
+        renamed = {}
+        for step in appended:
+            identifier = _fresh_step_id(steps, "ATOM")
+            renamed[step.id] = identifier
+            steps.append(
+                ProofStep(
+                    identifier,
+                    step.rule,
+                    step.conclusion,
+                    tuple(renamed.get(item, item) for item in step.inputs),
+                )
+            )
+        inputs.append(renamed.get(result, result))
+    return _append_formula_step(
+        steps, ProofRule.ATOM_RECOMPOSITION, atom, tuple(inputs), None
+    )
 
 
 def _append_formula_contradiction(
@@ -1363,6 +1447,15 @@ def build_direction_proof(
     candidates = [item for item in candidates if item in query.candidate_directions]
     steps = _premise_steps(problem)
     _saturate_formula_steps(steps)
+    # Case conclusions may supply an intermediate relation for axis composition.
+    intermediates = {
+        step.conclusion.consequent
+        for step in tuple(steps)
+        if isinstance(step.conclusion, Implies)
+        and isinstance(step.conclusion.consequent, RelationConstraint)
+    }
+    for intermediate in sorted(intermediates, key=repr):
+        _derive_formula(steps, intermediate)
     formula_steps = {}
     for candidate in candidates:
         result = _derive_formula(

@@ -178,6 +178,7 @@ class GenerationPolicy:
     max_membership_depth: int | None = None
     distractor_premises: int = 0
     require_joint_count_dependency: bool = False
+    composition: str | None = None
     generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:
@@ -215,6 +216,10 @@ class GenerationPolicy:
             raise ValueError("ordinary_option_target must be between 1 and 25")
 
     def _validate_answer_contract(self) -> None:
+        if self.composition is not None:
+            from spatial.v2.composition import validate_composition_policy
+
+            validate_composition_policy(self)
         if (
             self.generation_mode is GenerationMode.WORLD_FIRST
             and self.boolean_shape is not BooleanShape.ATOMIC
@@ -701,6 +706,12 @@ class SpatialGeneratorV2:
             problem = self._premise_first_problem(policy, objects)
             coordinates = {}
             provenance = GenerationProvenance.PREMISE_FIRST
+        elif policy.composition is not None:
+            from spatial.v2.composition import construct_composition
+
+            problem = construct_composition(policy, objects, self._random)
+            coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         elif policy.require_joint_count_dependency:
             problem = self._joint_count_problem(policy, objects)
             coordinates = {}
@@ -750,6 +761,15 @@ class SpatialGeneratorV2:
         ):
             raise _RetryGeneration("target direction did not match")
         difficulty = measure_difficulty(problem, analysis, self._solver)
+        if policy.composition is not None:
+            from spatial.v2.composition import assess_composition
+
+            try:
+                difficulty["composition"] = assess_composition(
+                    problem, policy.composition, self._solver
+                )
+            except ProofConstructionError as exc:
+                raise _RetryGeneration(f"composition admission failed: {exc}") from exc
         if not _difficulty_matches(policy, difficulty):
             raise _RetryGeneration("difficulty controls did not match")
         if provenance is not GenerationProvenance.WORLD_FIRST:
@@ -1132,6 +1152,7 @@ class SpatialGeneratorV2:
         extras = shuffled[cursor:]
         filler_count = policy.num_premises - len(relations)
         filler_pairs = list(combinations((reference, *extras), 2))
+        self._random.shuffle(filler_pairs)
         if filler_count > len(filler_pairs):
             raise _RetryGeneration("not enough isolated pairs for distractor premises")
         relations.extend(
@@ -1179,15 +1200,14 @@ class SpatialGeneratorV2:
             avoid_target_prefix=True,
         )
         extras = shuffled[cursor:]
-        nonmember_direction = next(
-            candidate
-            for candidate in (
+        nonmember_direction = self._random.choice(
+            [candidate for candidate in (
                 Direction.NORTHEAST,
                 Direction.SOUTHEAST,
                 Direction.SOUTHWEST,
                 Direction.NORTHWEST,
             )
-            if candidate is not direction
+            if candidate is not direction]
         )
         relations.extend(
             _exact_relation(candidate, nonmember_direction, reference)
@@ -1195,6 +1215,7 @@ class SpatialGeneratorV2:
         )
         filler_count = policy.num_premises - len(relations)
         filler_pairs = list(combinations(extras, 2))
+        self._random.shuffle(filler_pairs)
         relations.extend(
             _exact_relation(higher, nonmember_direction, lower)
             for lower, higher in filler_pairs[:filler_count]

@@ -220,6 +220,12 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
             f"{scope}{step.id}: Therefore {_claim_text(conclusion, labels)}, "
             f"as established by {step.inputs[0]}."
         )
+    if step.rule is ProofRule.ATOM_RECOMPOSITION:
+        return (
+            f"{scope}{step.id}: Combining the X and Y comparisons from "
+            f"{step.inputs[0]} and {step.inputs[1]}, "
+            f"{_formula_text(conclusion, labels, symbolic=False)} follows."
+        )
     assert step.rule is ProofRule.DIRECTION_RECOMPOSITION
     assert isinstance(conclusion, DirectionClaim)
     return (

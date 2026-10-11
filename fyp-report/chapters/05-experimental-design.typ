@@ -20,129 +20,76 @@ global rank witness is a useful training target.
   caption: [Predeclared supervision contrasts.],
 ) <experimental-contrasts>
 
-The first two are central comparisons across model sizes. The latter two are
+The first two are central comparisons on the primary 4B model. The latter two are optional
 mechanism studies on the 4B model. Natural and Symbolic are described as
 supervision packages because their tokenization, validation, and presentation
 properties differ.
 
-== Nested Data-Size Calibration
+== Corpus and Benchmark Roles
 
-The maximum candidate budget is one 17K base-problem pool with deterministic
-subsets:
+SpatialEntail-Train and SpatialEntail-Bench are distinct candidate artifacts.
+The existing 650-row pilot is development evidence only. The reviewed execution
+protocol supersedes the earlier seventeen-thousand-example and 5.8K-test plans.
+Candidate training budgets are a nested 4K/8K pair; 16K is optional future
+expansion. Quotas are frozen only after structural diversity, semantic coverage,
+and exact context admission pass. Equal cell counts describe an experimental
+sampling distribution, not the population of all spatial reasoning problems.
 
-$ 4"K" subset 8"K" subset 17"K". $
-
-The final benchmark-cell registry and quotas are frozen only after a bounded
-capability-coverage and generation-yield pilot. Once frozen, each subset
-preserves the query, reasoning-structure, semantic-status, and evidence-burden
-allocation using stratified prefixes and largest-remainder integer allocation.
-Calibration trains only checked Symbolic using Qwen3.5-2B and Qwen3.5-4B with
-seed 42 and development data.
-
-The selected size is the smallest for which the next size improves both macro
-answer accuracy and full Symbolic validity by less than two percentage points
-for both models, without a material regression in a predeclared query family or
-capability lens. Sparse cells and uncertainty are reported rather than hidden by
-the aggregate. If 4K→8K saturates, 17K is not trained. Otherwise, 8K is selected
-only if 8K→17K saturates; 17K is the fallback. The selected-size calibration
-checkpoints are reused in the confirmatory matrix. Final test data are not
-accessed during this decision. Exact cell quotas and the material-regression
-threshold are not yet frozen; consequently, generation and calibration remain
-`Not Run`.
+The production assembler records exact role quotas, paired variants,
+contamination inputs, canonical instance signatures, declared skeleton families,
+software revision, and content hashes. It rejects insufficient unique diversity
+rather than substituting renamed copies. Its output remains a candidate until
+quality review and the final seal are complete.
 
 == Models and Training Arms
 
-The study uses the instruction-tuned `Qwen/Qwen3.5-2B` and
-`Qwen/Qwen3.5-4B` checkpoints. Both use the same QLoRA recipe, two fixed epochs,
-and training seeds 42 and 43. Model size is a robustness factor rather than a
-claim of monotonic parameter scaling; total and trainable parameter counts are
-reported.
+The primary study uses Qwen3.5-4B with matched base problems and fixed epochs.
+Answer-only, checked Natural, and checked Symbolic each run with seeds 42 and
+43, giving six central SFT runs. The final fixed-epoch checkpoint is evaluated;
+format-dependent token loss does not select different checkpoints. Appropriate
+prompt-matched untuned baselines accompany each package. Natural versus
+Symbolic compares supervision packages, not notation isolated from information
+content, token cost, or replayability.
 
-Three central arms run on both sizes:
+The 4K to 8K checked-Symbolic comparison is a bounded development-set budget
+ablation. It does not prove two-point saturation or an optimal training size.
+Unresolved uncertainty is reported. A second model size, local-proof and
+corrupted-trace mechanisms, broader answer-contract training, and GRPO are
+optional after the central study.
 
-1. answer-only;
-2. checked Natural; and
-3. checked Symbolic with qualitative rank witness.
+== Matched and Structural Evaluations
 
-This gives $3 times 2 times 2 = 12$ confirmatory runs. Two mechanism arms run
-only on 4B:
+Four seen skeleton families (MP→TRC, IFF→TRC, TRC→MP, DJE→TRC) are crossed
+with all three query contracts, producing twelve COMP cells. Three reserved
+families (MP→TRC→MP, MP→DJE→TRC, TRC→MP→TRC) produce nine holdout cells.
+Every component rule is seen; its longer dependency ordering is held out.
+All use proof-template-first construction, separating composition from provenance.
+Distinct checked steps must follow the declared order, each an ancestor of the next. Removing each
+logical support premise must change the consistent query answer domain.
+This establishes bounded semantic dependence, not globally shortest proofs.
 
-4. corrupted Symbolic; and
-5. Symbolic local proof.
+Candidate internal evaluation has 1,300 CORE bases, 1,200 matched composition
+bases, 900 held-out composition bases, and 900 depth bases: 4,300 total.
+These remain quota targets pending full admission and diversity audits.
+CORE entries include primary structures, semantic strata, and diagnostic noise;
+no claim is made that the thirteen strata are thirteen equal primitives.
 
-This adds $2 times 1 times 2 = 4$ runs, for sixteen confirmatory SFT runs. With
-size calibration, the complete programme requires approximately eighteen to
-twenty unique runs. Untuned prompt-matched checkpoints are evaluation baselines
-and do not count as training runs. The local-proof comparison is evaluated only
-on unique or entailed cells, where removing the qualitative rank witness does
-not remove evidence required to express ambiguity.
+Depth evaluation uses fifty examples for each query family at depths 3 through
+8. Depths 3 and 4 anchor the matched generator; depths 5 through 8 test
+extrapolation. Input length, entity count, premise count, and achieved depth are
+reported together. Deep Selection and Count traces exceed the existing output
+budget, so this module uses a common direct-answer protocol. Gold certificates
+are checked offline, and model process validity is not applicable. Full
+Natural/Symbolic replay applies only to paired CORE/composition examples that
+fit the frozen budget. No truncation or shallower backfill is allowed.
 
-The local-proof arm is a planned mechanism condition, not an exposed current
-supervision variant. Before it enters the run matrix, its serializer and checker
-must specify which consistency evidence remains required, how eligible base IDs
-are paired, and which process-validity metrics remain comparable with the
-rank-witness condition.
-
-The same base IDs and epochs are used across arms. The experiment does not
-repeat short answer-only targets to match Symbolic tokens. It instead reports
-prompt tokens, supervised target tokens, optimizer updates, wall time, and peak
-memory. Conclusions concern supervision packages under fixed task exposure,
-not equal-compute notation effects.
-
-== Internal Evaluation Regimes
-
-=== Matched interpolation
-
-A balanced interpolation test will sample new base problems across every frozen
-reporting cell under the training distributions. Per-cell counts and the total
-are not fixed until the post-pilot registry is frozen; they must be identical
-across supervision arms and sufficient for separately reported query and
-capability results.
-
-=== StepGame-style depth ladder
-
-Depth-controlled training stops at depth 4 for every central arm, mechanism
-arm, and auxiliary demonstration. The frozen test covers all three query
-families from depth 1 through 8:
-
-#figure(
-  table(
-    columns: (auto, auto, auto, auto),
-    table.header([*Family*], [*Depths*], [*Per depth*], [*Clean total*]),
-    [Direction], [1–8], [100], [800],
-    [Selection], [1–8], [100], [800],
-    [Count], [1–8], [100], [800],
-    [*Total*], [], [], [*2,400*],
-  ),
-  caption: [Depth ladder. Depths 1–4 are matched; depths 5–8 are unseen-depth extrapolation.],
-) <depth-ladder-design>
-
-Direction depth is the required X/Y support depth. Selection depth is the entailed
-membership-proof depth. Count depth is the positive membership depth underlying
-a unique count; correlated-only counts without an entailed member remain in the
-uncertainty suite rather than receiving a fabricated depth.
-
-Every clean item has one matched noisy counterpart with identical core premises,
-query, and answer plus two solver-verified removable distractors. The noisy set
-adds 2,400 examples. Clean depth accuracy is the headline extrapolation curve;
-the paired clean/noisy delta measures robustness separately.
-
-The current generator exposes controlled removable distractors for Direction
-and controlled-depth Selection. The stated paired Count condition remains an
-implementation requirement; the complete depth suite cannot be frozen until
-that control passes semantic and context-admission checks.
-
-Any family/depth cell that cannot produce 100 context-admitted examples fails
-before freezing. It is never backfilled with a shallower or different-family
-problem.
-
-=== Premise-first composition holdout
-
-A separate 1,000-example test reserves 250 examples each for premise-first
-conditional formulas, negation/disjunction, branching, and mixed compositions.
-Every primitive operator appears during training; only selected formula trees
-and proof-rule compounds are held out. This follows the systematic-composition
-logic of CFQ rather than testing wholly unseen operators @keysers2020cfq.
+The benchmark is sealed before central model selection. Two grouping keys serve
+different roles: a canonical instance signature excludes renamed/reordered
+near-duplicates, while a declared skeleton signature reserves composition
+families. Canonicalization is direction-sensitive and does not establish logical
+equivalence or rotation invariance. Held-out results apply to the three frozen
+skeleton families, not arbitrary unseen compositions. Engineering checkpoints and
+previously inspected pilots are excluded from final evaluation and initialization.
 
 == External Transfer
 
@@ -169,8 +116,8 @@ comparator until a semantics-preserving public adapter can be frozen.
 
 == Metrics and Statistical Reporting
 
-Primary outcomes are macro strict accuracy across the frozen benchmark cells,
-depth-5–8 extrapolation accuracy, premise-first holdout accuracy, and strict
+Primary outcomes are separately reported cell-macro accuracy on matched CORE,
+matched compositions, held-out compositions, depth curves, and strict
 SpatialMap-TQA-Corr accuracy. Secondary metrics include per-capability/query results,
 ambiguity precision/recall, option-position consistency, Symbolic parse and
 replay rates, decision/domain consistency, full-trace validity, rank-witness
@@ -178,8 +125,12 @@ validity, generated tokens, runtime, and memory.
 
 Both training seeds are reported individually, together with their mean and
 range. Two seeds do not support a strong seed-level confidence interval. Paired
-item-level bootstrap intervals are reported within each seed, and an effect is
-described as replicated only when its direction agrees across both seeds.
+item-level bootstrap intervals are reported within each seed, and consistent directions are reported as observations from two runs. Item-level
+intervals condition on the checkpoints and do not estimate training-run variance.
+The two primary held-out comparisons are Natural and Symbolic versus answer-only,
+with Holm adjustment within each seed. Cell-stratified paired resampling keeps
+base variants together. At one hundred examples, cell profiles are descriptive;
+a cell near fifty percent has roughly a ten-point confidence half-width.
 
 == Source-Blinded Quality Review
 

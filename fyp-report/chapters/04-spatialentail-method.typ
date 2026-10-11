@@ -169,9 +169,9 @@ formula trees are withheld. Syntax exposure, replay-verified rule use, and a
 semantic change under a controlled intervention are reported separately; none
 alone proves that one rule is unavoidable across every derivation.
 
-The maximum `4K`/`8K`/`17K` nested sizes remain candidate calibration budgets,
+The maximum `4K`/`8K` (`16K` optional) nested sizes remain candidate calibration budgets,
 but cell quotas, matched-test totals, and quality-review strata must be frozen
-together after a capability-coverage and generation-yield pilot. No final 17K
+together after a capability-coverage and generation-yield pilot. No final production
 corpus or cell allocation is claimed in this draft.
 
 == Supervision Views
