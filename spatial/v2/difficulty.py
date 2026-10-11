@@ -209,6 +209,8 @@ def measure_difficulty(
     problem: SpatialProblem,
     analysis: QueryAnalysis,
     solver: SpatialSolverV2,
+    *,
+    analyze_support: bool = True,
 ) -> dict[str, Any]:
     """Measure positive axis paths and sufficient complete-answer support.
 
@@ -252,16 +254,23 @@ def measure_difficulty(
     else:
         assert isinstance(query, (WhichQuery, CountQuery))
         direct_query_relation = _has_direct_membership_fact(problem)
-        for candidate in query.candidates:
-            assessment = solver.assess(problem, membership_constraint(candidate, query))
-            membership_statuses[candidate] = (
-                assessment.possible,
-                assessment.entailed,
-            )
+        atomic_premises = conjunctive_atoms(problem.premise)
+        if analyze_support or atomic_premises is None:
+            for candidate in query.candidates:
+                assessment = solver.assess(
+                    problem, membership_constraint(candidate, query)
+                )
+                membership_statuses[candidate] = (
+                    assessment.possible,
+                    assessment.entailed,
+                )
         if len(query.directions) == 1:
             direction = next(iter(query.directions))
             for candidate in query.candidates:
-                if not membership_statuses[candidate][1]:
+                if (
+                    membership_statuses
+                    and not membership_statuses[candidate][1]
+                ):
                     continue
                 proof = derive_axis_proof(
                     problem,
@@ -298,9 +307,12 @@ def measure_difficulty(
             else (problem.premise,)
         )
     support = set(range(len(units)))
-    try:
-        expected = solver.semantic_signature(problem)
-    except RuntimeError:
+    if analyze_support:
+        try:
+            expected = solver.semantic_signature(problem)
+        except RuntimeError:
+            expected = None
+    else:
         expected = None
     support_checks_complete = expected is not None
     for index in range(len(units)):
@@ -329,9 +341,7 @@ def measure_difficulty(
     membership_y_depths = [proof["y_depth"] for proof in membership_proofs]
     joint_count_dependency = False
     if isinstance(analysis, CountAnalysis):
-        entailed_count = sum(
-            entailed for _, entailed in membership_statuses.values()
-        )
+        entailed_count = sum(entailed for _, entailed in membership_statuses.values())
         contingent_count = sum(
             possible and not entailed
             for possible, entailed in membership_statuses.values()

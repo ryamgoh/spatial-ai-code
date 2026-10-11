@@ -123,3 +123,87 @@ def test_training_depth_maximum_cannot_bypass_holdout_guard(tmp_path):
     path.write_text(yaml.safe_dump(source))
     with pytest.raises(ValueError, match="depth"):
         build_release(path, tmp_path / "release", tokenizer=FixtureTokenizer())
+
+
+@pytest.mark.parametrize("role", ["train", "dev"])
+def test_oracle_only_generation_is_forbidden_for_supervised_roles(tmp_path, role):
+    path = config(tmp_path)
+    source = yaml.safe_load(path.read_text())
+    source["roles"][role] = [
+        {
+            "stratum": "bad-oracle-only",
+            "count": 1,
+            "policy": {
+                "semantic_shape": "unique",
+                "oracle_only": True,
+            },
+        }
+    ]
+    path.write_text(yaml.safe_dump(source))
+
+    with pytest.raises(ValueError, match="oracle-only"):
+        build_release(path, tmp_path / "release", tokenizer=FixtureTokenizer())
+
+
+def test_depth_benchmark_can_persist_oracle_only_count_rows(tmp_path):
+    import json
+
+    path = config(tmp_path, engineering=False)
+    source = yaml.safe_load(path.read_text())
+    source["attempts_per_base"] = 20
+    source["roles"]["bench-depth"] = [
+        {
+            "stratum": "count-depth-3",
+            "count": 1,
+            "policy": {
+                "query_kind": "count",
+                "semantic_shape": "unique",
+                "num_entities": 9,
+                "num_premises": 12,
+                "omit_direct_query_relation": True,
+                "min_membership_depth": 3,
+                "max_membership_depth": 3,
+                "membership_candidate_limit": 3,
+                "measure_support": False,
+                "oracle_only": True,
+            },
+        }
+    ]
+    path.write_text(yaml.safe_dump(source))
+
+    manifest = build_release(
+        path, tmp_path / "release", tokenizer=FixtureTokenizer()
+    )
+    row = json.loads((tmp_path / "release/bench-depth.jsonl").read_text())
+
+    assert manifest["artifacts"]["bench-depth"]["rows"] == 1
+    assert row["metadata"]["oracle_only"] is True
+    assert row["metadata"]["process_evaluation"] == "not-applicable"
+    assert row["metadata"]["supervision_arm"] == "answer-only"
+    assert row["messages"][2]["content"].startswith("Answer: ")
+    assert "Considering only [" in row["messages"][1]["content"]
+
+
+def test_failed_release_can_resume_bound_completed_strata(tmp_path, monkeypatch):
+    from spatial.v2.generation import SpatialGeneratorV2
+
+    path = config(tmp_path)
+    release = tmp_path / "release"
+    original = SpatialGeneratorV2.generate
+    calls = 0
+
+    def interrupted(self, *args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls > 2:
+            raise RuntimeError("simulated interruption")
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(SpatialGeneratorV2, "generate", interrupted)
+    with pytest.raises(RuntimeError, match="quota failed"):
+        build_release(path, release, tokenizer=FixtureTokenizer())
+    assert not release.exists()
+    assert list((tmp_path / "release-work").glob("*.json"))
+    monkeypatch.setattr(SpatialGeneratorV2, "generate", original)
+    report = build_release(path, release, tokenizer=FixtureTokenizer())
+    assert report["artifacts"]["train"]["bases"] == 2

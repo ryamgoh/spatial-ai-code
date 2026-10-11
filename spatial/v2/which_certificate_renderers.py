@@ -8,6 +8,7 @@ from spatial.v2.model_certificate_renderers import (
     render_contingency_certificate,
     render_model_certificate,
 )
+from spatial.v2.natural_evidence import share_natural_evidence
 from spatial.v2.proof_renderers import (
     render_direction_proof,
     render_direction_refutation,
@@ -189,4 +190,4 @@ def render_which_training_trace(
         )
         lines.extend((evidence, f"{name}: {item.status.value}"))
     lines.append(_which_summary(certificate, labels))
-    return "\n".join(lines)
+    return share_natural_evidence("\n".join(lines))

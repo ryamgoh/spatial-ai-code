@@ -39,7 +39,6 @@ from spatial.v2.grading import (
 from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.solver import (
     And,
-    CountAnalysis,
     CountQuery,
     Direction,
     DirectionAnalysis,
@@ -176,6 +175,9 @@ class GenerationPolicy:
     ambiguity_size: int | None = None
     min_membership_depth: int = 1
     max_membership_depth: int | None = None
+    membership_candidate_limit: int | None = None
+    measure_support: bool = True
+    oracle_only: bool = False
     distractor_premises: int = 0
     require_joint_count_dependency: bool = False
     composition: str | None = None
@@ -216,6 +218,8 @@ class GenerationPolicy:
             raise ValueError("ordinary_option_target must be between 1 and 25")
 
     def _validate_answer_contract(self) -> None:
+        if self.oracle_only and self.trace_format is not TraceFormat.NATURAL:
+            raise ValueError("oracle-only generation cannot render a Symbolic trace")
         if self.composition is not None:
             from spatial.v2.composition import validate_composition_policy
 
@@ -265,7 +269,9 @@ class GenerationPolicy:
             if self.boolean_shape is not BooleanShape.CASE_SPLIT:
                 raise ValueError("joint count dependency requires case-split premises")
             if self.num_entities < 3:
-                raise ValueError("joint count dependency requires at least three entities")
+                raise ValueError(
+                    "joint count dependency requires at least three entities"
+                )
 
     def _validate_difficulty(self) -> None:
         if (
@@ -315,6 +321,17 @@ class GenerationPolicy:
             raise ValueError("proof controls require unique semantics")
         if self.query_kind is QueryKind.DIRECTION and membership_controlled:
             raise ValueError("membership depth controls apply only to Which or Count")
+        if self.membership_candidate_limit is not None:
+            if self.query_kind not in {QueryKind.WHICH, QueryKind.COUNT}:
+                raise ValueError(
+                    "membership candidate limit applies only to Which or Count"
+                )
+            if not 1 <= self.membership_candidate_limit <= self.num_entities - 1:
+                raise ValueError("membership candidate limit exceeds the object domain")
+            if self.min_membership_depth <= 1:
+                raise ValueError(
+                    "membership candidate limit requires controlled membership depth"
+                )
         if self.require_independent_axes:
             relevant_depth = (
                 self.min_axis_depth
@@ -353,6 +370,8 @@ class GenerationPolicy:
             raise ValueError("distractor_premises must be within the premise count")
         if self.distractor_premises and self.query_kind is QueryKind.COUNT:
             raise ValueError("distractor controls do not yet support Count queries")
+        if self.distractor_premises and not self.measure_support:
+            raise ValueError("distractor controls require support analysis")
         if (
             self.distractor_premises
             and self.query_kind is QueryKind.WHICH
@@ -437,7 +456,7 @@ class GeneratedSpatialSample:
     analysis: QueryAnalysis
     resolution: AnswerResolution
     menu_answer: MenuAnswer
-    certificate: AnswerCertificate
+    certificate: AnswerCertificate | None
     prompt: str
     trace: str
     policy: GenerationPolicy
@@ -470,7 +489,11 @@ class GeneratedSpatialSample:
     def audit_metadata(self) -> dict[str, Any]:
         return {
             "generation_witness": _coordinate_payload(self.generation_witness),
-            "answer_certificate": answer_certificate_to_dict(self.certificate),
+            "answer_certificate": (
+                answer_certificate_to_dict(self.certificate)
+                if self.certificate is not None
+                else None
+            ),
         }
 
     def as_sft_row(self, *, include_audit: bool = False) -> dict[str, Any]:
@@ -487,6 +510,11 @@ class GeneratedSpatialSample:
             and len(self.analysis.possible_directions) == 1
             else None
         )
+        completion = (
+            f"Answer: {answer}"
+            if self.policy.oracle_only
+            else f"<think>\n{self.trace}\n</think>\nAnswer: {answer}"
+        )
         row: dict[str, Any] = {
             "id": (
                 f"{self.base_id}-{self.policy.answer_mode.value}-"
@@ -496,10 +524,7 @@ class GeneratedSpatialSample:
             "messages": [
                 {"role": "system", "content": _system_prompt(self.policy.answer_mode)},
                 {"role": "user", "content": self.prompt},
-                {
-                    "role": "assistant",
-                    "content": f"<think>\n{self.trace}\n</think>\nAnswer: {answer}",
-                },
+                {"role": "assistant", "content": completion},
             ],
             "metadata": {
                 "schema": "spatial-v2",
@@ -530,11 +555,24 @@ class GeneratedSpatialSample:
                 "oracle_letters": sorted(self.menu_answer.letters),
                 "solver_engine": self.analysis.engine,
                 "round_trip_verified": True,
+                "oracle_only": self.policy.oracle_only,
                 "difficulty": self.difficulty,
             },
         }
         if include_audit:
             row["audit"] = self.audit_metadata
+        if self.policy.oracle_only:
+            row["id"] += "-answer-only"
+            row["metadata"].update(
+                supervision_arm=SupervisionArm.ANSWER_ONLY.value,
+                expected_process_valid=None,
+                process_status="absent",
+                process_evaluation="not-applicable",
+                oracle_source="complete-solver-analysis",
+                target_characters=len(completion),
+                target_whitespace_tokens=len(completion.split()),
+            )
+            return row
         return apply_supervision_arm(row, SupervisionArm.CHECKED_TRACE)
 
     def with_trace(
@@ -543,6 +581,10 @@ class GeneratedSpatialSample:
     ) -> GeneratedSpatialSample:
         """Render another training trace for the same problem and gold answer."""
         trace_format = TraceFormat(trace_format)
+        if self.certificate is None:
+            if trace_format is TraceFormat.SYMBOLIC:
+                raise ValueError("oracle-only samples cannot render Symbolic traces")
+            return self
         policy = replace(
             self.policy,
             trace_format=trace_format,
@@ -675,11 +717,15 @@ class SpatialGeneratorV2:
             policy,
             menu_answer,
         )
-        trace = _render_trace(
-            sample.certificate,
-            resolution,
-            menu_answer,
-            policy,
+        trace = (
+            ""
+            if sample.certificate is None
+            else _render_trace(
+                sample.certificate,
+                resolution,
+                menu_answer,
+                policy,
+            )
         )
         return replace(
             sample,
@@ -712,6 +758,33 @@ class SpatialGeneratorV2:
             problem = construct_composition(policy, objects, self._random)
             coordinates = {}
             provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
+        elif (
+            use_templates
+            and policy.query_kind is QueryKind.WHICH
+            and policy.semantic_shape is SemanticShape.NO_MATCH
+            and policy.boolean_shape is BooleanShape.ATOMIC
+            and policy.num_premises == policy.num_entities - 1
+        ):
+            reference = self._random.choice(objects)
+            direction = policy.query_direction or self._random.choice(tuple(Direction))
+            candidates = tuple(obj for obj in objects if obj != reference)
+            premises = tuple(
+                _exact_relation(
+                    candidate,
+                    self._random.choice(
+                        tuple(other for other in Direction if other is not direction)
+                    ),
+                    reference,
+                )
+                for candidate in candidates
+            )
+            problem = SpatialProblem(
+                objects,
+                And(premises),
+                WhichQuery(frozenset({direction}), reference, candidates),
+            )
+            coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         elif policy.require_joint_count_dependency:
             problem = self._joint_count_problem(policy, objects)
             coordinates = {}
@@ -742,7 +815,9 @@ class SpatialGeneratorV2:
             premise = self._premise(policy, objects, coordinates, query)
             problem = SpatialProblem(objects, premise, query)
             provenance = GenerationProvenance.WORLD_FIRST
-        analysis = self._solver.analyze(problem)
+        analysis = self._solver.analyze(
+            problem, include_witnesses=not policy.oracle_only
+        )
         if analysis.error or not analysis.consistent:
             raise _RetryGeneration(
                 analysis.error or "generated premise was inconsistent"
@@ -760,7 +835,9 @@ class SpatialGeneratorV2:
             and analysis.possible_directions != (policy.target_direction,)
         ):
             raise _RetryGeneration("target direction did not match")
-        difficulty = measure_difficulty(problem, analysis, self._solver)
+        difficulty = measure_difficulty(
+            problem, analysis, self._solver, analyze_support=policy.measure_support
+        )
         if policy.composition is not None:
             from spatial.v2.composition import assess_composition
 
@@ -777,10 +854,14 @@ class SpatialGeneratorV2:
                 coordinates = analysis.coordinates or {}
             else:
                 coordinates = next(iter(analysis.witnesses.values()), {})
-        try:
-            certificate = build_answer_certificate(problem, analysis, self._solver)
-        except ProofConstructionError as exc:
-            raise _RetryGeneration(f"certificate construction failed: {exc}") from exc
+        certificate = None
+        if not policy.oracle_only:
+            try:
+                certificate = build_answer_certificate(problem, analysis, self._solver)
+            except ProofConstructionError as exc:
+                raise _RetryGeneration(
+                    f"certificate construction failed: {exc}"
+                ) from exc
 
         resolution = resolve_answer(analysis, policy.answer_mode)
         options = self._menu(policy, analysis, resolution)
@@ -790,11 +871,15 @@ class SpatialGeneratorV2:
 
         prompt = self._prompt(problem, options, policy.answer_mode)
         self._verify_round_trip(problem, options, prompt, policy, menu_answer)
-        trace = _render_trace(
-            certificate,
-            resolution,
-            menu_answer,
-            policy,
+        trace = (
+            ""
+            if certificate is None
+            else _render_trace(
+                certificate,
+                resolution,
+                menu_answer,
+                policy,
+            )
         )
         return GeneratedSpatialSample(
             problem,
@@ -987,12 +1072,13 @@ class SpatialGeneratorV2:
             for pair in combinations(objects, 2)
             if set(pair) != {target, reference}
         ]
-        for index, (subject, filler_reference) in enumerate(filler_pairs):
+        self._random.shuffle(filler_pairs)
+        for subject, filler_reference in filler_pairs:
             if len(premises) == policy.num_premises:
                 break
             filler_atom = _exact_relation(
                 subject,
-                tuple(Direction)[index % len(Direction)],
+                self._random.choice(tuple(Direction)),
                 filler_reference,
             )
             premises.append(Or((filler_atom, Not(filler_atom))))
@@ -1027,12 +1113,13 @@ class SpatialGeneratorV2:
             ),
         ]
         filler_pairs = list(combinations(objects, 2))
-        for index, (subject, filler_reference) in enumerate(filler_pairs):
+        self._random.shuffle(filler_pairs)
+        for subject, filler_reference in filler_pairs:
             if len(premises) == policy.num_premises:
                 break
             filler = _exact_relation(
                 subject,
-                tuple(Direction)[index % len(Direction)],
+                self._random.choice(tuple(Direction)),
                 filler_reference,
             )
             premises.append(Or((filler, Not(filler))))
@@ -1067,27 +1154,25 @@ class SpatialGeneratorV2:
 
         The two queried objects are placed on the same known axis relative to a
         shared pivot. Their order on the other axis is deliberately left open.
-        The remaining objects form a perpendicular chain, so they connect the
-        premise graph without resolving that open order.
+        The remaining objects form an independent tree attached only to the
+        pivot, connecting the graph without resolving the open query order.
         """
         shuffled = list(objects)
         self._random.shuffle(shuffled)
         target, reference, pivot, *extras = shuffled
         uncertain_vertical = bool(self._random.getrandbits(1))
-        anchor_direction = (
-            Direction.NORTH if uncertain_vertical else Direction.EAST
-        )
-        filler_direction = (
-            Direction.EAST if uncertain_vertical else Direction.NORTH
-        )
+        anchor_direction = Direction.NORTH if uncertain_vertical else Direction.EAST
         relations = [
             _exact_relation(target, anchor_direction, pivot),
             _exact_relation(reference, anchor_direction, pivot),
         ]
-        previous = pivot
+        attached = [pivot]
         for extra in extras:
-            relations.append(_exact_relation(extra, filler_direction, previous))
-            previous = extra
+            previous = self._random.choice(attached)
+            relations.append(
+                _exact_relation(extra, self._random.choice(tuple(Direction)), previous)
+            )
+            attached.append(extra)
         self._random.shuffle(relations)
         return SpatialProblem(
             objects,
@@ -1200,29 +1285,56 @@ class SpatialGeneratorV2:
             avoid_target_prefix=True,
         )
         extras = shuffled[cursor:]
-        nonmember_direction = self._random.choice(
-            [candidate for candidate in (
+        nonmember_directions = [
+            candidate
+            for candidate in (
                 Direction.NORTHEAST,
                 Direction.SOUTHEAST,
                 Direction.SOUTHWEST,
                 Direction.NORTHWEST,
             )
-            if candidate is not direction]
-        )
-        relations.extend(
-            _exact_relation(candidate, nonmember_direction, reference)
-            for candidate in extras
-        )
+            if candidate is not direction
+        ]
+        # Independent nonmember branches may occupy different quadrants. Filler
+        # comparisons are consistent proposals; final labels still come from P.
+        extra_points = {}
+        used_points = set()
+        for candidate in extras:
+            quadrant = self._random.choice(nonmember_directions)
+            signs = direction_signs(quadrant)
+            point = (
+                signs[0] * self._random.randint(1, 1000),
+                signs[1] * self._random.randint(1, 1000),
+            )
+            while point in used_points:
+                point = (
+                    signs[0] * self._random.randint(1, 1000),
+                    signs[1] * self._random.randint(1, 1000),
+                )
+            used_points.add(point)
+            extra_points[candidate] = point
+            relations.append(_exact_relation(candidate, quadrant, reference))
         filler_count = policy.num_premises - len(relations)
         filler_pairs = list(combinations(extras, 2))
         self._random.shuffle(filler_pairs)
         relations.extend(
-            _exact_relation(higher, nonmember_direction, lower)
+            _exact_relation(
+                higher,
+                direction_between(extra_points[higher], extra_points[lower]),
+                lower,
+            )
             for lower, higher in filler_pairs[:filler_count]
         )
         self._random.shuffle(relations)
         direction_set = frozenset({direction})
-        candidates = tuple(obj for obj in objects if obj != reference)
+        if policy.membership_candidate_limit is None:
+            candidates = tuple(obj for obj in objects if obj != reference)
+        else:
+            candidates = (target, *extras[: policy.membership_candidate_limit - 1])
+            if len(candidates) != policy.membership_candidate_limit:
+                raise _RetryGeneration(
+                    "not enough nonmember candidates for requested domain"
+                )
         query = (
             WhichQuery(direction_set, reference, candidates)
             if policy.query_kind is QueryKind.WHICH
@@ -1415,7 +1527,8 @@ class SpatialGeneratorV2:
         if (
             policy.query_kind is QueryKind.WHICH
             and policy.semantic_shape is SemanticShape.MULTIPLE_CERTAIN
-            and sum(value is direction for value in directions_by_candidate.values()) < 2
+            and sum(value is direction for value in directions_by_candidate.values())
+            < 2
         ):
             raise _RetryGeneration(
                 "requested Which direction has fewer than two certain matches"
@@ -1622,12 +1735,31 @@ class SpatialGeneratorV2:
             )
         elif isinstance(query, WhichQuery):
             direction = next(iter(query.directions)).value
+            full_domain = tuple(
+                name for name in problem.objects if name != query.reference
+            )
+            scope = (
+                "in the map"
+                if query.candidates == full_domain
+                else "among [" + "; ".join(query.candidates) + "]"
+            )
             question = (
-                f"Which object in the map is in the {direction} of {query.reference}?"
+                f"Which object {scope} is in the {direction} of {query.reference}?"
             )
         else:
             direction = next(iter(query.directions)).value
-            question = f"How many objects are in the {direction} of {query.reference}?"
+            full_domain = tuple(
+                name for name in problem.objects if name != query.reference
+            )
+            scope = (
+                ""
+                if query.candidates == full_domain
+                else "Considering only [" + "; ".join(query.candidates) + "], "
+            )
+            question = (
+                f"{scope}How many objects are in the {direction} of "
+                f"{query.reference}?"
+            )
         menu = ", ".join(f"{letter}. {value}" for letter, value in options.items())
         return (
             f"Consider a map with multiple locations:\n\n{premises}\n\n"
@@ -1648,7 +1780,9 @@ class SpatialGeneratorV2:
             raise _RetryGeneration(f"rendered prompt did not parse: {exc}") from exc
         if parsed.problem != problem or parsed.options != options:
             raise _RetryGeneration("rendered prompt changed the structured problem")
-        reparsed_analysis = self._solver.analyze(parsed.problem)
+        reparsed_analysis = self._solver.analyze(
+            parsed.problem, include_witnesses=not policy.oracle_only
+        )
         reparsed_resolution = resolve_answer(reparsed_analysis, policy.answer_mode)
         reparsed_menu = encode_menu_answer(reparsed_resolution, parsed.options)
         if (

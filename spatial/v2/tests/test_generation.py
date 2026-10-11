@@ -459,15 +459,20 @@ def test_generator_targets_joint_count_dependency() -> None:
     assert len(sample.certificate.fixed_memberships) < len(
         sample.problem.query.candidates
     )
-    assert parse_symbolic_training_trace(
-        sample.problem,
-        sample.trace,
-        sample.menu_answer,
-    ).reasoning is not None
+    assert (
+        parse_symbolic_training_trace(
+            sample.problem,
+            sample.trace,
+            sample.menu_answer,
+        ).reasoning
+        is not None
+    )
 
 
 def test_joint_count_dependency_is_count_only() -> None:
-    with pytest.raises(ValueError, match="joint count dependency applies only to Count"):
+    with pytest.raises(
+        ValueError, match="joint count dependency applies only to Count"
+    ):
         GenerationPolicy(
             query_kind=QueryKind.WHICH,
             require_joint_count_dependency=True,
@@ -577,10 +582,7 @@ def test_exact_two_direction_ambiguity_is_constructed_without_rejection() -> Non
             {Direction.NORTH, Direction.SOUTH},
             {Direction.EAST, Direction.WEST},
         )
-        assert (
-            sample.generation_provenance
-            is GenerationProvenance.PROOF_TEMPLATE_FIRST
-        )
+        assert sample.generation_provenance is GenerationProvenance.PROOF_TEMPLATE_FIRST
         assert sample.attempt == 0
         assert sample.rejection_counts == {}
 
@@ -699,6 +701,47 @@ def test_trace_variants_share_one_base_problem_and_have_distinct_ids() -> None:
     assert first["messages"][1] == second["messages"][1]
     assert first["metadata"]["oracle_letters"] == second["metadata"]["oracle_letters"]
     assert first["messages"][2] != second["messages"][2]
+
+
+def test_oracle_only_generation_skips_certificate_but_keeps_checked_answer() -> None:
+    sample = SpatialGeneratorV2(seed=1736).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.COUNT,
+            semantic_shape=SemanticShape.UNIQUE,
+            num_entities=9,
+            num_premises=12,
+            omit_direct_query_relation=True,
+            min_membership_depth=3,
+            max_membership_depth=3,
+            membership_candidate_limit=3,
+            measure_support=False,
+            oracle_only=True,
+        )
+    )
+
+    row = sample.as_sft_row()
+    assistant = row["messages"][2]["content"]
+    assert sample.certificate is None
+    assert sample.trace == ""
+    assert assistant == "Answer: " + ", ".join(sorted(sample.menu_answer.letters))
+    assert "<think>" not in assistant
+    assert row["metadata"]["oracle_only"] is True
+    assert row["metadata"]["supervision_arm"] == "answer-only"
+    assert row["metadata"]["process_status"] == "absent"
+    assert row["metadata"]["round_trip_verified"] is True
+    assert max(
+        proof[axis]
+        for proof in sample.difficulty["membership_proofs"]
+        for axis in ("x_depth", "y_depth")
+    ) == 3
+
+    with pytest.raises(ValueError, match="oracle-only"):
+        sample.with_trace(TraceFormat.SYMBOLIC)
+
+
+def test_oracle_only_policy_rejects_symbolic_trace_format() -> None:
+    with pytest.raises(ValueError, match="oracle-only"):
+        GenerationPolicy(oracle_only=True, trace_format=TraceFormat.SYMBOLIC)
 
 
 def test_answer_mode_variants_share_one_solved_problem() -> None:
@@ -1249,3 +1292,71 @@ def test_premise_first_boolean_families_replay_without_target_templates(shape):
     assert score_symbolic_training_trace(
         sample.problem, sample.trace, sample.menu_answer
     ).fully_valid
+
+
+def test_constructive_no_match_preserves_all_candidate_exclusions():
+    generator = SpatialGeneratorV2(532)
+    for _ in range(10):
+        sample = generator.generate(
+            GenerationPolicy(
+                query_kind="which",
+                semantic_shape="no-match",
+                num_entities=6,
+                num_premises=5,
+            ),
+            max_attempts=1,
+        )
+        assert sample.analysis.possible_entities == ()
+        assert sample.generation_provenance is GenerationProvenance.PROOF_TEMPLATE_FIRST
+        assert score_symbolic_training_trace(
+            sample.problem, sample.with_trace("symbolic").trace, sample.menu_answer
+        ).fully_valid
+
+
+@pytest.mark.parametrize("kind", [QueryKind.WHICH, QueryKind.COUNT])
+def test_controlled_membership_can_hold_candidate_domain_constant_across_depth(kind):
+    sample = SpatialGeneratorV2(818).generate(
+        GenerationPolicy(
+            query_kind=kind,
+            semantic_shape="unique",
+            num_entities=17,
+            num_premises=17,
+            min_membership_depth=6,
+            max_membership_depth=6,
+            omit_direct_query_relation=True,
+            membership_candidate_limit=3,
+            measure_support=False,
+            oracle_only=True,
+        )
+    )
+    assert len(sample.problem.query.candidates) == 3
+    assert sample.difficulty["max_membership_x_depth"] == 6
+    assert sample.difficulty["max_membership_y_depth"] == 6
+
+
+def test_membership_candidate_limit_rejects_uncontrolled_or_direction_policy():
+    with pytest.raises(ValueError, match="controlled membership"):
+        GenerationPolicy(query_kind="count", membership_candidate_limit=3)
+    with pytest.raises(ValueError, match="only to Which or Count"):
+        GenerationPolicy(query_kind="direction", membership_candidate_limit=1)
+
+
+def test_support_analysis_may_be_skipped_but_not_when_distractors_are_requested():
+    sample = SpatialGeneratorV2(819).generate(
+        GenerationPolicy(
+            semantic_shape="unique",
+            num_entities=5,
+            num_premises=4,
+            measure_support=False,
+        )
+    )
+    assert sample.difficulty["support_checks_complete"] is False
+    assert sample.difficulty["num_distractor_premises"] == 0
+    with pytest.raises(ValueError, match="require support analysis"):
+        GenerationPolicy(
+            semantic_shape="unique",
+            num_entities=5,
+            num_premises=4,
+            distractor_premises=1,
+            measure_support=False,
+        )

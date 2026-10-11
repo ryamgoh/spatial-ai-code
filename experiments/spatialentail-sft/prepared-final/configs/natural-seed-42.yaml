@@ -1,0 +1,65 @@
+chat_template: tokenizer_default
+base_model: Qwen/Qwen3.5-4B
+load_in_4bit: true
+adapter: qlora
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+- q_proj
+- k_proj
+- v_proj
+- o_proj
+- gate_proj
+- down_proj
+- up_proj
+- linear_attn.in_proj_qkv
+- linear_attn.in_proj_z
+- linear_attn.out_proj
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
+embeddings_skip_upcast: true
+attn_implementation: sdpa
+sample_packing: false
+pad_to_sequence_len: false
+shuffle_merged_datasets: true
+learning_rate: 5.0e-05
+sequence_len: 12288
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_ratio: 0.05
+fp16: false
+bf16: true
+max_grad_norm: 0.05
+num_epochs: 2
+logging_steps: 1
+output_dir: ../experiments/spatialentail-sft/prepared-final/models/natural-seed-42
+datasets:
+- path: ../experiments/spatialentail-sft/prepared-final/data/train-natural.jsonl
+  type: chat_template
+  field_messages: messages
+test_datasets:
+- path: ../experiments/spatialentail-sft/prepared-final/data/dev-natural.jsonl
+  type: chat_template
+  field_messages: messages
+dataloader_prefetch_factor: 8
+dataloader_num_workers: 2
+dataloader_pin_memory: true
+dataset_num_proc: 16
+val_set_size: 0
+eval_strategy: epoch
+save_strategy: epoch
+save_total_limit: 2
+load_best_model_at_end: false
+revision_of_model: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+use_wandb: true
+wandb_project: spatialentail-sft
+wandb_mode: online
+seed: 42
+wandb_name: qwen3.5-4b-natural-seed-42
+wandb_run_id: spatialentail-qwen3.5-4b-natural-seed-42

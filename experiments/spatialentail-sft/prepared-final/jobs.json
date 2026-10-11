@@ -1,0 +1,84 @@
+{
+  "context_budget": {
+    "eval_max_tokens": 16384,
+    "max_new_tokens": 12288,
+    "tokenizer_name": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "train_max_tokens": 12288
+  },
+  "environment_sha256": {
+    "experiments/15-v2-ablation/jobs/common.bash": "980d6d70da8108571c521113466068d4e2830a85e3cefb06f1704b5f25c88e42",
+    "experiments/15-v2-ablation/jobs/train.sh": "5f1c1f2c69d84a58e9206f3514b4de56cac8a2dd83134c4222ddf6253aefef53",
+    "finetune/finetune.py": "0719d45c389754772205eb15d6aaba02caf11ff878e0583f0ea439d0110a1e91",
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "slurm/lib/pin-srun-cpus.sh": "cfb04bed02cfe24b85ecd22bc99891f77cba95fceb2bc55db867e5477b145abb",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e"
+  },
+  "file_sha256": {
+    "configs/answer-only-seed-42.yaml": "8773bbc452523960e90179c361385df3a3f45c486c5d299513b95cfae7a5229a",
+    "configs/answer-only-seed-43.yaml": "4351d31327f7f9c7dd03704934e2e9aa8f75d025ee5ba0e693c7a96317e4fdbd",
+    "configs/natural-seed-42.yaml": "62b7fc6ae58466b69ad7e1083e8a4049676d69d9140692ce72e805a5006fca97",
+    "configs/natural-seed-43.yaml": "5409160b5e05fc90c53d7588af74ad53296fd7ea57d70d580f745fc94a665027",
+    "configs/symbolic-seed-42.yaml": "6481a82cb845f102b49fd56287f1a95a812a45009208613d61754415e402d32d",
+    "configs/symbolic-seed-43.yaml": "1073842912b0c66a27a4571970f94ea0c94e3a82f54fc7deadd03fbc5c59c821",
+    "data/dev-answer-only.jsonl": "ccd27dccb3b4c3809dcf380d41c2fe77c083c16b13f80c839b21b4a9febac03a",
+    "data/dev-natural.jsonl": "e8c82a128c7a92027930ae4cbe2d1ee5a99d764ed42c436cb053b370c100ba0d",
+    "data/dev-symbolic.jsonl": "0ab8f155709f14f1166f47f133daab3efc6bd8d898c879e35d1d5c272f4e39af",
+    "data/train-answer-only.jsonl": "72c1be0af34cb51cd180bee766b86f7bc186e8ee97bace9d9d9daf5ece927d03",
+    "data/train-natural.jsonl": "777c342ad1645c5a3186e0866660d1690a66f143a9c7635efcd45ac96222171f",
+    "data/train-symbolic.jsonl": "5bc7572cdc41e4b59bd436fca40ae5471f8096c2861a3b6670960b6c5394bea5",
+    "slurm/answer-only-seed-42.sh": "284567b471e574f0bcf204f5984dfba43d09fb3f169724eebcd883216116164e",
+    "slurm/answer-only-seed-43.sh": "720e5103f93518486994613a3b7482fb5db67021e540cd6186cf4c3f073a919d",
+    "slurm/natural-seed-42.sh": "8d31d2accbc420f61e1200c1c119220ebc155438f88a601313ce9b8a92fae56a",
+    "slurm/natural-seed-43.sh": "93b56b12fe1dac537b2f9880f979edf7b3e3444abd0086fded64add5c6adc192",
+    "slurm/symbolic-seed-42.sh": "aafb57b671d9aefcc6fab071774f73e87293d2fd6bfeec362fd513ebb61dd134",
+    "slurm/symbolic-seed-43.sh": "3e41e641a0e06220150b757b2205719054a35ee9d4d8b59c44645e8d5a3ca2da"
+  },
+  "jobs": [
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/answer-only-seed-42.yaml",
+      "name": "answer-only-seed-42",
+      "package": "answer-only",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/answer-only-seed-42.sh",
+      "seed": 42
+    },
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/answer-only-seed-43.yaml",
+      "name": "answer-only-seed-43",
+      "package": "answer-only",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/answer-only-seed-43.sh",
+      "seed": 43
+    },
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/natural-seed-42.yaml",
+      "name": "natural-seed-42",
+      "package": "natural",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/natural-seed-42.sh",
+      "seed": 42
+    },
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/natural-seed-43.yaml",
+      "name": "natural-seed-43",
+      "package": "natural",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/natural-seed-43.sh",
+      "seed": 43
+    },
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/symbolic-seed-42.yaml",
+      "name": "symbolic-seed-42",
+      "package": "symbolic",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/symbolic-seed-42.sh",
+      "seed": 42
+    },
+    {
+      "config": "experiments/spatialentail-sft/prepared-final/configs/symbolic-seed-43.yaml",
+      "name": "symbolic-seed-43",
+      "package": "symbolic",
+      "script": "experiments/spatialentail-sft/prepared-final/slurm/symbolic-seed-43.sh",
+      "seed": 43
+    }
+  ],
+  "release_manifest_sha256": "01f97b0f6ec50f6b73a9fe3ef6561c09917f34413312d7f59fa7fb5c7ca7aaa7",
+  "schema": "spatialentail-sft-jobs-v1",
+  "submitted": false
+}

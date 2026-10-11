@@ -122,6 +122,15 @@ def build_release(
         for row in _read_rows(path):
             for known, key in zip(keys_seen, _keys(row), strict=True):
                 known.add(key)
+    # Work files are resumable proposals, never a completed release. Bind every
+    # checkpoint to config, registries, contamination ledger and implementation.
+    sources = {
+        str(p): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(Path("spatial/v2").rglob("*.py"))
+    }
+    binding = _hash([source, registry_hashes, contamination_receipts, sources])
+    work = output.with_name(output.name + "-work")
+    work.mkdir(parents=True, exist_ok=True)
     artifact_rows = {}
     quotas = {}
     rejections = Counter()
@@ -152,6 +161,8 @@ def build_release(
                 policy = GenerationPolicy(**request["policy"])
                 stratum = request["stratum"]
                 skeleton = policy.composition or "depth:" + policy.query_kind.value
+            if policy.oracle_only and role != "bench-depth":
+                raise ValueError("oracle-only generation is restricted to bench-depth")
             if stratum in quotas[role]:
                 raise ValueError(f"duplicate role stratum: {stratum}")
             if (
@@ -182,7 +193,29 @@ def build_release(
             skeletons_by_role[role].add(skeleton)
             seed = int(_hash([source["seed"], role, stratum])[:8], 16)
             generator = SpatialGeneratorV2(seed)
+            checkpoint = work / (role + "--" + stratum + ".json")
             accepted = []
+            if checkpoint.exists():
+                cached = json.loads(checkpoint.read_text())
+                if cached.get("binding") != binding:
+                    raise ValueError(
+                        "stale release work checkpoint; use a new output version"
+                    )
+                accepted = [tuple(group) for group in cached["groups"]]
+                if len(accepted) != count:
+                    raise ValueError("incomplete cached stratum")
+                for group in accepted:
+                    for row in group:
+                        from spatial.v2.context_budget import validate_context_admission
+
+                        validate_context_admission(row)
+                    keys = _keys(group[0])
+                    if any(
+                        key in known for known, key in zip(keys_seen, keys, strict=True)
+                    ):
+                        raise ValueError("checkpoint overlaps earlier release roles")
+                    for known, key in zip(keys_seen, keys, strict=True):
+                        known.add(key)
             for _ in range(count * attempt_limit):
                 if len(accepted) == count:
                     break
@@ -222,7 +255,13 @@ def build_release(
                     rejections[role + ":duplicate"] += 1
                     continue
                 if role == "bench-depth":
-                    rows = [apply_supervision_arm(natural, SupervisionArm.ANSWER_ONLY)]
+                    rows = [
+                        natural
+                        if policy.oracle_only
+                        else apply_supervision_arm(
+                            natural, SupervisionArm.ANSWER_ONLY
+                        )
+                    ]
                 else:
                     symbolic_sample = sample.with_trace("symbolic")
                     if not score_symbolic_training_trace(
@@ -264,8 +303,14 @@ def build_release(
                     [source["seed"], stratum, group[0]["metadata"]["base_id"]]
                 )
             )
+            if not checkpoint.exists():
+                checkpoint.write_text(
+                    json.dumps({"binding": binding, "groups": accepted}, sort_keys=True)
+                    + "\n"
+                )
             groups.extend(accepted)
             quotas[role][stratum] = count
+            print(f"admitted {role}/{stratum}: {count} bases", flush=True)
         artifact_rows[role] = [row for group in groups for row in group]
         if role == "train":
             by_cell = {}

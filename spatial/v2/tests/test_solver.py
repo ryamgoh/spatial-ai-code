@@ -214,6 +214,32 @@ def test_problem_candidate_directions_restrict_the_generic_solver() -> None:
 
 
 @pytest.mark.parametrize("backend", ["reference", "z3"])
+@pytest.mark.parametrize("query_kind", ["direction", "which", "count"])
+def test_analysis_can_suppress_witness_coordinates(backend, query_kind) -> None:
+    if backend == "z3":
+        pytest.importorskip("z3")
+    premise = atom("A", Direction.NORTH, "B")
+    query = {
+        "direction": DirectionQuery("A", "B"),
+        "which": WhichQuery(frozenset({Direction.NORTH}), "B", ("A",)),
+        "count": CountQuery(frozenset({Direction.NORTH}), "B", ("A",)),
+    }[query_kind]
+    problem = SpatialProblem(("A", "B"), premise, query)
+    solver = SpatialSolverV2(backend=backend)
+
+    full = solver.analyze(problem)
+    compact = solver.analyze(problem, include_witnesses=False)
+    full_resolution = resolve_answer(full, AnswerMode.SINGLE)
+    compact_resolution = resolve_answer(compact, AnswerMode.SINGLE)
+
+    assert compact.consistent
+    assert compact_resolution.status == full_resolution.status
+    assert compact_resolution.values == full_resolution.values
+    assert compact.witnesses
+    assert all(witness == {} for witness in compact.witnesses.values())
+
+
+@pytest.mark.parametrize("backend", ["reference", "z3"])
 def test_propositional_disjunctive_syllogism(backend: str) -> None:
     if backend == "z3":
         pytest.importorskip("z3")

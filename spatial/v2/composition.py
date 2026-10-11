@@ -207,12 +207,16 @@ def construct_composition(
     if len(premises) > policy.num_premises:
         raise ProofConstructionError("composition premise budget is too small")
     # Budget fillers are explicit tautologies and never carry query support.
-    for obj in objects:
+    from itertools import combinations
+
+    pairs = list(combinations(objects, 2))
+    rng.shuffle(pairs)
+    for subject, filler_reference in pairs:
         if len(premises) == policy.num_premises:
             break
-        if obj == reference:
-            continue
-        filler = direction_constraint(obj, reference, Direction.EAST)
+        filler = direction_constraint(
+            subject, filler_reference, rng.choice(tuple(Direction))
+        )
         premises.append(Or((filler, Not(filler))))
     if len(premises) != policy.num_premises:
         raise ProofConstructionError(

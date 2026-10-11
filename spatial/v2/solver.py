@@ -694,6 +694,8 @@ class _ReferenceEngine:
         target: str,
         reference: str,
         candidate_directions: frozenset[Direction],
+        *,
+        include_witnesses: bool = True,
     ) -> dict[Direction, dict[str, tuple[int, int]]] | None:
         if self._find_formula_witness(objects, premise, target, reference) is None:
             return None
@@ -705,7 +707,7 @@ class _ReferenceEngine:
                 objects, premise, target, reference, direction
             )
             if witness is not None:
-                witnesses[direction] = witness
+                witnesses[direction] = witness if include_witnesses else {}
         return witnesses
 
     def analyze(
@@ -721,7 +723,12 @@ class _ReferenceEngine:
         constraints = conjunctive_atoms(premise)
         if constraints is None:
             return self._analyze_formula(
-                objects, premise, target, reference, candidate_directions
+                objects,
+                premise,
+                target,
+                reference,
+                candidate_directions,
+                include_witnesses=include_witnesses,
             )
         if self._find_witness(objects, constraints) is None:
             return None
@@ -733,7 +740,7 @@ class _ReferenceEngine:
                 objects, constraints, (target, reference, direction)
             )
             if witness is not None:
-                witnesses[direction] = witness
+                witnesses[direction] = witness if include_witnesses else {}
         return witnesses
 
     def analyze_which(self, objects, premise, query, *, include_witnesses=True):
@@ -757,7 +764,7 @@ class _ReferenceEngine:
             )
             if witness is not None:
                 possible.append(candidate)
-                witnesses[candidate] = witness
+                witnesses[candidate] = witness if include_witnesses else {}
             counterexample = self._find_formula_witness(
                 objects,
                 And((premise, Not(predicate))),
@@ -805,7 +812,7 @@ class _ReferenceEngine:
                 query.reference,
             )
             if witness is not None:
-                witnesses[count] = witness
+                witnesses[count] = witness if include_witnesses else {}
         return witnesses
 
     def satisfy(
@@ -1121,15 +1128,26 @@ class SpatialSolverV2:
                     raise
                 self._engine = _ReferenceEngine()
 
-    def analyze(self, problem: SpatialProblem) -> QueryAnalysis:
+    def analyze(
+        self,
+        problem: SpatialProblem,
+        *,
+        include_witnesses: bool = True,
+    ) -> QueryAnalysis:
         if not isinstance(problem, SpatialProblem):
             raise TypeError("analyze expects a SpatialProblem")
         try:
             if isinstance(problem.query, DirectionQuery):
-                return self._analyze_direction(problem, problem.query)
+                return self._analyze_direction(
+                    problem, problem.query, include_witnesses=include_witnesses
+                )
             if isinstance(problem.query, WhichQuery):
-                return self._analyze_which(problem, problem.query)
-            return self._analyze_count(problem, problem.query)
+                return self._analyze_which(
+                    problem, problem.query, include_witnesses=include_witnesses
+                )
+            return self._analyze_count(
+                problem, problem.query, include_witnesses=include_witnesses
+            )
         except RuntimeError as exc:
             error = str(exc)
             if isinstance(problem.query, DirectionQuery):
@@ -1225,7 +1243,11 @@ class SpatialSolverV2:
         )
 
     def _analyze_direction(
-        self, problem: SpatialProblem, query: DirectionQuery
+        self,
+        problem: SpatialProblem,
+        query: DirectionQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> DirectionAnalysis:
         witnesses = self._engine.analyze(
             problem.objects,
@@ -1233,6 +1255,7 @@ class SpatialSolverV2:
             query.target,
             query.reference,
             query.candidate_directions,
+            include_witnesses=include_witnesses,
         )
         consistent = witnesses is not None
         witnesses = witnesses or {}
@@ -1247,9 +1270,18 @@ class SpatialSolverV2:
         )
 
     def _analyze_which(
-        self, problem: SpatialProblem, query: WhichQuery
+        self,
+        problem: SpatialProblem,
+        query: WhichQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> WhichAnalysis:
-        result = self._engine.analyze_which(problem.objects, problem.premise, query)
+        result = self._engine.analyze_which(
+            problem.objects,
+            problem.premise,
+            query,
+            include_witnesses=include_witnesses,
+        )
         consistent = result is not None
         possible, entailed, witnesses = result or ((), (), {})
         return WhichAnalysis(
@@ -1264,9 +1296,18 @@ class SpatialSolverV2:
         )
 
     def _analyze_count(
-        self, problem: SpatialProblem, query: CountQuery
+        self,
+        problem: SpatialProblem,
+        query: CountQuery,
+        *,
+        include_witnesses: bool = True,
     ) -> CountAnalysis:
-        witnesses = self._engine.analyze_count(problem.objects, problem.premise, query)
+        witnesses = self._engine.analyze_count(
+            problem.objects,
+            problem.premise,
+            query,
+            include_witnesses=include_witnesses,
+        )
         consistent = witnesses is not None
         witnesses = witnesses or {}
         return CountAnalysis(

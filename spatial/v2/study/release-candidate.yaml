@@ -23,34 +23,127 @@ roles:
   - count: 200
     stratum: DIR-ARC-UNI
     policy: &id001
-      query_kind: direction
       semantic_shape: unique
+      boolean_shape: atomic
       num_entities: 6
       num_premises: 7
-  - cell: DIR-TRC-UNI
-    count: 200
-  - cell: CNT-AXC-UNI
-    count: 200
-  - cell: DIR-MP-UNI
-    count: 200
-  - cell: SEL-IFF-UNI
-    count: 200
-  - cell: CNT-NEG-UNI
-    count: 200
-  - cell: DIR-DJE-UNI
-    count: 200
-  - cell: SEL-CSR-UNI
-    count: 200
-  - cell: DIR-ARC-ALT
-    count: 200
-  - cell: SEL-ARC-NOM
-    count: 200
-  - cell: SEL-ARC-MUL
-    count: 200
-  - cell: CNT-CSR-JCR-UNI
-    count: 200
-  - cell: SEL-TRC-UNI-NOISE
-    count: 200
+      query_kind: direction
+      min_axis_depth: 1
+      max_axis_depth: 1
+  - count: 200
+    stratum: DIR-TRC-UNI
+    policy: &id002
+      semantic_shape: unique
+      boolean_shape: atomic
+      num_entities: 8
+      num_premises: 10
+      omit_direct_query_relation: true
+      query_kind: direction
+      min_axis_depth: 2
+      max_axis_depth: 2
+  - count: 200
+    stratum: CNT-AXC-UNI
+    policy: &id003
+      semantic_shape: unique
+      boolean_shape: atomic
+      num_entities: 9
+      num_premises: 14
+      require_independent_axes: true
+      query_kind: count
+      min_membership_depth: 2
+      max_membership_depth: 2
+  - count: 200
+    stratum: DIR-MP-UNI
+    policy: &id004
+      semantic_shape: unique
+      boolean_shape: modus-ponens
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      query_kind: direction
+  - count: 200
+    stratum: SEL-IFF-UNI
+    policy: &id005
+      semantic_shape: unique
+      boolean_shape: iff
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      query_kind: which
+  - count: 200
+    stratum: CNT-NEG-UNI
+    policy: &id006
+      semantic_shape: unique
+      boolean_shape: double-negation
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      query_kind: count
+  - count: 200
+    stratum: DIR-DJE-UNI
+    policy: &id007
+      semantic_shape: unique
+      boolean_shape: disjunctive-syllogism
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      query_kind: direction
+  - count: 200
+    stratum: SEL-CSR-UNI
+    policy: &id008
+      semantic_shape: unique
+      boolean_shape: case-split
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      query_kind: which
+  - count: 200
+    stratum: DIR-ARC-ALT
+    policy: &id009
+      semantic_shape: ambiguous
+      boolean_shape: atomic
+      num_entities: 8
+      num_premises: 7
+      ambiguity_size: 2
+      query_kind: direction
+  - count: 200
+    stratum: SEL-ARC-NOM
+    policy: &id010
+      semantic_shape: no-match
+      boolean_shape: atomic
+      num_entities: 6
+      num_premises: 5
+      query_kind: which
+  - count: 200
+    stratum: SEL-ARC-MUL
+    policy: &id011
+      semantic_shape: multiple-certain
+      boolean_shape: atomic
+      num_entities: 6
+      num_premises: 5
+      query_kind: which
+  - count: 200
+    stratum: CNT-CSR-JCR-UNI
+    policy: &id012
+      semantic_shape: unique
+      boolean_shape: case-split
+      generation_mode: proof-template-first
+      num_entities: 6
+      num_premises: 7
+      require_joint_count_dependency: true
+      query_kind: count
+  - count: 200
+    stratum: SEL-TRC-UNI-NOISE
+    policy: &id013
+      semantic_shape: unique
+      boolean_shape: atomic
+      num_entities: 9
+      num_premises: 11
+      omit_direct_query_relation: true
+      distractor_premises: 2
+      query_kind: which
+      min_membership_depth: 2
+      max_membership_depth: 2
   - cell: DIR-MP-TRC-UNI
     count: 350
   - cell: SEL-MP-TRC-UNI
@@ -77,7 +170,7 @@ roles:
     count: 350
   - stratum: direction-depth-3
     count: 200
-    policy: &id002
+    policy: &id014
       query_kind: direction
       semantic_shape: unique
       num_entities: 9
@@ -87,7 +180,7 @@ roles:
       max_axis_depth: 3
   - stratum: direction-depth-4
     count: 200
-    policy: &id003
+    policy: &id015
       query_kind: direction
       semantic_shape: unique
       num_entities: 10
@@ -97,7 +190,7 @@ roles:
       max_axis_depth: 4
   - stratum: which-depth-3
     count: 200
-    policy: &id004
+    policy: &id016
       query_kind: which
       semantic_shape: unique
       num_entities: 11
@@ -107,7 +200,7 @@ roles:
       max_membership_depth: 3
   - stratum: which-depth-4
     count: 200
-    policy: &id005
+    policy: &id017
       query_kind: which
       semantic_shape: unique
       num_entities: 13
@@ -117,7 +210,7 @@ roles:
       max_membership_depth: 4
   - stratum: count-depth-3
     count: 200
-    policy: &id006
+    policy: &id018
       query_kind: count
       semantic_shape: unique
       num_entities: 11
@@ -127,7 +220,7 @@ roles:
       max_membership_depth: 3
   - stratum: count-depth-4
     count: 200
-    policy: &id007
+    policy: &id019
       query_kind: count
       semantic_shape: unique
       num_entities: 13
@@ -139,30 +232,42 @@ roles:
   - count: 25
     stratum: DIR-ARC-UNI
     policy: *id001
-  - cell: DIR-TRC-UNI
-    count: 25
-  - cell: CNT-AXC-UNI
-    count: 25
-  - cell: DIR-MP-UNI
-    count: 25
-  - cell: SEL-IFF-UNI
-    count: 25
-  - cell: CNT-NEG-UNI
-    count: 25
-  - cell: DIR-DJE-UNI
-    count: 25
-  - cell: SEL-CSR-UNI
-    count: 25
-  - cell: DIR-ARC-ALT
-    count: 25
-  - cell: SEL-ARC-NOM
-    count: 25
-  - cell: SEL-ARC-MUL
-    count: 25
-  - cell: CNT-CSR-JCR-UNI
-    count: 25
-  - cell: SEL-TRC-UNI-NOISE
-    count: 25
+  - count: 25
+    stratum: DIR-TRC-UNI
+    policy: *id002
+  - count: 25
+    stratum: CNT-AXC-UNI
+    policy: *id003
+  - count: 25
+    stratum: DIR-MP-UNI
+    policy: *id004
+  - count: 25
+    stratum: SEL-IFF-UNI
+    policy: *id005
+  - count: 25
+    stratum: CNT-NEG-UNI
+    policy: *id006
+  - count: 25
+    stratum: DIR-DJE-UNI
+    policy: *id007
+  - count: 25
+    stratum: SEL-CSR-UNI
+    policy: *id008
+  - count: 25
+    stratum: DIR-ARC-ALT
+    policy: *id009
+  - count: 25
+    stratum: SEL-ARC-NOM
+    policy: *id010
+  - count: 25
+    stratum: SEL-ARC-MUL
+    policy: *id011
+  - count: 25
+    stratum: CNT-CSR-JCR-UNI
+    policy: *id012
+  - count: 25
+    stratum: SEL-TRC-UNI-NOISE
+    policy: *id013
   - cell: DIR-MP-TRC-UNI
     count: 25
   - cell: SEL-MP-TRC-UNI
@@ -189,54 +294,62 @@ roles:
     count: 25
   - stratum: direction-depth-3
     count: 25
-    policy: *id002
+    policy: *id014
   - stratum: direction-depth-4
     count: 25
-    policy: *id003
+    policy: *id015
   - stratum: which-depth-3
     count: 25
-    policy: *id004
+    policy: *id016
   - stratum: which-depth-4
     count: 25
-    policy: *id005
+    policy: *id017
   - stratum: count-depth-3
     count: 25
-    policy: *id006
+    policy: *id018
   - stratum: count-depth-4
     count: 25
-    policy: *id007
+    policy: *id019
   bench-core:
   - count: 100
     stratum: DIR-ARC-UNI
-    policy:
-      query_kind: direction
-      semantic_shape: unique
-      num_entities: 6
-      num_premises: 7
-  - cell: DIR-TRC-UNI
-    count: 100
-  - cell: CNT-AXC-UNI
-    count: 100
-  - cell: DIR-MP-UNI
-    count: 100
-  - cell: SEL-IFF-UNI
-    count: 100
-  - cell: CNT-NEG-UNI
-    count: 100
-  - cell: DIR-DJE-UNI
-    count: 100
-  - cell: SEL-CSR-UNI
-    count: 100
-  - cell: DIR-ARC-ALT
-    count: 100
-  - cell: SEL-ARC-NOM
-    count: 100
-  - cell: SEL-ARC-MUL
-    count: 100
-  - cell: CNT-CSR-JCR-UNI
-    count: 100
-  - cell: SEL-TRC-UNI-NOISE
-    count: 100
+    policy: *id001
+  - count: 100
+    stratum: DIR-TRC-UNI
+    policy: *id002
+  - count: 100
+    stratum: CNT-AXC-UNI
+    policy: *id003
+  - count: 100
+    stratum: DIR-MP-UNI
+    policy: *id004
+  - count: 100
+    stratum: SEL-IFF-UNI
+    policy: *id005
+  - count: 100
+    stratum: CNT-NEG-UNI
+    policy: *id006
+  - count: 100
+    stratum: DIR-DJE-UNI
+    policy: *id007
+  - count: 100
+    stratum: SEL-CSR-UNI
+    policy: *id008
+  - count: 100
+    stratum: DIR-ARC-ALT
+    policy: *id009
+  - count: 100
+    stratum: SEL-ARC-NOM
+    policy: *id010
+  - count: 100
+    stratum: SEL-ARC-MUL
+    policy: *id011
+  - count: 100
+    stratum: CNT-CSR-JCR-UNI
+    policy: *id012
+  - count: 100
+    stratum: SEL-TRC-UNI-NOISE
+    policy: *id013
   bench-comp:
   - cell: DIR-MP-TRC-UNI
     count: 100
@@ -284,10 +397,14 @@ roles:
   bench-depth:
   - stratum: direction-depth-3
     count: 50
-    policy: *id002
+    policy:
+      <<: *id014
+      measure_support: false
   - stratum: direction-depth-4
     count: 50
-    policy: *id003
+    policy:
+      <<: *id015
+      measure_support: false
   - stratum: direction-depth-5
     count: 50
     policy:
@@ -298,6 +415,7 @@ roles:
       omit_direct_query_relation: true
       min_axis_depth: 5
       max_axis_depth: 5
+      measure_support: false
   - stratum: direction-depth-6
     count: 50
     policy:
@@ -308,6 +426,7 @@ roles:
       omit_direct_query_relation: true
       min_axis_depth: 6
       max_axis_depth: 6
+      measure_support: false
   - stratum: direction-depth-7
     count: 50
     policy:
@@ -318,6 +437,7 @@ roles:
       omit_direct_query_relation: true
       min_axis_depth: 7
       max_axis_depth: 7
+      measure_support: false
   - stratum: direction-depth-8
     count: 50
     policy:
@@ -328,12 +448,21 @@ roles:
       omit_direct_query_relation: true
       min_axis_depth: 8
       max_axis_depth: 8
+      measure_support: false
   - stratum: which-depth-3
     count: 50
-    policy: *id004
+    policy:
+      <<: *id016
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: which-depth-4
     count: 50
-    policy: *id005
+    policy:
+      <<: *id017
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: which-depth-5
     count: 50
     policy:
@@ -344,6 +473,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 5
       max_membership_depth: 5
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: which-depth-6
     count: 50
     policy:
@@ -354,6 +486,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 6
       max_membership_depth: 6
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: which-depth-7
     count: 50
     policy:
@@ -364,6 +499,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 7
       max_membership_depth: 7
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: which-depth-8
     count: 50
     policy:
@@ -374,12 +512,23 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 8
       max_membership_depth: 8
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-3
     count: 50
-    policy: *id006
+    policy:
+      <<: *id018
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-4
     count: 50
-    policy: *id007
+    policy:
+      <<: *id019
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-5
     count: 50
     policy:
@@ -390,6 +539,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 5
       max_membership_depth: 5
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-6
     count: 50
     policy:
@@ -400,6 +552,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 6
       max_membership_depth: 6
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-7
     count: 50
     policy:
@@ -410,6 +565,9 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 7
       max_membership_depth: 7
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true
   - stratum: count-depth-8
     count: 50
     policy:
@@ -420,3 +578,6 @@ roles:
       omit_direct_query_relation: true
       min_membership_depth: 8
       max_membership_depth: 8
+      membership_candidate_limit: 3
+      measure_support: false
+      oracle_only: true

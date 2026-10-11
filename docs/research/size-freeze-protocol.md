@@ -1,7 +1,7 @@
 # SpatialEntail corpus and benchmark protocol
 
-Status: reviewed design implemented as candidate configurations, 2026-10-11.
-No production corpus, sealed benchmark, selected size, or SFT result is claimed.
+Status: production corpus sealed and six SFT jobs prepared, 2026-10-11.
+No job has been submitted and no SFT or evaluation result is claimed.
 This protocol supersedes the earlier 17K, seven-composition, and 5.8K-test plans.
 
 ## Research question and required study
@@ -70,7 +70,10 @@ proofs, consistent witnesses, and query-specific complete exclusions. All
 use the same proof-template-first construction route. Selection targets use
 explicit diagonal membership predicates; this limitation is reported rather
 than claimed as full cardinal-direction coverage. All named non-reference
-objects remain in the membership candidate domain.
+objects remain in the membership candidate domain for CORE and composition
+modules. Deep Selection/Count evaluation explicitly names a fixed three-object
+candidate scope so proof depth is not confounded with an exponentially growing
+membership domain.
 
 The old three-cell minimum was withdrawn: it confounded rule family with query
 family and covered only logical-to-spatial transitivity. The strengthened
@@ -120,13 +123,15 @@ remain partially associated with these quantities. No length-independent causal
 claim is made.
 
 **Depth 8 remains an answer-accuracy target, not a requirement to emit full
-traces.** Gold answers/certificates are formally validated offline. Deep SEL/CNT
-proof traces exceed the existing output envelope. The depth module uses admitted
-answer-only targets with process validity not applicable. No truncation or
-shallower backfill is allowed. Natural/Symbolic process results apply only to
-CORE/COMP examples admitted as a complete paired group. All trained models are
-also evaluated under the same direct-answer instruction on the depth module;
-this is separate from their native trace-generation evaluations.
+traces.** Every gold answer is recomputed from complete solver semantics.
+Selection/Count depth rows skip unused witness and answer-certificate rendering;
+their three-candidate scope is explicit in the prompt and round-trips to the
+structured query. The depth module uses admitted answer-only targets with
+process validity marked not applicable. No truncation or shallower backfill is
+allowed. Natural/Symbolic process results apply only to CORE/COMP examples
+admitted as a complete paired group. All trained models are also evaluated
+under the same direct-answer instruction on the depth module; this is separate
+from their native trace-generation evaluations.
 
 ## Allocation and training size
 
@@ -176,8 +181,8 @@ production uniqueness gate. Insufficient distinct structures fail the quota
 and require a protocol revision before the benchmark is sealed.
 
 Sealing requires: all quotas met; formal/replay/round-trip/context checks pass;
-coverage and overlap audits pass; quality receipts recorded; manifests/hashes
-fixed; operator review. The builder marks output candidate-awaiting-quality-review,
+coverage and overlap audits pass; quality receipts recorded; and manifests and
+hashes fixed. The builder marks output candidate-awaiting-quality-review,
 not frozen. Log final benchmark accesses. Any benchmark-informed generator
 repair requires a new benchmark version and fresh instances. Do not submit final
 benchmark traces to an evaluated judge-model family and then claim that family
@@ -222,7 +227,10 @@ population human acceptability or false acceptance. A separate random human
 audit would strengthen a public language-quality claim, but it is not activated
 because the user requested selective human involvement only. Until separately
 authorized, describe the artifact as a formally validated synthetic experimental
-corpus; do not report a human-validated benchmark claim.
+corpus; do not report a human-validated benchmark claim. In the executed screen,
+all 485 sampled items received two approvals, so no human appeal was triggered.
+Report this as two independent blinded LLM reviews, not a double-blind human
+review.
 
 ## Runnable paths and remaining release gates
 
@@ -233,11 +241,10 @@ corpus; do not report a human-validated benchmark claim.
   CORE cells, exact context admission, engineering dev/test, and one Symbolic
   training arm. It is an engineering configuration, not a sealed final study.
 
-The production assembler exists, but full candidate quotas, coverage, quality,
-and final release are not executed. The current constructors may exhaust their
-unique structural diversity at the requested sizes. That is a release blocker,
-not permission to substitute renamed copies. Large training is not launched by
-this protocol update.
+The production release contains 8,000 Train, 775 Dev, and 4,300 Bench bases.
+All quotas, structural uniqueness, cross-role overlap, achieved-depth,
+round-trip, semantic re-solving, Symbolic replay, and context gates passed.
+The six Qwen3.5-4B job configurations are prepared but have not been submitted.
 
 ### Diversity repair after independent review
 
@@ -260,3 +267,19 @@ engineering smoke remains at 4,096/8,192. This is an unsealed compute choice,
 not permission to truncate or mix token budgets across compared arms. Record
 actual costs and retain all-or-none paired admission. Depth-eight answer-only
 checks remain separate from this full-trace envelope.
+
+## Release-to-SFT job endpoint
+
+The active preparation goal stops at creation of six SFT configs/scripts; no
+Slurm job is submitted and no commit is made. `study/feasibility.py` records
+structural yield and exact token admission. `study/seal.py` checks all roles,
+paired targets, overlap, hashes, and release-linked judge receipts before
+sealing. `study/jobs.py` refuses engineering/unsealed data and writes paired
+Train/Dev package views, pinned Axolotl configs, and repository-relative Slurm
+scripts for seeds 42/43. See the [execution guide](../../spatial/v2/study/README.md).
+
+Production ambiguity and no-match Selection policies now use larger independent
+object trees/star exclusions. Boolean and hybrid budget fillers vary object
+pairs and directions without altering query support. These additions affect
+syntactic diversity, not measured proof difficulty; report both and never claim
+that unique whole-problem signatures imply unique core reasoning skeletons.

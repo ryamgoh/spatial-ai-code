@@ -11,6 +11,7 @@ from spatial.v2.count_certificates import (
     check_count_answer_set,
 )
 from spatial.v2.model_certificate_renderers import render_model_certificate
+from spatial.v2.natural_evidence import share_natural_evidence
 from spatial.v2.proof_renderers import render_formula_refutation
 from spatial.v2.solver import CountQuery, Direction
 from spatial.v2.symbolic_trace_codec import render_symbolic_count_trace
@@ -32,7 +33,15 @@ def _render_count_evidence(
                 labels.get(member, member) for member in assignment.members
             )
             assignment_lines.append(
-                f"membership assignment {{{members}}}\n"
+                (
+                    f"membership assignment {{{members}}}: suppose exactly "
+                    + (
+                        f"{members} satisfy the requested relation and every other candidate does not."
+                        if members
+                        else "none of the candidates satisfies the requested relation."
+                    )
+                    + " We will show why this assumption is impossible.\n"
+                )
                 + render_formula_refutation(assignment.refutation, trace_format, labels)
             )
         return (
@@ -169,4 +178,4 @@ def render_count_training_trace(
         )
         lines.extend((evidence, f"Count {item.count}: {status}"))
     lines.append(_count_summary(certificate, trace_format))
-    return "\n".join(lines)
+    return share_natural_evidence("\n".join(lines))

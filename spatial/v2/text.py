@@ -41,12 +41,15 @@ _DIRECTION_QUERY_RE = re.compile(
     r"In which direction is (.+?) relative to (.+?)\?", re.IGNORECASE
 )
 _WHICH_QUERY_RE = re.compile(
-    rf"Which objects?(?P<map_scope> in the map)? (?:is|are) in the "
+    rf"Which objects?(?:(?P<map_scope> in the map)| among "
+    rf"\[(?P<candidates>[^\]]+)\])? (?:is|are) in the "
     rf"(?P<relation>{_RELATION_PATTERN}) of (?P<reference>.+?)\?",
     re.IGNORECASE,
 )
 _COUNT_QUERY_RE = re.compile(
-    rf"How many objects are in the ({_RELATION_PATTERN}) of (.+?)\?",
+    rf"(?:Considering only \[(?P<candidates>[^\]]+)\], )?"
+    rf"How many objects are in the (?P<relation>{_RELATION_PATTERN}) of "
+    rf"(?P<reference>.+?)\?",
     re.IGNORECASE,
 )
 _OPTION_RE = re.compile(
@@ -310,6 +313,17 @@ class SpatialTextAdapter:
             reference = _strip_the(which_query.group("reference"))
             if which_query.group("map_scope"):
                 candidates = tuple(sorted(objects - {reference}))
+            elif which_query.group("candidates"):
+                candidates = tuple(
+                    _strip_the(candidate)
+                    for candidate in which_query.group("candidates").split(";")
+                )
+                if (
+                    len(candidates) != len(set(candidates))
+                    or reference in candidates
+                    or any(candidate not in objects for candidate in candidates)
+                ):
+                    raise ValueError("invalid Which candidate scope")
             else:
                 candidates = tuple(
                     candidate
@@ -323,11 +337,26 @@ class SpatialTextAdapter:
                 candidates=candidates,
             )
         elif count_query:
-            reference = _strip_the(count_query.group(2))
+            reference = _strip_the(count_query.group("reference"))
+            candidate_text = count_query.group("candidates")
+            if candidate_text is None:
+                candidates = tuple(sorted(objects - {reference}))
+            else:
+                candidates = tuple(
+                    _strip_the(candidate)
+                    for candidate in candidate_text.split(";")
+                )
+                if (
+                    not candidates
+                    or len(candidates) != len(set(candidates))
+                    or reference in candidates
+                    or any(candidate not in objects for candidate in candidates)
+                ):
+                    raise ValueError("invalid Count candidate scope")
             query = CountQuery(
-                directions=_relation_set(count_query.group(1)),
+                directions=_relation_set(count_query.group("relation")),
                 reference=reference,
-                candidates=tuple(sorted(objects - {reference})),
+                candidates=candidates,
             )
         else:
             raise ValueError("unsupported or malformed question")

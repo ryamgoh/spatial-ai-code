@@ -459,3 +459,38 @@ def test_count_compact_parser_rejects_claim_injection_and_old_schema() -> None:
     payload["schema"] = "spatial-count-trace-v1"
     with pytest.raises(ValueError, match="unsupported symbolic Count trace schema"):
         parse_symbolic_count_trace(problem, json.dumps(payload))
+
+
+def test_repeated_natural_models_are_named_once_without_dropping_claim_checks():
+    from spatial.v2.natural_evidence import share_natural_evidence
+
+    axes = "X west to east: A < B.\nY south to north: A = B."
+    source = (
+        axes
+        + "\nClaim one is true.\n"
+        + axes
+        + "\nClaim two is false.\nCount 1: possible"
+    )
+    rendered = share_natural_evidence(source)
+    assert rendered.count("X west to east:") == 1
+    assert "Qualitative witness M1:" in rendered
+    assert "Reuse qualitative witness M1 defined above." in rendered
+    assert "Claim one is true." in rendered and "Claim two is false." in rendered
+    assert "Count 1: possible" in rendered
+
+
+def test_natural_witness_sharing_is_idempotent():
+    from spatial.v2.natural_evidence import share_natural_evidence
+
+    source = "X west to east: A < B.\nY south to north: A = B.\nClaim.\nX west to east: A < B.\nY south to north: A = B.\nOther claim."
+    once = share_natural_evidence(source)
+    assert share_natural_evidence(once) == once
+
+
+def test_natural_case_scope_names_preserve_step_suffixes():
+    from spatial.v2.natural_evidence import share_natural_evidence
+
+    text = "[refutation/case-P1-1] refutation/case-P1-1-F1: fact.\n[refutation/case-P1-1/case-P2-2] refutation/case-P1-1/case-P2-2-C1: contradiction via refutation/case-P1-1-F1."
+    rendered = share_natural_evidence(text)
+    assert "[Case1] Case1-F1: fact." in rendered
+    assert "[Case2] Case2-C1: contradiction via Case1-F1." in rendered
