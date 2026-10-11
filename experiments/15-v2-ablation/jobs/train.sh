@@ -5,6 +5,9 @@ cd "$SLURM_SUBMIT_DIR"
 source "$SLURM_SUBMIT_DIR/slurm/lib/pin-srun-cpus.sh"
 # shellcheck disable=SC1091
 source "$SLURM_SUBMIT_DIR/experiments/15-v2-ablation/jobs/common.bash"
+if [[ "${WANDB_REQUIRED:-0}" == "1" ]]; then
+  load_wandb_credentials
+fi
 
 : "${ARM:?ARM is required}"
 : "${TRAIN_CONFIG:?TRAIN_CONFIG is required}"

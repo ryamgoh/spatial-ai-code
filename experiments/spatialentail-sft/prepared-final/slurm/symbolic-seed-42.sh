@@ -17,7 +17,7 @@ cd "$SLURM_SUBMIT_DIR"
 export ARM=symbolic-seed-42
 export TRAIN_CONFIG="$SLURM_SUBMIT_DIR/experiments/spatialentail-sft/prepared-final/configs/symbolic-seed-42.yaml"
 export MODEL_DIR="$SLURM_SUBMIT_DIR/experiments/spatialentail-sft/prepared-final/models/symbolic-seed-42"
-load_wandb_credentials
+export WANDB_REQUIRED=1
 export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-spatialentail-qwen3.5-4b}"
 export WANDB_JOB_TYPE=symbolic
 export WANDB_RESUME=allow

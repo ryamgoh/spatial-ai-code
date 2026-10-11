@@ -247,7 +247,7 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
         assert "#SBATCH --mail-user=e0958116@u.nus.edu" in script
         assert "/logs/%x-%j.out" in script
         assert "/logs/%x-%j.err" in script
-        assert "load_wandb_credentials" in script
+        assert "WANDB_REQUIRED=1" in script
         assert "WANDB_RESUME=allow" in script
         import subprocess
 
@@ -262,6 +262,14 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
     copied = prepare_jobs(moved / "release", moved / "jobs", repo_root=moved)
     assert len(copied["jobs"]) == 6
     assert (moved / "jobs/logs/.gitkeep").is_file()
+
+    train_launcher = (
+        Path(__file__).parents[3]
+        / "experiments/15-v2-ablation/jobs/train.sh"
+    ).read_text()
+    assert train_launcher.index("source ") < train_launcher.index(
+        "load_wandb_credentials"
+    )
 
 
 def test_nested_partial_group_cannot_pass_with_rehashed_artifact(tmp_path):

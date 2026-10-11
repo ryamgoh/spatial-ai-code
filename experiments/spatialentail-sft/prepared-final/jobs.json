@@ -8,7 +8,7 @@
   },
   "environment_sha256": {
     "experiments/15-v2-ablation/jobs/common.bash": "d4fd9b8c59de470ea814412a8ad14d21b086893abe16a4764036a41d48763a39",
-    "experiments/15-v2-ablation/jobs/train.sh": "5f1c1f2c69d84a58e9206f3514b4de56cac8a2dd83134c4222ddf6253aefef53",
+    "experiments/15-v2-ablation/jobs/train.sh": "4fbdb397ffadc39380eb80cbc93bd431f6b20e0b7fc2a9a9982949540ebcb778",
     "finetune/finetune.py": "0719d45c389754772205eb15d6aaba02caf11ff878e0583f0ea439d0110a1e91",
     "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
     "slurm/lib/pin-srun-cpus.sh": "cfb04bed02cfe24b85ecd22bc99891f77cba95fceb2bc55db867e5477b145abb",
@@ -27,12 +27,12 @@
     "data/train-answer-only.jsonl": "6b6aabe07fa485521d46b09bd5cc688862f812967baae2fffc33de319e84a072",
     "data/train-natural.jsonl": "a9688f2aa9d04299810c77029588c9d100b347de2bde13229ee7c26655b50d26",
     "data/train-symbolic.jsonl": "4bb904384e1bf3d5c2363d2041021c03ad441a17afd644efb144a9141c376f1b",
-    "slurm/answer-only-seed-42.sh": "010273cc9966405b84b32f09a9d4524cae80f4b75fc500cb2c422489c0f4ba40",
-    "slurm/answer-only-seed-43.sh": "08e478214f4dca25a4e48fae55c3ac95a866fe082934886b071eb7360646f8ef",
-    "slurm/natural-seed-42.sh": "dd0b34fc827fe90336883f594e9945609701b8bb19d00548fcfe2e2c04afbdd6",
-    "slurm/natural-seed-43.sh": "6283034115e08b87cd69c43d6706ec4f5c92eb74cb74ede14c4e56675f6eee76",
-    "slurm/symbolic-seed-42.sh": "a76dacfd6482eb4da0ca4aaac9e122f828ece82fd265c267fc13b22d5e054090",
-    "slurm/symbolic-seed-43.sh": "038360cbb9a400b99c78096a6208266e31569ae57ebcaa94d4e035a445b9fe5f"
+    "slurm/answer-only-seed-42.sh": "7e7dd7bbea59553361db25c5361eeb355b96d9b32a1cd73ba2b7ff804ca8a4f6",
+    "slurm/answer-only-seed-43.sh": "53886aad8ec857dbfed70cca03e3fb3c93afb89ab0390f246bee62937457182e",
+    "slurm/natural-seed-42.sh": "f65de4f9daf8be5308120d0a9fb02ca8c7ca81f0d8ca4c6c0eead640794e40e7",
+    "slurm/natural-seed-43.sh": "7c5eb30aa0c7348bdf0af93c07158770292188ec56142575500f735fdbbbd499",
+    "slurm/symbolic-seed-42.sh": "b92bb9e8bfabcb1d72f9a7c9486baf359682aece096c7fa434aba73cc13b0b09",
+    "slurm/symbolic-seed-43.sh": "e50f21d13446a7b4af313acbf0fa442174241755240e8f4b088912d0a9e48591"
   },
   "jobs": [
     {
