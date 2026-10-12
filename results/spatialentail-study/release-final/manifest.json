@@ -1,0 +1,456 @@
+{
+  "artifacts": {
+    "bench-comp": {
+      "answer_position_rows": {
+        "A": 900,
+        "B": 909,
+        "C": 906,
+        "D": 885
+      },
+      "bases": 1200,
+      "query_base_counts": {
+        "count": 400,
+        "direction": 400,
+        "which": 400
+      },
+      "rows": 3600,
+      "sha256": "bfa3d64a508257ce71af7af001a948ccd4a1b5716b6a0942fc6e5e2e4bdf433e",
+      "signature_fallback_rows": 0,
+      "target_tokens": 3113334,
+      "target_tokens_by_package": {
+        "natural:answer-only": 3600,
+        "natural:checked-trace": 939533,
+        "symbolic:checked-trace": 2170201
+      },
+      "unique_structures": 1200
+    },
+    "bench-composition": {
+      "answer_position_rows": {
+        "A": 636,
+        "B": 681,
+        "C": 672,
+        "D": 711
+      },
+      "bases": 900,
+      "query_base_counts": {
+        "count": 300,
+        "direction": 300,
+        "which": 300
+      },
+      "rows": 2700,
+      "sha256": "88d458608d84bc5e66bfd92e7eb5c1e8402b200116542f8747b95ff142c76056",
+      "signature_fallback_rows": 0,
+      "target_tokens": 2781246,
+      "target_tokens_by_package": {
+        "natural:answer-only": 2700,
+        "natural:checked-trace": 826628,
+        "symbolic:checked-trace": 1951918
+      },
+      "unique_structures": 900
+    },
+    "bench-core": {
+      "answer_position_rows": {
+        "A": 897,
+        "B": 1068,
+        "C": 906,
+        "D": 849,
+        "E": 180
+      },
+      "bases": 1300,
+      "query_base_counts": {
+        "count": 300,
+        "direction": 500,
+        "which": 500
+      },
+      "rows": 3900,
+      "sha256": "16cb66fb7e9ded1df130259bf9ed386576812df414b790ba1a17f9469f526d1d",
+      "signature_fallback_rows": 0,
+      "target_tokens": 3986042,
+      "target_tokens_by_package": {
+        "natural:answer-only": 3900,
+        "natural:checked-trace": 1172692,
+        "symbolic:checked-trace": 2809450
+      },
+      "unique_structures": 1300
+    },
+    "bench-depth": {
+      "answer_position_rows": {
+        "A": 265,
+        "B": 251,
+        "C": 221,
+        "D": 163
+      },
+      "bases": 900,
+      "query_base_counts": {
+        "count": 300,
+        "direction": 300,
+        "which": 300
+      },
+      "rows": 900,
+      "sha256": "cbb232a1e126eec9305dc79b92271e8b2dba0d4831dc71f7c4b61cecc5a5d328",
+      "signature_fallback_rows": 0,
+      "target_tokens": 2700,
+      "target_tokens_by_package": {
+        "natural:answer-only": 2700
+      },
+      "unique_structures": 900
+    },
+    "dev": {
+      "answer_position_rows": {
+        "A": 552,
+        "B": 570,
+        "C": 597,
+        "D": 528,
+        "E": 78
+      },
+      "bases": 775,
+      "query_base_counts": {
+        "count": 225,
+        "direction": 275,
+        "which": 275
+      },
+      "rows": 2325,
+      "sha256": "a6c8cef42f652b96a26b373b7d94a7f629c35aaed941c1040f2ab324699de613",
+      "signature_fallback_rows": 0,
+      "target_tokens": 2855343,
+      "target_tokens_by_package": {
+        "natural:answer-only": 2325,
+        "natural:checked-trace": 842928,
+        "symbolic:checked-trace": 2010090
+      },
+      "unique_structures": 775
+    },
+    "train": {
+      "answer_position_rows": {
+        "A": 5868,
+        "B": 5931,
+        "C": 5904,
+        "D": 5898,
+        "E": 399
+      },
+      "bases": 8000,
+      "query_base_counts": {
+        "count": 2400,
+        "direction": 2800,
+        "which": 2800
+      },
+      "rows": 24000,
+      "sha256": "092015a755ecda57e0b01500554ef9b1d4bd8555fcadeaccf0f52b2eb80a0748",
+      "signature_fallback_rows": 0,
+      "target_tokens": 27513753,
+      "target_tokens_by_package": {
+        "natural:answer-only": 24000,
+        "natural:checked-trace": 8143819,
+        "symbolic:checked-trace": 19345934
+      },
+      "unique_structures": 8000
+    },
+    "train-0.5": {
+      "answer_position_rows": {
+        "A": 2871,
+        "B": 2931,
+        "C": 3075,
+        "D": 2931,
+        "E": 192
+      },
+      "bases": 4000,
+      "query_base_counts": {
+        "count": 1200,
+        "direction": 1400,
+        "which": 1400
+      },
+      "rows": 12000,
+      "sha256": "14dba49680179235fb46adea868893f737aa2daf9210661067bffab9150f7937",
+      "signature_fallback_rows": 0,
+      "target_tokens": 13763316,
+      "target_tokens_by_package": {
+        "natural:answer-only": 12000,
+        "natural:checked-trace": 4074451,
+        "symbolic:checked-trace": 9676865
+      },
+      "unique_structures": 4000
+    }
+  },
+  "config_sha256": "0556ec0e6d6c55c3582c6f460f45557628062f078ea146eb3cea2e7b6e921d6d",
+  "contamination_inputs_sha256": {
+    "../../../results/spatialentail-capability-pilot/v3/pilot.jsonl": "78161bfc3a16d7cfd7fce1ce843856bab97921b2d20f66567a224e913f9fa7ce"
+  },
+  "context_budget": {
+    "eval_max_tokens": 16384,
+    "max_new_tokens": 12288,
+    "tokenizer_name": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "train_max_tokens": 12288
+  },
+  "implementation_sources_sha256": {
+    "spatial/v2/__init__.py": "cbd16bf20ee50b893668858175fd713585d1f5f001046293d390e57fedc6a4b7",
+    "spatial/v2/answer_certificate_renderers.py": "b307ec3892b5b9c8eb67f57352ba93c691072686ae12a4f5ba23e923ce9ddc50",
+    "spatial/v2/answer_certificates.py": "fb13f8d05184d090302f5b55b5fa883c37c21c6d137b51934959e83aa6446ebd",
+    "spatial/v2/audit_spatialeval.py": "5076de20c9c40656dd6619009baa13cc4c179afb16e4e7fdc5ffe44eef593822",
+    "spatial/v2/benchmark_registry.py": "4eef7ef18eb9c8580f152689e41b8c8e06cc1e050721a4a6cc1975eed900518a",
+    "spatial/v2/certificate_generation.py": "254bb7adad30503958ac8b8cb1c87e437ebad09e22386dc9a3c331720e68bffe",
+    "spatial/v2/check_registry.py": "25097fa585e54e961ae4fe1256ae5f3a8267cb0a6558c01e954a448b2f6b7410",
+    "spatial/v2/composition.py": "50cb17c847644804e73203daa37ea8d301f53d99b75f7d048c53e475322c18f3",
+    "spatial/v2/context_budget.py": "bc2cdeffe962090677e57c0275755f6917152e31832e8b8b3e79e04cb8443268",
+    "spatial/v2/count_certificate_renderers.py": "c2678384b47e9748d0ac282210e2c2c01ad825a494952474ef6030b2064a8d96",
+    "spatial/v2/count_certificates.py": "f5c0bf20d14d552b4f9bb5642c18cfa08a511f812696e8f9e456d38cc72d91da",
+    "spatial/v2/difficulty.py": "e2c599844946cf096cce77dc64098e2381e18c7a3084129b3db2a7e19d75a88d",
+    "spatial/v2/generate_all.py": "7b7542886e3e8316f73e14b6540cc0d191b967026b478e0474b9b36627780152",
+    "spatial/v2/generate_matrix.py": "d6df5abc5aad924d78b63c228d753901fa4dbefa78038b471202ca2c828c3c4f",
+    "spatial/v2/generation.py": "80732ea37c86f5a9c4347b6e83e85549b926d4a5a3ecc61eaaf625b025ccfeaf",
+    "spatial/v2/grading.py": "03bfeb85bedb4f82717e028e50f5d1772a908f095c7c0290bd90f41688bd25c2",
+    "spatial/v2/hitl/__init__.py": "b749d60fc438519602901b09927a82ad89dfbc3d18e99dd36b1fe16bd46bc5fd",
+    "spatial/v2/hitl/batches.py": "54d71f44a5e5a3ea661a2205527e55cf732bc7b2be84efe5bf553cd68eb51cf6",
+    "spatial/v2/hitl/review.py": "5646c12b8d752d0b40da01a1da185cdf6ff2950a8aa6aee46212c29f0e1b2635",
+    "spatial/v2/matrix.py": "851166e182f48a5d293715f6abf40be08a5dad46f1a48d5672c8c006391bfab8",
+    "spatial/v2/model_certificate_renderers.py": "6a9b9f194db7276631fd1209b24c9c694ff1572d92ef8daa4467992a67ee33e6",
+    "spatial/v2/model_certificates.py": "c7e6e75980d0348f4514daaea5ec259edfac6b5be83e71c5a022904f2e9b0963",
+    "spatial/v2/natural_evidence.py": "83091e159ec33a5951864452e8060bbd6cdd09423d90fa798112bf99e96656c9",
+    "spatial/v2/proof_renderers.py": "58f7fd380803577eaf59e45cd9c560bf72ca87dd456e6297a3cf11f1aab85377",
+    "spatial/v2/proofs.py": "943bc9625332b279429f724e04d6b24d11bb43b6aa02c8501396ca77ef6d18f3",
+    "spatial/v2/serialization.py": "53dd40e6f6997f5919dcfc16b7175d2bf28e8aa769b3ac196235a160508cd40a",
+    "spatial/v2/solver.py": "31daa8da830cb7dfe56b079d24d53f6b944806f70bfba12f4ea0193cc46f6c95",
+    "spatial/v2/spatialeval_adapter.py": "b1639264c8d7284263dcaca7692398ce30d8a1597affac3373e7bc7b70181556",
+    "spatial/v2/structure.py": "3831348cc767044e9511692bd1d66ba7eac24a1ee32c8048c6f148b5f9379ede",
+    "spatial/v2/study/__init__.py": "4040b4e06ca7bdee761a859d2f22d8aa562e4919d153d4c84057c818c57ce0f8",
+    "spatial/v2/study/build.py": "6d67bdaa38e7d849bb62b45cc1b6cc84d2e7c546f4d85d7280f4c4802d56d8ce",
+    "spatial/v2/study/feasibility.py": "b827f92f8da9a78bcf0acd720bec5efd68484b6d116c854922853261a9a95a0c",
+    "spatial/v2/study/jobs.py": "6ae393f5d28724b763b87526f84a617e89b300d6f6227447ac62d961b3a4bc1a",
+    "spatial/v2/study/metrics.py": "a6d0b5760b7382a0d889798102971c25625189fa63170449025b6efe3ab67215",
+    "spatial/v2/study/refresh.py": "e736f4ad65be920994a67081f3cf34e30679bd699243a8e2c8b48c9ffc83b5cb",
+    "spatial/v2/study/reuse_reviews.py": "c9cdc7b5f8e5d77291a5d740b34d8d6a4f735bffc4e4fa8775ec31aebc916fa9",
+    "spatial/v2/study/review_packets.py": "6c43c70d251c12eeffe6c7d9afbc384c2e34b8b32554448a708acdabbe4a2ab5",
+    "spatial/v2/study/seal.py": "8304d14cd8946e29c911a1e99e4c6619875b811a1659f8521136a306d37473c4",
+    "spatial/v2/supervision_controls.py": "90fc8c4d3512704bdbe696ac5228a295d053927c93a4c11aa6fd341c5784a396",
+    "spatial/v2/symbolic_trace_codec.py": "e9dc99d2f14848ed6fcd167fd61164c37ea87a08f43e57cdf4a61bf70b598fcd",
+    "spatial/v2/tests/__init__.py": "cd4c066d26c86a16303934968807de4f9673b65cbd688ff137fd9f2fd4fbe01c",
+    "spatial/v2/tests/hitl/test_batches.py": "8bd8178be25c3fbac35f58be973735952081a286e2e521bacdf0d98b0bcc84f7",
+    "spatial/v2/tests/hitl/test_review.py": "30f9fe019dc6c726a0a4fed81a01dd626122636a1d8253533c4692664b8b8ee9",
+    "spatial/v2/tests/test_answer_certificates.py": "e3e1dc4d10cd800e44cdd1ef964497d5cf19f0c2ee148f6f725a4036a55e6dd1",
+    "spatial/v2/tests/test_audit_spatialeval.py": "12e4b43a63175285c64f893a4115820d665659406763f315b40dc9a03a16ddda",
+    "spatial/v2/tests/test_benchmark_registry.py": "72624150a5d6e372c0f7f9b86a4f0c4c70644d75d96315e1049cd42775fec492",
+    "spatial/v2/tests/test_composition.py": "cbf5a958e791b7f04d75def19bfb18d300d7355022f5825085975c235eb5b56d",
+    "spatial/v2/tests/test_context_budget.py": "034da7483f75f709d4576e0d48d0a92de18e23b2a54df0646592ece17323c826",
+    "spatial/v2/tests/test_count_certificates.py": "d2fe42490365cdd9233f2a609d6e09e2283b4c267d6e34402c2cdf70b82e6528",
+    "spatial/v2/tests/test_difficulty.py": "ede10bc29c07c8935dfdcd1b4bab0ded76d64c5c2f987914c175011e612f6df3",
+    "spatial/v2/tests/test_generation.py": "07a6edeb08b3d3740e46858b0d7fc4c8f5a64da5ba238ae964ef4121d1ba79d7",
+    "spatial/v2/tests/test_grading.py": "b51bd535a4eea446517def4b0107f7a7af3440140591b8ca5ec0f266863b04d0",
+    "spatial/v2/tests/test_matrix.py": "f3b4de7c9874c64bbb8f4f1a75108b6727d4b1b13d4309b6a7f13c298de6cf8b",
+    "spatial/v2/tests/test_model_certificates.py": "192034e2408d0afdf58935e4fbdc7024f5bd7865915b269742e4db3fe46fd060",
+    "spatial/v2/tests/test_proofs.py": "46d0a950790eacf4481b85678bfc5887d696932857c480aeb8326f45c68f052f",
+    "spatial/v2/tests/test_solver.py": "580a7bf1375964b63adf43d5d6fb40e0c0be1e4ce04a407a8026dabb678b500f",
+    "spatial/v2/tests/test_study_jobs.py": "479a28b1df94010b6ee4da12c7a19c2470ca2255aff7e2b6132c0c491315ca04",
+    "spatial/v2/tests/test_study_metrics.py": "93de34502a353177d2f210500921ba1037bfa1ab125e95516d7113e787927f09",
+    "spatial/v2/tests/test_study_refresh.py": "155769527caa4bbd5d3b763d12c1e714758a0bebe2ac6d52a1052565249b4e39",
+    "spatial/v2/tests/test_study_release.py": "48aab094d09a574cbabe6337c9082c433d88c324b07f2f556f2787d99f11f820",
+    "spatial/v2/tests/test_study_release_audit.py": "7315a98ed8258c7a5309b3425a54da4711ee73781f408596d497a32ec563cf89",
+    "spatial/v2/tests/test_study_seal.py": "c055810031a59a87db822cc1490b7c4b6f780862dee5279e7e92a7f95056eddd",
+    "spatial/v2/tests/test_supervision_controls.py": "1d6233cd7052300f7978cde41d1ac617652f16aad6cc5249dd9aac6fd8643dba",
+    "spatial/v2/tests/test_which_certificates.py": "766e1442c884de63547f5a43a5fffd00103e767affd1f20a832cd602632af966",
+    "spatial/v2/tests/test_workload_manifest.py": "47124d8020246d65de64a5192396b21953cf93e6f769a1dbe4dd9e537373198c",
+    "spatial/v2/text.py": "9022b50ae55e83a23a11a7ab5f1cf6d3a3297bf624263b1b4441c93333971d09",
+    "spatial/v2/trace.py": "da65d0dd99e771d91c9e7805b050facdd3c0b7bf5384d7bbfe1dd01a789720b5",
+    "spatial/v2/which_certificate_renderers.py": "10c465ba833f7a65b62c2994599cb5938f67ff0572ac5e93b76196f50735f1f2",
+    "spatial/v2/which_certificates.py": "84ccecfb9f81b37e4ecd4600f27d400cf4528f882b3c868b88a2c6dcc13f4203",
+    "spatial/v2/workload_manifest.py": "7a9fb004656c65d24b44bc642e7994395c77fc1edd4eeaf68c5e64005341fd7f"
+  },
+  "instance_signature": "visible-problem-structure-v1; direction-sensitive; conservative fallback",
+  "name": "spatialentail-release-candidate",
+  "quotas": {
+    "bench-comp": {
+      "CNT-DJE-TRC-UNI": 100,
+      "CNT-IFF-TRC-UNI": 100,
+      "CNT-MP-TRC-UNI": 100,
+      "CNT-TRC-MP-UNI": 100,
+      "DIR-DJE-TRC-UNI": 100,
+      "DIR-IFF-TRC-UNI": 100,
+      "DIR-MP-TRC-UNI": 100,
+      "DIR-TRC-MP-UNI": 100,
+      "SEL-DJE-TRC-UNI": 100,
+      "SEL-IFF-TRC-UNI": 100,
+      "SEL-MP-TRC-UNI": 100,
+      "SEL-TRC-MP-UNI": 100
+    },
+    "bench-composition": {
+      "CNT-MP-DJE-TRC-UNI": 100,
+      "CNT-MP-TRC-MP-UNI": 100,
+      "CNT-TRC-MP-TRC-UNI": 100,
+      "DIR-MP-DJE-TRC-UNI": 100,
+      "DIR-MP-TRC-MP-UNI": 100,
+      "DIR-TRC-MP-TRC-UNI": 100,
+      "SEL-MP-DJE-TRC-UNI": 100,
+      "SEL-MP-TRC-MP-UNI": 100,
+      "SEL-TRC-MP-TRC-UNI": 100
+    },
+    "bench-core": {
+      "CNT-AXC-UNI": 100,
+      "CNT-CSR-JCR-UNI": 100,
+      "CNT-NEG-UNI": 100,
+      "DIR-ARC-ALT": 100,
+      "DIR-ARC-UNI": 100,
+      "DIR-DJE-UNI": 100,
+      "DIR-MP-UNI": 100,
+      "DIR-TRC-UNI": 100,
+      "SEL-ARC-MUL": 100,
+      "SEL-ARC-NOM": 100,
+      "SEL-CSR-UNI": 100,
+      "SEL-IFF-UNI": 100,
+      "SEL-TRC-UNI-NOISE": 100
+    },
+    "bench-depth": {
+      "count-depth-3": 50,
+      "count-depth-4": 50,
+      "count-depth-5": 50,
+      "count-depth-6": 50,
+      "count-depth-7": 50,
+      "count-depth-8": 50,
+      "direction-depth-3": 50,
+      "direction-depth-4": 50,
+      "direction-depth-5": 50,
+      "direction-depth-6": 50,
+      "direction-depth-7": 50,
+      "direction-depth-8": 50,
+      "which-depth-3": 50,
+      "which-depth-4": 50,
+      "which-depth-5": 50,
+      "which-depth-6": 50,
+      "which-depth-7": 50,
+      "which-depth-8": 50
+    },
+    "dev": {
+      "CNT-AXC-UNI": 25,
+      "CNT-CSR-JCR-UNI": 25,
+      "CNT-DJE-TRC-UNI": 25,
+      "CNT-IFF-TRC-UNI": 25,
+      "CNT-MP-TRC-UNI": 25,
+      "CNT-NEG-UNI": 25,
+      "CNT-TRC-MP-UNI": 25,
+      "DIR-ARC-ALT": 25,
+      "DIR-ARC-UNI": 25,
+      "DIR-DJE-TRC-UNI": 25,
+      "DIR-DJE-UNI": 25,
+      "DIR-IFF-TRC-UNI": 25,
+      "DIR-MP-TRC-UNI": 25,
+      "DIR-MP-UNI": 25,
+      "DIR-TRC-MP-UNI": 25,
+      "DIR-TRC-UNI": 25,
+      "SEL-ARC-MUL": 25,
+      "SEL-ARC-NOM": 25,
+      "SEL-CSR-UNI": 25,
+      "SEL-DJE-TRC-UNI": 25,
+      "SEL-IFF-TRC-UNI": 25,
+      "SEL-IFF-UNI": 25,
+      "SEL-MP-TRC-UNI": 25,
+      "SEL-TRC-MP-UNI": 25,
+      "SEL-TRC-UNI-NOISE": 25,
+      "count-depth-3": 25,
+      "count-depth-4": 25,
+      "direction-depth-3": 25,
+      "direction-depth-4": 25,
+      "which-depth-3": 25,
+      "which-depth-4": 25
+    },
+    "train": {
+      "CNT-AXC-UNI": 200,
+      "CNT-CSR-JCR-UNI": 200,
+      "CNT-DJE-TRC-UNI": 350,
+      "CNT-IFF-TRC-UNI": 350,
+      "CNT-MP-TRC-UNI": 350,
+      "CNT-NEG-UNI": 200,
+      "CNT-TRC-MP-UNI": 350,
+      "DIR-ARC-ALT": 200,
+      "DIR-ARC-UNI": 200,
+      "DIR-DJE-TRC-UNI": 350,
+      "DIR-DJE-UNI": 200,
+      "DIR-IFF-TRC-UNI": 350,
+      "DIR-MP-TRC-UNI": 350,
+      "DIR-MP-UNI": 200,
+      "DIR-TRC-MP-UNI": 350,
+      "DIR-TRC-UNI": 200,
+      "SEL-ARC-MUL": 200,
+      "SEL-ARC-NOM": 200,
+      "SEL-CSR-UNI": 200,
+      "SEL-DJE-TRC-UNI": 350,
+      "SEL-IFF-TRC-UNI": 350,
+      "SEL-IFF-UNI": 200,
+      "SEL-MP-TRC-UNI": 350,
+      "SEL-TRC-MP-UNI": 350,
+      "SEL-TRC-UNI-NOISE": 200,
+      "count-depth-3": 200,
+      "count-depth-4": 200,
+      "direction-depth-3": 200,
+      "direction-depth-4": 200,
+      "which-depth-3": 200,
+      "which-depth-4": 200
+    }
+  },
+  "registry_sha256": {
+    "../benchmark-cells.yaml": "c4168727a1b4d00f5df3073fc650267648eb2ca6aac8af4fb7f19edd3865dab4",
+    "../composition-cells.yaml": "9fb467fcc04a9b035f4a1adb4aebf4b6ab9b10d40b95f221a1f192c2c881a6bb",
+    "../composition-holdout-cells.yaml": "49f796b0f8ecc6efe881a16babf3a34d55177021dfdd8d29858d8bdf2fbb0e9e"
+  },
+  "rejections": {},
+  "release_audit_sha256": "b36df3a145262c91559ea1d5084a44c9d3116685c83ee5b8fc8f0357f1e19fce",
+  "render_refresh": {
+    "changed_bases": {
+      "bench-comp": 800,
+      "bench-composition": 600,
+      "bench-core": 800,
+      "dev": 500,
+      "train": 5200
+    },
+    "quality_receipts_reused": false,
+    "renderer_sha256": "83091e159ec33a5951864452e8060bbd6cdd09423d90fa798112bf99e96656c9",
+    "schema": "shared-membership-witness-prose-v2",
+    "source_manifest_sha256": "f8d5e79b04bcc53c6d2f238213db7450434f5a5d788d7c4d28ca1979fe2e7be6"
+  },
+  "review_index_sha256": "c40bcb4d124e6b8cff7c6c83ad7544829ed4511f75c96993aeff2cb3203243ee",
+  "schema": "spatialentail-study-release-v1",
+  "skeleton_signature": "declared-skeleton-v1; construction-family reservation, not logical equivalence",
+  "skeletons": {
+    "bench-comp": [
+      "dje-trc",
+      "iff-trc",
+      "mp-trc",
+      "trc-mp"
+    ],
+    "bench-composition": [
+      "mp-dje-trc",
+      "mp-trc-mp",
+      "trc-mp-trc"
+    ],
+    "bench-core": [
+      "depth:count",
+      "depth:direction",
+      "depth:which"
+    ],
+    "bench-depth": [
+      "depth:count",
+      "depth:direction",
+      "depth:which"
+    ],
+    "dev": [
+      "depth:count",
+      "depth:direction",
+      "depth:which",
+      "dje-trc",
+      "iff-trc",
+      "mp-trc",
+      "trc-mp"
+    ],
+    "train": [
+      "depth:count",
+      "depth:direction",
+      "depth:which",
+      "dje-trc",
+      "iff-trc",
+      "mp-trc",
+      "trc-mp"
+    ]
+  },
+  "software_dirty": true,
+  "software_dirty_after_refresh": true,
+  "software_revision": "ad832bfa14feb4f9c9eb9c78dbb23e9ac1ff719c",
+  "status": "sealed",
+  "tracked_implementation_diff_sha256": "7669ae5eab3d4d5114308553abe10a1d4dcb2535e5e3a267445a675daf785144"
+}
