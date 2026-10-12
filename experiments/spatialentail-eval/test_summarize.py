@@ -23,6 +23,13 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
             "count": 100,
         },
         {
+            "task": "matched",
+            "role": "bench-composition-matched",
+            "cell": "DIR-MP-TRC-UNI",
+            "query_kind": "direction",
+            "count": 100,
+        },
+        {
             "task": "depth",
             "role": "bench-depth",
             "cell": "direction-depth-3",
@@ -33,7 +40,7 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
     (tmp_path / "jobs.json").write_text(
         json.dumps(
             {
-                "total_bases": 150,
+                "total_bases": 250,
                 "tasks": tasks,
                 "jobs": [{"name": "model"}, {"name": "missing"}],
             }
@@ -47,6 +54,7 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
             {
                 "results": {
                     "core": {"strict_acc,none": 0.8, "loose_acc,none": 0.9},
+                    "matched": {"strict_acc,none": 0.7, "loose_acc,none": 0.8},
                     "depth": {"strict_acc,none": 0.5, "loose_acc,none": 0.6},
                 }
             }
@@ -58,6 +66,7 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
     assert summary["models"]["model"]["overall_micro_accuracy"] == pytest.approx(0.7)
     assert summary["models"]["model"]["module_cell_macro_accuracy"] == {
         "bench-core": 0.8,
+        "bench-composition-matched": 0.7,
         "bench-depth": 0.5,
     }
     assert summary["models"]["model"]["depth_accuracy"] == {"direction": {"3": 0.5}}

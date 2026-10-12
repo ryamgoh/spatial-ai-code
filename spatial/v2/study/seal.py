@@ -22,6 +22,7 @@ from spatial.v2.hitl.review import (
 )
 from spatial.v2.solver import SpatialSolverV2
 from spatial.v2.structure import canonical_structure_profile
+from spatial.v2.study import role_path
 from spatial.v2.study.build import _hash, _keys
 from spatial.v2.symbolic_trace_codec import score_symbolic_training_trace
 from spatial.v2.text import SpatialTextAdapter
@@ -44,7 +45,7 @@ def audit_release(release: Path) -> dict:
     summary = {}
     skeletons_by_role = {}
     for role, quotas in manifest["quotas"].items():
-        path = release / (role + ".jsonl")
+        path = role_path(release, role)
         if (
             hashlib.sha256(path.read_bytes()).hexdigest()
             != manifest["artifacts"][role]["sha256"]
@@ -202,13 +203,13 @@ def audit_release(release: Path) -> dict:
     full = {
         row["id"]: _hash(row)
         for row in (
-            json.loads(x) for x in (release / "train.jsonl").read_text().splitlines()
+            json.loads(x) for x in role_path(release, "train").read_text().splitlines()
         )
     }
     for role, record in manifest["artifacts"].items():
         if not role.startswith("train-"):
             continue
-        path = release / (role + ".jsonl")
+        path = role_path(release, role)
         if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
             raise ValueError("nested hash mismatch")
         nested_rows = [json.loads(line) for line in path.read_text().splitlines()]
@@ -274,7 +275,7 @@ def seal_release(
         raise ValueError("review covers different release artifacts")
     natural = {}
     for role in manifest["quotas"]:
-        for line in (release / (role + ".jsonl")).read_text().splitlines():
+        for line in role_path(release, role).read_text().splitlines():
             row = json.loads(line)
             if (
                 row["metadata"]["trace_format"] == "natural"

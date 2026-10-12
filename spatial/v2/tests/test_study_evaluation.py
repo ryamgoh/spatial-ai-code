@@ -3,7 +3,8 @@ import json
 import subprocess
 from pathlib import Path
 
-from spatial.v2.study.evaluation import BENCH_ROLES, prepare_evaluation
+from spatial.v2.study import role_path
+from spatial.v2.study.evaluation import BENCH_MODULES, prepare_evaluation
 
 
 def _row(base_id: str, role: str, trace: str, arm: str) -> dict:
@@ -28,7 +29,7 @@ def _release(root: Path) -> Path:
     release = root / "release"
     release.mkdir()
     artifacts = {}
-    for role in BENCH_ROLES:
+    for role in BENCH_MODULES.values():
         rows = [_row(role, role, "natural", "answer-only")]
         if role != "bench-depth":
             rows.extend(
@@ -37,7 +38,7 @@ def _release(root: Path) -> Path:
                     _row(role, role, "symbolic", "checked-trace"),
                 ]
             )
-        path = release / f"{role}.jsonl"
+        path = role_path(release, role)
         path.write_text("".join(json.dumps(row) + "\n" for row in rows))
         artifacts[role] = {
             "bases": 1,
@@ -68,6 +69,7 @@ def test_frozen_evaluation_selects_one_answer_row_per_base(tmp_path: Path) -> No
 
     assert receipt["total_bases"] == 4
     assert len(receipt["tasks"]) == 4
+    assert {item["role"] for item in receipt["tasks"]} == set(BENCH_MODULES)
     assert [job["name"] for job in receipt["jobs"]] == [
         "untuned",
         "answer-only-seed-42",

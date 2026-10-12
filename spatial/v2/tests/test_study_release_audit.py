@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from spatial.v2.study import role_path
 from spatial.v2.study.build import build_release
 from spatial.v2.study.jobs import prepare_jobs
 from spatial.v2.study.seal import audit_release
@@ -115,7 +116,7 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
             continue
         rows = [
             json.loads(line)
-            for line in (release / (role + ".jsonl")).read_text().splitlines()
+            for line in role_path(release, role).read_text().splitlines()
         ]
         natural = [
             r

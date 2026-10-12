@@ -8,6 +8,7 @@ from pathlib import Path
 
 from spatial.v2.hitl.batches import batch_review_packet
 from spatial.v2.hitl.review import build_review_packet
+from spatial.v2.study import role_path
 from spatial.v2.study.seal import audit_release
 
 
@@ -24,7 +25,7 @@ def prepare_review(release: Path, output: Path, *, seed: int = 42) -> dict:
             continue
         rows = [
             json.loads(line)
-            for line in (release / (role + ".jsonl")).read_text().splitlines()
+            for line in role_path(release, role).read_text().splitlines()
         ]
         natural = [
             r

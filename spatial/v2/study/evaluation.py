@@ -12,7 +12,14 @@ from typing import Any
 
 import yaml
 
-BENCH_ROLES = ("bench-core", "bench-comp", "bench-composition", "bench-depth")
+from spatial.v2.study import role_path
+
+BENCH_MODULES = {
+    "bench-core": "bench-core",
+    "bench-composition-matched": "bench-comp",
+    "bench-composition-heldout": "bench-composition",
+    "bench-depth": "bench-depth",
+}
 MODEL_SPECS = {
     "untuned": None,
     "answer-only-seed-42": (
@@ -189,25 +196,29 @@ spec.loader.exec_module(module)
 process_docs_v2_sft = module.process_docs_v2_sft
 process_results_v2_answer = module.process_results_v2_answer
 """
-    for role in BENCH_ROLES:
-        source = release / f"{role}.jsonl"
-        artifact = manifest["artifacts"][role]
+    for report_role, sealed_role in BENCH_MODULES.items():
+        source = role_path(release, sealed_role)
+        artifact = manifest["artifacts"][sealed_role]
         if _sha256(source) != artifact["sha256"]:
-            raise ValueError(f"{role} hash disagrees with the sealed manifest")
+            raise ValueError(
+                f"{report_role} hash disagrees with the sealed manifest"
+            )
         rows = [json.loads(line) for line in source.read_text().splitlines()]
-        selected = _select_answer_rows(rows, role)
+        selected = _select_answer_rows(rows, report_role)
         if len(selected) != artifact["bases"]:
-            raise ValueError(f"{role} base count disagrees with the sealed manifest")
+            raise ValueError(
+                f"{report_role} base count disagrees with the sealed manifest"
+            )
         total_bases += len(selected)
         by_cell: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in selected:
             cell = str(row["metadata"].get("benchmark_cell") or "")
             if not cell:
-                raise ValueError(f"{role} row lacks metadata.benchmark_cell")
+                raise ValueError(f"{report_role} row lacks metadata.benchmark_cell")
             by_cell[cell].append(row)
         for cell, cell_rows in sorted(by_cell.items()):
-            task_name = f"spatialentail_{_slug(role)}_{_slug(cell)}"
-            data_name = f"data/{role}--{cell}.jsonl"
+            task_name = f"spatialentail_{_slug(report_role)}_{_slug(cell)}"
+            data_name = f"data/{report_role}--{cell}.jsonl"
             data_path = "../" + str((output / data_name).relative_to(root))
             files[data_name] = "".join(
                 json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
@@ -220,7 +231,7 @@ process_results_v2_answer = module.process_results_v2_answer
             task_records.append(
                 {
                     "task": task_name,
-                    "role": role,
+                    "role": report_role,
                     "cell": cell,
                     "query_kind": metadata.get("query_kind"),
                     "count": len(cell_rows),

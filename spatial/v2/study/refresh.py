@@ -10,6 +10,7 @@ from pathlib import Path
 
 from spatial.v2.context_budget import ContextBudget, admit_row_group, load_tokenizer
 from spatial.v2.natural_evidence import share_natural_evidence
+from spatial.v2.study import role_path
 
 
 def refresh_count_prose(source: Path, output: Path) -> dict:
@@ -24,7 +25,7 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
     replacement_rows = {}
     changed = Counter()
     for role in manifest["quotas"]:
-        path = source / (role + ".jsonl")
+        path = role_path(source, role)
         if (
             hashlib.sha256(path.read_bytes()).hexdigest()
             != manifest["artifacts"][role]["sha256"]
@@ -70,7 +71,7 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
     for role, record in manifest["artifacts"].items():
         if not role.startswith("train-"):
             continue
-        path = source / (role + ".jsonl")
+        path = role_path(source, role)
         if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
             raise ValueError("nested source hash mismatch")
         rendered[role] = [
@@ -132,7 +133,7 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
     }
     output.mkdir(parents=True)
     for role, text in serialized.items():
-        (output / (role + ".jsonl")).write_text(text)
+        role_path(output, role).write_text(text)
     (output / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )

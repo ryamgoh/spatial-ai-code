@@ -92,8 +92,8 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
         lines.append(
             f"| {name} | {result['overall_micro_accuracy']:.4f} | "
             f"{_display_metric(modules, 'bench-core')} | "
-            f"{_display_metric(modules, 'bench-comp')} | "
-            f"{_display_metric(modules, 'bench-composition')} | "
+            f"{_display_metric(modules, 'bench-composition-matched')} | "
+            f"{_display_metric(modules, 'bench-composition-heldout')} | "
             f"{_display_metric(modules, 'bench-depth')} |"
         )
     lines.extend(["", "Cell-level and depth-curve values are in `summary.json`."])
