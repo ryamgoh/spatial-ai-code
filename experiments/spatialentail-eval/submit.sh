@@ -8,8 +8,8 @@ if [[ "${1:-}" == "--dry-run" ]]; then
     'sbatch --dependency=afterany:<three-eval-job-ids> experiments/spatialentail-eval/slurm/summarize.sh'
   exit 0
 fi
-: "${SLURM_SUBMIT_DIR:?Submit this script from the repository root}"
-cd "$SLURM_SUBMIT_DIR"
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
 
 prepared=experiments/spatialentail-eval/prepared-final/slurm
 [[ -f experiments/spatialentail-eval/prepared-final/jobs.json ]] || {
