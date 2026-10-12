@@ -2,6 +2,13 @@
 
 Date: 2026-10-11. Uncommitted implementation; no GPU training launched.
 
+Superseded scope note (2026-10-12): this receipt records an earlier proposed
+study and is retained only as implementation provenance. The active FYP uses
+four prepared answer-only/Natural jobs (two seeds each). Replayable Symbolic
+certificates and corrupted variants are offline verifier fixtures, not SFT arms.
+The production release is now sealed at 8,000 Train, 775 Dev, and 4,300 Bench
+bases; later protocol and preparation receipts are authoritative.
+
 ## Implemented changes
 
 - Three fully specified training compositions: DIR MP→TRC, SEL IFF→TRC,

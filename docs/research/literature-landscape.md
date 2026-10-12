@@ -18,9 +18,9 @@ relation-recognition benchmark rather than a text-reasoning comparator.
 The strongest defensible thesis position is therefore not "a new overall SOTA
 in spatial reasoning." It is a validity-first study of one explicit qualitative
 calculus: audit inherited labels against formal semantics; generate
-solver-round-tripped training and evaluation data; compare controlled reasoning
-trace representations; and test whether outcome-verifiable RL adds anything to
-a strong SFT policy on a frozen hard holdout.
+solver-round-tripped training and evaluation data; compare answer-only with
+verified Natural worked-solution SFT; and reserve compact symbolic notation or
+outcome-verifiable RL as optional extensions after the central comparison.
 
 ## 1. Benchmark landscape
 
@@ -265,8 +265,9 @@ generalisation on algorithmic tasks. For spatial reasoning specifically,
 [Chain-of-Symbol](https://openreview.net/forum?id=Hvq9RtSoHG) reports that
 compact symbolic prompts outperform natural-language CoT across its three
 spatial reasoning/planning settings while using fewer tokens (including
-31.8% to 92.6% on its Brick World setting). This supports testing symbolic
-representations, not assuming they will win under SFT on SpatialMap.
+31.8% to 92.6% on its Brick World setting). This supports a future compact
+token-efficiency experiment, not use of SpatialEntail's replayable NDJSON
+certificate as an SFT target or an assumption that symbols will win.
 
 A current inference-time preprint,
 [Spatial Reasoning via Modality Switching](https://arxiv.org/abs/2606.31285),
@@ -302,8 +303,8 @@ code tests, plus format rewards, without a learned neural reward model for the
 reasoning task.
 
 SpatialMap is suitable for the same *mechanism* because a solver can parse an
-answer set and assign an exact reward. The appropriate thesis experiment is
-therefore narrow: start from the strongest delta-state SFT policy, use the same
+answer set and assign an exact reward. Any optional thesis experiment should be
+narrow: start from the stronger completed answer-only/Natural SFT policy, use the same
 solver and answer semantics for reward and evaluation, calibrate prompts so
 sample groups contain both successes and failures, and compare SFT against
 SFT+GRPO on a frozen disjoint hard holdout plus retention suites. In ordinary
@@ -314,8 +315,7 @@ not evidence that GRPO itself improves spatial reasoning.
 Until a completed run shows holdout gain and retention, the supported statement
 is **"solver-verifiable GRPO is implemented as a marginal post-SFT probe,"**
 not **"RL improves SpatialMap."** Outcome reward can optimise any behaviour
-correlated with the answer, so trace correctness should be audited separately
-if the thesis makes a process-quality claim.
+correlated with the answer, so it does not establish a process-quality claim.
 
 ## 6. Suggested thesis positioning (interpretation, not a literature fact)
 
@@ -330,9 +330,9 @@ if the thesis makes a process-quality claim.
 3. Solver-backed generation can make answers and difficulty controls auditable,
    but parser coverage, world-model assumptions, and train/test separation must
    also be checked.
-4. Intermediate representation is a causal experimental variable. Compact
-   symbolic or delta-state traces can remove an avoidable serialization burden;
-   the exact benefit must be measured under controlled SFT ablations.
+4. Intermediate representation is a causal experimental variable. A compact
+   CoS-like target may reduce serialization cost, but it is future optional work
+   and must be defined separately from replayable audit certificates.
 5. Exact-answer RLVR/GRPO is justified only as a marginal test after SFT, with
    reward variance, a frozen holdout, and retention reporting.
 

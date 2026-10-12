@@ -18,8 +18,8 @@ The active pipeline is:
 generation policy
 → visible premises and typed query
 → all-model semantic analysis
-→ checked answer certificate
-→ Natural or Symbolic supervision projection
+→ checked answer and offline audit certificate
+→ answer-only or verified Natural target rendering
 → exact context admission
 → frozen train/development/test artifacts
 ```
@@ -91,7 +91,7 @@ The generator records construction order explicitly.
     [Proof-template-first], [Instantiate a controlled path or Boolean obligation, solve it, then construct and replay the actual certificate.],
     [Premise-first], [Sample visible premises and a query without selecting an answer, then solve, classify, and certify the discovered semantics.],
   ),
-  caption: [Implemented SpatialEntail generation routes. Certificate-first remains a proposed stronger design, not an implementation label.],
+  caption: [Implemented SpatialEntail generation routes.],
 ) <spatialentail-provenance>
 
 Every accepted candidate is solved, checked against its requested semantic and
@@ -169,32 +169,27 @@ formula trees are withheld. Syntax exposure, replay-verified rule use, and a
 semantic change under a controlled intervention are reported separately; none
 alone proves that one rule is unavoidable across every derivation.
 
-The maximum `4K`/`8K` (`16K` optional) nested sizes remain candidate calibration budgets,
-but cell quotas, matched-test totals, and quality-review strata must be frozen
-together after a capability-coverage and generation-yield pilot. No final production
-corpus or cell allocation is claimed in this draft.
+The sealed release provides nested 4K and 8K training pools, 775 development
+bases, and a 4,300-base benchmark. The 8K pool is the central SFT allocation;
+16K is outside the current FYP scope.
 
 == Supervision Views
 
-Natural traces narrate checked premise, dependency, and branch identifiers.
-Symbolic traces serialize typed reasoning and menu-decision records as NDJSON.
-Training model evidence uses qualitative X/Y rank groups; coordinate assignments
-remain audit artifacts.
+Answer certificates, qualitative rank witnesses, and coordinate assignments are
+verification and audit artifacts. They establish that a gold solution is valid;
+they are not the model's default response format. Natural targets are readable,
+query-directed worked solutions rendered from verified reasoning.
 
 The planned arms are:
 
 - answer-only;
-- checked Natural;
-- checked Symbolic with rank witness;
-- corrupted Symbolic, in which one typed assertion is invalid while syntax,
-  decision, and answer remain intact; and
-- Symbolic local proof, which omits the full rank witness while retaining the
-  query-directed proof/refutation.
+- verified Natural worked solutions; and
+- optionally, a compact Chain-of-Symbol-like representation if it reduces
+  target tokens relative to Natural.
 
-The local-proof versus rank-witness comparison is restricted to unique/entailed
-cells. Ambiguous cases retain witnesses because contrasting valid worlds are the
-evidence for ambiguity. A valid external trace does not establish that the LLM
-used the same steps internally.
+The existing replayable NDJSON rendering remains an engineering and audit
+format. It is not the optional compact Symbolic arm and is not described as
+evidence of the LLM's hidden reasoning.
 
 == Validation and Admission
 
@@ -203,4 +198,4 @@ Structural clusters and explicit holdout cells are separated across training,
 development, and test. Exact tokenizer admission checks the complete rendered
 training sequence and the evaluation prompt plus generation reserve. If any
 required arm fails, the entire paired base is rejected and a diagnostic artifact
-records the reason. No trace is truncated to force admission.
+records the reason. No training target is truncated to force admission.

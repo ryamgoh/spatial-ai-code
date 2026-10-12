@@ -1,7 +1,8 @@
 # SpatialEntail consensus-rejection human audit
 
-Status: planned execution protocol, 2026-10-10. No review can begin until real,
-formally validated items and a frozen quality-review packet exist.
+Status: executed release protocol, updated 2026-10-12. The final 485-item
+release-linked Natural sample received two approvals per item; there were no
+split verdicts, double rejections, or human appeals.
 
 ## Purpose
 
@@ -15,9 +16,9 @@ Formal semantics, certificate validity, replay, round trip, split integrity,
 menu validity, and context admission remain checker-authoritative. The quality
 review concerns prompt clarity and the checked Natural trace.
 
-## Start gate and frozen packet
+## Executed gate and frozen packet
 
-Freeze a sample of at least the larger of 2% of the formally admitted maximum
+The protocol froze a sample of at least the larger of 2% of the formally admitted maximum
 candidate pool or `5C` examples, where `C` is the number of frozen reporting
 cells and every cell contributes at least five items. Every sampled item must already pass the
 automatic checks.
@@ -31,9 +32,9 @@ The immutable packet records:
 - a sealed crosswalk to base ID, cell, query, semantic status, provenance, and
   audit metadata.
 
-Each visible payload contains only the opaque ID, prompt, and checked Natural
+Each visible payload contains only the opaque ID, prompt, and verified Natural
 trace. It excludes the source route, real sample ID, cell/capability tags,
-Symbolic trace, coordinates, solver state, expected hypothesis, and answer
+replayable Symbolic certificate view, coordinates, solver state, expected hypothesis, and answer
 metadata not already present in the task.
 
 ## Sequential model screening
@@ -123,8 +124,7 @@ human false-acceptance rate. The human sample is selected by the model verdicts,
 so those quantities are not identifiable. If later work needs them, it requires
 a separately sampled human-calibration study.
 
-Release requires 100% automatic formal validity. Within the quality sample, an
+Release required 100% automatic formal validity. Within the quality sample, an
 item passes only through double approval or human override of double rejection;
 a split verdict is held out. The final acceptance threshold and per-cell
-revision trigger must be frozen with the benchmark-cell registry before the
-review begins.
+revision trigger were frozen with the benchmark-cell registry before review.

@@ -50,18 +50,18 @@
         fill: answer-fill,
       ), name: <policy>),
       node((1, 4), diagram-panel(
-        [Certificate layer],
-        [Build and replay evidence \ render Natural or \ Symbolic traces],
+        [Target renderer],
+        [Render answer-only or \ verified Natural target],
         fill: explanation-fill,
-      ), name: <certificate>),
+      ), name: <target>),
       node((2, 4), diagram-panel(
-        [Audit layer],
-        [Validate witnesses \ record alternatives \ and provenance],
+        [Offline verification],
+        [Build and replay certificates \ validate witnesses],
         fill: audit-fill,
-      ), name: <audit>),
+      ), name: <verification>),
       edge(<analysis.south-west>, <policy.north>, "->"),
-      edge(<analysis.south>, <certificate.north>, "->"),
-      edge(<analysis.south-east>, <audit.north>, "->"),
+      edge(<analysis.south>, <target.north>, "->"),
+      edge(<analysis.south-east>, <verification.north>, "->"),
 
       node((0, 5), diagram-panel(
         [Answer output],
@@ -70,7 +70,7 @@
       ), name: <answer>),
       node((1, 5), diagram-panel(
         [Training output],
-        [Prompt and answer decision \ Natural or Symbolic trace],
+        [Prompt and answer decision \ answer-only or Natural],
         fill: explanation-fill,
       ), name: <training>),
       node((2, 5), diagram-panel(
@@ -80,8 +80,8 @@
       ), name: <artifact>),
       edge(<policy.south>, <answer.north>, "->"),
       edge(<policy.south-east>, <training.north-west>, "->"),
-      edge(<certificate.south>, <training.north>, "->"),
-      edge(<audit.south>, <artifact.north>, "->"),
+      edge(<target.south>, <training.north>, "->"),
+      edge(<verification.south>, <artifact.north>, "->"),
     )
   ],
   caption: [End-to-end lifecycle and module boundaries. Dataset-specific input

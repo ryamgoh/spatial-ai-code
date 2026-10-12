@@ -23,8 +23,7 @@ variants:
       menu_coverage: full
   traces:
     - format: natural
-    - format: symbolic
-  supervision_arms: [checked-trace, answer-only, corrupted-trace]
+  supervision_arms: [checked-trace, answer-only]
 
 cells:
   - name: direction-depth-2

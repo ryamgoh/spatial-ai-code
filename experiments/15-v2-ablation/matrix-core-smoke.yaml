@@ -21,7 +21,6 @@ variants:
     menu_coverage: full
   traces:
   - format: natural
-  - format: symbolic
   supervision_arms:
   - checked-trace
   - answer-only

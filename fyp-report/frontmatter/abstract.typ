@@ -14,16 +14,18 @@ conditional semantic audit.
 
 The same contract supports SpatialEntail, a generator and certificate-checking
 pipeline for Direction, Entity Selection, and correlated Count queries over eight
-directions and finite Boolean formulas. Accepted certificates yield Natural and
-replayable Symbolic supervision. The predeclared study compares answer-only,
-checked Natural, and checked Symbolic targets on Qwen3.5-4B with two training
-seeds. Secondary model sizes and mechanism studies are optional. Candidate
-nested 4K/8K budgets, matched capabilities, reserved composition families, and
-depth-3--8 answer tests separate task exposure from structural extrapolation.
-Production training and transfer results remain unavailable; the completed
-quality screen concerns the bounded capability pilot only.
-Certificate validity supports auditability, not claims about a model's internal
-reasoning.
+directions and finite Boolean formulas. Replayable certificates and constructive
+witnesses verify gold answers and remain offline audit artifacts. The
+predeclared central study compares answer-only with verified Natural targets on
+Qwen3.5-4B using two training seeds. A compact Chain-of-Symbol-like target is an
+optional token-efficiency extension, not a certificate format. The sealed
+release contains 8,000 training, 775 development, and 4,300 benchmark bases;
+reserved composition families and depth-3--8 answer tests separate task exposure
+from structural extrapolation. Its 485-item Natural quality sample was approved
+by both independent model judges. Model benchmark and transfer results remain
+pending.
+Certificate validity supports auditability, not a model response contract or
+claims about internal reasoning.
 
 #v(1fr)
 *Subject Descriptors:* Artificial intelligence; knowledge representation and reasoning.

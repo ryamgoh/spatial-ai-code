@@ -51,7 +51,7 @@ Three distinct claims must not be conflated:
 2. **Procedure:** an explicit policy chooses and constructs relevant reasoning
    and evidence from visible premises before producing an answer.
 3. **Assurance pipeline:** the generator, semantic oracle, proof replay, witness
-   validation, and text round trip check the resulting supervision artifact.
+   validation, and text round trip check the resulting dataset and solution artifacts.
 
 A neutral method description is **premise-first, proof-and-model-guided spatial
 reasoning**. Here premise-first describes the evidence authority at inference:
@@ -93,7 +93,7 @@ language, automatic construction fragment, and assurance limits;
 
 ## 3. Candidate teachable procedure
 
-The current supervision constructor receives solver-classified outcomes and
+The current certificate constructor receives solver-classified outcomes and
 models before assembling evidence (`generation.py` and
 `answer_certificates.py`, `build_direction_answer_set`). Its checked gold output
 is not an autonomous learned search policy. For the proposed policy, specify
@@ -138,15 +138,12 @@ non-uniqueness but do not exhaust the complete possible-answer domain; an
 ALL_POSSIBLE certificate needs additional coverage/exclusion obligations.
 Canonical rank witnesses are a selected representation of satisfying worlds,
 not a hidden source of the gold answer.
-The local-proof comparison concerns whether explicit global ranks belong in
-the learning target; removing them must not silently weaken truth checking.
-That arm is planned, not an exposed current supervision variant. Unique
-Direction's existing grammar requires a consistency witness. A local-proof
-protocol must define whether eligible examples alone form the training domain,
-or all base IDs remain paired with ranks omitted only in eligible cells; it
-must also define independent premise-consistency assurance, process acceptance,
-and comparable metrics. Stripping required witness fields from existing records
-is not currently a valid implementation of this arm.
+Global ranks and replayable local proofs remain certificate-side validation
+artifacts, not central learning targets. Unique Direction's certificate grammar
+requires a consistency witness, and that requirement must remain intact even
+though the central model response does not reproduce it. A future compact
+CoS-like target must be designed independently rather than obtained by deleting
+required fields from the certificate.
 
 ### Decide under the query contract
 
@@ -325,17 +322,16 @@ added, needs its own untuned tool-access baseline and separate result label.
 
 | Group | Supervised behavior | What a held-out test should check | What success would not establish |
 |---|---|---|---|
-| RR | Decompose, invert, chain and recombine supported comparisons; aggregate query memberships. | New entity graphs and independent-axis supports, with replay-valid dependencies and correct native answers. | Metric distance, geometry, rotations or arbitrary language understanding. |
+| RR | Decompose, invert, chain and recombine supported comparisons; aggregate query memberships. | New entity graphs and independent-axis supports, with correct native answers. | Metric distance, geometry, rotations or arbitrary language understanding. |
 | LR | Preserve Boolean scopes, activate only licensed consequents, eliminate alternatives, and close all cases. | Predeclared new rule compounds/formula trees with familiar primitives; count illegal converse/branch leakage failures separately. | Quantified FOL, missing typed rewrites, or all logically equivalent presentations. |
 | MTR | Establish candidate possibility/exclusion and query-level invariants; preserve correlated memberships. | Uniquely answered versus genuinely ambiguous pairs, witness/candidate coverage, and invariant/variable joint counts. | Calibrated confidence, probability estimates, or exhaustive reasoning inside a model. |
 
-For Symbolic output, parse success alone is not success. Evaluate reasoning
-replay, decision validity, domain agreement, and full answer correctness
-separately. Witness-only and proof-only failures can reveal which part of the
-explicit evidence policy transfers. Generated Natural output remains an
-answer/readability evaluation unless an independent prose formalizer is added;
-gold Natural correctness does not confer automatic process scoring on model
-prose.
+Central model evaluation scores the generated answer and, for Natural output,
+readability under the declared answer contract. Gold Natural correctness does
+not confer automatic process scoring on model prose. Replay, decision validity,
+and domain agreement remain offline checks on the dataset certificate. If a
+future structured-output experiment is introduced, it requires a separately
+validated format and baseline rather than reuse of the NDJSON certificate.
 
 If external native formats cannot represent our typed certificates, native
 answer accuracy remains the primary transfer result. A separately requested
@@ -364,12 +360,11 @@ process validity cannot silently be reported for all external answers.
   contraposition and De Morgan conversions are absent from the constructor.
 - Validate group/query coverage and context yield before setting revised quotas.
 - Adapt, source-pin, and freeze external task interfaces and capability subsets.
-- Teach the same evidence policy through both Natural and Symbolic gold targets,
-  while preserving current distinctions in output validation and token cost.
-- Measure learning with answer-only, checked Natural, checked Symbolic and the
-  validity/rank-witness mechanisms, without multiplying training runs merely to
-  introduce a mnemonic. A separate procedure-prompt ablation is optional if the
-  causal claim specifically concerns stage instructions.
+- Teach the evidence policy through verified Natural worked solutions, with
+  answer-only as the matched central baseline.
+- Measure learning with answer-only and verified Natural. Treat a compact
+  CoS-like representation only as a future token-efficiency extension; keep
+  certificate validity and rank witnesses on the offline audit side.
 - Test primitive retention, unseen logical-spatial compounds, ambiguity and
   correlated-count calibration, evidence validity, and native external transfer.
 

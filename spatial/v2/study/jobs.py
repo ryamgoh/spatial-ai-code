@@ -1,4 +1,4 @@
-"""Prepare six SFT jobs from a verified release; never submit Slurm jobs."""
+"""Prepare answer-only and Natural SFT jobs from a verified release."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ from spatial.v2.study.seal import seal_release
 PACKAGES = {
     "answer-only": ("natural", "answer-only"),
     "natural": ("natural", "checked-trace"),
-    "symbolic": ("symbolic", "checked-trace"),
 }
 
 
@@ -229,10 +228,10 @@ bash experiments/15-v2-ablation/jobs/train.sh
     )
     (output / "README.md").write_text("""# Prepared SFT jobs
 
-Six jobs compare answer-only, Natural, and Symbolic on the same base problems,
-with seeds 42 and 43. These files have not been submitted. Transfer the whole
+Four jobs compare answer-only and Natural on the same base problems, with seeds
+42 and 43. These files have not been submitted. Transfer the whole
 repository plus the release/job artifacts to the Slurm server. From its repo
-root, submit the six scripts individually using `sbatch <script-path>`.
+root, submit the four scripts individually using `sbatch <script-path>`.
 The default resource request is one H200 on gpu for three hours. Confirm
 that request against the server's limits before submission. Authenticate once
 with `wandb login` or export `WANDB_API_KEY` before submission. Training and

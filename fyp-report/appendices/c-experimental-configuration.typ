@@ -1,9 +1,8 @@
 #pagebreak(weak: true)
 #heading(level: 1, numbering: none)[Appendix C — Experimental Configuration]
 
-This appendix records the configuration status for the eventual learning study.
-Values marked fixed are predeclared methods, not results; the benchmark-cell
-registry and allocation remain pending.
+This appendix records the frozen learning-study configuration. Configuration
+values are methods rather than model results.
 
 #heading(level: 2, numbering: none)[Model and Training Matrix]
 
@@ -11,17 +10,17 @@ registry and allocation remain pending.
   table(
     columns: (1fr, 1fr),
     table.header([*Field*], [*Status and value*]),
-    [Models], [Primary: `Qwen/Qwen3.5-4B`; 2B optional],
+    [Model], [`Qwen/Qwen3.5-4B`],
     [Training seeds], [`42`, `43`],
     [Epochs], [Two fixed epochs],
-    [Core arms], [Answer-only; checked Natural; checked Symbolic],
-    [Optional mechanism arms], [Corrupted Symbolic; local proof only after a valid serializer exists],
-    [Size calibration], [Candidate maximum budgets: $4"K" subset 8"K"$; cell quotas pending],
+    [Core arms], [Answer-only; verified Natural],
+    [Optional extension], [Compact Chain-of-Symbol-like target, only after corpus-wide token reduction is demonstrated],
+    [Training allocation], [8,000 bases; nested 4,000-base subset retained as a data artifact],
     [Training depth], [Controlled 3/4 anchors plus CORE/compositions],
-    [Candidate trace envelope], [12,288 train/output; 16,384 evaluation; pending full audit],
+    [Sequence envelope], [12,288 training; 16,384 evaluation],
     [Depth test], [3–8; 3/4 matched anchors, 5–8 answer-only extrapolation],
   ),
-  caption: [Training configuration. Exact model/tokenizer revisions, cell allocation, and LoRA fields must be copied from the frozen or executed manifests.],
+  caption: [Frozen training configuration. Exact model/tokenizer revisions, cell allocation, and LoRA fields are recorded in the prepared manifests.],
 ) <appendix-training-matrix>
 
 The executed artifact must record base-model and tokenizer revisions, adapter
@@ -32,7 +31,7 @@ files alone are not proof that a run completed.
 
 #heading(level: 2, numbering: none)[Task and Split Record]
 
-The release manifest must contain the requested and accepted counts for every
+The release manifest contains the requested and accepted counts for every
 frozen benchmark cell, query/capability marginals, continuous difficulty distributions, generation provenance,
 structural signatures, rejection reasons, answer-position distributions,
 context-token distributions, and train/development/test fingerprints. All arms
@@ -41,8 +40,8 @@ for one base problem remain in one split.
 #heading(level: 2, numbering: none)[Quality-Review Rubric]
 
 The source-blinded screen runs `DeepSeek-V4-Pro` and `GPT-5.5` sequentially in
-isolated terminal-agent contexts over the same anonymized prompt and checked
-Natural trace. A human sees only items rejected by both judges and decides an
+isolated terminal-agent contexts over the same anonymized prompt and verified
+Natural target. A human sees only items rejected by both judges and decides an
 Approve/Reject appeal without seeing either model's reasons.
 
 #figure(

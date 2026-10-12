@@ -57,7 +57,7 @@ class WorkloadSpec:
         SemanticShape.AMBIGUOUS,
     )
     menu_coverages: tuple[MenuCoverage, ...] = (MenuCoverage.FULL,)
-    trace_formats: tuple[TraceFormat, ...] = tuple(TraceFormat)
+    trace_formats: tuple[TraceFormat, ...] = (TraceFormat.NATURAL,)
     supervision_arms: tuple[SupervisionArm, ...] = (SupervisionArm.CHECKED_TRACE,)
     boolean_shapes: tuple[BooleanShape, ...] = (BooleanShape.ATOMIC,)
     query_directions: tuple[Direction, ...] | None = None
@@ -323,7 +323,13 @@ def main(
     answer_modes: str = typer.Option("single"),
     semantic_shapes: str = typer.Option("unique,ambiguous"),
     menu_coverages: str = typer.Option("full"),
-    trace_formats: str = typer.Option("natural,symbolic"),
+    trace_formats: str = typer.Option(
+        "natural",
+        help=(
+            "Response views to emit. Natural is the SFT view; symbolic is an "
+            "explicit audit/debug view and is not used by study training jobs."
+        ),
+    ),
     supervision_arms: str = typer.Option("checked-trace"),
     boolean_shapes: str = typer.Option("atomic"),
     query_directions: str = typer.Option(

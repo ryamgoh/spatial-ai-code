@@ -13,22 +13,20 @@ adapters, all-model solving, answer policy, local proof replay, constructive
 model checking, rendering, and audit storage. Generated problems carry explicit
 provenance and are accepted only after semantic analysis, certificate replay,
 text round trip, structural split validation, and exact context admission.
-Natural and Symbolic traces are evidence projections rather than claims about a
-model's hidden thought process.
+Answer certificates verify and audit solutions; they are not presented as the
+model's hidden thought process or its default response format.
 
 The implemented generator and bounded pilot establish preparation feasibility,
-not a learning benefit. The final study therefore predeclares answer-only,
-checked Natural, checked Symbolic, corrupted Symbolic, and local-proof
-conditions over 2B and 4B models. It separates matched interpolation,
-depth-5–8 extrapolation, premise-first formula composition, and external
-transfer. A source-blinded two-model quality screen with selective human appeal
-measures readability separately from formal validity.
+not a learning benefit. The central study compares answer-only and verified
+Natural SFT on Qwen3.5-4B, separating matched interpolation, depth-5–8
+extrapolation, premise-first formula composition, and external transfer. A
+source-blinded two-model quality screen with selective human appeal measures
+readability separately from formal validity. A compact Chain-of-Symbol-like arm
+is optional and asks only whether a shorter representation can retain accuracy.
 
-The unresolved empirical question is whether checked evidence teaches a more
-general spatial procedure than task exposure alone. The rank-witness comparison
-asks a narrower question: whether explicit qualitative world construction helps
-or whether a query-local proof is the better supervision target. Until those
-experiments run, the report makes no claim of SFT improvement, human-preferred
+The unresolved empirical question is whether a verified Natural worked solution
+teaches a more general spatial procedure than task exposure alone. Until the
+evaluations run, the report makes no claim of SFT improvement, human-preferred
 explanation, or causal faithfulness to internal model reasoning.
 
 Future work may extend the controlled language, add visual grounding, evaluate

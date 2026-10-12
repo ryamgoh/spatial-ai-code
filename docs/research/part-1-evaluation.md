@@ -276,9 +276,10 @@ official chat template. A secondary condition may use the model's documented
 reasoning mode, but its results remain separate. Do not tune a different task
 prompt for every model.
 
-The full Direct/Generic-CoT/Natural-axis/Symbolic-axis comparison belongs in
-Part II. Part I uses the common direct prompt and, at most, one frozen structured
-prompt across the panel.
+The Direct/Generic-CoT/Natural-axis comparison belongs in Part II; a compact
+CoS-like prompt is only a future token-efficiency extension there. Part I uses
+the common direct prompt and, at most, one frozen structured prompt across the
+panel.
 
 Counterbalance the position of `Cannot be determined` in a robustness variant.
 If performance changes when the option moves, the model may be exploiting menu

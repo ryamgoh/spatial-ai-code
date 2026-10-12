@@ -18,8 +18,8 @@ The strongest defensible position is that SpatialEntail occupies an
 3. a small proof checker replays local derivations while an independently
    implemented SMT encoding checks global possibility, entailment, ambiguity,
    and inconsistency; and
-4. Natural and Symbolic traces are deterministic views of the same checked
-   proof object, enabling a controlled representation experiment.
+4. a verified Natural solution and replayable audit certificate are derived
+   from the same checked proof object while serving separate responsibilities.
 
 No source found in this search implements all four for a **text-only, static,
 qualitative spatial entailment** task. The nearest spatial precedent, SpaRP,
@@ -43,9 +43,9 @@ programme at the intersection of established lines,” not “a wholly new field
 ### Question
 
 Do proof-template-first or proof-carrying generation, premise-first evaluation,
-independent proof checking plus SMT validation, and paired Natural/Symbolic
-proof traces together constitute a novel research direction for text-only LLM
-spatial reasoning?
+independent proof checking plus SMT validation, and verified Natural solutions
+together constitute a novel research direction for text-only LLM spatial
+reasoning?
 
 ### Included
 
@@ -84,7 +84,7 @@ The terms are used operationally here, not asserted as standard names.
 | **Certificate-first generation (proposed)** | Sample and instantiate the final typed certificate before rendering the problem. SpatialEntail reserves this provenance but does not currently implement it. |
 | **Premise-first evaluation** | Sample visible premises `P` and query `Q` without selecting an answer; classify every candidate under declared open-world semantics; search for proofs or countermodels; admit the instance to the semantic and difficulty bucket discovered after solving. |
 | **Independent proof checker + SMT** | A small checker validates the certificate's local rule applications and dependencies. A separately implemented SMT encoding decides global semantics, including `SAT(P & A)` and `UNSAT(P & not A)`. Neither component merely calls the other. |
-| **Paired Natural/Symbolic traces** | Both traces are deterministic renderings of one proof object, with identical base problem, supporting premises, conclusion, and split assignment. They are experimental views, not separately authored rationales. |
+| **Natural solution plus audit certificate** | The readable solution and replayable typed certificate are deterministic views of one proof object, with identical base problem, supporting premises, conclusion, and split assignment. Natural may be used for SFT; the certificate remains an offline audit view. |
 
 This is stronger than “solver generated the label,” “an LLM produced CoT,” or
 “a verifier liked the steps.” It also differs from executing a symbolic program
@@ -208,7 +208,7 @@ SpatialEntail can remain distinct if its artifact demonstrably adds all of:
   all-model semantics;
 - a replay checker whose implementation and failure modes differ from the SMT
   semantic oracle; and
-- matched Natural/Symbolic renderings from the exact same certificate.
+- a readable Natural solution and replayable audit rendering from the exact same certificate.
 
 ### 2. interwhen: closest same-benchmark SMT precedent
 
@@ -258,7 +258,7 @@ Legend: **Y** = clearly present; **P** = partial or analogous mechanism; **N** =
 not reported in the cited primary source. “Dual validation” means two
 substantively independent paths, not two calls to one engine.
 
-| Work | Text-only qualitative spatial | Proof-first generation | Premise-first solve-and-bucket | Replay checker + independent SMT semantics | Paired Natural/Symbolic views of one proof |
+| Work | Text-only qualitative spatial | Proof-first generation | Premise-first solve-and-bucket | Replay checker + independent SMT semantics | Natural solution + typed audit view of one proof |
 |---|:---:|:---:|:---:|:---:|:---:|
 | SpaRP | Y | N | N | N | P |
 | Graph-based StepGame SFT | Y | P | N | N | N |
@@ -317,8 +317,8 @@ pipeline**. More specifically, none was found that simultaneously:
   their open-world semantic class after solving;
 - requires agreement between a local proof replay checker and a separately
   implemented SMT model oracle; and
-- derives matched Natural and Symbolic trace variants from the same certificate
-  for controlled prompting/SFT experiments.
+- derives a verified Natural solution and typed replayable audit view from the
+  same certificate while keeping their runtime responsibilities separate.
 
 This is meaningful white space, but it does not prove priority. The claim could
 be falsified by an unindexed preprint, a non-English paper, a repository without
@@ -331,8 +331,8 @@ Use:
 > To our knowledge, SpatialEntail is the first text-only qualitative spatial
 > reasoning framework to combine proof-template-first problem generation with
 > replay-checked certificates, premise-first open-world evaluation, independent
-> proof replay and SMT semantics, and matched natural/symbolic renderings of the
-> same derivation.
+> proof replay and SMT semantics, and readable natural solutions derived from
+> the same verified derivations.
 
 Immediately follow it with:
 
@@ -368,7 +368,7 @@ Avoid:
 | “The proof checker and SMT solver are not really independent.” | They may share parser, IR, relation tables, or tests, allowing correlated bugs. | Document separate implementations and trust boundaries; use mutation, differential, metamorphic, witness, and countermodel tests. |
 | “A checked proof can still formalize the English incorrectly.” | Formal proof systems guarantee derivability from the formalization, not semantic fidelity of the translation. | Deterministically generate text from typed atoms where possible; reparse every emitted prompt; reject non-round-tripping cases; manually audit held-out templates. |
 | “Proof-first data teaches templates, not reasoning.” | Proof skeleton, premise order, surface form, or answer position can leak construction. | Use premise-first evaluation, held-out rule compositions, proof-shape splits, premise permutations, distractors, and canonical-world deduplication. |
-| “Natural and Symbolic traces differ in more than representation.” | Length, tokenization, instruction wording, and error exposure can confound results. | Pair by base problem and checked certificate; report target tokens and compute; vary one representation factor at a time. |
+| “Natural solutions and replayable Symbolic certificates differ in more than representation.” | Length, tokenization, purpose, and checkability differ. | Do not compare them as central SFT arms. Keep certificates offline; define any future compact CoS-like target separately and require a measured token reduction. |
 | “SMT says entailment but does not provide a human proof.” | Unsatisfiability is a semantic decision, not automatically an explanatory derivation. | Keep the replayable proof as the explanation artifact and SMT as the independent global oracle; publish countermodels for non-entailments. |
 | “The benchmark is only another synthetic micro-world.” | Controlled logic may not transfer to natural language. | Include held-out templates and names, ReSQ/SpaRTUN transfer where semantically compatible, and the corrected SpatialMap external case study. |
 
@@ -397,8 +397,10 @@ Avoid:
    A secondary premise-first training pool is defensible only when extracted
    proofs also replay successfully.
 
-5. **Run matched trace ablations.** Answer-only, Natural, and Symbolic targets
-   should share the same base IDs and checked proof supports.
+5. **Run the central matched SFT comparison.** Answer-only and verified Natural
+   targets should share the same base IDs and checked certificate provenance.
+   Keep replayable NDJSON certificates offline. A compact CoS-like target is a
+   future token-efficiency extension, not the certificate serialized for SFT.
 
 6. **Include the nearest baselines, not only generic CoT.** At minimum compare
    direct answer, natural CoT, CoS-like symbolic prompting, SpaRP-like verbalized
@@ -433,10 +435,10 @@ SpatialEntail should not be sold as inventing proofs, symbolic spatial
 reasoning, SMT-backed checking, trace supervision, or text-only spatial
 training. Those are established. The credible frontier is the **joint research
 design**: distinguish proof-template-first training from premise-first
-evaluation;
-attach replayable certificates to qualitative spatial problems; validate local
-proof structure separately from global SMT semantics; and compare Natural and
-Symbolic views without changing the underlying derivation.
+evaluation; attach replayable certificates to qualitative spatial problems;
+validate local proof structure separately from global SMT semantics; and use
+those certificates to validate Natural worked solutions without making the
+certificate itself a central model target.
 
 That combination is not present in the primary sources found through 7 October
 2026. It is specific enough to be defensible, important enough to motivate a

@@ -65,6 +65,23 @@ The claim that an explanation must establish, such as necessity,
 impossibility, possibility, consistency, or joint Count coverage.
 _Avoid_: Generic rationale, solver search log
 
+**Answer certificate**:
+A machine-checkable audit artifact establishing that a proposed answer satisfies
+the declared semantics. It belongs to generation, verification, and evaluation;
+it is not a default model response or SFT target.
+_Avoid_: Reasoning trace, chain of thought, Symbolic supervision
+
+**Natural solution trace**:
+A readable, query-directed explanation rendered from verified reasoning for use
+as an ordinary worked-solution target in SFT.
+_Avoid_: Natural-language certificate dump, audit witness
+
+**Compact symbolic trace**:
+An optional CoS-like intermediate representation that abbreviates the
+query-relevant spatial reasoning to reduce target and generation tokens. It is
+not an answer certificate and is not required to be a replayable proof object.
+_Avoid_: Certificate, formal proof, checked Symbolic
+
 **Benchmark cell**:
 A predeclared combination of query contract, support or rule structure,
 semantic status, and evidence burden. Difficulty measurements annotate the

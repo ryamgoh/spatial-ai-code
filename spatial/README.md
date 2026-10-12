@@ -13,7 +13,7 @@ kept under `v1/` only for historical reproducibility.
 | `v2/which_certificates.py` | Entailed, contingent, or impossible membership evidence | Which answer sets |
 | `v2/count_certificates.py` | Correlation-preserving evidence over complete membership assignments | Count answer sets |
 | `v2/certificate_generation.py` | Convert solver witnesses into independently replayed answer certificates | Proof-first generator |
-| `v2/*_renderers.py` | Natural and Symbolic views of checked evidence | Proof-first traces |
+| `v2/*_renderers.py` | Natural worked solutions and machine-readable audit views | Verified data construction |
 | `v2/text.py` | Controlled prompt grammar to `SpatialProblem` | Round-trip validation |
 | `v2/grading.py` | Answer-mode resolution, menu encoding, and scoring | Dataset adapters |
 | `v2/generation.py` | Policy-driven, certificate-backed workload construction | V2 synthetic workloads |
@@ -49,11 +49,12 @@ The V2 core intentionally has no JSONL, prompt, option-letter, oracle, or
 dataset-policy knowledge. New generators construct `SpatialProblem` directly,
 render text above that seam, parse the rendered text back through an adapter,
 and verify the reparsed problem before emitting a row. Accepted rows carry a
-checked answer certificate and render it as either `TraceFormat.NATURAL` or
-`TraceFormat.SYMBOLIC`. Coordinate witnesses belong only in structured audit
-metadata, never in an SFT reasoning target.
+checked answer certificate for verification and auditing. Central SFT uses the
+Natural worked-solution view; replayable Symbolic NDJSON and coordinate
+witnesses are audit artifacts, never SFT reasoning targets.
 
-The proof-first seam is the training-explanation path.
+The proof-first seam constructs and verifies the solution evidence from which a
+Natural worked solution can be rendered.
 `build_direction_proof` performs deterministic closure over conjunction,
 modus ponens, disjunctive syllogism, biconditional elimination, and double
 negation before applying the spatial axis rules. It also constructs bounded
@@ -82,8 +83,8 @@ limited by the proof builder's supported fragment.
 
 `v2/generation.py` rejects any candidate for which
 `build_answer_certificate` cannot produce complete checked evidence. Accepted
-training traces are rendered only from that certificate; there is no post-hoc
-explanation fallback or independent state-snapshot mode.
+Natural worked solutions are rendered only after that verification; there is no
+post-hoc explanation fallback or independent state-snapshot mode.
 
 For proof-first Boolean curricula, `BooleanShape` provides `modus-ponens`,
 `iff`, `double-negation`, `disjunctive-syllogism`, `case-split`, and
@@ -115,12 +116,12 @@ Generate a balanced V2 workload with:
       --boolean-shapes atomic \
       --query-directions north,northeast,east,southeast,south,southwest,west,northwest \
       --target-directions north,northeast,east,southeast,south,southwest,west,northwest \
-      --trace-formats natural,symbolic
+      --trace-formats natural
 
 This writes `data/spatial_v2_train.jsonl`, `data/spatial_v2_test.jsonl`, and
-`data/spatial_v2_manifest.json`. Natural/Symbolic variants of one base problem
-stay in the same split. Coordinate-bearing audit metadata is excluded by
-default. `--include-audit` is for diagnostic artifacts, not training data.
+`data/spatial_v2_manifest.json`. Coordinate-bearing and replayable Symbolic
+audit metadata is excluded from SFT data by default. `--include-audit` is for
+diagnostic artifacts, not training data.
 Programmatic callers pass one `WorkloadSpec` to `generate_workload` rather than
 duplicating the CLI's individual settings.
 

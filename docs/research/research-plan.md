@@ -2,7 +2,7 @@
 
 Status: working research direction, not a fixed paper outline
 
-Last updated: 10 October 2026
+Last updated: 12 October 2026
 
 Raw contribution notes:
 [`What this project is trying to do`](../notes/raw-contribution-notes.md)
@@ -23,9 +23,9 @@ Working benchmark name:
 > **SpatialEntail: A Benchmark for Qualitative Spatial Reasoning under Partial
 > Information**
 
-`SpatialEntail` is provisional until the benchmark tracks are frozen and a
-public-name collision check is completed. Internal schemas and implementation
-modules continue to use `spatial-v2` for now.
+`SpatialEntail` remains provisional only pending a public-name collision check;
+the benchmark tracks and production corpus are frozen. Internal schemas and
+implementation modules continue to use `spatial-v2` for now.
 
 ## Naming convention
 
@@ -36,11 +36,11 @@ Use these terms consistently in experiments and the report:
 | `SpatialEntail` | The benchmark as a whole | “evaluated on SpatialEntail” |
 | Pilot | Preliminary data used to calibrate generation, difficulty, and protocols | SpatialEntail Pilot |
 | Suite | A fixed evaluation module | Core, Propositional, Depth, Ambiguity |
-| Arm | One prompting, training, or RL condition | Answer-Only, Checked Natural, Checked Symbolic, Symbolic Local Proof |
+| Arm | One prompting, training, or RL condition | Untuned, Answer-Only, Verified Natural, optional Compact Symbolic |
 | Version | Public artifact identity, used only when needed for reproducibility | SpatialEntail v1.0 |
 
-Do not rename the benchmark for each ablation. Natural/Symbolic traces, state
-schedules, data scales, and SFT/RL methods are arm names over the same benchmark.
+Do not rename the benchmark for each comparison. Response formats, data scales,
+and SFT/RL methods are arm names over the same benchmark.
 Avoid “dev release”; use “pilot” for preliminary experiments and “development
 split” only for data used to make research decisions.
 
@@ -99,15 +99,16 @@ The result serves four roles:
 ```text
 an evaluator  -> audit labels and expose ambiguity
 a generator   -> accept only problems with the requested semantics
-a supervisor  -> render Natural or Symbolic reasoning traces
+a supervisor  -> render verified Natural worked solutions or answer-only targets
 a verifier    -> score exact outcomes during optional RL
 ```
 
 Coordinates must not be a privileged hidden source from which both premises and
 gold answers are read. Numeric coordinates remain post-solve audit certificates,
-not SFT targets. The checked Symbolic arm may expose a qualitative rank-compressed
-witness; a 4B-only local-proof arm omits that witness. This comparison is limited
-to unique or entailed cells for which both targets are well-defined.
+not SFT targets. Replayable typed certificates and qualitative rank witnesses
+remain offline validation artifacts. A future compact CoS-like target, if used,
+is a separately designed token-efficiency representation rather than a reduced
+or partially deleted certificate.
 
 ## Generation provenance: world-first, proof-template-first, certificate-first,
 and premise-first
@@ -187,11 +188,11 @@ P2: NOT NW(A,B)
 therefore: NE(A,B)
 ```
 
-Certificate-first generation would be the strongest source of trace-supervised
-training data because it guarantees a structured derivation before the problem
-text exists. It remains a distinct target provenance rather than a label for
-the current proof-template-first generator. Together, the two controlled
-families can directly control:
+Certificate-first generation would provide the strongest construction-time
+guarantee because it fixes a structured derivation before the problem text
+exists. It remains a distinct generation provenance rather than a model-target
+design or a label for the current proof-template-first generator. Together, the
+two controlled families can directly control:
 
 - Boolean and spatial proof depth;
 - rule family and rule composition;
@@ -238,18 +239,18 @@ admission rather than balancing by planting a target answer.
 | Difficulty control | Indirect and unreliable | Intended template, then remeasured | Direct, then remeasured | Post-hoc only |
 | Rule coverage | Accidental | Explicitly balanceable | Explicitly balanceable | Emergent and potentially sparse |
 | Template leakage | Hidden-world and construction bias | Main risk | Main risk | Lower, though sampler artifacts remain |
-| Best role | Proposal source only after re-solving | Current controlled supervision | Stricter future supervision | Generalisation and robustness evaluation |
+| Best role | Proposal source only after re-solving | Current controlled generation | Stricter future generation | Generalisation and robustness evaluation |
 
 ### Provisional SpatialEntail design
 
 The working recommendation is not template-controlled generation everywhere.
 
 ```text
-Trace-supervised training:
-  proof-template-first problems with replayable certificates
+Central SFT training:
+  proof-template-first problems with answer-only or verified Natural targets
 
 Secondary training pool:
-  premise-first problems for which concise proofs are successfully extracted
+  premise-first problems for which concise verified solutions are available
 
 Development and final evaluation:
   primarily premise-first, solve-and-bucket problems
@@ -258,12 +259,12 @@ External transfer:
   untouched SpatialMap-TQA-Corr
 ```
 
-Proof-template-first data supplies controlled coverage and checked Natural or
-Symbolic targets. Premise-first evaluation tests whether any gain transfers
-beyond the construction templates seen during supervision. A
+Proof-template-first data supplies controlled coverage and answer-only or
+verified Natural targets. Premise-first evaluation tests whether any gain
+transfers beyond the construction templates seen during supervision. A
 proof-template-only final test would risk measuring template recognition; a
-premise-first-only trace corpus would make checked supervision unnecessarily
-expensive and selective.
+premise-first-only worked-solution corpus would make verified supervision
+unnecessarily expensive and selective.
 
 No fixed mixture is assumed. The balance must be chosen from a pilot measuring
 rejection rates, proof-search success, trace length, class balance, duplicate
@@ -278,7 +279,7 @@ SpatialProblem
   |-- Z3 oracle: possible, entailed, impossible, inconsistent
   |-- proof certificate: typed derivation or constructive branch evidence
   |-- proof checker: replay every claimed step
-  |-- renderer: Natural and Symbolic views of the same certificate
+  |-- renderer: audit certificate and verified Natural solution views
   `-- text round trip: parse and re-solve the emitted prompt
 ```
 
@@ -298,15 +299,13 @@ impossible  -> UNSAT(P AND A) and a checked contradiction certificate
 contingent  -> SAT(P AND A) and SAT(P AND NOT A), with evidence for both
 ```
 
-Natural and Symbolic targets originate from the same accepted certificate.
-Natural now narrates the checked dependencies and scopes that Symbolic encodes,
-with query-specific witnesses and exclusions in both views. Shared provenance
-and step coverage do not establish equal information load or token cost. Audit
-the mapping across the frozen corpus before claiming a notation-only effect;
-only Symbolic model outputs have replay-based process validation. Generated Natural
-targets inherit checked source evidence, but arbitrary model-produced Natural
-prose has no replay parser. External evidence validity does not establish
-faithfulness to a model's internal computation.
+Verified Natural targets are rendered from accepted certificates, but the
+certificate itself remains an offline generation and audit artifact. Generated
+Natural targets inherit checked source evidence; arbitrary model-produced
+Natural prose has no replay parser, and source verification does not establish
+faithfulness to a model's internal computation. A future compact CoS-like arm
+must define its own notation and token-efficiency criterion; it must not reuse
+the replayable NDJSON certificate as the model target.
 
 ### Leakage and split commitments
 
@@ -341,7 +340,8 @@ predeclared holdout cells and a distribution audit after context admission.
 - How often does premise-first sampling yield concise replayable proofs?
 - How often does proof-template-first construction admit an unintended shorter proof?
 - What semantic-class imbalance appears before solve-and-bucket admission?
-- Does a qualitative rank witness add value beyond query-local Symbolic proof?
+- Can a separately designed compact CoS-like format reduce tokens relative to
+  Natural while retaining answer accuracy?
 - How much performance survives held-out formula trees and proof-rule
   compositions?
 - Should problems without a concise extracted proof remain answer-only
@@ -375,8 +375,8 @@ evaluation view from them.
 | Are answers in an existing spatial benchmark entailed by the information given to the LLM? | SpatialEval will contain a substantial set of published answers that are possible but not unique under the declared semantics. |
 | Does semantic correction change how LLM spatial reasoning is measured? | Original and corrected evaluation will produce different scores and error interpretations; ranking changes are possible but not assumed. |
 | Can a generated benchmark measure meaningful spatial difficulty? | Accuracy will decline systematically with proof depth, independent-axis composition, and relevant distractors rather than only with prompt length. |
-| Does formal reasoning supervision teach more than answer imitation? | Natural or Symbolic trace SFT will outperform answer-only SFT on at least some structurally held-out conditions. |
-| Which representation supports the strongest generalisation? | Natural and Symbolic supervision packages may trade accuracy, validity, and token cost; information-matched notation effects remain a separate experiment. |
+| Does verified worked-solution supervision teach more than answer imitation? | Verified Natural SFT may outperform answer-only SFT on at least some structurally held-out conditions. |
+| Can a compact intermediate representation improve token efficiency? | A future CoS-like arm is useful only if it is measurably shorter than Natural while retaining answer accuracy. |
 | Does solver-verifiable RL add value after SFT? | Unknown; it is viable only if hard prompts produce within-group reward variance and SFT leaves headroom. |
 
 The first five questions form the intended study. RL is optional.
@@ -391,9 +391,9 @@ Detailed plans:
 | Study | Design | Question answered |
 |---|---|---|
 | Formal validation and SpatialEval | Prove and validate the encoding; audit the untouched four-option release; validate counter-witnesses; create a separate five-option correction; compare general, reasoning, and compatible spatially fine-tuned LLMs on original, corrected, entailed-only, and ambiguous-only views | Does formal semantics expose consequential ambiguity and change conclusions about LLM capability? |
-| Benchmark calibration and prompting | Generate a development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, Natural-axis, and Symbolic-axis prompts; then freeze the benchmark | Is the benchmark valid, solvable, non-saturated, and structurally discriminative? |
-| SFT and representation | Compare answer-only, checked Natural, and checked Symbolic on the primary Qwen3.5-4B; secondary sizes and mechanisms are optional | Do checked traces add value beyond task exposure, does evidence validity matter, and does a global qualitative witness help? |
-| Generalisation, scale, and optional RL | Calibrate nested 4K/8K (16K optional) training; test matched cells, depth 3--8, held-out formula compositions, and SpatialMap-TQA-Corr, with StepGame optional; run GRPO only with reward variance and compare it with compute-matched continued SFT | Do gains extrapolate beyond training depth and construction families, and does RL add anything beyond supervised optimisation? |
+| Benchmark calibration and prompting | Use the frozen development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, and Natural-axis prompts, with compact-symbol prompting only as a future token-efficiency extension | Is the benchmark valid, solvable, and structurally discriminative? |
+| SFT | Compare answer-only and verified Natural on the primary Qwen3.5-4B; a compact CoS-like token-efficiency arm is future optional work | Do verified worked solutions add value beyond task exposure? |
+| Generalisation and optional extensions | Train on the frozen 8K allocation; test matched cells, depth 3--8, held-out formula compositions, and SpatialMap-TQA-Corr, with StepGame optional; run compact-symbol or GRPO extensions only after their go/no-go conditions pass | Do gains extrapolate beyond training depth and construction families, and can an optional extension justify its added cost? |
 
 Difficulty is not an end in itself. The benchmark should contain solvable,
 discriminative, and hard cells whose performance changes for identifiable
@@ -404,21 +404,22 @@ structural reasons.
 - The [canonical task taxonomy](task-taxonomy.md) defines three query families
   (`DIR`, `SEL`, `CNT`), three capability lenses (`RR`, `LR`, `MTR`), and
   factorial benchmark cells. The former four-tier, 17-bucket allocation is
-  withdrawn. The 4K/8K (16K optional) sizes remain candidate maximum budgets; cell quotas
-  are frozen only after a bounded capability/yield pilot.
-- The central arms are answer-only, checked Natural, and checked Symbolic on
-  Qwen3.5-4B with seeds 42 and 43: six central runs. Secondary sizes,
-  corrupted evidence, local proof, and GRPO are optional.
+  withdrawn. The sealed production allocation is 8K training bases; the nested
+  4K artifact is bookkeeping rather than a central scaling study, and the
+  former 16K expansion is outside the current design.
+- The central arms are answer-only and verified Natural on Qwen3.5-4B with
+  seeds 42 and 43: four prepared jobs. Remote execution state is external to
+  the repository receipt. Compact
+  CoS-like representation work and GRPO are future optional work.
 - Training contains controlled depth-3/4 anchor strata; the test ladder spans
   depths 3–8, fifty per family/depth. Deep answers use a common direct-answer
   protocol; full-trace validity is not applicable. No noisy suite is mandatory.
 - SpatialMap-TQA-Corr is essential external evaluation; StepGame is next
   priority. Additional adapters are optional and retain native scores.
-- Every row receives formal checking. If `C` is the number of frozen reporting
-  cells, source-blinded review uses at least the larger of 2% of the formally
-  admitted maximum candidate pool or `5C` examples, with at least five per cell. Sequential isolated
-  `DeepSeek-V4-Pro` and `GPT-5.5` runs screen the prompt and checked Natural trace;
-  only unanimous rejections reach a payload-blinded human appeal.
+- Every row received formal checking. The frozen source-blinded review sampled
+  485 Natural items across Train, Dev, CORE, matched COMP, and held-out COMP.
+  Sequential isolated `DeepSeek-V4-Pro` and `GPT-5.5` reviews approved all 485;
+  the predefined double-rejection human appeal was not triggered.
 - SFT is the main study. GRPO is conditional future work.
 
 ## Evaluation commitments
@@ -434,8 +435,8 @@ structural reasons.
 - Macro-average predeclared structural cells so easy mass cannot hide failures.
 - Report ambiguity recognition, output validity, token cost, and paired
   fixes/regressions as secondary diagnostics.
-- Decompose Symbolic process validity into replayable reasoning, checked menu
-  decision, cross-record domain agreement, and fully valid trace rates.
+- Use replay and semantic agreement to validate release artifacts offline; do
+  not require central models to emit the replayable certificate.
 - Report seeds 42 and 43 separately, with their mean and range; use paired
   item-level bootstrap intervals within each seed rather than a strong
   seed-level confidence claim.
@@ -465,12 +466,9 @@ low-priority KIV extension.
 
 - Final wording of the title and central claim
 - Final collision check and approval of the provisional `SpatialEntail` name
-- Pilot balance between proof-template-first and premise-first generation
-- Held-out proof compositions and formula structures for the final test
-- Manual case-selection and checking protocol
 - Frozen inference prompts and decoding conditions
-- Frozen quality-judge prompt and any provider-exposed model revision metadata
 - Whether `ALL_POSSIBLE` belongs in the core benchmark
+- Whether to design a compact CoS-like token-efficiency extension
 - Go/no-go criteria and compute budget for RL
 
 The reviewed executable scope and all allocation decisions are governed by

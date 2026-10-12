@@ -12,28 +12,25 @@ The supported certificate acceptance contract is recorded in
 - `proofs.py` and the certificate modules define independently replayed
   evidence. Its deterministic constructor handles Boolean closure, finite
   nested case splits, axis reasoning, and explicit or spatial contradictions.
-- `symbolic_trace_codec.py` defines the versioned JSON grammar for proof,
-  answer-set, and menu traces and parses model output back into replay-checked
-  certificates.
+- `symbolic_trace_codec.py` defines the versioned JSON grammar used to serialize
+  and replay-check proof, answer-set, and menu certificates during verification
+  and audit.
   The grammar contract is documented in
   [`docs/spatialentail/trace-formats.md`](../../docs/spatialentail/trace-formats.md).
-- The answer-certificate renderers expose separate compact training and
-  coordinate-bearing audit views from checked evidence. Natural narrates the
-  checked dependencies/scopes that Symbolic encodes; rendered information and
-  token costs still need auditing before claiming a notation-only ablation. Only Symbolic model output has replay scoring.
-- `supervision_controls.py` derives checked-trace, answer-only, and deliberately
-  corrupted Symbolic controls from one row. Corruption changes semantic
-  evidence while retaining valid syntax and the gold decision, and must fail
-  replay. Answer-only evidence is absent, not invalid. Context admission uses
-  the selected tokenizer/template and rejects whole paired groups on overflow.
-  Workload manifests report lengths and matching multipliers, not measured compute.
+- The answer-certificate renderers produce checked evidence for verification
+  and a readable Natural worked solution for SFT. Replayable Symbolic NDJSON is
+  an audit format, not a training target.
+- `supervision_controls.py` retains low-level regression fixtures for checked,
+  absent, and deliberately corrupted evidence. These exercise the verifier and
+  are not active study arms. Context admission uses the selected
+  tokenizer/template and rejects required variants on overflow.
 - `difficulty.py` measures proof depth and support for workload controls.
 - `benchmark_registry.py` loads the taxonomy-level benchmark-cell registry,
   validates its semantic and generator-policy declarations, and probes one
   checked example per ready cell. `benchmark-cells.yaml` contains no quotas:
   ready cells are executable coverage seeds, while any future blocked cells
   must name their exact implementation prerequisites.
-- `generation.py` emits training rows only after certificate checking and text
+- `generation.py` emits rows only after certificate checking and text
   round-trip validation. Each row records its actual `world-first`, `proof-template-first`, or
   `premise-first` proposal route. The premise-first route samples visible
   relations without coordinates and obtains witnesses only after solving.

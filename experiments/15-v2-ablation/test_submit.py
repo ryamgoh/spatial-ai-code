@@ -39,19 +39,23 @@ def options(tmp_path, run_id: str, **overrides):
     )
 
 
-def test_checked_in_run_spec_renders_two_arm_configs(tmp_path) -> None:
+def test_checked_in_run_spec_renders_central_arm_configs(tmp_path) -> None:
     spec = SUBMIT.load_run_spec(Path(__file__).with_name("run.yaml"), REPO)
 
     prepared = SUBMIT.prepare_run(spec, REPO, "test-run", run_root=tmp_path)
 
+    assert spec.name == "v2-sft-pilot"
     assert [arm.name for arm in prepared.arms] == [
         "single-natural",
-        "single-symbolic",
         "answer-only",
-        "corrupted-symbolic",
         "untuned-natural",
-        "untuned-symbolic",
         "untuned-answer-only",
+    ]
+    matrix = yaml.safe_load(spec.matrix.read_text())
+    assert matrix["variants"]["traces"] == [{"format": "natural"}]
+    assert matrix["variants"]["supervision_arms"] == [
+        "checked-trace",
+        "answer-only",
     ]
     natural = yaml.safe_load(prepared.arms[0].train_config.read_text())
     assert natural["datasets"][0]["path"].endswith(
@@ -115,11 +119,6 @@ def test_dry_run_builds_graph_without_sbatch_or_run_directory(tmp_path) -> None:
         "eval",
         "train",
         "eval",
-        "train",
-        "eval",
-        "train",
-        "eval",
-        "eval",
         "eval",
         "eval",
         "summarize",
@@ -157,15 +156,15 @@ def test_submission_wires_independent_arm_dependencies(tmp_path) -> None:
 
     assert receipt.generate_job == "8100"
     assert receipt.arms["single-natural"] == {"train": "8101", "eval": "8102"}
-    assert receipt.arms["single-symbolic"] == {"train": "8103", "eval": "8104"}
-    assert receipt.summary_job == "8112"
+    assert receipt.arms["answer-only"] == {"train": "8103", "eval": "8104"}
+    assert receipt.summary_job == "8107"
     assert "--dependency=afterok:8100" in commands[1]
     assert "--dependency=afterok:8101" in commands[2]
     assert "--dependency=afterok:8100" in commands[3]
     assert "--dependency=afterok:8103" in commands[4]
     assert any(value.startswith("--dependency=afterany:") for value in commands[-1])
     stored = json.loads((tmp_path / "submitted" / "jobs.json").read_text())
-    assert stored["summary"] == "8112"
+    assert stored["summary"] == "8107"
 
 
 def test_partial_submission_failure_preserves_job_ids(tmp_path) -> None:
@@ -252,7 +251,7 @@ def test_summary_reports_partial_arm_completion(tmp_path) -> None:
             {
                 "arms": {
                     "natural": {"train": "1", "eval": "2"},
-                    "symbolic": {"train": "3", "eval": "4"},
+                    "answer-only": {"train": "3", "eval": "4"},
                 }
             }
         )
@@ -268,7 +267,7 @@ def test_summary_reports_partial_arm_completion(tmp_path) -> None:
     summary = SUMMARY.summarize(tmp_path)
 
     assert summary["arms"]["natural"]["eval_complete"] is True
-    assert summary["arms"]["symbolic"]["train_complete"] is False
+    assert summary["arms"]["answer-only"]["train_complete"] is False
     assert (tmp_path / "SUMMARY.md").exists()
 
 

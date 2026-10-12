@@ -21,9 +21,10 @@ dataset row or synthetic spec
 - `spatial/v2/difficulty.py` measures positive axis-path depth and semantic
   premise-deletion support, including exclusion and membership effects.
 - `spatial/v2/*_certificates.py` builds and independently checks Direction,
-  Which, and correlated Count evidence. `render_training_trace` emits compact
-  Natural or Symbolic supervision, while `render_audit_certificate` emits the
-  exhaustive checked evidence from the same certificate.
+  Which, and correlated Count evidence. `render_training_trace` can render the
+  implemented Natural or Symbolic views, while `render_audit_certificate` emits
+  exhaustive checked evidence from the same certificate. Central SFT consumes
+  the Natural view only; replayable Symbolic output remains an offline artifact.
 - `spatial/v2/audit_spatialeval.py` validates and records coordinate witnesses
   for benchmark auditing.
 - `spatial/v2/text.py` adapts the current prompt grammar into a
@@ -86,8 +87,9 @@ receive the all-eight default.
 - Use `spatial/v2/solver.py` when the caller already has structured objects,
   formulas, and a query.
 - Use `spatial/v2/difficulty.py` for structural generation metrics.
-- Use the answer-certificate builders and renderers for checked Natural or
-  Symbolic proof-trace supervision without exposing numeric coordinates.
+- Use the answer-certificate builders and renderers to validate solutions,
+  produce verified Natural SFT targets, and emit replayable Symbolic audit views
+  without exposing numeric coordinates to the model.
 - Use `spatial/v2/audit_spatialeval.py` for coordinate-bearing benchmark audits.
 - Use `spatial/v2/text.py` only to adapt the current rendered prompt grammar.
 - Use `spatial/v2/grading.py` after semantic analysis to resolve answer
@@ -372,13 +374,14 @@ written directly by `audit_spatialeval.py` from checked analyses and witnesses.
 Training and audit output are deliberately separate. `TraceFormat.NATURAL` and
 `TraceFormat.SYMBOLIC` are deterministic views of one checked certificate.
 Natural narrates checked step IDs, inputs, branch scopes, candidate evidence,
-and correlated Count cases. Symbolic serializes typed evidence. This aligns
-intended dependencies but does not establish corpus-wide rendered-information
-or token matching; only Symbolic model output has a replay parser. There is no independent state-update mode: such a
-mode belonged to the removed post-hoc renderer and could change presentation
-without preserving a one-to-one relation with checked proof steps.
-Audit artifacts may include normalized coordinate witnesses; they are not SFT
-reasoning targets.
+and correlated Count cases and supplies the verified worked-solution target.
+Symbolic serializes typed evidence for replay and offline audits; it is not a
+central SFT target. There is no independent state-update mode: such a mode
+belonged to the removed post-hoc renderer and could change presentation without
+preserving a one-to-one relation with checked proof steps. Audit artifacts may
+include normalized coordinate witnesses; they are not SFT reasoning targets.
+A future compact CoS-like format would be a separate, non-NDJSON,
+query-directed representation evaluated only for token efficiency.
 
 A synthetic generator should therefore construct once and render later:
 
@@ -393,10 +396,10 @@ row = {
     "prompt": prompt_renderer.render(problem),
     "answer": menu_answer.raw,
     "proof": answer_certificate_to_dict(certificate),
-    "explanation": render_training_trace(certificate, trace_format, labels=labels),
+    "explanation": render_training_trace(certificate, TraceFormat.NATURAL, labels=labels),
     "metadata": {
         "answer_mode": answer_mode.value,
-        "trace_format": trace_format.value,
+        "trace_format": TraceFormat.NATURAL.value,
         "audit_witnesses": analysis.witnesses,
         "seed": seed,
     },

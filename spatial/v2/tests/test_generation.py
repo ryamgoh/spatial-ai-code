@@ -504,6 +504,10 @@ def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> Non
         WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))
 
 
+def test_workload_defaults_to_natural_sft_view_only() -> None:
+    assert WorkloadSpec().trace_formats == (TraceFormat.NATURAL,)
+
+
 def test_direction_policy_enforces_transitive_axis_depth_without_direct_fact() -> None:
     sample = SpatialGeneratorV2(seed=1721).generate(
         GenerationPolicy(

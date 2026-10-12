@@ -189,8 +189,9 @@ algorithm or a mandatory four-paragraph trace:
    two worlds with different **complete query answers** establish non-uniqueness.
    One witness never establishes necessity; sampled worlds never exhaust the
    answer domain. Proof and witness construction may alternate. Global maps or
-   rank tables are a representation choice, not mandatory on every task; retaining
-   independent validity checks is essential when comparing local-proof targets.
+   rank tables are a certificate representation choice, not mandatory model
+   output; retaining independent validity checks is essential when evaluating
+   any future compact representation.
 4. **Decide:** preserve native Direction/Which/Count projections and existing
    SINGLE/ALL_POSSIBLE contracts. Count requires joint membership constraints;
    Which depends on whether a singular object or a complete set was requested.
@@ -216,18 +217,17 @@ sides vacuously; check consistency before making non-vacuous necessity claims.
 **Z3 boundary:** use it for generation, semantic labels, witness validation, and
 independent audit/scoring without leaking answers or evidence into test prompts.
 That does not give the tested LLM a solver. A model-plus-Z3 test-time oracle is a
-separately labelled tool-assisted system. Likewise, verified gold traces do not
-make arbitrary model traces verified; current Symbolic outputs have replay
-support, whereas arbitrary Natural outputs lack a process checker. See the local
+separately labelled tool-assisted system. Likewise, verified source reasoning
+does not make arbitrary model prose verified. Replay applies to the offline
+answer certificate, whereas arbitrary Natural output lacks a process checker. See the local
 [semantic contract](../spatialentail/semantics.md) and
 [certificate limits](../spatialentail/certificates.md).
 
-Test teachability with matched answer-only/Natural/Symbolic controls, legal step
-and scope use, candidate coverage, primitive retention, and held-out logical-spatial
-compounds, ambiguity, and correlated counts—not mnemonic compliance alone.
-Current Boolean/depth/axis-generation combinations and the proposed local-proof
-comparison still require feasibility/coverage checks; no learning benefit is
-established by naming the policy.
+Test teachability centrally with matched answer-only and Natural targets,
+candidate coverage, primitive retention, and held-out logical-spatial compounds,
+ambiguity, and correlated counts—not mnemonic compliance alone. A compact
+CoS-like representation is optional only as a token-efficiency comparison;
+replayable answer certificates remain offline audit artifacts.
 
 ## 5. Secondary validation recommendation
 

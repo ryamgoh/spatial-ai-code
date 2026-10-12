@@ -3,59 +3,52 @@
 
 == Hypotheses and Contrasts
 
-The experiment separates three questions that are easily conflated: whether
-task exposure helps, whether valid reasoning evidence helps, and whether a
-global rank witness is a useful training target.
+The experiment separates whether task exposure helps from whether a verified
+worked solution helps. A compact symbolic representation is an optional
+token-efficiency extension rather than a central formal-reasoning claim.
 
 #figure(
   table(
     columns: (auto, 1fr),
     inset: (x: 7pt, y: 5pt),
     table.header([*Contrast*], [*Interpretation*]),
-    [Checked Natural vs. answer-only], [Effect of adding readable checked evidence to matched task exposure.],
-    [Checked Symbolic vs. answer-only], [Effect of adding replayable typed evidence.],
-    [Checked vs. corrupted Symbolic], [Whether semantic validity matters beyond structured answer-conditioned tokens.],
-    [Proof plus ranks vs. local proof], [Whether constructing a global qualitative witness helps beyond query-local reasoning.],
+    [Verified Natural vs. answer-only], [Effect of adding a readable, query-directed worked solution to matched task exposure.],
+    [Compact Symbolic vs. Natural (optional)], [Whether a CoS-like representation reduces target and generation tokens while retaining accuracy.],
   ),
   caption: [Predeclared supervision contrasts.],
 ) <experimental-contrasts>
 
-The first two are central comparisons on the primary 4B model. The latter two are optional
-mechanism studies on the 4B model. Natural and Symbolic are described as
-supervision packages because their tokenization, validation, and presentation
-properties differ.
+Verified Natural versus answer-only is the central SFT comparison on the
+primary 4B model. Prompt-matched untuned evaluation provides context rather
+than another SFT arm. Compact Symbolic is optional and proceeds only after its
+notation and corpus-wide token reduction are demonstrated. Replayable NDJSON
+answer certificates are not an SFT arm.
 
 == Corpus and Benchmark Roles
 
-SpatialEntail-Train and SpatialEntail-Bench are distinct candidate artifacts.
-The existing 650-row pilot is development evidence only. The reviewed execution
+SpatialEntail-Train and SpatialEntail-Bench are distinct sealed artifacts. The
+production release contains 8,000 training bases, a nested 4,000-base subset,
+775 development bases, and 4,300 benchmark bases. The reviewed execution
 protocol supersedes the earlier seventeen-thousand-example and 5.8K-test plans.
-Candidate training budgets are a nested 4K/8K pair; 16K is optional future
-expansion. Quotas are frozen only after structural diversity, semantic coverage,
-and exact context admission pass. Equal cell counts describe an experimental
-sampling distribution, not the population of all spatial reasoning problems.
+Equal cell counts describe an experimental sampling distribution, not the
+population of all spatial reasoning problems.
 
 The production assembler records exact role quotas, paired variants,
 contamination inputs, canonical instance signatures, declared skeleton families,
 software revision, and content hashes. It rejects insufficient unique diversity
-rather than substituting renamed copies. Its output remains a candidate until
-quality review and the final seal are complete.
+rather than substituting renamed copies. The production output passed quality
+review and sealing before job preparation.
 
 == Models and Training Arms
 
 The primary study uses Qwen3.5-4B with matched base problems and fixed epochs.
-Answer-only, checked Natural, and checked Symbolic each run with seeds 42 and
-43, giving six central SFT runs. The final fixed-epoch checkpoint is evaluated;
-format-dependent token loss does not select different checkpoints. Appropriate
-prompt-matched untuned baselines accompany each package. Natural versus
-Symbolic compares supervision packages, not notation isolated from information
-content, token cost, or replayability.
+Answer-only and verified Natural are the central SFT arms. The final fixed-epoch
+checkpoint is evaluated; training loss does not select different checkpoints.
+Appropriate prompt-matched untuned baselines accompany each response contract.
 
-The 4K to 8K checked-Symbolic comparison is a bounded development-set budget
-ablation. It does not prove two-point saturation or an optimal training size.
-Unresolved uncertainty is reported. A second model size, local-proof and
-corrupted-trace mechanisms, broader answer-contract training, and GRPO are
-optional after the central study.
+Compact Symbolic and GRPO are optional after the central study. Compact Symbolic
+is compared with Natural on answer accuracy, target/generated tokens, runtime,
+and memory; it is not evaluated as a formal certificate format.
 
 == Matched and Structural Evaluations
 
@@ -68,20 +61,19 @@ Distinct checked steps must follow the declared order, each an ancestor of the n
 logical support premise must change the consistent query answer domain.
 This establishes bounded semantic dependence, not globally shortest proofs.
 
-Candidate internal evaluation has 1,300 CORE bases, 1,200 matched composition
-bases, 900 held-out composition bases, and 900 depth bases: 4,300 total.
-These remain quota targets pending full admission and diversity audits.
+Internal evaluation has 1,300 CORE bases, 1,200 matched composition bases, 900
+held-out composition bases, and 900 depth bases: 4,300 total. These quotas passed
+admission and diversity audits before sealing.
 CORE entries include primary structures, semantic strata, and diagnostic noise;
 no claim is made that the thirteen strata are thirteen equal primitives.
 
 Depth evaluation uses fifty examples for each query family at depths 3 through
 8. Depths 3 and 4 anchor the matched generator; depths 5 through 8 test
 extrapolation. Input length, entity count, premise count, and achieved depth are
-reported together. Deep Selection and Count traces exceed the existing output
-budget, so this module uses a common direct-answer protocol. Gold certificates
-are checked offline, and model process validity is not applicable. Full
-Natural/Symbolic replay applies only to paired CORE/composition examples that
-fit the frozen budget. No truncation or shallower backfill is allowed.
+reported together. Deep Selection and Count worked solutions can exceed the
+output budget, so this module uses a common direct-answer protocol. Gold
+certificates are checked offline, and model process validity is not required.
+No truncation or shallower backfill is allowed.
 
 The benchmark is sealed before central model selection. Two grouping keys serve
 different roles: a canonical instance signature excludes renamed/reordered
@@ -118,19 +110,19 @@ comparator until a semantics-preserving public adapter can be frozen.
 
 Primary outcomes are separately reported cell-macro accuracy on matched CORE,
 matched compositions, held-out compositions, depth curves, and strict
-SpatialMap-TQA-Corr accuracy. Secondary metrics include per-capability/query results,
-ambiguity precision/recall, option-position consistency, Symbolic parse and
-replay rates, decision/domain consistency, full-trace validity, rank-witness
-validity, generated tokens, runtime, and memory.
+SpatialMap-TQA-Corr accuracy. Secondary metrics include per-capability/query
+results, ambiguity precision/recall, option-position consistency, generated
+tokens, runtime, and memory. If compact Symbolic runs, its token reduction and
+answer accuracy are reported together.
 
 Both training seeds are reported individually, together with their mean and
 range. Two seeds do not support a strong seed-level confidence interval. Paired
 item-level bootstrap intervals are reported within each seed, and consistent directions are reported as observations from two runs. Item-level
 intervals condition on the checkpoints and do not estimate training-run variance.
-The two primary held-out comparisons are Natural and Symbolic versus answer-only,
-with Holm adjustment within each seed. Cell-stratified paired resampling keeps
-base variants together. At one hundred examples, cell profiles are descriptive;
-a cell near fifty percent has roughly a ten-point confidence half-width.
+The primary held-out comparison is Natural versus answer-only. Cell-stratified
+paired resampling keeps base variants together. At one hundred examples, cell
+profiles are descriptive; a cell near fifty percent has roughly a ten-point
+confidence half-width.
 
 == Source-Blinded Quality Review
 

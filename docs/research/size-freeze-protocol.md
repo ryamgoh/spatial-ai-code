@@ -1,30 +1,35 @@
 # SpatialEntail corpus and benchmark protocol
 
-Status: production corpus sealed and six SFT jobs prepared, 2026-10-11.
-No job has been submitted and no SFT or evaluation result is claimed.
+Status: production corpus sealed and four SFT jobs prepared, 2026-10-12.
+The repository receipt does not track remote submission or completion. No frozen
+benchmark evaluation result is claimed here.
 This protocol supersedes the earlier 17K, seven-composition, and 5.8K-test plans.
 
 ## Research question and required study
 
-Does formally checked spatial evidence improve answer accuracy on matched and
-held-out logical-spatial structures compared with answer-only task exposure?
+Does SFT on solver-validated spatial problems improve answer accuracy on
+matched, structurally held-out, and external spatial tasks?
 
-The primary model is Qwen3.5-4B. Answer-only, checked Natural, and checked
-Symbolic SFT use the same admitted base problems and two seeds (42 and 43): six
-central training runs. Each receives an appropriate prompt-matched untuned
-baseline. SINGLE is the headline contract. Natural versus Symbolic compares
-supervision packages, not notation alone. The final fixed-epoch checkpoint is
-used, avoiding format-dependent checkpoint selection by token loss.
+The primary model is Qwen3.5-4B. The central SFT comparison uses answer-only and
+Natural worked-solution targets on the same admitted base problems, with a
+prompt-matched untuned baseline. SINGLE is the headline contract. Answer
+certificates remain offline generation, verification, and evaluation artifacts;
+the model is not required to reproduce them. The final fixed-epoch checkpoint
+is used, avoiding checkpoint selection by training-target loss.
 
-A second model size, corrupted traces, local-proof serialization, ALL_POSSIBLE
-training, distractor pairs, extensive prompting factorials, and GRPO are
-optional after the central study. SpatialMap-TQA-Corr is the essential external
-anchor; StepGame is next priority. External suites retain native contracts and
-are never pooled into the internal score.
+A compact CoS-like Symbolic arm is optional after the central study. Its purpose
+is to test whether a shorter symbolic representation can retain accuracy while
+reducing target and generated tokens; it is not the replayable NDJSON answer
+certificate. A second model size, ALL_POSSIBLE training, distractor pairs,
+extensive prompting factorials, and GRPO are also optional. SpatialMap-TQA-Corr
+is the essential external anchor; StepGame is next priority. External suites
+retain native contracts and are never pooled into the internal score.
 
 ## Separate artifacts
 
-- **SpatialEntail-Train:** paired answer-only/Natural/Symbolic supervision.
+- **SpatialEntail-Train:** matched answer-only and Natural supervision; an
+  optional compact Symbolic view may be added only after its representation and
+  token-reduction criterion are frozen.
 - **SpatialEntail-Dev:** checkpoint diagnostics and the bounded size comparison.
 - **SpatialEntail-Bench:** fixed evaluation modules, unavailable for selection.
 - **Engineering pools:** previously inspected pilots, smoke runs, demonstrations,
@@ -108,13 +113,13 @@ operator generalization is made.
 
 ## Evaluation modules
 
-| Module | Provisional allocation | Interpretation |
+| Module | Sealed allocation | Interpretation |
 |---|---:|---|
 | CORE matched | 100 × 13 = 1,300 bases | coverage-stratum performance |
 | COMP matched | 100 × 12 = 1,200 bases | seen skeletons, unseen instances |
 | COMP holdout | 100 × 9 = 900 bases | transfer to three reserved skeleton families |
 | Depth | 50 × 3 query families × depths 3–8 = 900 bases | 3/4 matched anchors; 5–8 extrapolation |
-| Total candidate benchmark | 4,300 bases | artifact count only, not one headline score |
+| Total benchmark | 4,300 bases | artifact count only, not one headline score |
 
 Depth and composition have separate scorecards. Depth examples use one
 consistent controlled generator across anchors and extrapolation. Report
@@ -128,30 +133,24 @@ Selection/Count depth rows skip unused witness and answer-certificate rendering;
 their three-candidate scope is explicit in the prompt and round-trips to the
 structured query. The depth module uses admitted answer-only targets with
 process validity marked not applicable. No truncation or shallower backfill is
-allowed. Natural/Symbolic process results apply only to CORE/COMP examples
-admitted as a complete paired group. All trained models are also evaluated
-under the same direct-answer instruction on the depth module; this is separate
-from their native trace-generation evaluations.
+allowed. All trained models are evaluated under the same direct-answer
+instruction on the depth module.
 
 ## Allocation and training size
 
-`release-candidate.yaml` contains feasibility targets: 200 bases per CORE
+`release-candidate.yaml` supplied the now-sealed quotas: 200 bases per CORE
 stratum (2,600), 350 per seen COMP cell (4,200), and 1,200 controlled depth-3/4
 anchors, giving an 8K pool and nested 4K prefix. Dev contains 25 per each of the
-31 CORE/COMP/anchor strata: 775 bases. These remain budget targets until
-structural uniqueness, achieved-depth, all-variant context, and marginal
-coverage audits pass. Equal counts across query families within each skeleton
-reduce the earlier confound; CORE and anchor weighting remain explicit.
-Report per-query, per-semantic, direction/answer-position, and package token
-exposure before approving quotas. No extra examples are added merely because
-a trace is longer or requested depth is larger.
+31 CORE/COMP/anchor strata: 775 bases. Structural uniqueness, achieved-depth,
+all-variant context, and marginal coverage audits passed before sealing. Equal
+counts across query families within each skeleton reduce the earlier confound;
+CORE and anchor weighting remain explicit. Report per-query, per-semantic,
+direction/answer-position, and package token exposure. No extra examples are
+added merely because a worked solution is longer or requested depth is larger.
 
-One bounded 4K→8K checked-Symbolic comparison uses development only. Eight
-thousand is the primary budget candidate, not evidence of saturation. Report
-observed gains, paired uncertainty, and both seeds when feasible. The old
-“less than two points proves saturation” rule is withdrawn. If uncertainty or
-run variance is unresolved, report “not resolved within budget.” A 16K pool is
-optional future expansion, not part of the central critical path.
+Eight thousand bases is the sealed SFT allocation. The nested 4K subset remains
+an available data artifact, not a required scaling experiment. The former 16K
+expansion is not part of the current study.
 
 Use a keyed random rank within strata for nested prefixes. Freeze prompts,
 training epochs, tokenizer revision, decoding, and score definitions before
@@ -199,12 +198,13 @@ populations. No aggregate SHIFT or whole-benchmark headline is used.
 
 At 100 examples, a cell near 50% accuracy has an approximate 95% half-width of
 9.6 points. Cells support descriptive profiles and large effects, not small
-rankings. The primary comparisons are Natural versus answer-only and Symbolic
-versus answer-only on held-out COMP; apply Holm correction to those two tests
-within each seed. Use cell-stratified paired bootstrap/permutation recomputing
-macro differences; resample base problems together with their variants. Report
-within-skeleton results, without treating three skeleton families as hundreds of
-independent generalization units.
+rankings. The primary comparison is Natural versus answer-only on held-out COMP.
+Use cell-stratified paired bootstrap/permutation recomputing macro differences;
+resample base problems together with their variants. Report within-skeleton
+results without treating three skeleton families as hundreds of independent
+generalization units. If the optional compact Symbolic arm runs, report its
+accuracy and token/runtime delta as a secondary comparison rather than adding it
+to the central family of tests.
 
 Two seeds are reported individually and with descriptive mean/range. Item
 intervals are conditional on the checkpoints and do not measure training-run
@@ -232,24 +232,25 @@ all 485 sampled items received two approvals, so no human appeal was triggered.
 Report this as two independent blinded LLM reviews, not a double-blind human
 review.
 
-## Runnable paths and remaining release gates
+## Runnable verification paths and final release state
 
 - `python -m spatial.v2.check_registry spatial/v2/composition-cells.yaml --probe`
 - `python -m spatial.v2.check_registry spatial/v2/composition-holdout-cells.yaml --probe`
 - `python -m spatial.v2.study.build spatial/v2/study/smoke.yaml --out <new-dir>`
 - P0 launcher: `experiments/15-v2-ablation/run-core-smoke.yaml`, with thirteen
-  CORE cells, exact context admission, engineering dev/test, and one Symbolic
+  CORE cells, exact context admission, engineering dev/test, and one Natural
   training arm. It is an engineering configuration, not a sealed final study.
 
 The production release contains 8,000 Train, 775 Dev, and 4,300 Bench bases.
 All quotas, structural uniqueness, cross-role overlap, achieved-depth,
 round-trip, semantic re-solving, Symbolic replay, and context gates passed.
-The six Qwen3.5-4B job configurations are prepared but have not been submitted.
+The four Qwen3.5-4B answer-only/Natural job configurations are prepared but have
+not been submitted from this repository.
 
 ### Diversity repair after independent review
 
-The pilot-size DIR-ARC template and minimal depth chains cannot meet production
-quotas with unique signatures. Candidate production now uses a larger six-object
+The pilot-size DIR-ARC template and minimal depth chains could not meet production
+quotas with unique signatures. Production therefore used a larger six-object
 direct-relation policy and randomized support-independent filler-edge subsets
 for depth ladders; membership fillers vary the nonmember quadrant. A depth-three
 Direction probe produced thirty unique structures from thirty candidates while
@@ -257,21 +258,19 @@ retaining X/Y depth three. This repairs the fixed-topology bottleneck but does
 not establish full quotas or long-trace admission. All train/dev/test policies
 for an anchor use the same expanded domain/topology recipe.
 
-### Candidate trace envelope
+### Sealed context envelope
 
-Expanded SEL/CNT depth-three/four anchors do not admit paired Symbolic targets
-under 4,096 tokens: representative full-training counts were 5,843/8,252 for
-Selection and 6,112/8,568 for Count. Production candidate therefore reserves
-12,288 training/output tokens within a 16,384 evaluation envelope. The small
-engineering smoke remains at 4,096/8,192. This is an unsealed compute choice,
-not permission to truncate or mix token budgets across compared arms. Record
-actual costs and retain all-or-none paired admission. Depth-eight answer-only
-checks remain separate from this full-trace envelope.
+The sealed release records a conservative 12,288-token training envelope and a
+16,384-token evaluation envelope. Central answer-only/Natural jobs retain those
+admission limits so the sealed data and receipts remain reproducible; the limits
+are not evidence that ordinary Natural SFT requires that much context. Report
+actual target lengths and runtime. Depth-eight answer-only checks remain
+separate from the worked-solution envelope.
 
 ## Release-to-SFT job endpoint
 
-The active preparation goal stops at creation of six SFT configs/scripts; no
-Slurm job is submitted and no commit is made. `study/feasibility.py` records
+The completed preparation goal stopped at creation of four SFT configs/scripts;
+no Slurm job was submitted. `study/feasibility.py` records
 structural yield and exact token admission. `study/seal.py` checks all roles,
 paired targets, overlap, hashes, and release-linked judge receipts before
 sealing. `study/jobs.py` refuses engineering/unsealed data and writes paired

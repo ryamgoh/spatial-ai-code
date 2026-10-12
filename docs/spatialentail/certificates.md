@@ -1,9 +1,11 @@
 # Certificate-stack implementation and acceptance contract
 
 This document defines acceptance requirements for the supported certificate
-fragment. Test coverage and constructor support are implementation evidence;
-they do not establish unrestricted proof-search completeness, SFT readiness,
-learning benefit, human readability, or internal reasoning faithfulness.
+fragment. Answer certificates are offline generation, solution-validation, and
+dataset-audit artifacts; they are never central SFT targets. Test coverage and
+constructor support are implementation evidence; they do not establish
+unrestricted proof-search completeness, SFT readiness, learning benefit, human
+readability, or internal reasoning faithfulness.
 
 ## Supported language
 
@@ -34,16 +36,16 @@ learning benefit, human readability, or internal reasoning faithfulness.
   stored once, plus exhaustive exclusions for assignments compatible with those
   classifications for impossible counts. Correlations remain explicit and
   evidence can still grow exponentially in contingent candidates.
-- Natural narrates checked step IDs, inputs, branch scopes and query evidence;
-  Symbolic encodes those objects in typed records. Corpus-wide evidence mapping
-  and length must be audited before a notation-only claim. Symbolic model output
-  is parsed and replayed; arbitrary
-  Natural model output has no process checker.
+- Natural worked solutions may be rendered from the checked dependencies for
+  central SFT. The replayable Symbolic NDJSON encodes the certificate objects
+  for offline checking; it is not a model target. A future compact CoS-like
+  target would be a separate, query-directed format and would require its own
+  token-efficiency audit. Arbitrary Natural model output has no process checker.
 - Unique Direction training includes a consistency witness alongside its proof.
 - Generated proofs are pruned to relevant steps; proof validity and relevance
   remain distinct acceptance properties.
-- Training model evidence uses qualitative ranks; every audit query kind
-  exposes coordinate-bearing witnesses.
+- Certificate-side model evidence uses qualitative ranks; every audit query
+  kind exposes coordinate-bearing witnesses.
 - Unsupported proof construction fails closed; there is no legacy renderer
   fallback.
 

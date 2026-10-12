@@ -1,12 +1,10 @@
-# Experiment 15: Spatial V2 proof-trace pilot (Part II)
+# Experiment 15: Spatial V2 SFT integration pilot (Part II)
 
-This is a preparation and integration pilot for proof-trace SFT. It contains no
-model results. The checked-in run trains four supervision arms on paired base
-problems: checked Natural, checked Symbolic, answer-only, and corrupted Symbolic.
-Three untuned baselines evaluate the same Natural, Symbolic, and answer-only
-prompts without adapters. Corrupted Symbolic preserves parseable syntax and the
-final gold answer while changing checked reasoning; there is no Natural
-corruption arm.
+This is a preparation and integration pilot for conventional SFT. It contains
+no model results. The checked-in run compares verified Natural worked solutions
+with answer-only targets on paired base problems, with prompt-matched untuned
+baselines. Replayable answer certificates remain offline verification and audit
+artifacts; they are not training arms.
 
 The complete generator and matrix field catalogue is
 [`docs/spatialentail/generation-and-knobs.md`](../../docs/spatialentail/generation-and-knobs.md).
@@ -33,7 +31,7 @@ structural-overlap rejection. Its Boolean shape names specify sampling syntax;
 they do not promise that every accepted example needs the named inference rule.
 It is an additional source/operator diagnostic, not a reported benchmark result.
 
-All variants of each base problem pass admission together using the actual
+Both variants of each base problem pass admission together using the actual
 `Qwen/Qwen3.5-4B` tokenizer at revision
 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` and its default chat template. Admission counts the
 full training conversation against 4096 tokens and the exact evaluation prompt
@@ -43,12 +41,9 @@ used. The manifest records actual model-token volumes by variant and split;
 fixed examples/epochs are not equal-token or equal-compute training.
 
 The evaluation task consumes the admitted, fully templated prompt verbatim,
-retains the raw completion, and scores answer accuracy plus Symbolic reasoning
-replay, decision validity, domain consistency, and full validity. Natural and
-answer-only process validity are unavailable; conditional process aggregates
-exclude them. Deterministic decoding uses temperature 0 and repetition penalty
-1. Retention evaluation is deferred because its separately authored task needs
-its own prompt/template contract.
+retains the raw completion, and scores answer accuracy. Deterministic decoding
+uses temperature 0 and repetition penalty 1. Retention evaluation is deferred
+because its separately authored task needs its own prompt/template contract.
 
 ## Local checks
 
@@ -73,7 +68,7 @@ Use `matrix-premise-holdout.yaml` instead to prepare the independent-source
 holdout diagnostic. The generator writes `_train.jsonl`, `_dev.jsonl`,
 `_test.jsonl`, `_manifest.json`, and paired view directories. View names are
 `<answer>__<trace>__<supervision-arm>_<split>.jsonl`, for example
-`single__symbolic__checked-trace_test.jsonl`. Answer-only is emitted once using
+`single__natural__checked-trace_test.jsonl`. Answer-only is emitted once using
 the first configured trace format as its view namespace.
 
 ```bash
@@ -86,7 +81,7 @@ uv run --no-project --with pytest --with typer --with pyyaml --with z3-solver \
 
 On the Slurm login server, the same submit command without `--dry-run` renders
 immutable run configs and submits generation, one train/eval chain for each SFT
-arm, three generation-dependent untuned evaluation jobs, and a summary job.
+arm, two generation-dependent untuned evaluation jobs, and a summary job.
 The summary waits `afterany`; dependent training/evaluation jobs require
 `afterok`. No GPU training or evaluation is required for the local checks.
 
@@ -105,7 +100,7 @@ prompts must be regenerated after changing the model or tokenizer template.
 ## CORE engineering smoke
 
 `run-core-smoke.yaml` uses all thirteen existing CORE cells via
-`matrix-core-smoke.yaml`. It trains one Symbolic engineering checkpoint with
+`matrix-core-smoke.yaml`. It trains one Natural engineering checkpoint with
 non-reportable dev/test splits. This run does not initialize central SFT and
 is not the sealed study benchmark.
 

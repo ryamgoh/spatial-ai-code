@@ -15,18 +15,15 @@ pilot; this draft does not claim that a final release has been frozen.
 
 #heading(level: 2, numbering: none)[Executed Renderer Example]
 
-The following excerpt was produced by the Natural Direction training renderer
+The following excerpt was produced by the verified Natural Direction target renderer
 from a direct two-object fixture: A is Northeast of B, queried from A to B,
-with supporting coordinates A=(1,1) and B=(0,0). The fixture is deterministic
-and has no generation seed. It illustrates rendered evidence rather than a
-sample from the planned depth-controlled pilot. The coordinates are used to
-check the model; the training output prints only qualitative orders.
+The fixture is deterministic and has no generation seed. It illustrates a
+query-directed worked solution rather than a sample from the planned
+depth-controlled pilot. Coordinates, rank witnesses, and replayable certificate
+records are retained only in the offline audit artifact.
 
 #quote[
   P1: A is Northeast of B. \
   Q-DIR: Therefore A is Northeast of B, as established by P1. \
-  X west to east: B < A. \
-  Y south to north: B < A. \
-  This supporting model satisfies every premise and makes the claim that A is Northeast of B true. \
   Therefore the unique direction is Northeast; all other exact directions are excluded because exact directions are mutually exclusive.
 ]

@@ -241,13 +241,14 @@ only a pruning optimisation and is not relied upon for completeness.
 
 #heading(level: 2, numbering: none)[Proof Certificate Calculus]
 
-The SMT encoding decides model-theoretic truth, but a training trace requires a
-separate derivation object. This work therefore uses a typed proof certificate.
+The SMT encoding decides model-theoretic truth, while offline verification uses
+a separate derivation object: a typed proof certificate.
 Each step has a unique identifier, a rule name, an ordered list of dependencies,
 and one conclusion. Premise steps additionally identify their source premise.
 Derived steps may occur in the global scope or inside one explicitly named case
-branch. Natural narrates these checked step identifiers, dependencies and scopes;
-Symbolic serializes the typed records. Only the latter has a model-output parser.
+branch. A verified Natural target may selectively narrate query-directed
+dependencies. The complete typed records remain in the replayable Symbolic
+audit artifact and are not a model-output contract.
 
 Let $Gamma$ denote the visible premise formulas of one `SpatialProblem`. The
 judgement $Gamma tack.r phi$ means that formula $phi$ has a checked derivation
@@ -378,9 +379,10 @@ $square$
 The theorem does not require $Gamma$ to be consistent: under classical
 semantics an inconsistent premise set has no models. Operationally, the pipeline
 checks consistency separately and does not emit an ordinary answer for an
-inconsistent problem. Unique Direction training includes a checked model witness
-as well as the positive proof, so the emitted evidence establishes non-vacuous
-entailment. A model without a proof establishes only possibility.
+inconsistent problem. The offline certificate for a unique Direction answer
+includes a checked model witness as well as the positive proof, so the stored
+evidence establishes non-vacuous entailment. A model without a proof establishes
+only possibility.
 
 #heading(level: 3, numbering: none)[Scope of the claim]
 
@@ -480,11 +482,13 @@ exact directions are possible, their mutual exclusivity makes each contingent;
 if exactly one is possible, exhaustive exclusion of all alternatives plus its
 positive proof makes it the unique entailed direction. $square$
 
-For a unique answer, both training views include the positive derivation and a
-consistency witness. Mutual exclusivity rules out the remaining exact directions.
-The full certificate's individual refutations are checked before rendering.
-Natural narrates the proof dependencies; Symbolic serializes replayable records.
-The ambiguous case retains explicit evidence for every candidate.
+For a unique answer, the offline certificate includes the positive derivation
+and a consistency witness. Mutual exclusivity rules out the remaining exact
+directions. Its individual refutations are checked before any training target
+is rendered. A verified Natural target may narrate query-directed proof
+dependencies, while replayable Symbolic records and complete witness coverage
+remain audit artifacts. The ambiguous case retains explicit offline evidence
+for every candidate.
 
 This is completeness relative to the query's declared candidate set. A dataset
 adapter that exposes only four ordinal directions is making a narrower contract
@@ -590,8 +594,9 @@ missing evidence is a construction limitation rather than proof of possibility.
 Generated proofs retain steps supporting the designated conclusion. The local
 checker establishes validity of supplied rule applications; relevance is a
 separate construction property. Neither property establishes that a model used
-the emitted steps internally. Only Symbolic model output has a replay parser;
-Natural prose is not covered by these output-validation claims.
+the emitted steps internally. The stored Symbolic certificate has a replay
+parser; it is not a model response format. Natural model output is not covered
+by certificate-replay claims.
 
 #heading(level: 2, numbering: none)[Implementation Evidence and Trust Boundary]
 

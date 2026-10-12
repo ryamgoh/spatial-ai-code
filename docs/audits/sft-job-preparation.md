@@ -1,12 +1,12 @@
 # SpatialEntail preparation through SFT job creation
 
-Status: preparation complete, 2026-10-11. No commit, Slurm submission, or
+Status: preparation complete, 2026-10-12. No commit, Slurm submission, or
 remote training was performed by this goal.
 
 ## Stop boundary
 
-Produce a validated release and six reviewable SFT configurations/scripts for
-Qwen3.5-4B, answer-only/Natural/Symbolic packages, seeds 42/43. Job creation
+Produce a validated release and four reviewable SFT configurations/scripts for
+Qwen3.5-4B, answer-only/verified-Natural packages, seeds 42/43. Job creation
 requires actual release quality receipts and a verified seal. Server execution,
 GPU memory verification, training results, and final model evaluation are
 outside this goal.
@@ -42,10 +42,14 @@ outside this goal.
 
 ## Evidence
 
+The entries below are a chronological execution log. Intermediate statements
+that work was still running are superseded by **Final executed state**; they are
+retained only as provenance for the completed build.
+
 The initial full regression passed 487 tests in 56.05 seconds before final
 seal-boundary additions. Targeted tests cover nested partial-group rejection,
 status-only seal rejection, exact release-to-quality binding, all-approve and
-approved-double-rejection sealing, corrupted appeals, six-job creation, and
+approved-double-rejection sealing, corrupted appeals, four-job creation, and
 relocation. Test receipts are synthetic unit fixtures, not dataset quality
 judgments. The actual production build and quality screen are still running.
 
@@ -54,7 +58,7 @@ validation, missing quality binding, nested quota gaps, and per-role sampling.
 Final evidence is appended when the actual artifacts complete.
 
 The cleanup follow-up added meaningful synthetic integration tests: an approved
-human appeal after double rejection passes sealing, six-job preparation, and
+human appeal after double rejection passes sealing, four-job preparation, and
 copied-release revalidation; a changed appeal payload fails. Per-role sampling
 minima and exact depth/process metadata are independently checked by the seal.
 Synthetic fixtures remain separate from actual judge receipts.
@@ -95,8 +99,9 @@ Production-v3 hybrid progress: Direction and Selection MP→TRC each met their
 The production artifact is not yet complete or sealed.
 
 Persisted release auditing now re-solves each visible prompt and independently
-replays each Symbolic target before sealing. A rehashed, re-admitted corrupt
-trace is rejected by replay, proving the audit is not merely a checksum gate.
+replays each Symbolic certificate view before sealing. A rehashed, re-admitted
+invalid verifier fixture is rejected by replay, proving the audit is not merely
+a checksum gate. Neither artifact is an SFT target.
 The actual first DeepSeek quality pass covers seventy CORE training items in
 immutable packets; its receipts are pending. Current training checkpoint count
 is 5,050 bases, including the first reverse TRC→MP cell.
@@ -154,12 +159,12 @@ not a complete release quality result. No SFT job was submitted.
 Train 8,000 and Dev 775 production quotas completed. Bench generation is active
 (first 200 CORE bases saved). Final Train screen group one has 46 double approvals
 with no rejects. Remaining final Train/Dev/Bench quality coverage and persisted
-audit/seal are still required before six production SFT jobs can be created.
+audit/seal are still required before four production SFT jobs can be created.
 
 Bench CORE production progress reached 1,000/1,300 bases with strict Train/Dev
 overlap exclusion. Final Train first 46 sampled items are approved by both judges.
 Remaining final Train groups and Dev screening run in bounded isolated packets;
-full Bench/seal and six production jobs remain outstanding.
+full Bench/seal and four production jobs remain outstanding.
 
 Final Train quality sample first-stage receipts now validate for all 160 items,
 with 160 approvals. GPT second-stage groups one/three have 100 approvals so far;
@@ -181,13 +186,13 @@ second-stage review is active. No production seal/jobs yet.
 Release-linked quality now has full double approval for Train 160, Dev 155,
 CORE-Bench 65, and matched-COMP 60 samples. No holds or appeals in these final
 samples. Held-out composition first/second screening and depth generation still
-remain, followed by persisted semantic/replay audit, sealing, and six job files.
+remain, followed by persisted semantic/replay audit, sealing, and four job files.
 
 Release-linked Natural quality is fully accepted for Train 160, Dev 155,
 CORE-Bench 65, matched-COMP 60, and held-out-COMP 45 samples. Every item has two
 independent approvals; there are no holds or human appeals. Depth benchmark is
 answer-only and excluded from this Natural-trace screen. Final build, refresh,
-persisted audit, sealing, and six SFT jobs remain.
+persisted audit, sealing, and four SFT jobs remain.
 
 All release-linked Natural samples are now double-approved: Train 160, Dev 155,
 CORE 65, matched COMP 60, held-out COMP 45. No holds or human appeals remain in
@@ -215,15 +220,15 @@ context admission, and cross-role structural checks.
 The sealed production release contains 8,000 Train, 775 Dev, and 4,300 Bench
 bases. Bench comprises 1,300 CORE, 1,200 matched COMP, 900 held-out COMP, and
 900 depth bases. The persisted audit re-parsed and re-solved every prompt,
-replayed every Symbolic trace, confirmed exact quotas and depths, and found zero
+replayed every Symbolic certificate view, confirmed exact quotas and depths, and found zero
 cross-role overlap.
 
 Deep Selection/Count depth evaluation uses an explicit three-object candidate
 scope and answer-only oracle generation. It retains complete solver semantics,
 exact depth checks, visible-text round trips, and context admission while
 skipping unused witness and answer-certificate rendering. Its process-evaluation
-status is `not-applicable`; it is forbidden in Train and Dev and cannot emit a
-Symbolic trace.
+status is `not-applicable`; it is forbidden in Train and Dev and does not emit a
+replayable Symbolic certificate view.
 
 The 485-item Natural quality sample was reviewed independently by
 DeepSeek-V4-Pro followed by GPT-5.5 in isolated contexts. Both approved all 485
@@ -232,9 +237,9 @@ not triggered. The final release preserves the original packets and receipts
 alongside an item-identical receipt-rebinding record necessitated by the changed
 unreviewed depth configuration.
 
-Six Qwen3.5-4B SFT jobs were created for answer-only, Natural, and Symbolic at
-seeds 42 and 43. Their receipt records `submitted: false`; Bench data is absent
-from every training configuration.
+Four Qwen3.5-4B SFT jobs were created for answer-only and Natural at seeds 42
+and 43. Their receipt records `submitted: false`; Bench data is absent from
+every training configuration.
 
 The prepared Axolotl JSONL views contain only the `messages` field. The sealed
 release retains the complete heterogeneous audit metadata. This separation

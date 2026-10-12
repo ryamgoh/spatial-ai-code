@@ -41,13 +41,13 @@ Slurm jobs or train a model locally.
    python -m spatial.v2.study.seal results/spatialentail-study/release-final --review-index results/spatialentail-study/review-final/index.json
    ```
 
-5. Create the six paired SFT configurations and Slurm scripts:
+5. Create the four answer-only/Natural SFT configurations and Slurm scripts:
 
    ```sh
    python -m spatial.v2.study.jobs results/spatialentail-study/release-final --out experiments/spatialentail-sft/prepared-final
    ```
 
-   The output contains three supervision packages times seeds 42/43, paired
+   The output contains two supervision packages times seeds 42/43, paired
    Train/Dev views, config/script hashes, and server instructions. Generation
    does not call `sbatch`. Transfer the repository and ignored result/job
    artifacts together. Scripts assume the Slurm submission directory is the

@@ -79,9 +79,10 @@ must still validate the resulting visible problem.
 
 This is stricter than template-first. A template says what kind of reasoning is
 intended; a certificate identifies concrete steps, dependencies, and branch
-scope. Certificate-first is attractive for exact process supervision, but it
-can make examples unusually clean and can leak generator-specific proof shape.
-It is currently proposed vocabulary in SpatialEntail, not implemented code.
+scope. Certificate-first is attractive for exact construction and validation,
+but it can make examples unusually clean and can leak generator-specific proof
+shape. It is currently proposed vocabulary in SpatialEntail, not implemented
+code or a planned certificate-supervision arm.
 
 ### 4. Visible-problem-first
 
@@ -109,7 +110,7 @@ modes:
 |---|---|---|---|
 | Latent-world-first | Complete world | Easy coherent scene construction | Hidden-world labels and world-induced selection bias |
 | Proof-template-first | Intended support/rule shape | Controlled coverage of rare reasoning | Template leakage and accidental shorter proofs |
-| Certificate-first | Concrete derivation | Exact process supervision | Over-clean proof distribution and certificate artifacts |
+| Certificate-first | Concrete derivation | Exact construction and validation | Over-clean proof distribution and certificate artifacts |
 | Visible-problem-first | Visible premises and query | Unplanted semantic stress testing | Post-selection and certificate-availability bias |
 
 The distinction may disappear observationally after aggressive balancing. Two
@@ -231,8 +232,8 @@ combination of:
    domain;
 5. independent replay and global SMT validation with a round-tripped text
    representation; and
-6. evaluation of whether controlled proof-conditioned training transfers to
-   unplanted visible-problem-first and external instances.
+6. evaluation of whether training on controlled, solver-validated problems
+   transfers to unplanted visible-problem-first and external instances.
 
 This is an integration and evaluation claim. No located primary source uses
 this exact combination, but that bounded literature finding is not proof of
@@ -248,19 +249,18 @@ four-arm project by itself.
 1. **Part I — diagnose latent-world labeling.** Show that a complete map can
    support an answer that is not entailed by the emitted text. This motivates
    all-model validation.
-2. **Part II — train on proof-template-first checked traces.** Controlled
-   construction supplies enough examples of rare rule and evidence forms.
+2. **Part II — train on proof-template-first problems.** Compare answer-only
+   with verified Natural worked solutions while certificates remain offline.
 3. **Evaluate on visible-problem-first and external data.** This tests whether
    the model learned the spatial logic rather than the planted generator
    template.
 
 ### Minimum convincing comparison
 
-Hold supervision and model constant, then compare:
-
-- proof-template-first training only;
-- a matched mixture of proof-template-first and visible-problem-first training;
-- answer-only versus checked trace supervision on the same base problems.
+Hold the model and base problems constant, then compare answer-only with verified
+Natural SFT on proof-template-first training data. Evaluate both on
+visible-problem-first and external data; a provenance-mixture study is optional,
+not part of the central SFT contrast.
 
 Test on:
 
@@ -276,12 +276,11 @@ than row identity.
 
 ### Strong research questions
 
-1. Does proof-template-first checked-trace training transfer to
+1. Does proof-template-first verified-Natural training transfer to
    visible-problem-first problems whose proof structures were not planted?
 2. Does adding visible-problem-first training reduce template dependence?
-3. Does checked certificate supervision improve answer accuracy, ambiguity
-   recognition, and process validity beyond answer-only supervision on the same
-   problems?
+3. Does verified Natural supervision improve answer accuracy and ambiguity
+   recognition beyond answer-only supervision on the same problems?
 4. How often does intended template depth differ from measured proof depth or
    admit a shorter alternative proof?
 5. How often does a privileged-world answer disagree with the complete
@@ -387,7 +386,8 @@ core contribution.
 > every candidate answer is possible, impossible, or entailed. Entailment is
 > checked by asking whether the premises together with the negation of the
 > answer are unsatisfiable. I then construct checked proof, refutation, and
-> witness traces for supervision, and test whether models trained on controlled
+> witness certificates to validate the data, render verified Natural worked
+> solutions for SFT, and test whether models trained on controlled
 > proof-template examples generalize to independently proposed visible problems
 > and compatible external datasets.
 
@@ -457,9 +457,9 @@ where it belongs, rather than in the oral explanation.
 
 The idea is valid and worth retaining. The clean version is:
 
-> SpatialEntail studies whether formally checked, proof-conditioned spatial
-> supervision transfers beyond its construction regime to independently
-> proposed visible problems under open-world entailment.
+> SpatialEntail studies whether solver-validated Natural spatial supervision
+> transfers beyond its construction regime to independently proposed visible
+> problems under open-world entailment, compared with matched answer-only SFT.
 
 That is narrower, more testable, and better supported than presenting
 world-first, proof-first, and premise-first as three universally recognized

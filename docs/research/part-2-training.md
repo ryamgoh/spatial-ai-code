@@ -1,12 +1,14 @@
 # SpatialEntail learning-study plan
 
-Status: living experimental plan
+Status: production corpus sealed and four central SFT jobs prepared, 2026-10-12.
+The repository receipt does not track remote submission or completion. No frozen
+benchmark evaluation result is claimed here.
 
 The canonical [task taxonomy](task-taxonomy.md) separates query family,
 capability, reasoning structure, semantic status, evidence burden, and measured
-difficulty. The former four-tier, 17-bucket allocation is withdrawn. Final cell
-quotas, matched-test totals, and review strata must be frozen together before
-corpus generation.
+difficulty. The former four-tier, 17-bucket allocation is withdrawn. The final
+cell quotas, matched-test totals, and review strata are frozen in the sealed
+production release.
 
 This document develops the learning study within the unified FYP pipeline. It
 is subordinate to the main [`FYP research plan`](research-plan.md) and does not
@@ -23,7 +25,7 @@ solver-validated SpatialEntail examples.
 The formal system contributes to learning in three ways:
 
 - it generates problems with known answer semantics;
-- it produces proof-backed reasoning supervision, coordinate-free by default;
+- it validates the answers and Natural worked solutions used for supervision;
   and
 - it provides exact answer verification for evaluation and optional RL.
 
@@ -40,16 +42,17 @@ Supporting questions:
 
 1. How much can prompting elicit without parameter updates?
 2. Does SFT improve beyond prompt-only and answer-only baselines?
-3. Do Natural or Symbolic traces generalise better?
-4. How should intermediate spatial state be represented?
+3. Does a verified Natural worked solution improve over answer-only SFT?
+4. As an optional extension, can a compact CoS-like representation reduce
+   token cost without reducing accuracy?
 5. Does propositionally richer training add logical-spatial capability without
    damaging ordinary relational reasoning?
-6. How do gains change with data scale and structural difficulty?
+6. How do gains change across structural difficulty and transfer conditions?
 7. Does solver-verifiable RL add anything beyond strong SFT?
 
 ## Required semantic inputs
 
-The training study starts only after these artifacts are stable:
+The sealed release was prepared only after these artifacts were stable:
 
 - the qualitative spatial ontology and open-world semantics;
 - the validated solver and text round trip;
@@ -69,7 +72,7 @@ that distinction:
 - world-first answers read from a privileged coordinate map are not valid gold
   labels;
 - proof-template-first problems are the current source of controlled,
-  replayable trace supervision;
+  solver-validated answer-only and Natural supervision;
 - certificate-first generation remains a stricter future provenance in which
   the typed proof exists before the problem text;
 - premise-first solve-and-bucket problems are the preferred basis for testing
@@ -80,19 +83,19 @@ that distinction:
 
 Every track uses the same solver semantics, proof-checking boundary, and text
 round trip. Z3 supplies an independent answer oracle; it does not by itself
-supply the Natural or Symbolic trace. Coordinates remain post-solve audit
-witnesses. The checked Symbolic core arm may render their qualitative rank
-compression; the 4B local-proof mechanism arm omits that global witness. Neither
-arm may read its label from a hidden generating map.
+supply the SFT response. Coordinates and replayable certificates remain
+post-solve audit artifacts. Natural worked solutions may be rendered from the
+verified derivation, but they should include only query-relevant reasoning.
 
 ## Authoritative execution scope
 
 The reviewed [corpus and benchmark protocol](size-freeze-protocol.md) controls
-all sizes, roles, composition reservations, and central contrasts. Its candidate
+all sizes, roles, composition reservations, and central contrasts. Its sealed
 allocations supersede the former 17K and 5.8K-test programme. The primary study
-is one 4B model, three supervision packages, two seeds, and separately reported
-matched, held-out-composition, and depth evaluations. Final quotas remain
-conditional on unique structures, context admission, and coverage audits.
+is one 4B model, answer-only and Natural packages, and separately reported
+matched, held-out-composition, and depth evaluations. The release contains
+8,000 Train, 775 Dev, and 4,300 Bench bases and passed uniqueness, context,
+coverage, semantic, replay, and quality gates.
 
 ## Baseline prompting study
 
@@ -109,7 +112,7 @@ Hold the demonstration count at zero:
 | Zero-shot Direct | Native task performance with minimal instruction |
 | Zero-shot Generic CoT | Effect of generic step-by-step prompting |
 | Zero-shot Natural Axis | Effect of an explicit natural-language X/Y procedure |
-| Zero-shot Symbolic Axis | Effect of a compact symbolic X/Y procedure |
+| Zero-shot Compact Axis (optional) | Future token-efficiency probe using a separately defined CoS-like X/Y procedure |
 
 This comparison asks whether the formal procedure can be elicited without
 examples or parameter updates.
@@ -140,10 +143,10 @@ At one fixed shot count, compare:
 |---|---|
 | Answer-only | Problem and final answer |
 | Natural worked example | Natural reasoning trace and final answer |
-| Symbolic worked example | Symbolic reasoning trace and final answer |
 
-This separates the effect of seeing examples from the effect of seeing a
-particular reasoning representation.
+This separates the effect of seeing an answer from seeing a verified worked
+solution. A compact-symbol demonstration belongs only in the future
+token-efficiency extension and must not use replayable NDJSON certificates.
 
 All demonstrations must be solver-validated, disjoint from evaluation worlds,
 balanced in answer letters and semantic status, and drawn from a frozen pool.
@@ -163,8 +166,8 @@ prompt instead of crossing every model with every prompt.
   direct and generic CoT prompting.
 - Few-shot examples will improve answer-contract and format compliance more
   consistently than deep structural reasoning.
-- Worked Natural or Symbolic demonstrations will outperform answer-only
-  demonstrations on at least some compositional conditions.
+- Verified Natural demonstrations may outperform answer-only demonstrations on
+  at least some compositional conditions.
 - One-shot results will vary more across exemplar choices than balanced
   few-shot results.
 
@@ -180,56 +183,44 @@ Use the same underlying training problems and compare:
 |---|---|
 | Untuned, prompt-matched | No parameter update |
 | Answer-only SFT | Final answer only |
-| Checked Natural SFT | Natural-language narration of checked steps and witnesses |
-| Checked Symbolic SFT | Replayable typed evidence, qualitative rank witness, and menu decision |
-| Corrupted Symbolic SFT (4B only) | Invalid semantic evidence with the same gold answer |
-| Symbolic local-proof SFT (4B only) | Replayable local proof without the global qualitative rank witness |
+| Verified Natural SFT | Concise, query-directed worked solution rendered from checked reasoning |
+| Compact Symbolic SFT (optional) | CoS-like abbreviation of the query-relevant reasoning, evaluated for token reduction |
 
-The three central arms run on Qwen3.5-4B with seeds 42 and 43: six SFT runs.
-Use fixed epochs and the final checkpoint. Qwen3.5-2B, corrupted traces, and
-local-proof supervision remain optional after the central study. Local-proof is
-not an exposed valid variant and must not be produced by deleting witness data.
+The central arms are answer-only and verified Natural SFT on Qwen3.5-4B, with a
+prompt-matched untuned baseline. Use fixed epochs and the final checkpoint. A
+second seed remains desirable for run-to-run stability, but it is not used to
+inflate the project into a factorial study. Qwen3.5-2B, compact Symbolic SFT,
+and GRPO remain optional after the central study.
 
-**Hypothesis:** at least one reasoning-trace condition will outperform
-answer-only SFT on structurally held-out problems, even if matched accuracy is
-similar.
+**Hypothesis:** a verified Natural worked-solution condition may outperform
+answer-only SFT on structurally held-out or external problems, even if matched
+accuracy is similar.
 
-## SFT study 2: reasoning representation
+## Optional SFT extension: compact symbolic representation
 
-The checked formats share base problems, labels, and accepted source
-certificates. Natural now narrates each checked step with its identifier,
-dependencies and branch scope, while Symbolic serializes typed records. Both
-include query-specific model and exclusion evidence. This repairs the earlier
-compact-versus-exhaustive mismatch, but the complete mapping of rendered
-information and actual token lengths still need auditing across the frozen
-corpus. Output validation also differs: only Symbolic can be replayed. Report
-this pilot as a supervision-package comparison, not a proven isolation of
-notation alone.
+This optional arm follows Chain-of-Symbol's practical question: can the
+query-relevant reasoning be represented with fewer tokens than a Natural worked
+solution while retaining answer accuracy? It must use a compact, declared
+spatial notation. Replayable NDJSON answer certificates, global audit witnesses,
+and menu-decision records are not this arm's target.
 
 Keep base problems, model initialization, optimizer, and evaluation decisions
-paired. Report actual prompt and target tokens, optimizer updates, repeats, and
-runtime. Equal examples and equal target tokens are distinct comparisons;
-repeating shorter arms changes task exposure and does not alone match compute.
+paired. Report corpus-wide target tokens, generated tokens, runtime, and answer
+accuracy. The arm is worth running only if the frozen representation is actually
+shorter than Natural on the admitted corpus. It is an optional token-efficiency
+exploration, not a central claim about formal verification or hidden reasoning.
 
-**Hypotheses:** checked evidence may improve over answer-only task exposure;
-valid Symbolic evidence may improve over the predeclared typed semantic-
-corruption procedure; Natural and Symbolic packages may trade off accuracy,
-output validity, and cost. The corruption comparison estimates that procedure's
-effect within the Symbolic package, not semantic validity in general. All remain
-untested in the V2 pilot. No token-efficiency advantage is assumed.
-
-## Composition, scale, and depth
+## Composition, allocation, and depth
 
 See [size-freeze-protocol.md](size-freeze-protocol.md) for the executable twelve
 seen composition cells and nine held-out cells, paired semantic interventions,
-775-base candidate Dev set, and 4,300-base candidate benchmark. These allocations
-are targets subject to uniqueness and coverage, not frozen results.
+775-base Dev set, and 4,300-base benchmark. These are sealed artifact counts,
+not provisional allocation targets.
 
-The 4K→8K comparison is a bounded budget ablation. No two-point saturation or
-optimal-size claim is made. Depth 3/4 anchors and 5–8 extrapolation are scored
-separately; deep answers use a common direct-answer instruction, with process
-validity not applicable. Full Natural/Symbolic targets are admitted only where
-all paired representations fit. Sixteen thousand is optional expansion.
+The sealed study uses 8,000 training bases. The nested 4K artifact supports
+engineering checks but is not a required scaling experiment, and no saturation
+or optimal-size claim follows from it. Depth 3/4 anchors and 5–8 extrapolation
+are scored separately; deep answers use a common direct-answer instruction.
 
 ## Answer-contract study
 
@@ -259,9 +250,9 @@ every selected row. Let `C` be the number of frozen reporting cells. Review uses
 at least the larger of 2% of the formally admitted maximum candidate pool or
 `5C` examples,
 stratified with at least five examples from each cell. Version-pinned
-`DeepSeek-V4-Pro` and `GPT-5.5` review the same anonymized prompt and checked
-Natural trace in sequential, isolated terminal-agent runs. Raw Symbolic quality
-remains parser- and replay-based.
+`DeepSeek-V4-Pro` and `GPT-5.5` review the same anonymized prompt and verified
+Natural trace in sequential, isolated terminal-agent runs. Replayable Symbolic
+certificate quality remains an offline parser-and-replay check.
 
 Two approvals accept an item. A split verdict is held out for revision or
 replacement without human review. Two rejections trigger a separate
@@ -303,16 +294,13 @@ retention.
   their mean and range.
 - Report strict exact-answer-set accuracy, cell macro-averages, paired changes,
   uncertainty, output validity, and token/resource costs.
-- Replay model-produced Symbolic evidence against the visible prompt. Report
-  reasoning, decision, cross-record domain, and full validity separately; full
-  validity also requires a correct final answer footer. Natural and answer-only
-  process scores are not applicable, not invalid or zero.
-- `checked-trace` contains checked evidence. `answer-only` omits it and records
-  `expected_process_valid: null` with `process_status: absent`.
-  `corrupted-trace` is Symbolic-only: mutate a semantic evidence value, preserve
-  syntactically valid NDJSON and its record order, require replay rejection,
-  and retain the valid decision and gold answer. It tests evidence validity
-  within that package; it is not a generic extra-text control.
+- Score central models by generated answers under the benchmark's declared
+  contract. Gold certificates verify the dataset and oracle offline; the model
+  is not required to reproduce them.
+- `answer-only` omits a worked solution. Natural contains a verified
+  worked solution followed by the answer. If the optional compact Symbolic arm
+  runs, measure its token reduction and answer accuracy; do not substitute the
+  replayable NDJSON audit certificate for that representation.
 - Use `ContextBudget` with the selected tokenizer and chat template. Admit the
   full training chat, the evaluation prompt plus generation reserve, and any
   configured target limit. Reject the whole paired base group when any required
@@ -327,19 +315,22 @@ prompt, and measures the remaining rendered completion including termination
 tokens against the generation limit. Raw assistant-text token counts alone do
 not capture that cost. Lossy or incompatible chat templates are rejected.
 
-## Implemented preparation and unrun studies
+## Implemented preparation and pending model runs
 
-The bounded integration pilot wires checked Natural, checked Symbolic,
-answer-only, and corrupted Symbolic artifacts plus prompt-matched evaluation
-views. It exercises unique depth-2 and two-way ambiguous Direction cells with
-three entities and two premises. Its configured limits are 4,096 training
+The bounded integration pilot predates the current boundary and wires checked
+Natural, replayable NDJSON Symbolic, answer-only, and invalid Symbolic verifier
+fixtures. It exercises unique depth-2 and two-way ambiguous Direction cells
+with three entities and two premises. Its configured limits are 4,096 training
 tokens, 8,192 evaluation-context tokens, and a 4,096-token generation reserve.
-This is solver and data-pipeline validation, not a named model experiment.
+This is solver and data-pipeline validation, not the compact CoS-like optional
+arm or the central SFT design.
 
-The bounded configuration does not exercise the final Selection, Count, Boolean,
-transfer, depth, or quality-review protocols. SFT and model evaluation have not
-been run. See the [remediation audit](../audits/critique-remediation.md) for the
-implemented verification evidence.
+That bounded configuration did not exercise the final Selection, Count,
+Boolean, transfer, depth, or quality-review protocols. The later sealed
+production release does. SFT and model evaluation have not been run. See the
+[preparation audit](../audits/sft-job-preparation.md) for final verification
+evidence and the [remediation audit](../audits/critique-remediation.md) for the
+earlier pilot.
 
 The separate `matrix-premise-holdout.yaml` reserves premise-first IFF development
 cells and premise-first implication test cells against atomic training data.
@@ -348,9 +339,9 @@ check, not an empirical training comparison. Consult the remediation ledger for
 the executed tokenizer smoke status.
 
 The final tokenizer/generator smoke admitted all 80 pilot bases (320 rows):
-48 training, 16 development, and 16 test bases. Maximum full training lengths
-were 4,032 tokens for checked/corrupted Symbolic, 1,863 for Natural, and 129 for
-answer-only; the maximum reserved evaluation length was 4,218 and maximum
+48 training, 16 development, and 16 test bases. Maximum full rendered-row lengths
+were 4,032 tokens for valid/invalid Symbolic verifier fixtures, 1,863 for Natural,
+and 129 for answer-only; the maximum reserved evaluation length was 4,218 and maximum
 rendered generation target was 3,910. The 16-base holdout configuration also
 passed, with maximum training length 965 and reserved evaluation length 4,265.
 These are preparation diagnostics for the executed configuration, not model
@@ -364,34 +355,23 @@ and removable Selection distractors. A deterministic five-per-cell packet was
 screened sequentially by `DeepSeek-V4-Pro` and `GPT-5.5`; both approved all 65
 items, so the human appeal queue was empty. Exact hashes and local artifact paths
 are summarized in the tracked [v3 audit](../audits/capability-pilot-v3.md).
-This validates the representative registry and automated quality workflow, not
-the final cell allocation, human acceptability, data-size sufficiency, or learning.
+This historical pilot validated the representative registry and automated
+quality workflow. The later production release froze the final allocation and
+completed its review; neither artifact establishes learning results.
 
-## Decision order
+## Execution status and next steps
 
-1. Freeze the benchmark-cell registry, Selection strata, and reporting units.
-2. Run a bounded capability-coverage, admission, and generation-yield pilot.
-3. Implement and verify any required missing controls, including paired Count
-   distractors and the local-proof acceptance contract.
-4. Freeze cell quotas, matched-test totals, quality strata, and external
-   adapter ledgers.
-5. Generate and formally validate the reviewed candidate release and nested subsets.
-6. Complete the source-blinded larger-of-2%-or-`5C` quality review.
-7. Freeze prompts and run the untuned baselines.
-8. Run the bounded 4K/8K budget comparison on development data.
-9. Run the six central 4B SFT runs at the approved budget.
-10. Treat mechanism runs as optional after the primary study.
-11. Evaluate matched, depth, composition, and external suites without retuning.
-12. Consider GRPO only after its go/no-go conditions pass.
+Corpus generation, formal validation, source-blinded review, sealing, and
+creation of four answer-only/Natural configs and scripts are complete. The
+remaining central work is to freeze inference prompts, run the untuned
+baselines, submit the four prepared jobs, and evaluate their generated answers
+on matched, depth, composition, and external suites without retuning. A compact
+CoS-like arm may be designed later only if it is measurably shorter than Natural;
+GRPO remains conditional on its go/no-go checks.
 
 ## Open decisions
 
-- Exact held-out formula trees and rule compounds
-- Frozen benchmark-cell registry, quotas, and macro-averaging units
-- Selection result strata and whether a future all-entailed mode is warranted
-- Local-proof serialization, consistency evidence, and acceptance metrics
-- Version-pinned judge model identifiers and frozen judge prompt
 - Frozen inference prompts and decoding settings
-- Corpus-wide evidence mapping and token-cost audit
+- Optional compact Symbolic notation and its token-reduction threshold
 - Whether `ALL_POSSIBLE` is a core training objective
 - RL calibration thresholds and compute budget

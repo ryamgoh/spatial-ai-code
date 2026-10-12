@@ -6,13 +6,12 @@ will contain the complete per-task and per-seed tables underlying Chapter 6,
 including:
 
 - all frozen benchmark-cell scores and query/capability marginals;
-- clean and noisy depth-1–8 results for Direction, Selection, and Count;
+- depth-3–8 results for Direction, Selection, and Count;
 - premise-first formula-composition cells;
 - external adapter-specific results;
-- Symbolic replay error stages and denominators;
 - answer-position consistency;
 - paired fixes and regressions;
-- target-token, runtime, and memory accounting;
+- target-token, runtime, and memory accounting for any compact-representation extension;
 - LLM/human judge disagreements; and
 - representative model errors selected before reading arm identities.
 

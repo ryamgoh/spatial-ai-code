@@ -131,17 +131,18 @@ These are compatibility rules, not suggestions. Invalid cells fail before an
 attempt loop; feasible but selective cells may still exhaust
 `max_attempts_per_sample` and report their rejection histogram.
 
-## Rendering and supervision catalogue
+## Rendering and artifact catalogue
 
 | Field | Values | Effect | Important constraints |
 |---|---|---|---|
-| `trace_format` | `natural`, `symbolic` | Selects controlled prose or versioned replayable NDJSON. | Only arbitrary Symbolic model output has a process replay parser. |
-| `supervision_arm` | `checked-trace`, `answer-only`, `corrupted-trace` | Selects valid evidence, no evidence, or deliberately invalid evidence with the same answer. | Corruption is Symbolic-only and must preserve syntax/decision while failing reasoning replay. Answer-only is emitted once per answer/menu variant, not once per trace format. |
-| `include_audit` | Boolean | Adds full certificate and coordinate-bearing generation witness metadata. | Ordinary training evidence remains qualitative and coordinate-free. |
+| `trace_format` | `natural`, `symbolic` | Selects controlled prose or versioned replayable NDJSON. | Natural is the verified worked-solution view used by central SFT. Symbolic is an offline replay/audit artifact, not the future compact CoS-like format. |
+| `supervision_arm` | `checked-trace`, `answer-only`, `corrupted-trace` | Selects valid evidence, no evidence, or a deliberately invalid verifier fixture with the same answer. | Central SFT uses answer-only or checked Natural. `corrupted-trace` is retained only to test that Symbolic replay fails closed; it is not a training arm. |
+| `include_audit` | Boolean | Adds full certificate and coordinate-bearing generation witness metadata. | Audit metadata is never an SFT target. |
 
 Natural and Symbolic rows originate from the same checked certificate, problem,
-menu, and gold answer. This makes them paired supervision packages; it does not
-by itself make their rendered information or token cost identical.
+menu, and gold answer. They validate renderer agreement, but have different
+responsibilities: Natural may supply central SFT targets, while Symbolic is
+retained for offline replay and dataset audits.
 
 ## Workload and split catalogue
 
@@ -238,8 +239,7 @@ variants:
     - {name: single, mode: single, menu_coverage: full}
   traces:
     - {format: natural}
-    - {format: symbolic}
-  supervision_arms: [checked-trace, answer-only, corrupted-trace]
+  supervision_arms: [checked-trace, answer-only]
 
 cells:
   - name: direction-depth-2
@@ -262,19 +262,20 @@ Which/Count. Unknown keys and unsupported combinations fail validation.
 
 ## Current executed preparation coverage
 
-The bounded pilot exercises:
+The bounded engineering pilot predates the final SFT boundary and exercises:
 
 - Direction queries;
 - unique depth-two versus ambiguity-size-two semantics;
 - all eight target directions for the unique cell;
-- Natural versus Symbolic checked traces;
-- answer-only and corrupted-Symbolic controls;
+- agreement between Natural rendering and replayable Symbolic certificates;
+- answer-only output and corrupted-Symbolic verifier fixtures;
 - structural train/development/test splitting;
 - identical three-entity/two-premise budgets across semantic strata; and
 - pinned Qwen3.5-4B context admission.
 
 Its tokenizer/generator smoke admitted 80 bases and 320 rows, split 48/16/16
-bases. Maximum full training length was 4,032 tokens under the 4,096 limit.
+bases. Maximum full rendered-row length was 4,032 tokens under the 4,096 limit.
+These historical fixture counts do not define the central training packages.
 
 The separate `matrix-premise-holdout.yaml` exercises atomic training,
 premise-first IFF development, and premise-first implication testing over 16

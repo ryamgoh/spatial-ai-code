@@ -1,9 +1,10 @@
 # Prepared SFT jobs
 
-Six jobs compare answer-only, Natural, and Symbolic on the same base problems,
-with seeds 42 and 43. These files have not been submitted. Transfer the whole
+Four jobs compare answer-only and Natural on the same base problems, with seeds
+42 and 43. `jobs.json` records preparation only; remote submission and
+completion are not synchronized back into this directory. Transfer the whole
 repository plus the release/job artifacts to the Slurm server. From its repo
-root, submit the six scripts individually using `sbatch <script-path>`.
+root, submit the four scripts individually using `sbatch <script-path>`.
 The default resource request is one H200 on gpu for three hours. Confirm
 that request against the server's limits before submission. Authenticate once
 with `wandb login` or export `WANDB_API_KEY` before submission. Training and

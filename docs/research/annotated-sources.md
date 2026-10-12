@@ -270,7 +270,7 @@ before the report was recompiled.
   future work.
 - **BibTeX key:** Existing `pan2026mentalmap`.
 
-## Verified spatial paths, traces, and symbolic supervision
+## Verified spatial paths, traces, and compact symbolic representations
 
 ### PistaQ
 
@@ -409,8 +409,9 @@ before the report was recompiled.
   be trained and that map construction is harder than reading a supplied map.”
 - **Does not support / avoid:** One generated layout is not a complete certificate
   for all models of an underdetermined prompt.
-- **Relationship to SpatialEntail:** Motivates the proof-plus-rank-witness versus
-  local-proof mechanism comparison.
+- **Relationship to SpatialEntail:** Motivates asking whether a future compact
+  CoS-like target can reduce token cost. SpatialEntail rank witnesses remain
+  offline certificate artifacts rather than an SFT map-construction target.
 - **BibTeX key:** Existing `huang2026text2space`.
 
 ### CLUTRR
@@ -528,8 +529,7 @@ before the report was recompiled.
   reasoning data: the ontology and proof precede the natural-language example.”
 - **Does not support / avoid:** Proof-first generation is therefore not a new
   generic contribution. PrOntoQA does not provide a qualitative spatial
-  calculus, premise-first evaluation, paired trace arms, or an independent SMT
-  oracle.
+  calculus, premise-first evaluation, or an independent SMT oracle.
 - **Relationship to SpatialEntail:** Nearest generation-order precedent and a
   mandatory qualifier for any priority language.
 - **Suggested placement:** Definition of proof-first generation and novelty
@@ -661,7 +661,7 @@ before the report was recompiled.
   proof calculus and are not a second SMT model-theoretic oracle.
 - **Relationship to SpatialEntail:** Very close certificate-and-rendering
   precedent outside space.
-- **Suggested placement:** Certificate schema and paired trace design.
+- **Suggested placement:** Certificate schema and Natural-rendering boundary.
 - **BibTeX key:** Proposed `perrier2025typedcot`.
 
 ### ProofSketcher
@@ -680,7 +680,8 @@ before the report was recompiled.
   certificate-checked external automation.”
 - **Does not support / avoid:** It does not establish novelty for checker-plus-
   SMT architecture in general, and it provides no spatial benchmark,
-  premise-first protocol, or paired Natural/Symbolic spatial data.
+  premise-first protocol, or verified Natural spatial data derived from a
+  separately replayed certificate.
 - **Relationship to SpatialEntail:** Strongest limiting source for the claimed
   architecture; SpatialEntail's novelty can only be domain integration and the
   exact local/global division.
@@ -706,8 +707,8 @@ before the report was recompiled.
   does not validate natural-language equivalence by itself.
 - **Relationship to SpatialEntail:** Important trace-pairing and
   verifier-filtering precedent outside space.
-- **Suggested placement:** Natural/Symbolic trace supervision and formal
-  verification.
+- **Suggested placement:** Verified Natural supervision and formal
+  verification background.
 - **BibTeX key:** Proposed `lin2025leanstar`.
 
 ### Herald
@@ -727,8 +728,8 @@ before the report was recompiled.
   general. Herald does not study qualitative space, matched spatial SFT arms,
   or independent SMT semantics.
 - **Relationship to SpatialEntail:** Strongest broad limitation on the pairing
-  claim; SpatialEntail's contribution is the spatial instantiation and
-  controlled representation experiment.
+  claim; SpatialEntail uses the formal view for offline validation and the
+  Natural view as the central worked-solution target.
 - **Suggested placement:** Paired trace design and novelty qualification.
 - **BibTeX key:** Proposed `gao2025herald`.
 
@@ -778,7 +779,8 @@ before the report was recompiled.
   SMT, or intermediate verification for textual SpatialMap. `interwhen` checks
   extracted claim consistency, not a complete dependency-explicit certificate;
   it does not use proof-first or premise-first data construction and does not
-  release paired Natural/Symbolic proof views.
+  release both a verified Natural solution and a separate replayable
+  certificate view.
 - **Relationship to SpatialEntail:** Strongest direct counterclaim and required
   baseline/citation. The residual distinction is certificate replay plus a
   separate global semantic oracle and provenance-controlled data.
@@ -808,11 +810,11 @@ novelty.
 |---|---|---|
 | **Open-world, model-theoretic spatial evaluation under partial information** | AIMA for entailment/satisfiability definitions; ProofWriter for open-world `Unknown`; SpartQA for explicit unknown spatial QA; SpatialText for non-omniscient spatial cases | “SpatialEntail applies standard all-model entailment semantics to a text-only qualitative spatial benchmark; unknown and incomplete spatial cases exist in prior work, so the contribution is the exact formal contract and audit, not uncertainty itself.” |
 | **World-first / proof-template-first / premise-first provenance taxonomy** | SpatialText illustrates coordinate/world-first construction; PrOntoQA is direct proof-first prior art; RuleTaker computes consequences from a sampled theory before selecting questions; EntailmentBank separates proof construction from premise retrieval | “The implemented labels organize established construction mechanisms. SpatialEntail's proof-template-first route is weaker than certificate-first construction; none of the mechanisms should be claimed as invented here.” |
-| **Proof-template-first spatial training data with replayable certificates** | PrOntoQA for stronger proof-first generation; ProofWriter for explicit proof DAGs; SpaRP for solver-derived spatial paths; PCRLLM for premise/rule/conclusion-carrying outputs | “The implemented contribution is a spatial synthesis: controlled proof-template construction, post-construction certificate extraction and replay, and semantic re-solving. Certificate-first data remains proposed; proof DAGs, spatial paths, and proof-carrying outputs each have prior art.” |
+| **Solver-validated spatial training data with replayable audit certificates** | PrOntoQA for stronger proof-first generation; ProofWriter for explicit proof DAGs; SpaRP for solver-derived spatial paths; PCRLLM for premise/rule/conclusion-carrying outputs | “The implemented contribution is a spatial synthesis: controlled proof-template construction, post-construction certificate extraction and replay, and semantic re-solving. Certificates validate the generated data offline; the central model targets remain answer-only or verified Natural.” |
 | **Premise-first solve-and-bucket evaluation** | RuleTaker for theory-first closure; ProofWriter for theory-relative open-world classification; SpatialText for deliberately incomplete descriptions; EntailmentBank for premise-given versus retrieval-separated evaluation | “No located source uses the exact premise-first solve-and-bucket protocol for open-world qualitative spatial candidate sets. This remains a bounded absence finding, not proof of priority.” |
 | **Small proof checker plus independent SMT semantic oracle** | LogicGuide for independently checked deduction; ProofSketcher for a lightweight kernel plus certificate-checked external automation; `interwhen` for Z3 on SpatialMap; FoVer for Z3-derived step labels | “Formal checkers and SMT-backed verification are established, including on SpatialMap. The narrower proposed contribution is the auditable separation of local certificate replay from global spatial possibility/entailment semantics.” |
-| **Paired Natural and Symbolic traces from one proof object** | SpaRP for symbolic paths verbalized link-by-link; Chain-of-Symbol for a direct spatial Natural/Symbolic representation comparison; Proof-Carrying CoT for typed JSON plus deterministic text; Lean-STaR and Herald for aligned informal/formal proof traces | “Natural/symbolic pairing and symbolic spatial traces are established. SpatialEntail's proposed contribution is a matched spatial ablation in which both forms are deterministic views of the identical checked certificate.” |
-| **Trace-supervised spatial SFT, with optional verifier-based RL** | SpaRP and Q-Chains for spatial trace supervision; graph-based StepGame for synthetic SFT; SODA for pure-text spatial SFT+GRPO; FoVer for formally synthesized process labels | “Neither spatial trace SFT nor spatial GRPO is new. The research question is whether certificate-grounded supervision or rewards improve structural generalization beyond matched answer-only and trace baselines.” |
+| **Natural solutions and typed audit views from one proof object** | SpaRP for symbolic paths verbalized link-by-link; Chain-of-Symbol for a direct spatial Natural/Symbolic representation comparison; Proof-Carrying CoT for typed JSON plus deterministic text; Lean-STaR and Herald for aligned informal/formal proof traces | “Natural/symbolic pairing and symbolic spatial traces are established. SpatialEntail instead keeps the replayable typed view as an offline audit certificate and uses the verified Natural view for central worked-solution SFT.” |
+| **Worked-solution spatial SFT, with optional compact notation or verifier-based RL** | SpaRP and Q-Chains for spatial trace supervision; Chain-of-Symbol for compact prompting; graph-based StepGame for synthetic SFT; SODA for pure-text spatial SFT+GRPO | “Neither spatial worked-solution SFT nor spatial GRPO is new. The central research question is whether verified Natural supervision improves structural generalization beyond matched answer-only SFT; compact notation is a later token-efficiency question.” |
 
 ## Calibrated overall statement
 
@@ -823,9 +825,10 @@ The primary sources support the following conclusion:
 > search through 7 October 2026, no source was found that combines
 > proof-template-first spatial generation with replay-checked certificates,
 > premise-first open-world evaluation, a local replay
-> checker independent of a global SMT semantic oracle, and paired Natural and
-> Symbolic renderings of one derivation in a single text-only qualitative
-> spatial benchmark and learning pipeline.
+> checker independent of a global SMT semantic oracle, and verified Natural
+> solutions derived from the same evidence in a single text-only qualitative
+> spatial benchmark and learning pipeline. The replayable certificate remains
+> an offline artifact rather than an SFT target.
 
 Use “to our knowledge” for any priority claim. Describe SpatialEntail as an
 integration and controlled evaluation of established ideas. Re-run the search

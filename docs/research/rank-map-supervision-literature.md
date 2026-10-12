@@ -2,6 +2,12 @@
 
 _Primary-source review, 10 October 2026._
 
+Current project boundary: rank maps and replayable proof structures remain
+offline answer-certificate artifacts, not SpatialEntail SFT targets. This note
+surveys prior work and motivates only a possible future compact CoS-like
+token-efficiency format; it does not define a central rank-map or local-proof
+training arm.
+
 ## Question and representation taxonomy
 
 This review asks a narrow question: do text-only spatial-reasoning systems
@@ -414,14 +420,14 @@ rank-map precedents.
   study is few-shot prompting and its relation programs are not spatial world
   maps.
 
-## Is exact rank-compressed-map generation harder to teach than local proof traces?
+## Is exact rank-compressed-map generation harder than query-local representations?
 
 ### Defensible answer
 
 **Probably, as a first supervised target; not yet demonstrated directly.** No
-located primary paper runs the needed controlled comparison between
-answer-only, query-local proof/path targets, relation triples, and a canonical
-two-axis rank map on matched spatial problems.
+located primary paper runs the needed controlled comparison between query-local
+paths, relation triples, and a canonical two-axis rank map on matched spatial
+problems. This is a literature gap, not the current SpatialEntail SFT design.
 
 There are four evidence-backed considerations:
 
@@ -460,7 +466,7 @@ The structural burden of a rank map is also visibly larger. It requires the
 model to extract every relevant relation, split diagonal relations across two
 axes, merge transitive information, retain disconnected or irrelevant
 components, choose a canonical representation, and serialize all entities
-exactly. A local proof path can ignore facts that do not support the query. This
+exactly. A query-local path can ignore facts that do not support the query. This
 is a task-complexity argument, not an empirical effect size.
 
 ### Why “harder” is not the whole story
@@ -481,23 +487,18 @@ The most conservative research claim is therefore:
 > results predict that such a target may need decomposition or auxiliary losses,
 > but this remains a hypothesis to test.
 
-## What a decisive experiment would need to separate
+## Implication for the current training boundary
 
-This is a literature-derived experimental distinction, not an implementation
-proposal:
+SpatialEntail does not train models to reproduce the exact rank-compressed map
+or replayable certificate. Those artifacts remain offline checks on generated
+problems and solutions. The central SFT comparison is answer-only versus
+verified Natural.
 
-1. Use identical base problems and compare answer-only, SpaRP-like local path,
-   graph-triple, per-axis delta, and full rank-map targets.
-2. Report answer accuracy separately from map parse validity, entity coverage,
-   pairwise X/Y order accuracy, global consistency, and solver acceptance.
-3. Include both exact-match and semantic validation; exact match is appropriate
-   only for a genuinely canonical and identifiable state.
-4. Match supervised tokens or compute, since a full map is longer than a local
-   path.
-5. Test structural and depth extrapolation. ProofWriter suggests this is where
-   local-step and all-at-once supervision are most likely to diverge.
-6. Evaluate whether a correct emitted map causally supports the answer, rather
-   than serving as a post-hoc decorative trace.
+If a future compact CoS-like arm is considered, this literature suggests three
+minimum gates: define a query-local notation distinct from the certificate,
+show corpus-wide token reduction relative to Natural, and compare answer
+accuracy/runtime on identical base problems. It does not justify a global-map,
+local-proof, or multi-size scaling arm in the central study.
 
 ## Scope of the absence finding
 

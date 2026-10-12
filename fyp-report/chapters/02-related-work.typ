@@ -57,11 +57,10 @@ Text2Space directly fine-tunes an LLM to construct ASCII layouts from spatial
 descriptions @huang2026text2space. The paper identifies a read–write asymmetry:
 models read supplied layouts more reliably than they construct them, generated
 layout errors can harm answers, and explicit construction training improves
-later text-only reasoning. This motivates SpatialEntail's secondary comparison
-between a query-local proof and the same proof plus a qualitative rank witness.
-SpatialEntail's setting is additionally underdetermined: several rank-compressed
-maps may satisfy the same visible premises, so semantic witness checking is more
-appropriate than exact matching to one arbitrary completion.
+later text-only reasoning. SpatialEntail's setting is additionally
+underdetermined: several rank-compressed maps may satisfy the same visible
+premises, so such maps are checked as audit witnesses rather than treated as
+unique response targets.
 
 == Verified Reasoning and Systematic Generalisation
 
@@ -97,6 +96,7 @@ solver-derived paths, symbolic traces, map construction, proof generation, and
 SMT-backed monitoring all have strong precedents. SpatialEntail studies their
 integration under one explicit contract: visible-premise all-model semantics,
 proof-template-first and premise-first provenance, replay-checked answer
-certificates, paired Natural/Symbolic projections, and independently frozen
-generalisation suites. Any priority claim is therefore limited to this
-combination and must use _to our knowledge_ language.
+certificates for offline audit, answer-only versus verified Natural SFT, and
+independently frozen generalisation suites. The contribution claimed here is
+this integrated study design and its empirical findings, not priority for any
+individual technique or representation.

@@ -35,10 +35,10 @@ every satisfying map supports it.
 
 The same semantics underlies SpatialEntail, a controlled data and evaluation
 framework over all eight compass directions and finite Boolean combinations of
-spatial atoms. SpatialEntail generates typed answer certificates, renders
-Natural and Symbolic supervision, checks Symbolic model output by replay, and
-records constructive witnesses for audit. The project is text-only and does not
-claim unrestricted spatial language understanding, metric geometry, visual
+spatial atoms. SpatialEntail generates typed answer certificates to verify gold
+solutions, renders conventional answer-only and Natural worked-solution targets,
+and records constructive witnesses for audit. The project is text-only and does
+not claim unrestricted spatial language understanding, metric geometry, visual
 grounding, or embodied navigation.
 
 == Research Questions
@@ -53,8 +53,8 @@ The report addresses three questions.
     fill: (_, y) => if y == 0 { luma(235) } else { none },
     table.header([*RQ*], [*Question*]),
     [RQ1], [How does SpatialMap evaluation change when answers are defined over all worlds satisfying the visible premises rather than one latent generating world?],
-    [RQ2], [Do replay-checked reasoning traces improve answer accuracy and structural generalisation over answer-only and invalid-reasoning supervision?],
-    [RQ3], [How do Natural versus Symbolic traces, and local proofs versus proof-plus-rank-witness traces, affect accuracy, process validity, cost, and transfer?],
+    [RQ2], [Does verified Natural SFT improve answer accuracy and structural generalisation over answer-only SFT on the same solver-validated spatial problems?],
+    [RQ3], [As an optional extension, can a compact Chain-of-Symbol-like representation reduce token cost while retaining spatial answer accuracy?],
   ),
   caption: [Research questions linking benchmark validity, checked supervision, and representation.],
 ) <research-questions>
@@ -79,12 +79,12 @@ rendered, parsed back, and re-solved. They carry explicit construction
 provenance, structural signatures, measured difficulty, and exact tokenizer
 admission metadata.
 
-Finally, the planned learning study compares answer-only, checked Natural,
-checked Symbolic, corrupted Symbolic, and query-local Symbolic supervision over
-Qwen3.5-2B and Qwen3.5-4B. It separates matched interpolation, unseen-depth
-extrapolation, held-out formula composition, and external transfer. The model
-experiments remain unrun in this draft; implementation checks are not presented
-as learning results.
+Finally, the learning study compares conventional answer-only and verified
+Natural SFT on Qwen3.5-4B. It separates matched interpolation, unseen-depth
+extrapolation, held-out formula composition, and external transfer. A compact
+Chain-of-Symbol-like target is optional and is evaluated only as a
+token-efficiency extension; replayable answer certificates remain offline audit
+artifacts rather than the model's normal response format.
 
 == Report Organization
 
@@ -93,6 +93,6 @@ traces, explicit maps, and verified reasoning. Chapter 3 defines the formal
 problem and SpatialEval diagnosis. Chapter 4 presents SpatialEntail's solver,
 certificates, generator, difficulty taxonomy, and supervision views. Chapter 5
 predeclares the model, data, quality-review, and evaluation protocols. Chapter
-6 reports completed audit and artifact evidence and reserves the frozen model
-result analyses. Chapter 7 concludes. Formal proofs, complete artifact examples,
+6 reports completed audit and artifact evidence and identifies the model
+analyses that remain unrun. Chapter 7 concludes. Formal proofs, complete artifact examples,
 configuration details, and extended results are placed in appendices.

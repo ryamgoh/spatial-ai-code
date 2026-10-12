@@ -77,7 +77,7 @@ def test_production_audit_checks_all_roles_and_hashes(tmp_path):
         audit_release(release)
 
 
-def test_six_jobs_have_no_benchmark_training_and_transferable_paths(tmp_path):
+def test_jobs_have_no_benchmark_training_and_transferable_paths(tmp_path):
     release = production_fixture(tmp_path)
     audit = audit_release(release)
     audit_path = release / "release-audit.json"
@@ -221,7 +221,31 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
         template,
     )
     report = prepare_jobs(release, tmp_path / "jobs", repo_root=tmp_path)
-    assert len(report["jobs"]) == 6 and not report["submitted"]
+    assert len(report["jobs"]) == 4 and not report["submitted"]
+    assert [job["name"] for job in report["jobs"]] == [
+        "answer-only-seed-42",
+        "answer-only-seed-43",
+        "natural-seed-42",
+        "natural-seed-43",
+    ]
+    assert sorted(path.name for path in (tmp_path / "jobs/data").glob("*.jsonl")) == [
+        "dev-answer-only.jsonl",
+        "dev-natural.jsonl",
+        "train-answer-only.jsonl",
+        "train-natural.jsonl",
+    ]
+    assert sorted(path.name for path in (tmp_path / "jobs/configs").glob("*.yaml")) == [
+        "answer-only-seed-42.yaml",
+        "answer-only-seed-43.yaml",
+        "natural-seed-42.yaml",
+        "natural-seed-43.yaml",
+    ]
+    assert sorted(path.name for path in (tmp_path / "jobs/slurm").glob("*.sh")) == [
+        "answer-only-seed-42.sh",
+        "answer-only-seed-43.sh",
+        "natural-seed-42.sh",
+        "natural-seed-43.sh",
+    ]
     for path in (tmp_path / "jobs/data").glob("*.jsonl"):
         rows = [json.loads(line) for line in path.read_text().splitlines()]
         assert rows
@@ -260,7 +284,7 @@ def test_seal_validates_actual_judge_payloads_then_prepares_jobs(tmp_path, use_a
     moved_template.parent.mkdir(parents=True)
     shutil.copy(template, moved_template)
     copied = prepare_jobs(moved / "release", moved / "jobs", repo_root=moved)
-    assert len(copied["jobs"]) == 6
+    assert len(copied["jobs"]) == 4
     assert (moved / "jobs/logs/.gitkeep").is_file()
 
     train_launcher = (

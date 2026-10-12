@@ -13,10 +13,10 @@ eval:
   task_template: templates/task.yaml
   overrides: {}
 arms:
-- name: single-symbolic
-  view: single__symbolic__checked-trace
-- name: untuned-symbolic
-  view: single__symbolic__checked-trace
+- name: single-natural
+  view: single__natural__checked-trace
+- name: untuned-natural
+  view: single__natural__checked-trace
   train: false
 resources:
   generate:

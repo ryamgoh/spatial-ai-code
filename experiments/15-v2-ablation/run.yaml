@@ -1,5 +1,5 @@
 version: 1
-name: v2-trace-pilot
+name: v2-sft-pilot
 matrix: matrix.yaml
 data_output: data/spatial_v2_pilot.jsonl
 base_model: Qwen/Qwen3.5-4B
@@ -17,17 +17,10 @@ eval:
 arms:
   - name: single-natural
     view: single__natural__checked-trace
-  - name: single-symbolic
-    view: single__symbolic__checked-trace
   - name: answer-only
     view: single__natural__answer-only
-  - name: corrupted-symbolic
-    view: single__symbolic__corrupted-trace
   - name: untuned-natural
     view: single__natural__checked-trace
-    train: false
-  - name: untuned-symbolic
-    view: single__symbolic__checked-trace
     train: false
   - name: untuned-answer-only
     view: single__natural__answer-only
