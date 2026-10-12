@@ -217,6 +217,7 @@ experiments/**/logs/*
 experiments/**/generated/*
 experiments/**/runs/*
 experiments/spatialentail-sft/prepared-*/data/
+experiments/spatialentail-eval/prepared-*/
 slurm/archive/logs/*
 !slurm/archive/logs/.gitkeep
 

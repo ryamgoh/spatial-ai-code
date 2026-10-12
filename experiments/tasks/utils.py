@@ -166,7 +166,12 @@ def process_docs_v2_sft(dataset):
             "text": user_content,
             "oracle_option": ",".join(letters),
             "evaluation_prompt": evaluation_prompt,
-            "matrix_cell": str(metadata.get("matrix_cell") or ""),
+            "matrix_cell": str(
+                metadata.get("matrix_cell") or metadata.get("benchmark_cell") or ""
+            ),
+            "base_id": str(metadata.get("base_id") or ""),
+            "study_role": str(metadata.get("study_role") or ""),
+            "query_kind": str(metadata.get("query_kind") or ""),
             "answer_mode": str(metadata.get("answer_mode") or ""),
             "trace_format": str(metadata.get("trace_format") or ""),
             "supervision_arm": str(metadata.get("supervision_arm") or "checked-trace"),
@@ -247,6 +252,15 @@ def process_results_v2(doc, results):
         1,
     )
     return metrics
+
+
+def process_results_v2_answer(doc, results):
+    """Score generated answers without treating audit certificates as model output."""
+    metrics = process_results_v2(doc, results)
+    return {
+        "strict_acc": metrics["strict_acc"],
+        "loose_acc": metrics["loose_acc"],
+    }
 
 
 def process_docs_v13_sft(dataset):

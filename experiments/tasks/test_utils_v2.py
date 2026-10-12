@@ -62,12 +62,29 @@ def test_v2_loader_uses_metadata_gold_through_z() -> None:
         "oracle_option": "A,Z",
         "evaluation_prompt": "<system>rules\n<user>question\n<assistant>",
         "matrix_cell": "direction-depth-10",
+        "base_id": "fixture",
+        "study_role": "",
+        "query_kind": "",
         "answer_mode": "all-possible",
         "trace_format": "symbolic",
         "supervision_arm": "checked-trace",
         "difficulty": {"x_depth": 10, "y_depth": 10},
     }
     assert strict_acc(["A,Z", ["A,Z"]]) == 1.0
+
+
+def test_v2_answer_scoring_excludes_certificate_metrics() -> None:
+    from utils import process_results_v2_answer
+
+    metrics = process_results_v2_answer(
+        {
+            "oracle_option": "B",
+            "trace_format": "natural",
+            "supervision_arm": "answer-only",
+        },
+        ["Answer: B"],
+    )
+    assert metrics == {"strict_acc": 1, "loose_acc": 1}
 
 
 def _sample(trace_format="symbolic"):
