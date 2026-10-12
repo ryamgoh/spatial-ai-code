@@ -92,8 +92,9 @@ verified derivation, but they should include only query-relevant reasoning.
 The reviewed [corpus and benchmark protocol](size-freeze-protocol.md) controls
 all sizes, roles, composition reservations, and central contrasts. Its sealed
 allocations supersede the former 17K and 5.8K-test programme. The primary study
-is one 4B model, answer-only and Natural packages, and separately reported
-matched, held-out-composition, and depth evaluations. The release contains
+is one 4B model, answer-only and Natural packages, and separately reported CORE,
+COMP, and SHIFT evaluations. SHIFT retains held-out composition and depth as
+diagnostic submetrics. The release contains
 8,000 Train, 775 Dev, and 4,300 Bench bases and passed uniqueness, context,
 coverage, semantic, replay, and quality gates.
 

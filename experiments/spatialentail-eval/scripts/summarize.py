@@ -41,7 +41,10 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
         payload = json.loads(result_path.read_text())
         raw_results = payload.get("results") or payload
         cells = {}
-        module_values: dict[str, list[float]] = defaultdict(list)
+        group_correct: dict[str, float] = defaultdict(float)
+        group_total: dict[str, int] = defaultdict(int)
+        component_correct: dict[str, float] = defaultdict(float)
+        component_total: dict[str, int] = defaultdict(int)
         depth_values: dict[str, dict[int, float]] = defaultdict(dict)
         weighted_correct = 0.0
         weighted_total = 0
@@ -52,7 +55,13 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
             loose = _metric(raw_results[task_name], "loose_acc")
             count = int(metadata["count"])
             cells[task_name] = {**metadata, "strict_acc": strict, "loose_acc": loose}
-            module_values[metadata["role"]].append(strict)
+            role = str(metadata["role"])
+            component = str(metadata["component"])
+            group_correct[role] += strict * count
+            group_total[role] += count
+            component_key = f"{role}/{component}"
+            component_correct[component_key] += strict * count
+            component_total[component_key] += count
             weighted_correct += strict * count
             weighted_total += count
             depth = _depth(metadata["cell"])
@@ -61,9 +70,13 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
         models[name] = {
             "complete": True,
             "overall_micro_accuracy": weighted_correct / weighted_total,
-            "module_cell_macro_accuracy": {
-                role: sum(values) / len(values)
-                for role, values in sorted(module_values.items())
+            "group_accuracy": {
+                role: group_correct[role] / count
+                for role, count in sorted(group_total.items())
+            },
+            "component_accuracy": {
+                component: component_correct[component] / count
+                for component, count in sorted(component_total.items())
             },
             "depth_accuracy": {
                 family: {str(depth): value for depth, value in sorted(values.items())}
@@ -81,20 +94,22 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
     )
     lines = ["# SpatialEntail Frozen Benchmark", ""]
     lines.append(
-        "| Model | Overall micro | CORE macro | Matched COMP macro | Held-out COMP macro | Depth macro |"
+        "| Model | Overall | CORE | COMP | SHIFT | SHIFT composition | SHIFT depth |"
     )
-    lines.append("|---|---:|---:|---:|---:|---:|")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|")
     for name, result in models.items():
         if not result["complete"]:
-            lines.append(f"| {name} | incomplete | — | — | — | — |")
+            lines.append(f"| {name} | incomplete | — | — | — | — | — |")
             continue
-        modules = result["module_cell_macro_accuracy"]
+        groups = result["group_accuracy"]
+        components = result["component_accuracy"]
         lines.append(
             f"| {name} | {result['overall_micro_accuracy']:.4f} | "
-            f"{_display_metric(modules, 'bench-core')} | "
-            f"{_display_metric(modules, 'bench-composition-matched')} | "
-            f"{_display_metric(modules, 'bench-composition-heldout')} | "
-            f"{_display_metric(modules, 'bench-depth')} |"
+            f"{_display_metric(groups, 'bench-core')} | "
+            f"{_display_metric(groups, 'bench-composition')} | "
+            f"{_display_metric(groups, 'bench-shift')} | "
+            f"{_display_metric(components, 'bench-shift/heldout-composition')} | "
+            f"{_display_metric(components, 'bench-shift/depth')} |"
         )
     lines.extend(["", "Cell-level and depth-curve values are in `summary.json`."])
     (prepared_dir / "SUMMARY.md").write_text("\n".join(lines) + "\n")

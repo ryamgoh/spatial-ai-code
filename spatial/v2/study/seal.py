@@ -22,7 +22,7 @@ from spatial.v2.hitl.review import (
 )
 from spatial.v2.solver import SpatialSolverV2
 from spatial.v2.structure import canonical_structure_profile
-from spatial.v2.study import role_path
+from spatial.v2.study import read_role_text
 from spatial.v2.study.build import _hash, _keys
 from spatial.v2.symbolic_trace_codec import score_symbolic_training_trace
 from spatial.v2.text import SpatialTextAdapter
@@ -45,13 +45,12 @@ def audit_release(release: Path) -> dict:
     summary = {}
     skeletons_by_role = {}
     for role, quotas in manifest["quotas"].items():
-        path = role_path(release, role)
-        if (
-            hashlib.sha256(path.read_bytes()).hexdigest()
-            != manifest["artifacts"][role]["sha256"]
-        ):
+        text = read_role_text(release, role)
+        if hashlib.sha256(text.encode()).hexdigest() != manifest["artifacts"][role][
+            "sha256"
+        ]:
             raise ValueError(f"{role} hash mismatch")
-        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        rows = [json.loads(line) for line in text.splitlines()]
         groups = {}
         for row in rows:
             validate_context_admission(row)
@@ -203,16 +202,16 @@ def audit_release(release: Path) -> dict:
     full = {
         row["id"]: _hash(row)
         for row in (
-            json.loads(x) for x in role_path(release, "train").read_text().splitlines()
+            json.loads(x) for x in read_role_text(release, "train").splitlines()
         )
     }
     for role, record in manifest["artifacts"].items():
         if not role.startswith("train-"):
             continue
-        path = role_path(release, role)
-        if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
+        text = read_role_text(release, role)
+        if hashlib.sha256(text.encode()).hexdigest() != record["sha256"]:
             raise ValueError("nested hash mismatch")
-        nested_rows = [json.loads(line) for line in path.read_text().splitlines()]
+        nested_rows = [json.loads(line) for line in text.splitlines()]
         ids = [row["id"] for row in nested_rows]
         if len(ids) != len(set(ids)) or len(ids) != record["rows"]:
             raise ValueError("nested row count or uniqueness mismatch")
@@ -275,7 +274,7 @@ def seal_release(
         raise ValueError("review covers different release artifacts")
     natural = {}
     for role in manifest["quotas"]:
-        for line in role_path(release, role).read_text().splitlines():
+        for line in read_role_text(release, role).splitlines():
             row = json.loads(line)
             if (
                 row["metadata"]["trace_format"] == "natural"

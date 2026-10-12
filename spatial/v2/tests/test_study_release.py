@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from spatial.v2.study import role_path
 from spatial.v2.study.build import build_release
 from spatial.v2.tests.test_context_budget import FixtureTokenizer
 
@@ -174,7 +175,7 @@ def test_depth_benchmark_can_persist_oracle_only_count_rows(tmp_path):
     manifest = build_release(
         path, tmp_path / "release", tokenizer=FixtureTokenizer()
     )
-    row = json.loads((tmp_path / "release/bench-depth.jsonl").read_text())
+    row = json.loads(role_path(tmp_path / "release", "bench-depth").read_text())
 
     assert manifest["artifacts"]["bench-depth"]["rows"] == 1
     assert row["metadata"]["oracle_only"] is True

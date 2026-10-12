@@ -3,8 +3,8 @@ import json
 import subprocess
 from pathlib import Path
 
-from spatial.v2.study import role_path
-from spatial.v2.study.evaluation import BENCH_MODULES, prepare_evaluation
+from spatial.v2.study import read_role_text, write_role_texts
+from spatial.v2.study.evaluation import BENCH_SOURCES, prepare_evaluation
 
 
 def _row(base_id: str, role: str, trace: str, arm: str) -> dict:
@@ -29,7 +29,8 @@ def _release(root: Path) -> Path:
     release = root / "release"
     release.mkdir()
     artifacts = {}
-    for role in BENCH_MODULES.values():
+    serialized = {}
+    for _, _, role in BENCH_SOURCES:
         rows = [_row(role, role, "natural", "answer-only")]
         if role != "bench-depth":
             rows.extend(
@@ -38,13 +39,14 @@ def _release(root: Path) -> Path:
                     _row(role, role, "symbolic", "checked-trace"),
                 ]
             )
-        path = role_path(release, role)
-        path.write_text("".join(json.dumps(row) + "\n" for row in rows))
+        text = "".join(json.dumps(row) + "\n" for row in rows)
+        serialized[role] = text
         artifacts[role] = {
             "bases": 1,
             "rows": len(rows),
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "sha256": hashlib.sha256(text.encode()).hexdigest(),
         }
+    write_role_texts(release, serialized)
     manifest = {
         "schema": "spatialentail-study-release-v1",
         "status": "sealed",
@@ -69,7 +71,16 @@ def test_frozen_evaluation_selects_one_answer_row_per_base(tmp_path: Path) -> No
 
     assert receipt["total_bases"] == 4
     assert len(receipt["tasks"]) == 4
-    assert {item["role"] for item in receipt["tasks"]} == set(BENCH_MODULES)
+    assert {item["role"] for item in receipt["tasks"]} == {
+        "bench-core",
+        "bench-composition",
+        "bench-shift",
+    }
+    assert {
+        item["component"]
+        for item in receipt["tasks"]
+        if item["role"] == "bench-shift"
+    } == {"heldout-composition", "depth"}
     assert [job["name"] for job in receipt["jobs"]] == [
         "untuned",
         "answer-only-seed-42",
@@ -90,7 +101,7 @@ def test_frozen_evaluation_selects_one_answer_row_per_base(tmp_path: Path) -> No
 def test_frozen_evaluation_rejects_duplicate_answer_rows(tmp_path: Path) -> None:
     release = _release(tmp_path)
     path = release / "bench-core.jsonl"
-    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    rows = [json.loads(line) for line in read_role_text(release, "bench-core").splitlines()]
     rows.append(rows[0])
     path.write_text("".join(json.dumps(row) + "\n" for row in rows))
     manifest_path = release / "manifest.json"

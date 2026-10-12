@@ -10,7 +10,7 @@ from pathlib import Path
 
 from spatial.v2.context_budget import ContextBudget, admit_row_group, load_tokenizer
 from spatial.v2.natural_evidence import share_natural_evidence
-from spatial.v2.study import role_path
+from spatial.v2.study import read_role_text, write_role_texts
 
 
 def refresh_count_prose(source: Path, output: Path) -> dict:
@@ -25,13 +25,12 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
     replacement_rows = {}
     changed = Counter()
     for role in manifest["quotas"]:
-        path = role_path(source, role)
-        if (
-            hashlib.sha256(path.read_bytes()).hexdigest()
-            != manifest["artifacts"][role]["sha256"]
-        ):
+        text = read_role_text(source, role)
+        if hashlib.sha256(text.encode()).hexdigest() != manifest["artifacts"][role][
+            "sha256"
+        ]:
             raise ValueError("source artifact hash differs")
-        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        rows = [json.loads(line) for line in text.splitlines()]
         groups = {}
         for row in rows:
             groups.setdefault(row["metadata"]["base_id"], []).append(row)
@@ -71,12 +70,12 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
     for role, record in manifest["artifacts"].items():
         if not role.startswith("train-"):
             continue
-        path = role_path(source, role)
-        if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
+        text = read_role_text(source, role)
+        if hashlib.sha256(text.encode()).hexdigest() != record["sha256"]:
             raise ValueError("nested source hash mismatch")
         rendered[role] = [
             replacement_rows[json.loads(line)["id"]]
-            for line in path.read_text().splitlines()
+            for line in text.splitlines()
         ]
     serialized = {
         role: "".join(
@@ -132,8 +131,7 @@ def refresh_count_prose(source: Path, output: Path) -> dict:
         "quality_receipts_reused": False,
     }
     output.mkdir(parents=True)
-    for role, text in serialized.items():
-        role_path(output, role).write_text(text)
+    write_role_texts(output, serialized)
     (output / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )

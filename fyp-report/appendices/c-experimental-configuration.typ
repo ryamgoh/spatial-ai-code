@@ -18,6 +18,7 @@ values are methods rather than model results.
     [Training allocation], [8,000 bases; nested 4,000-base subset retained as a data artifact],
     [Training depth], [Controlled 3/4 anchors plus CORE/compositions],
     [Sequence envelope], [12,288 training; 16,384 evaluation],
+    [Benchmark groups], [CORE: 1,300; COMP: 1,200; SHIFT: 1,800],
     [Depth test], [3–8; 3/4 matched anchors, 5–8 answer-only extrapolation],
   ),
   caption: [Frozen training configuration. Exact model/tokenizer revisions, cell allocation, and LoRA fields are recorded in the prepared manifests.],

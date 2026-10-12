@@ -5,12 +5,12 @@ seed-42 adapters on all 4,300 sealed benchmark bases. It selects one answer-only
 row per base, so replayable certificates remain offline audit artifacts and no
 base is evaluated more than once.
 
-The four reporting modules remain separate:
+The benchmark has three formal reporting groups:
 
 - CORE: 1,300 bases;
-- matched composition: 1,200 bases;
-- held-out composition: 900 bases; and
-- depth 3–8: 900 bases.
+- COMP: 1,200 matched-composition bases; and
+- SHIFT: 1,800 bases, with held-out composition (900) and depth 3–8 (900)
+  retained as diagnostic submetrics.
 
 Prepare the immutable bundle from the repository root. The recommended workflow
 is to run this directly on the cluster after updating the checkout, so no

@@ -18,20 +18,31 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
         {
             "task": "core",
             "role": "bench-core",
+            "component": "core",
             "cell": "DIR-ARC-UNI",
             "query_kind": "direction",
             "count": 100,
         },
         {
             "task": "matched",
-            "role": "bench-composition-matched",
+            "role": "bench-composition",
+            "component": "composition",
             "cell": "DIR-MP-TRC-UNI",
             "query_kind": "direction",
             "count": 100,
         },
         {
+            "task": "shift-composition",
+            "role": "bench-shift",
+            "component": "heldout-composition",
+            "cell": "DIR-MP-TRC-MP-UNI",
+            "query_kind": "direction",
+            "count": 50,
+        },
+        {
             "task": "depth",
-            "role": "bench-depth",
+            "role": "bench-shift",
+            "component": "depth",
             "cell": "direction-depth-3",
             "query_kind": "direction",
             "count": 50,
@@ -40,7 +51,7 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
     (tmp_path / "jobs.json").write_text(
         json.dumps(
             {
-                "total_bases": 250,
+                "total_bases": 300,
                 "tasks": tasks,
                 "jobs": [{"name": "model"}, {"name": "missing"}],
             }
@@ -55,7 +66,11 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
                 "results": {
                     "core": {"strict_acc,none": 0.8, "loose_acc,none": 0.9},
                     "matched": {"strict_acc,none": 0.7, "loose_acc,none": 0.8},
-                    "depth": {"strict_acc,none": 0.5, "loose_acc,none": 0.6},
+                    "shift-composition": {
+                        "strict_acc,none": 0.4,
+                        "loose_acc,none": 0.5,
+                    },
+                    "depth": {"strict_acc,none": 0.6, "loose_acc,none": 0.7},
                 }
             }
         )
@@ -63,12 +78,20 @@ def test_summary_reports_module_macros_and_depth_curves(tmp_path: Path) -> None:
 
     summary = SUMMARY.summarize(tmp_path)
 
-    assert summary["models"]["model"]["overall_micro_accuracy"] == pytest.approx(0.7)
-    assert summary["models"]["model"]["module_cell_macro_accuracy"] == {
+    assert summary["models"]["model"]["overall_micro_accuracy"] == pytest.approx(
+        2 / 3
+    )
+    assert summary["models"]["model"]["group_accuracy"] == {
         "bench-core": 0.8,
-        "bench-composition-matched": 0.7,
-        "bench-depth": 0.5,
+        "bench-composition": 0.7,
+        "bench-shift": 0.5,
     }
-    assert summary["models"]["model"]["depth_accuracy"] == {"direction": {"3": 0.5}}
+    assert summary["models"]["model"]["component_accuracy"] == {
+        "bench-core/core": 0.8,
+        "bench-composition/composition": 0.7,
+        "bench-shift/depth": 0.6,
+        "bench-shift/heldout-composition": 0.4,
+    }
+    assert summary["models"]["model"]["depth_accuracy"] == {"direction": {"3": 0.6}}
     assert summary["models"]["missing"] == {"complete": False}
     assert (tmp_path / "SUMMARY.md").is_file()

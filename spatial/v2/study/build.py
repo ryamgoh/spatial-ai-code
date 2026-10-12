@@ -20,7 +20,7 @@ from spatial.v2.benchmark_registry import load_benchmark_registry
 from spatial.v2.composition import HOLDOUT_COMPOSITIONS, TRAIN_COMPOSITIONS
 from spatial.v2.context_budget import ContextBudget, admit_row_group, load_tokenizer
 from spatial.v2.generation import GenerationPolicy, SpatialGeneratorV2
-from spatial.v2.study import role_path
+from spatial.v2.study import write_role_texts
 from spatial.v2.supervision_controls import SupervisionArm, apply_supervision_arm
 from spatial.v2.symbolic_trace_codec import score_symbolic_training_trace
 
@@ -434,8 +434,7 @@ def build_release(
             "sha256": hashlib.sha256(serialized[role].encode()).hexdigest(),
         }
     output.mkdir(parents=True)
-    for role, content in serialized.items():
-        role_path(output, role).write_text(content)
+    write_role_texts(output, serialized)
     (output / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )

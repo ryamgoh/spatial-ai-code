@@ -12,14 +12,14 @@ from typing import Any
 
 import yaml
 
-from spatial.v2.study import role_path
+from spatial.v2.study import read_role_text
 
-BENCH_MODULES = {
-    "bench-core": "bench-core",
-    "bench-composition-matched": "bench-comp",
-    "bench-composition-heldout": "bench-composition",
-    "bench-depth": "bench-depth",
-}
+BENCH_SOURCES = (
+    ("bench-core", "core", "bench-core"),
+    ("bench-composition", "composition", "bench-comp"),
+    ("bench-shift", "heldout-composition", "bench-composition"),
+    ("bench-shift", "depth", "bench-depth"),
+)
 MODEL_SPECS = {
     "untuned": None,
     "answer-only-seed-42": (
@@ -196,14 +196,14 @@ spec.loader.exec_module(module)
 process_docs_v2_sft = module.process_docs_v2_sft
 process_results_v2_answer = module.process_results_v2_answer
 """
-    for report_role, sealed_role in BENCH_MODULES.items():
-        source = role_path(release, sealed_role)
+    for report_role, component, sealed_role in BENCH_SOURCES:
+        source_text = read_role_text(release, sealed_role)
         artifact = manifest["artifacts"][sealed_role]
-        if _sha256(source) != artifact["sha256"]:
+        if hashlib.sha256(source_text.encode()).hexdigest() != artifact["sha256"]:
             raise ValueError(
                 f"{report_role} hash disagrees with the sealed manifest"
             )
-        rows = [json.loads(line) for line in source.read_text().splitlines()]
+        rows = [json.loads(line) for line in source_text.splitlines()]
         selected = _select_answer_rows(rows, report_role)
         if len(selected) != artifact["bases"]:
             raise ValueError(
@@ -217,8 +217,10 @@ process_results_v2_answer = module.process_results_v2_answer
                 raise ValueError(f"{report_role} row lacks metadata.benchmark_cell")
             by_cell[cell].append(row)
         for cell, cell_rows in sorted(by_cell.items()):
-            task_name = f"spatialentail_{_slug(report_role)}_{_slug(cell)}"
-            data_name = f"data/{report_role}--{cell}.jsonl"
+            task_name = (
+                f"spatialentail_{_slug(report_role)}_{_slug(component)}_{_slug(cell)}"
+            )
+            data_name = f"data/{report_role}-{component}--{cell}.jsonl"
             data_path = "../" + str((output / data_name).relative_to(root))
             files[data_name] = "".join(
                 json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
@@ -232,6 +234,7 @@ process_results_v2_answer = module.process_results_v2_answer
                 {
                     "task": task_name,
                     "role": report_role,
+                    "component": component,
                     "cell": cell,
                     "query_kind": metadata.get("query_kind"),
                     "count": len(cell_rows),
@@ -316,9 +319,9 @@ process_results_v2_answer = module.process_results_v2_answer
 
 This immutable bundle evaluates the untuned model plus answer-only and Natural
 seed-42 adapters on exactly 4,300 sealed SpatialEntail bases. The 52 tasks retain
-the frozen cell boundaries used for CORE, matched composition, held-out
-composition, and depth reporting. Each data view contains one answer-only row
-per base; answer certificates remain offline audit artifacts.
+the frozen cell boundaries used for CORE, COMP, and SHIFT reporting. SHIFT keeps
+held-out composition and depth as diagnostic submetrics. Each data view contains
+one answer-only row per base; answer certificates remain offline audit artifacts.
 
 `jobs.json` records preparation only. Remote submission and completion are not
 synchronized back into this directory. Transfer this directory together with

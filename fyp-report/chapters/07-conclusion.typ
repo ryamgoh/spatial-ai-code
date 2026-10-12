@@ -18,8 +18,9 @@ model's hidden thought process or its default response format.
 
 The implemented generator and bounded pilot establish preparation feasibility,
 not a learning benefit. The central study compares answer-only and verified
-Natural SFT on Qwen3.5-4B, separating matched interpolation, depth-5–8
-extrapolation, premise-first formula composition, and external transfer. A
+Natural SFT on Qwen3.5-4B, reporting CORE, COMP, and SHIFT. SHIFT separates
+depth-5–8 extrapolation from held-out formula composition, while external
+transfer remains its own evaluation. A
 source-blinded two-model quality screen with selective human appeal measures
 readability separately from formal validity. A compact Chain-of-Symbol-like arm
 is optional and asks only whether a shorter representation can retain accuracy.

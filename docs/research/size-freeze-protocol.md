@@ -115,10 +115,9 @@ operator generalization is made.
 
 | Module | Sealed allocation | Interpretation |
 |---|---:|---|
-| CORE matched | 100 × 13 = 1,300 bases | coverage-stratum performance |
-| COMP matched | 100 × 12 = 1,200 bases | seen skeletons, unseen instances |
-| COMP holdout | 100 × 9 = 900 bases | transfer to three reserved skeleton families |
-| Depth | 50 × 3 query families × depths 3–8 = 900 bases | 3/4 matched anchors; 5–8 extrapolation |
+| CORE | 100 × 13 = 1,300 bases | coverage-stratum performance |
+| COMP | 100 × 12 = 1,200 bases | seen skeletons, unseen instances |
+| SHIFT | 1,800 bases | 900 held-out-composition plus 900 depth-ladder bases |
 | Total benchmark | 4,300 bases | artifact count only, not one headline score |
 
 Depth and composition have separate scorecards. Depth examples use one
@@ -189,12 +188,11 @@ has guaranteed contamination-free evaluation.
 
 ## Statistical reporting
 
-Primary outcomes are cell-macro strict accuracy separately for matched CORE,
-matched COMP, and held-out COMP; depth uses family-by-depth curves. Cell macro
-means the unweighted average of the frozen cell accuracies. Query summaries
-average their declared cells, and allocation-weighted micro scores are
-secondary. Overlapping RR/LR/MTR summaries are descriptive, not independent
-populations. No aggregate SHIFT or whole-benchmark headline is used.
+Primary outcomes are strict accuracy for CORE, COMP, and SHIFT. SHIFT is the
+equal-sized union of held-out composition and depth; those components retain
+separate diagnostic scorecards, and depth additionally uses family-by-depth
+curves. Query and cell summaries remain descriptive rather than independent
+populations. No whole-benchmark headline is used.
 
 At 100 examples, a cell near 50% accuracy has an approximate 95% half-width of
 9.6 points. Cells support descriptive profiles and large effects, not small

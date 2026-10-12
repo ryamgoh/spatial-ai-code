@@ -88,13 +88,19 @@ semantic status, and evidence burden. Difficulty measurements annotate the
 cell rather than define its task identity.
 _Avoid_: Flat task bucket, depth tier
 
-**Matched composition benchmark**:
-New instances using composition families represented in training.
-_Avoid_: Comp benchmark, `bench-comp`
+**Core benchmark**:
+The 1,300-base coverage suite over the standard reasoning cells.
 
-**Held-out composition benchmark**:
-Instances using composition families reserved from training.
-_Avoid_: Composition benchmark, `bench-composition`
+**Composition benchmark**:
+The 1,200-base suite of new instances using composition families represented in
+training.
+_Avoid_: Comp benchmark, matched composition tier
+
+**Shift benchmark**:
+The 1,800-base structural-generalisation suite combining 900 held-out
+composition instances with 900 depth-ladder instances. Its two components are
+reported separately as diagnostics.
+_Avoid_: Held-out composition tier, depth tier
 
 **Structural difficulty**:
 Measured properties such as spatial support depth, formula nesting, live branch

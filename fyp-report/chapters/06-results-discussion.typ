@@ -71,9 +71,10 @@ bases, together with a 4,000-base nested training subset. Its final Natural
 quality screen contains 485 items, all approved independently by both judges;
 this is a model-based readability screen, not a population-level human rating.
 Model benchmark evaluation remains pending, so no empty result tables are
-included. The central analysis compares answer-only with verified Natural SFT,
-keeping matched performance, depth-5–8 extrapolation, held-out composition, and
-external datasets as distinct outcomes. Gold certificates remain offline checks
+included. The central analysis compares answer-only with verified Natural SFT
+on CORE, COMP, and SHIFT. Within SHIFT, depth-5–8 extrapolation and held-out
+composition remain distinct diagnostics; external datasets remain separate from
+the internal benchmark. Gold certificates remain offline checks
 throughout. A compact Chain-of-Symbol-like extension is optional only if its
 frozen targets are shorter than Natural corpus-wide.
 

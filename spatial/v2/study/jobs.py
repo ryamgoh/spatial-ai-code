@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from spatial.v2.study import role_path
+from spatial.v2.study import read_role_text
 from spatial.v2.study.seal import seal_release
 
 PACKAGES = {
@@ -53,8 +53,7 @@ def prepare_jobs(release: Path, output: Path, *, repo_root: Path | None = None) 
         raise ValueError("tokenizer/model revision must be pinned")
     rows_by_role = {}
     for role in ("train", "dev"):
-        path = role_path(release, role)
-        rows = [json.loads(line) for line in path.read_text().splitlines()]
+        rows = [json.loads(line) for line in read_role_text(release, role).splitlines()]
         if not rows:
             raise ValueError(f"{role} set must be nonempty")
         rows_by_role[role] = rows

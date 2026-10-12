@@ -1,14 +1,13 @@
 # Frozen SpatialEntail benchmark source
 
-The four committed evaluation modules use explicit public names:
+The committed benchmark uses three formal groups:
 
-- `bench-core.jsonl` — standard task coverage;
-- `bench-composition-matched.jsonl` — new instances from composition families
-  represented in training;
-- `bench-composition-heldout.jsonl` — composition families reserved from
-  training; and
-- `bench-depth.jsonl` — Direction, Selection, and Count at depths 3–8.
+- **CORE** (1,300): `bench-core.jsonl`;
+- **COMP** (1,200): `bench-composition.jsonl`; and
+- **SHIFT** (1,800): `bench-shift.jsonl`, with held-out composition (900) and
+  depth ladder (900) distinguished by row metadata for diagnostic reporting.
 
-`manifest.json` preserves the sealed internal role keys `bench-comp` and
-`bench-composition` for provenance compatibility. The evaluation preparer maps
-those immutable keys to the unambiguous public filenames and reporting labels.
+`manifest.json` preserves the sealed internal role keys `bench-comp`,
+`bench-composition`, and `bench-depth` for provenance compatibility. The
+evaluation preparer maps those immutable keys to the public CORE/COMP/SHIFT
+hierarchy.
