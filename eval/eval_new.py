@@ -4,7 +4,7 @@ via CLI (LM Eval Harness).
 
 --stages 1  Single pass: the task scores the complete generated response.
 --stages 2  (default) Two passes: free thinking, then a constrained
-            A/B/C/D re-ask using the stage-1 output for more reliable
+            answer re-ask using the stage-1 output for more reliable
             answers and evaluation.
 
 All existing configs declare `model: vllm_staged_pass`; run them with this
@@ -22,6 +22,7 @@ from pathlib import Path
 import lm_eval
 import typer
 from generation_contract import (
+    answer_regex,
     finish_answer,
     prepare_requests,
     reasoning_without_answer,
@@ -40,6 +41,8 @@ class VLLMStagedPass(LM):
         pretrained: str,
         stages: int = 2,
         choices: list[str] | None = None,
+        allow_multiple_answers: bool = True,
+        record_stage1: bool = False,
         max_thinking_tokens: int = 512,
         dtype: str = "bfloat16",
         gpu_memory_utilization: float = 0.8,
@@ -64,6 +67,10 @@ class VLLMStagedPass(LM):
         self.max_model_len = max_model_len
         self.add_special_tokens = add_special_tokens
         self.choices = choices if choices is not None else ["A", "B", "C", "D"]
+        self.answer_regex = answer_regex(
+            self.choices, allow_multiple_answers=allow_multiple_answers
+        )
+        self.record_stage1 = record_stage1
         self.lora_path = lora_path
         self.LoRARequest = LoRARequest
 
@@ -126,7 +133,7 @@ class VLLMStagedPass(LM):
             "temperature": 0.0,
             "repetition_penalty": 1.0,
             "structured_outputs": self.StructuredOutputsParams(
-                regex=f"[{''.join(self.choices)}](,[{''.join(self.choices)}])*"
+                regex=self.answer_regex
             ),
         }
         answer_requests = [
@@ -143,11 +150,18 @@ class VLLMStagedPass(LM):
         outputs2 = self.llm.generate(
             answer_prompts,
             [self.SamplingParams(**item) for item in options],
-            lora_request=None,
+            lora_request=lora_req,
         )
         return [
-            finish_answer(text, output.outputs[0].text, self.choices)
-            for text, output in zip(reasoning, outputs2, strict=True)
+            finish_answer(
+                text,
+                output.outputs[0].text,
+                self.choices,
+                stage1_response=stage1 if self.record_stage1 else None,
+            )
+            for text, stage1, output in zip(
+                reasoning, thinking_outputs, outputs2, strict=True
+            )
         ]
 
     def loglikelihood(self, requests):
@@ -260,7 +274,7 @@ def main(
         "--stages",
         min=1,
         max=2,
-        help="1 = single pass; 2 (default) = thinking + constrained A/B/C/D re-ask",
+        help="1 = single pass; 2 (default) = thinking + constrained answer re-ask",
     ),
     output_dir: Path | None = typer.Option(  # noqa: B008
         None,

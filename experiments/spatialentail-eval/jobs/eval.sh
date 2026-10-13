@@ -42,7 +42,7 @@ export PYTHONPATH="$SLURM_SUBMIT_DIR${PYTHONPATH:+:$PYTHONPATH}"
 cd eval
 uv run python eval_new.py \
   --config "$EVAL_CONFIG" \
-  --stages 1 \
+  --stages 2 \
   --output-dir "$RESULT_DIR"
 
 [[ -f "$RESULT_DIR/results.json" ]] || {

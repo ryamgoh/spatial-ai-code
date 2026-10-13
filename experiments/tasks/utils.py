@@ -255,11 +255,37 @@ def process_results_v2(doc, results):
 
 
 def process_results_v2_answer(doc, results):
-    """Score generated answers without treating audit certificates as model output."""
+    """Score the constrained answer and retain native stage-one diagnostics."""
     metrics = process_results_v2(doc, results)
+    response = results[0]
+    stage1_match = re.fullmatch(
+        r"<stage1_response>\n(.*)\n</stage1_response>\n\nAnswer:[^\n]*",
+        response,
+        flags=re.DOTALL,
+    )
+    stage1_response = stage1_match.group(1) if stage1_match else response
+    canonical_footer = re.search(
+        r"(?:^|\n)Answer:\s*([A-Z](?:\s*,\s*[A-Z])*)\s*$",
+        stage1_response,
+    )
+    bare_footer = re.search(
+        r"(?:^|\n)\s*([A-Z](?:\s*,\s*[A-Z])*)\s*$",
+        stage1_response,
+    )
+    extracted = canonical_footer or bare_footer
+    letters = (
+        tuple(part.strip() for part in extracted.group(1).split(","))
+        if extracted
+        else ()
+    )
+    canonical = bool(letters) and letters == tuple(sorted(set(letters)))
+    predicted = set(letters) if canonical else set()
+    gold = _answer_letter_set(doc["oracle_option"])
     return {
         "strict_acc": metrics["strict_acc"],
         "loose_acc": metrics["loose_acc"],
+        "stage1_acc": int(bool(predicted) and predicted == gold),
+        "stage1_format_valid": int(canonical_footer is not None),
     }
 
 

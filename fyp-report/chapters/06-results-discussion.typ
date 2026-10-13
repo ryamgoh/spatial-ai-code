@@ -72,9 +72,9 @@ quality screen contains 485 items, all approved independently by both judges;
 this is a model-based readability screen, not a population-level human rating.
 Model benchmark evaluation remains pending, so no empty result tables are
 included. The central analysis compares answer-only with verified Natural SFT
-on CORE, COMP, and SHIFT. Within SHIFT, depth-5–8 extrapolation and held-out
-composition remain distinct diagnostics; external datasets remain separate from
-the internal benchmark. Gold certificates remain offline checks
+on CORE, COMP, and SHIFT. Each internal section will report its cumulative score
+and cell-level breakdown; SHIFT slice labels and depth curves remain diagnostic.
+External datasets remain separate from the internal benchmark. Gold certificates remain offline checks
 throughout. A compact Chain-of-Symbol-like extension is optional only if its
 frozen targets are shorter than Natural corpus-wide.
 

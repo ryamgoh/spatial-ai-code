@@ -63,7 +63,8 @@ This establishes bounded semantic dependence, not globally shortest proofs.
 
 Internal evaluation has three formal groups: 1,300 CORE bases, 1,200 COMP bases,
 and 1,800 SHIFT bases, for 4,300 total. SHIFT combines 900 held-out-composition
-bases with 900 depth-ladder bases; both remain separately reported diagnostics.
+and 900 depth-ladder bases; these labels remain cell metadata, not extra
+headline groups.
 These quotas passed admission and diversity audits before sealing.
 CORE entries include primary structures, semantic strata, and diagnostic noise;
 no claim is made that the thirteen strata are thirteen equal primitives.
@@ -110,8 +111,8 @@ comparator until a semantics-preserving public adapter can be frozen.
 == Metrics and Statistical Reporting
 
 Primary outcomes are separately reported accuracy on CORE, COMP, SHIFT, and
-SpatialMap-TQA-Corr. SHIFT additionally reports held-out-composition accuracy and
-depth curves. Secondary metrics include per-capability/query
+SpatialMap-TQA-Corr. Each internal section reports a cumulative score and its
+cell-level breakdown; depth curves remain diagnostic. Secondary metrics include per-capability/query
 results, ambiguity precision/recall, option-position consistency, generated
 tokens, runtime, and memory. If compact Symbolic runs, its token reduction and
 answer accuracy are reported together.

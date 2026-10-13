@@ -86,6 +86,13 @@ def test_frozen_evaluation_selects_one_answer_row_per_base(tmp_path: Path) -> No
         "answer-only-seed-42",
         "natural-seed-42",
     ]
+    for config_path in sorted((output / "configs").glob("*.yaml")):
+        assert "allow_multiple_answers: false" in config_path.read_text()
+        assert "record_stage1: true" in config_path.read_text()
+    for task_path in sorted((output / "tasks").glob("*.yaml")):
+        task_text = task_path.read_text()
+        assert "metric: stage1_acc" in task_text
+        assert "metric: stage1_format_valid" in task_text
     for data_path in sorted((output / "data").glob("*.jsonl")):
         rows = [json.loads(line) for line in data_path.read_text().splitlines()]
         assert len(rows) == 1

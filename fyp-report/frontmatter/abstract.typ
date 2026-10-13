@@ -21,7 +21,7 @@ Qwen3.5-4B using two training seeds. A compact Chain-of-Symbol-like target is an
 optional token-efficiency extension, not a certificate format. The sealed
 release contains 8,000 training, 775 development, and 4,300 benchmark bases;
 the benchmark reports CORE (1,300), COMP (1,200), and SHIFT (1,800), with SHIFT
-decomposed into held-out composition and depth. Its 485-item Natural quality sample was approved
+slice labels retained as cell metadata. Its 485-item Natural quality sample was approved
 by both independent model judges. Model benchmark and transfer results remain
 pending.
 Certificate validity supports auditability, not a model response contract or

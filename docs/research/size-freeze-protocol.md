@@ -188,11 +188,12 @@ has guaranteed contamination-free evaluation.
 
 ## Statistical reporting
 
-Primary outcomes are strict accuracy for CORE, COMP, and SHIFT. SHIFT is the
-equal-sized union of held-out composition and depth; those components retain
-separate diagnostic scorecards, and depth additionally uses family-by-depth
-curves. Query and cell summaries remain descriptive rather than independent
-populations. No whole-benchmark headline is used.
+Primary outcomes are strict accuracy for CORE, COMP, and SHIFT. Every formal
+group reports its cumulative score plus cell-level diagnostics under the same
+reporting rule. SHIFT records held-out-composition and depth-ladder labels as
+cell metadata, and depth additionally uses family-by-depth curves. Query and
+cell summaries remain descriptive rather than independent populations. No
+whole-benchmark headline is used.
 
 At 100 examples, a cell near 50% accuracy has an approximate 95% half-width of
 9.6 points. Cells support descriptive profiles and large effects, not small

@@ -83,6 +83,12 @@ metric_list:
   - metric: loose_acc
     aggregation: mean
     higher_is_better: true
+  - metric: stage1_acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: stage1_format_valid
+    aggregation: mean
+    higher_is_better: true
 metadata:
   version: 1.0
   note: "Frozen SpatialEntail answer evaluation; certificates remain offline"
@@ -111,6 +117,8 @@ def _eval_config(
             "gpu_memory_utilization": 0.85,
             "max_model_len": max_model_len,
             "choices": list("ABCDE"),
+            "allow_multiple_answers": False,
+            "record_stage1": True,
             "add_special_tokens": False,
         },
         "include_path": include_path,
@@ -320,7 +328,7 @@ process_results_v2_answer = module.process_results_v2_answer
 This immutable bundle evaluates the untuned model plus answer-only and Natural
 seed-42 adapters on exactly 4,300 sealed SpatialEntail bases. The 52 tasks retain
 the frozen cell boundaries used for CORE, COMP, and SHIFT reporting. SHIFT keeps
-held-out composition and depth as diagnostic submetrics. Each data view contains
+slice labels as cell metadata. Each data view contains
 one answer-only row per base; answer certificates remain offline audit artifacts.
 
 `jobs.json` records preparation only. Remote submission and completion are not

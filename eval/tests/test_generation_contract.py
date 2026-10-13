@@ -1,14 +1,46 @@
 """Real request preparation for both stages, without GPU libraries or AST mocks."""
 
+import re
 from types import SimpleNamespace
 
 import pytest
 
 from eval.generation_contract import (
+    answer_regex,
     finish_answer,
     prepare_requests,
     reasoning_without_answer,
 )
+
+
+def test_single_answer_regex_allows_exactly_one_configured_choice():
+    pattern = answer_regex(["A", "B", "C"], allow_multiple_answers=False)
+    assert re.fullmatch(pattern, "A")
+    assert re.fullmatch(pattern, "C")
+    assert not re.fullmatch(pattern, "A,B")
+    assert not re.fullmatch(pattern, "D")
+
+
+def test_multiple_answer_regex_allows_one_to_all_choices_in_canonical_order():
+    pattern = answer_regex(["A", "B", "C"], allow_multiple_answers=True)
+    for answer in ("A", "B", "C", "A,B", "A,C", "B,C", "A,B,C"):
+        assert re.fullmatch(pattern, answer)
+    for answer in ("", "C,A", "A,A", "A,D"):
+        assert not re.fullmatch(pattern, answer)
+
+
+@pytest.mark.parametrize(
+    "choices",
+    ([], ["A", "A"], ["AA", "B"], ["a", "B"]),
+)
+def test_answer_regex_rejects_invalid_choice_alphabets(choices):
+    with pytest.raises(ValueError):
+        answer_regex(choices, allow_multiple_answers=True)
+
+
+def test_answer_regex_rejects_non_boolean_answer_mode():
+    with pytest.raises(ValueError, match="boolean"):
+        answer_regex(["A", "B"], allow_multiple_answers="false")
 
 
 def tokenizer():
@@ -101,6 +133,19 @@ def test_second_stage_replaces_old_footer_and_canonicalizes_letters():
     final = finish_answer(reasoning, "C,A,C", ["A", "B", "C"])
     assert final == "<think>proof</think>\n\nAnswer: A, C"
     assert final.count("Answer:") == 1
+
+
+def test_second_stage_can_preserve_exact_stage_one_response():
+    first = "analysis\nE"
+    final = finish_answer(
+        reasoning_without_answer(first),
+        "B",
+        ["A", "B", "C"],
+        stage1_response=first,
+    )
+    assert final == (
+        "<stage1_response>\nanalysis\nE\n</stage1_response>\n\nAnswer: B"
+    )
 
 
 def test_invalid_second_stage_answer_is_not_emitted():

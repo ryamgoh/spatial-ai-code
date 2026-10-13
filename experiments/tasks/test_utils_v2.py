@@ -84,7 +84,32 @@ def test_v2_answer_scoring_excludes_certificate_metrics() -> None:
         },
         ["Answer: B"],
     )
-    assert metrics == {"strict_acc": 1, "loose_acc": 1}
+    assert metrics == {
+        "strict_acc": 1,
+        "loose_acc": 1,
+        "stage1_acc": 1,
+        "stage1_format_valid": 1,
+    }
+
+
+def test_v2_staged_answer_scores_both_passes_and_format_separately() -> None:
+    from utils import process_results_v2_answer
+
+    response = "<stage1_response>\nreasoning\nE\n</stage1_response>\n\nAnswer: B"
+    metrics = process_results_v2_answer(
+        {
+            "oracle_option": "E",
+            "trace_format": "natural",
+            "supervision_arm": "answer-only",
+        },
+        [response],
+    )
+    assert metrics == {
+        "strict_acc": 0,
+        "loose_acc": 0,
+        "stage1_acc": 1,
+        "stage1_format_valid": 0,
+    }
 
 
 def _sample(trace_format="symbolic"):
