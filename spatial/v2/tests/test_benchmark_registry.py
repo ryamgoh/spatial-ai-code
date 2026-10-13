@@ -257,3 +257,16 @@ def test_registry_pilot_persists_checked_rows_and_audit_manifest(
             seed=1902,
             max_attempts=100,
         )
+
+
+def test_all_possible_registry_cells_are_set_valued_alternatives() -> None:
+    path = Path(__file__).parents[1] / "all-possible-cells.yaml"
+    registry = load_benchmark_registry(path)
+
+    assert len(registry.cells) == 34
+    for cell in registry.cells:
+        policy = cell.generation_policy()
+        assert cell.semantic_status.value == "ALT"
+        assert policy.answer_mode.value == "all-possible"
+        assert policy.menu_coverage.value == "full"
+        assert policy.possibility_skeleton is not None

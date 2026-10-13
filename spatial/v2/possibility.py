@@ -49,6 +49,18 @@ POSSIBILITY_SKELETONS = {
 }
 
 
+# Reasoning-structure codes each skeleton exercises, for registry validation.
+POSSIBILITY_STRUCTURES = {
+    "depth": ("TRC",),
+    "mp": ("MP",),
+    "iff": ("IFF",),
+    "dje": ("DJE",),
+    "csr": ("CSR",),
+    "jcr": ("CSR",),
+    "noise": ("TRC",),
+}
+
+
 class PossibilityConstructionError(ValueError):
     pass
 
@@ -208,9 +220,15 @@ def _membership_skeleton(
         candidates = [open_target, fixed_target]
         rest = pool[cursor:]
         if name == "noise":
+            # Keep a real exclusion menu, then hang the remaining objects off
+            # the support as removable distractors.
+            excluded, spare = rest[:3], rest[3:]
+            premises.extend(Not(member(candidate)) for candidate in excluded)
+            candidates.extend(excluded)
+            used.update(excluded)
             premises.extend(
                 _attached_distractors(
-                    sorted(used), rest, policy.distractor_premises, rng
+                    sorted(used), spare, policy.distractor_premises, rng
                 )
             )
         else:

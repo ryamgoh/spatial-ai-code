@@ -1,0 +1,696 @@
+# SpatialEntail-ALL-POSSIBLE-Bench cell registry (draft, not frozen).
+#
+# Every cell is ALT: two or more answers are possible, and the model must return
+# the complete possibility set under the ALL_POSSIBLE contract with a full menu.
+# W<k> plants exactly k possible answers behind one Boolean rule; D<k> leaves an
+# axis open along a k-link chain; NOISE adds irrelevant support-attached
+# premises; JCR makes the planted memberships move together so intermediate
+# counts are impossible. Direction menus show all eight directions so set size
+# cannot be guessed from the menu; Selection and Count menus add at least three
+# distractors.
+version: 1
+cells:
+- id: DIR-MP-ALT-W2
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-MP-ALT-W4
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-IFF-ALT-W2
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-IFF-ALT-W4
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-DJE-ALT-W2
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-DJE-ALT-W4
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-CSR-ALT-W2
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-CSR-ALT-W4
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-TRC-ALT-D3
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 3
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 8
+- id: DIR-TRC-ALT-D5
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 5
+    num_entities: 14
+    num_premises: 15
+    ordinary_option_target: 8
+- id: DIR-TRC-ALT-NOISE
+  readiness: ready
+  query_kind: direction
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: noise
+    possibility_depth: 3
+    distractor_premises: 3
+    num_entities: 12
+    num_premises: 13
+    ordinary_option_target: 8
+- id: SEL-MP-ALT-W2
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: SEL-MP-ALT-W4
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: SEL-IFF-ALT-W2
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: SEL-IFF-ALT-W4
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: SEL-DJE-ALT-W2
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: SEL-DJE-ALT-W4
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: SEL-CSR-ALT-W2
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: SEL-CSR-ALT-W4
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: SEL-TRC-ALT-D3
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 3
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 6
+- id: SEL-TRC-ALT-D5
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 5
+    num_entities: 14
+    num_premises: 15
+    ordinary_option_target: 6
+- id: SEL-TRC-ALT-NOISE
+  readiness: ready
+  query_kind: which
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: noise
+    possibility_depth: 3
+    distractor_premises: 3
+    num_entities: 13
+    num_premises: 14
+    ordinary_option_target: 6
+- id: CNT-MP-ALT-W2
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: CNT-MP-ALT-W4
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - MP
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: mp
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: CNT-IFF-ALT-W2
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: CNT-IFF-ALT-W4
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - IFF
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: iff
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: CNT-DJE-ALT-W2
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: CNT-DJE-ALT-W4
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - DJE
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: dje
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: CNT-CSR-ALT-W2
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 2
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 5
+- id: CNT-CSR-ALT-W4
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: csr
+    possibility_width: 4
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 7
+- id: CNT-TRC-ALT-D3
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 3
+    num_entities: 10
+    num_premises: 11
+    ordinary_option_target: 6
+- id: CNT-TRC-ALT-D5
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - RR
+  - MTR
+  reasoning_structures:
+  - TRC
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: depth
+    possibility_depth: 5
+    num_entities: 14
+    num_premises: 15
+    ordinary_option_target: 6
+- id: CNT-CSR-JCR-ALT-W2
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  - joint-count
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: jcr
+    possibility_width: 2
+    num_entities: 9
+    num_premises: 10
+    ordinary_option_target: 5
+- id: CNT-CSR-JCR-ALT-W3
+  readiness: ready
+  query_kind: count
+  capability_lenses:
+  - LR
+  - MTR
+  reasoning_structures:
+  - CSR
+  semantic_status: ALT
+  evidence_obligations:
+  - possibility-witness
+  - candidate-exclusion
+  - joint-count
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    possibility_skeleton: jcr
+    possibility_width: 3
+    num_entities: 9
+    num_premises: 10
+    ordinary_option_target: 6

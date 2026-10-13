@@ -64,3 +64,20 @@ def test_skeletons_reject_unique_semantics() -> None:
             num_entities=7,
             num_premises=8,
         )
+
+
+@pytest.mark.parametrize("width", [2, 3])
+def test_joint_count_skeleton_skips_intermediate_counts(width) -> None:
+    sample = SpatialGeneratorV2(seed=9200).generate(
+        _policy(
+            query_kind="count",
+            possibility_skeleton="jcr",
+            possibility_width=width,
+            num_entities=8,
+            num_premises=9,
+        ),
+        max_attempts=40,
+    )
+
+    assert sample.analysis.possible_counts == (0, width)
+    assert sample.difficulty["joint_count_dependency"]
