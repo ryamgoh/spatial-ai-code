@@ -181,6 +181,9 @@ class GenerationPolicy:
     distractor_premises: int = 0
     require_joint_count_dependency: bool = False
     composition: str | None = None
+    possibility_skeleton: str | None = None
+    possibility_depth: int = 2
+    possibility_width: int = 2
     generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:
@@ -224,6 +227,10 @@ class GenerationPolicy:
             from spatial.v2.composition import validate_composition_policy
 
             validate_composition_policy(self)
+        if self.possibility_skeleton is not None:
+            from spatial.v2.possibility import validate_possibility_policy
+
+            validate_possibility_policy(self)
         if (
             self.generation_mode is GenerationMode.WORLD_FIRST
             and self.boolean_shape is not BooleanShape.ATOMIC
@@ -317,7 +324,10 @@ class GenerationPolicy:
             or membership_controlled
             or self.require_independent_axes
             or self.distractor_premises
-        ) and self.semantic_shape is not SemanticShape.UNIQUE:
+        ) and (
+            self.semantic_shape is not SemanticShape.UNIQUE
+            and self.possibility_skeleton is None
+        ):
             raise ValueError("proof controls require unique semantics")
         if self.query_kind is QueryKind.DIRECTION and membership_controlled:
             raise ValueError("membership depth controls apply only to Which or Count")
@@ -376,6 +386,7 @@ class GenerationPolicy:
             self.distractor_premises
             and self.query_kind is QueryKind.WHICH
             and self.min_membership_depth <= 1
+            and self.possibility_skeleton is None
         ):
             raise ValueError(
                 "Selection distractors require controlled membership depth"
@@ -615,7 +626,15 @@ def _difficulty_matches(
         )
         or (
             policy.distractor_premises
+            and policy.possibility_skeleton is None
             and difficulty["num_distractor_premises"] != policy.distractor_premises
+        )
+        or (
+            # Possibility skeletons also pad with removable tautologies, so the
+            # planted distractors are a lower bound on removable premises.
+            policy.distractor_premises
+            and policy.possibility_skeleton is not None
+            and difficulty["num_distractor_premises"] < policy.distractor_premises
         )
         or (
             policy.require_joint_count_dependency
@@ -756,6 +775,18 @@ class SpatialGeneratorV2:
             from spatial.v2.composition import construct_composition
 
             problem = construct_composition(policy, objects, self._random)
+            coordinates = {}
+            provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
+        elif policy.possibility_skeleton is not None:
+            from spatial.v2.possibility import (
+                PossibilityConstructionError,
+                construct_possibility,
+            )
+
+            try:
+                problem = construct_possibility(policy, objects, self._random)
+            except PossibilityConstructionError as exc:
+                raise _RetryGeneration(str(exc)) from exc
             coordinates = {}
             provenance = GenerationProvenance.PROOF_TEMPLATE_FIRST
         elif (

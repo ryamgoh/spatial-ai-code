@@ -1,0 +1,356 @@
+"""Proof-template constructions whose answers are possibility sets.
+
+`SINGLE` collapses every non-unique answer to `Cannot be determined`, so its
+templates only need one invariant result. These skeletons instead plant two or
+more possible answers behind the same depth, Boolean, joint-count, and
+distractor structures used by the unique cells. Each one returns a candidate
+problem; the generator still solves it, matches the declared possibility count,
+and builds a replayable certificate before admission.
+"""
+
+from __future__ import annotations
+
+from itertools import combinations, pairwise
+from typing import Any
+
+from spatial.v2.solver import (
+    And,
+    CountQuery,
+    Direction,
+    DirectionQuery,
+    Iff,
+    Implies,
+    Not,
+    Or,
+    SpatialFormula,
+    SpatialProblem,
+    WhichQuery,
+    direction_constraint,
+    direction_signs,
+)
+
+_DIRECTION_BY_SIGNS = {direction_signs(value): value for value in Direction}
+_DIAGONALS = (
+    Direction.NORTHEAST,
+    Direction.SOUTHEAST,
+    Direction.SOUTHWEST,
+    Direction.NORTHWEST,
+)
+
+# skeleton -> (query kinds, minimum objects)
+POSSIBILITY_SKELETONS = {
+    "depth": (frozenset({"direction", "which", "count"}), 4),
+    "mp": (frozenset({"direction", "which", "count"}), 5),
+    "iff": (frozenset({"direction", "which", "count"}), 5),
+    "dje": (frozenset({"direction", "which", "count"}), 5),
+    "csr": (frozenset({"direction", "which", "count"}), 5),
+    "jcr": (frozenset({"count"}), 5),
+    "noise": (frozenset({"direction", "which"}), 5),
+}
+
+
+class PossibilityConstructionError(ValueError):
+    pass
+
+
+def validate_possibility_policy(policy: Any) -> None:
+    if policy.possibility_skeleton not in POSSIBILITY_SKELETONS:
+        raise ValueError(f"unknown possibility skeleton: {policy.possibility_skeleton}")
+    kinds, minimum = POSSIBILITY_SKELETONS[policy.possibility_skeleton]
+    if policy.query_kind.value not in kinds:
+        raise ValueError(
+            f"{policy.possibility_skeleton} possibility skeleton does not support "
+            f"{policy.query_kind.value} queries"
+        )
+    if policy.semantic_shape.value != "ambiguous":
+        raise ValueError("possibility skeletons require ambiguous semantics")
+    if policy.boolean_shape.value != "atomic" or policy.composition is not None:
+        raise ValueError("possibility skeletons declare their own Boolean structure")
+    if policy.num_entities < minimum:
+        raise ValueError(
+            f"{policy.possibility_skeleton} possibility skeleton requires at least "
+            f"{minimum} objects"
+        )
+    if policy.possibility_depth < 1:
+        raise ValueError("possibility_depth must be positive")
+    width = policy.possibility_width
+    if policy.possibility_skeleton in {"mp", "iff", "dje", "csr", "jcr"}:
+        maximum = len(Direction) - 1 if policy.query_kind.value == "direction" else 6
+        if not 2 <= width <= maximum:
+            raise ValueError(f"possibility_width must be between 2 and {maximum}")
+        if policy.query_kind.value != "direction":
+            needed = 3 + width + (1 if policy.possibility_skeleton == "dje" else 0)
+            if policy.num_entities < needed:
+                raise ValueError(
+                    f"{policy.possibility_skeleton} with width {width} requires "
+                    f"at least {needed} objects"
+                )
+    elif width != 2:
+        raise ValueError("possibility_width applies only to Boolean and jcr skeletons")
+    if policy.possibility_skeleton in {"depth", "noise"} and policy.possibility_depth < 2:
+        raise ValueError("depth and noise skeletons require a chain of at least 2")
+    if policy.possibility_skeleton == "noise" and policy.distractor_premises < 1:
+        raise ValueError("noise possibility skeleton requires distractor premises")
+    if policy.possibility_skeleton != "noise" and policy.distractor_premises:
+        raise ValueError("only the noise possibility skeleton adds distractors")
+    if (
+        policy.target_direction is not None
+        or policy.omit_direct_query_relation
+        or policy.min_axis_depth != 1
+        or policy.max_axis_depth is not None
+        or policy.min_membership_depth != 1
+        or policy.max_membership_depth is not None
+        or policy.require_independent_axes
+        or policy.require_joint_count_dependency
+    ):
+        raise ValueError(
+            "possibility skeletons cannot be crossed with unique proof controls"
+        )
+
+
+def construct_possibility(
+    policy: Any, objects: tuple[str, ...], rng: Any
+) -> SpatialProblem:
+    """Instantiate one declared possibility skeleton."""
+    nodes = list(objects)
+    rng.shuffle(nodes)
+    kind = policy.query_kind.value
+    name = policy.possibility_skeleton
+    if kind == "direction":
+        premises, query, used = _direction_skeleton(name, policy, nodes, rng)
+    else:
+        premises, query, used = _membership_skeleton(name, policy, nodes, rng)
+    if len(premises) > policy.num_premises:
+        raise PossibilityConstructionError("possibility premise budget is too small")
+    premises.extend(_tautologies(objects, policy.num_premises - len(premises), rng))
+    if len(premises) != policy.num_premises:
+        raise PossibilityConstructionError(
+            "possibility premise budget exceeds filler capacity"
+        )
+    rng.shuffle(premises)
+    return SpatialProblem(objects, And(tuple(premises)), query)
+
+
+def _direction_skeleton(
+    name: str, policy: Any, nodes: list[str], rng: Any
+) -> tuple[list[SpatialFormula], DirectionQuery, set[str]]:
+    target, reference, first, second, *extras = nodes
+    query = DirectionQuery(target, reference)
+    if name in {"depth", "noise"}:
+        chain = [reference, *extras[: policy.possibility_depth - 1], target]
+        if len(chain) != policy.possibility_depth + 1:
+            raise PossibilityConstructionError("not enough objects for the chain")
+        premises = _open_axis_chain(chain, rng)
+        if name == "noise":
+            premises.extend(
+                _attached_distractors(
+                    chain,
+                    [first, second, *extras[policy.possibility_depth - 1 :]],
+                    policy.distractor_premises,
+                    rng,
+                )
+            )
+        return premises, query, set(chain)
+    trigger = direction_constraint(first, second, rng.choice(tuple(Direction)))
+    alternatives = tuple(rng.sample(list(Direction), policy.possibility_width))
+    answers = Or(
+        tuple(direction_constraint(target, reference, value) for value in alternatives)
+    )
+    if name == "mp":
+        premises = [trigger, Implies(trigger, answers)]
+    elif name == "iff":
+        premises = [trigger, Iff(trigger, answers)]
+    elif name == "dje":
+        excluded = rng.choice(tuple(d for d in Direction if d not in alternatives))
+        widened = Or(
+            (
+                *answers.operands,
+                direction_constraint(target, reference, excluded),
+            )
+        )
+        premises = [widened, Not(direction_constraint(target, reference, excluded))]
+    elif name == "csr":
+        cases = _exclusive_cases(first, second, len(alternatives), rng)
+        premises = [
+            Or(cases),
+            *(
+                Implies(case, direction_constraint(target, reference, value))
+                for case, value in zip(cases, alternatives, strict=True)
+            ),
+        ]
+    else:
+        raise PossibilityConstructionError(f"{name} does not support Direction")
+    return premises, query, {target, reference, first, second}
+
+
+def _membership_skeleton(
+    name: str, policy: Any, nodes: list[str], rng: Any
+) -> tuple[list[SpatialFormula], WhichQuery | CountQuery, set[str]]:
+    reference, *pool = nodes
+    direction = policy.query_direction or rng.choice(_DIAGONALS)
+    member = lambda candidate: direction_constraint(candidate, reference, direction)
+    if name in {"depth", "noise"}:
+        depth = policy.possibility_depth
+        needed = 2 * (depth - 1) + 2
+        if len(pool) < needed:
+            raise PossibilityConstructionError("not enough objects for the chains")
+        open_target, fixed_target = pool[0], pool[1]
+        cursor = 2
+        open_chain = [reference, *pool[cursor : cursor + depth - 1], open_target]
+        cursor += depth - 1
+        fixed_chain = [reference, *pool[cursor : cursor + depth - 1], fixed_target]
+        cursor += depth - 1
+        premises = [
+            *_membership_chain(open_chain, direction, open_axis=True, rng=rng),
+            *_membership_chain(fixed_chain, direction, open_axis=False, rng=rng),
+        ]
+        used = set(open_chain) | set(fixed_chain)
+        candidates = [open_target, fixed_target]
+        rest = pool[cursor:]
+        if name == "noise":
+            premises.extend(
+                _attached_distractors(
+                    sorted(used), rest, policy.distractor_premises, rng
+                )
+            )
+        else:
+            # Remaining objects are excluded candidates with checked refutations.
+            premises.extend(Not(member(candidate)) for candidate in rest)
+            candidates.extend(rest)
+            used.update(rest)
+        query_type = WhichQuery if policy.query_kind.value == "which" else CountQuery
+        rng.shuffle(candidates)
+        return premises, query_type(frozenset({direction}), reference, tuple(candidates)), used
+    first, second, *rest = pool
+    width = policy.possibility_width
+    if len(rest) < width:
+        raise PossibilityConstructionError("not enough membership candidates")
+    planted, others = rest[:width], rest[width:]
+    trigger = direction_constraint(first, second, rng.choice(tuple(Direction)))
+    any_planted = Or(tuple(member(candidate) for candidate in planted))
+    if name == "mp":
+        premises = [trigger, Implies(trigger, any_planted)]
+    elif name == "iff":
+        premises = [trigger, Iff(trigger, any_planted)]
+    elif name == "dje":
+        if not others:
+            raise PossibilityConstructionError("dje needs an excluded candidate")
+        premises = [
+            Or((*any_planted.operands, member(others[0]))),
+            Not(member(others[0])),
+        ]
+    elif name == "csr":
+        cases = _exclusive_cases(first, second, width, rng)
+        premises = [
+            Or(cases),
+            *(
+                Implies(case, member(candidate))
+                for case, candidate in zip(cases, planted, strict=True)
+            ),
+        ]
+    elif name == "jcr":
+        # The planted group moves together, so only counts {0, width} are
+        # possible although every planted member is individually contingent.
+        premises = [
+            Or(
+                (
+                    And(tuple(member(candidate) for candidate in planted)),
+                    And(tuple(Not(member(candidate)) for candidate in planted)),
+                )
+            ),
+        ]
+    else:
+        raise PossibilityConstructionError(f"unknown skeleton {name}")
+    candidates = [*planted, *others]
+    premises.extend(
+        Not(member(candidate))
+        for candidate in others
+        if not (name == "dje" and candidate == others[0])
+    )
+    query_type = WhichQuery if policy.query_kind.value == "which" else CountQuery
+    rng.shuffle(candidates)
+    used = {reference, first, second, *candidates}
+    return premises, query_type(frozenset({direction}), reference, tuple(candidates)), used
+
+
+def _exclusive_cases(
+    first: str, second: str, count: int, rng: Any
+) -> tuple[SpatialFormula, ...]:
+    """Mutually exclusive cases: distinct exact directions for one pair."""
+    return tuple(
+        direction_constraint(first, second, value)
+        for value in rng.sample(list(Direction), count)
+    )
+
+
+def _open_axis_chain(chain: list[str], rng: Any) -> list[SpatialFormula]:
+    """Fix one axis strictly along the chain and leave the other unordered."""
+    fixed_axis = rng.randrange(2)
+    fixed_sign = rng.choice((-1, 1))
+    free = [1, -1, *[rng.choice((-1, 1)) for _ in range(len(chain) - 3)]]
+    rng.shuffle(free)
+    relations = []
+    for (previous, subject), component in zip(pairwise(chain), free, strict=True):
+        signs = (fixed_sign, component) if fixed_axis == 0 else (component, fixed_sign)
+        relations.append(
+            direction_constraint(subject, previous, _DIRECTION_BY_SIGNS[signs])
+        )
+    return relations
+
+
+def _membership_chain(
+    chain: list[str], direction: Direction, *, open_axis: bool, rng: Any
+) -> list[SpatialFormula]:
+    """Reach one diagonal membership; optionally leave one axis unordered."""
+    x_sign, y_sign = direction_signs(direction)
+    links = len(chain) - 1
+    if open_axis:
+        open_index = rng.randrange(2)
+        mixed = [1, -1, *[rng.choice((-1, 1)) for _ in range(links - 2)]]
+        rng.shuffle(mixed)
+        signs = [
+            (x_sign, component) if open_index == 1 else (component, y_sign)
+            for component in mixed
+        ]
+    else:
+        signs = [(x_sign, y_sign)] * links
+    return [
+        direction_constraint(subject, previous, _DIRECTION_BY_SIGNS[sign])
+        for (previous, subject), sign in zip(pairwise(chain), signs, strict=True)
+    ]
+
+
+def _attached_distractors(
+    anchors: list[str], spare: list[str], count: int, rng: Any
+) -> list[SpatialFormula]:
+    """Hang spare objects off the support as a tree.
+
+    Each premise introduces one new leaf, so it can always be satisfied by
+    placing that leaf and never constrains the queried objects. The premises
+    mention support objects, which makes them look relevant without being so.
+    """
+    if count > len(spare):
+        raise PossibilityConstructionError("not enough spare objects for noise")
+    attached = list(anchors)
+    premises = []
+    for leaf in spare[:count]:
+        premises.append(
+            direction_constraint(
+                leaf, rng.choice(attached), rng.choice(tuple(Direction))
+            )
+        )
+        attached.append(leaf)
+    return premises
+
+
+
+def _tautologies(
+    objects: tuple[str, ...], count: int, rng: Any
+) -> list[SpatialFormula]:
+    pairs = list(combinations(objects, 2))
+    rng.shuffle(pairs)
+    fillers = []
+    for subject, reference in pairs[:count]:
+        atom = direction_constraint(subject, reference, rng.choice(tuple(Direction)))
+        fillers.append(Or((atom, Not(atom))))
+    return fillers

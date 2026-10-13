@@ -351,3 +351,34 @@ def test_audit_has_numeric_witnesses_while_training_has_axis_orders(
         assert (
             "X west to east:" if trace_format is TraceFormat.NATURAL else '"x_order"'
         ) in training
+
+
+def test_case_split_with_divergent_consequents_is_fully_certified() -> None:
+    from spatial.v2.certificate_generation import build_answer_certificate
+    from spatial.v2.solver import Implies, Or, SpatialSolverV2
+
+    solver = SpatialSolverV2(backend="z3")
+    problem = SpatialProblem(
+        ("A", "B", "R", "T"),
+        And(
+            (
+                Or((atom("A", Direction.NORTH, "B"), atom("A", Direction.SOUTH, "B"))),
+                Implies(
+                    atom("A", Direction.NORTH, "B"),
+                    atom("T", Direction.NORTHEAST, "R"),
+                ),
+                Implies(
+                    atom("A", Direction.SOUTH, "B"),
+                    atom("T", Direction.SOUTHEAST, "R"),
+                ),
+                atom("B", Direction.WEST, "R"),
+            )
+        ),
+        DirectionQuery("T", "R"),
+    )
+    analysis = solver.analyze(problem)
+
+    certificate = build_answer_certificate(problem, analysis, solver)
+
+    assert analysis.possible_directions == (Direction.NORTHEAST, Direction.SOUTHEAST)
+    check_direction_answer_set(certificate)

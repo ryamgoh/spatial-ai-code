@@ -1199,6 +1199,50 @@ def _append_formula_contradiction(
     return None
 
 
+def _inert_tautologies(problem: SpatialProblem) -> frozenset[SpatialFormula]:
+    """Top-level P OR NOT P premises about a pair no other premise mentions."""
+    premises = _top_level_premises(problem.premise)
+    inert = set()
+    for index, premise in enumerate(premises):
+        if not isinstance(premise, Or) or len(premise.operands) != 2:
+            continue
+        left, right = premise.operands
+        if right == Not(left):
+            atom = left
+        elif left == Not(right):
+            atom = right
+        else:
+            continue
+        if not isinstance(atom, RelationConstraint):
+            continue
+        pair = {atom.subject, atom.reference}
+        if not any(
+            _mentions_pair(other, pair)
+            for other_index, other in enumerate(premises)
+            if other_index != index
+        ):
+            inert.add(premise)
+    return frozenset(inert)
+
+
+def _mentions_pair(formula: SpatialFormula, pair: set[str]) -> bool:
+    if isinstance(formula, RelationConstraint):
+        return {formula.subject, formula.reference} == pair
+    if isinstance(formula, Not):
+        return _mentions_pair(formula.operand, pair)
+    if isinstance(formula, (And, Or)):
+        return any(_mentions_pair(operand, pair) for operand in formula.operands)
+    if isinstance(formula, Implies):
+        return _mentions_pair(formula.antecedent, pair) or _mentions_pair(
+            formula.consequent, pair
+        )
+    if isinstance(formula, Iff):
+        return _mentions_pair(formula.left, pair) or _mentions_pair(
+            formula.right, pair
+        )
+    return False
+
+
 def _derive_contradiction_by_cases(
     problem: SpatialProblem,
     steps: list[ProofStep],
@@ -1209,8 +1253,13 @@ def _derive_contradiction_by_cases(
     """Close every branch of an accessible disjunction by contradiction."""
     known = _saturate_formula_steps(steps, branch)
     by_id = {step.id: step for step in steps}
+    inert = _inert_tautologies(problem)
     for source, source_id in tuple(known.items()):
         if not isinstance(source, Or) or source in used_disjunctions:
+            continue
+        if source in inert:
+            # A P OR NOT P premise about a pair no other premise mentions can
+            # never help close a branch, but each one doubles the search.
             continue
         if by_id[source_id].branch not in {None, branch}:
             continue
@@ -1249,6 +1298,12 @@ def _derive_contradiction_by_cases(
                     refutation_assumption,
                     used_disjunctions | {source},
                 )
+            if contradiction_id is not None and assumption_id not in (
+                _reachable_step_ids(tuple(steps), contradiction_id)
+            ):
+                # The branch closed without its own assumption, so this split
+                # is unnecessary and its pruned certificate would not replay.
+                contradiction_id = None
             if contradiction_id is None:
                 del steps[attempt_start:]
                 contradictions = []
@@ -1515,6 +1570,20 @@ def build_direction_proof(
     return certificate
 
 
+def _accessible_axis_steps(
+    steps: list[ProofStep],
+    branch: str | None,
+) -> list[ProofStep]:
+    """Axis facts visible from a branch, including enclosing case branches."""
+    parents = _branch_parents({step.id: step for step in steps})
+    return [
+        step
+        for step in steps
+        if isinstance(step.conclusion, AxisFact)
+        and _scope_is_accessible(step.branch, branch, parents)
+    ]
+
+
 def _axis_facts_conflict(first: AxisFact, second: AxisFact) -> bool:
     if first.axis is not second.axis or {
         first.subject,
@@ -1573,11 +1642,7 @@ def _append_axis_contradiction(
             )
             return contradiction_id
 
-    accessible_facts = [
-        step
-        for step in steps
-        if isinstance(step.conclusion, AxisFact) and step.branch in {None, branch}
-    ]
+    accessible_facts = _accessible_axis_steps(steps, branch)
     for index, first in enumerate(accessible_facts):
         for second in accessible_facts[index + 1 :]:
             if not _axis_facts_conflict(first.conclusion, second.conclusion):

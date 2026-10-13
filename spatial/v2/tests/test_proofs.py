@@ -1399,3 +1399,55 @@ def test_formula_rule_cannot_hide_unused_axis_evidence_as_an_extra_input():
     certificate = certificate_from_atom_step(problem, steps, "eliminate", ab)
     with pytest.raises(ProofCheckError, match="only formula inputs"):
         check_direction_proof(certificate)
+
+
+def test_inert_tautology_fillers_do_not_explode_case_split_search() -> None:
+    from spatial.v2 import proofs
+    from spatial.v2.solver import Implies, Not, Or
+
+    def atom(subject, direction, reference):
+        return RelationConstraint(subject, reference, frozenset({direction}))
+
+    def filler(subject, reference):
+        relation = atom(subject, Direction.NORTH, reference)
+        return Or((relation, Not(relation)))
+
+    problem = SpatialProblem(
+        ("A", "B", "R", "T", "U", "V", "W", "X"),
+        And(
+            (
+                Or((atom("A", Direction.NORTH, "B"), atom("A", Direction.SOUTH, "B"))),
+                Implies(
+                    atom("A", Direction.NORTH, "B"),
+                    atom("T", Direction.NORTHEAST, "R"),
+                ),
+                Implies(
+                    atom("A", Direction.SOUTH, "B"),
+                    atom("T", Direction.SOUTHEAST, "R"),
+                ),
+                filler("U", "V"),
+                filler("V", "W"),
+                filler("W", "X"),
+                filler("U", "X"),
+                filler("U", "W"),
+                filler("V", "X"),
+            )
+        ),
+        DirectionQuery("T", "R"),
+    )
+    calls = 0
+    original = proofs._derive_contradiction_by_cases
+
+    def counting(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(*args, **kwargs)
+
+    proofs._derive_contradiction_by_cases = counting
+    try:
+        proofs.build_direction_refutation(problem, Direction.WEST)
+    finally:
+        proofs._derive_contradiction_by_cases = original
+
+    assert len(proofs._inert_tautologies(problem)) == 6
+    assert calls < 50
