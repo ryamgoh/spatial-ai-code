@@ -1,4 +1,4 @@
-"""Prepare frozen SpatialEntail benchmark evaluation jobs; never submit them."""
+"""Prepare frozen SpatialEntail-SINGLE benchmark evaluation jobs."""
 
 from __future__ import annotations
 
@@ -323,12 +323,12 @@ process_results_v2_answer = module.process_results_v2_answer
         json.dumps(receipt, indent=2, sort_keys=True) + "\n"
     )
     (output / "README.md").write_text(
-        """# Prepared frozen benchmark evaluation
+        """# Prepared SpatialEntail-SINGLE benchmark evaluation
 
 This immutable bundle evaluates the untuned model plus answer-only and Natural
-seed-42 adapters on exactly 4,300 sealed SpatialEntail bases. The 52 tasks retain
-the frozen cell boundaries used for CORE, COMP, and SHIFT reporting. SHIFT keeps
-slice labels as cell metadata. Each data view contains
+seed-42 adapters on exactly 4,300 sealed `SpatialEntail-SINGLE-Bench` bases. The
+52 tasks retain the frozen cell boundaries used for CORE, COMP, and SHIFT
+reporting. SHIFT keeps slice labels as cell metadata. Each data view contains
 one answer-only row per base; answer certificates remain offline audit artifacts.
 
 `jobs.json` records preparation only. Remote submission and completion are not

@@ -1,4 +1,4 @@
-# SpatialEntail corpus and benchmark protocol
+# SpatialEntail-SINGLE corpus and benchmark protocol
 
 Status: production corpus sealed and four SFT jobs prepared, 2026-10-12.
 The repository receipt does not track remote submission or completion. No frozen
@@ -10,12 +10,13 @@ This protocol supersedes the earlier 17K, seven-composition, and 5.8K-test plans
 Does SFT on solver-validated spatial problems improve answer accuracy on
 matched, structurally held-out, and external spatial tasks?
 
-The primary model is Qwen3.5-4B. The central SFT comparison uses answer-only and
-Natural worked-solution targets on the same admitted base problems, with a
-prompt-matched untuned baseline. SINGLE is the headline contract. Answer
-certificates remain offline generation, verification, and evaluation artifacts;
-the model is not required to reproduce them. The final fixed-epoch checkpoint
-is used, avoiding checkpoint selection by training-target loss.
+The primary model is Qwen3.5-4B. The central SFT comparison is
+`SpatialEntail-SINGLE-SFT`: answer-only and Natural worked-solution targets on
+the same admitted base problems, with a prompt-matched untuned baseline.
+`SINGLE` is the headline answer contract. Answer certificates remain offline
+generation, verification, and evaluation artifacts; the model is not required to
+reproduce them. The final fixed-epoch checkpoint is used, avoiding checkpoint
+selection by training-target loss.
 
 A compact CoS-like Symbolic arm is optional after the central study. Its purpose
 is to test whether a shorter symbolic representation can retain accuracy while
@@ -27,11 +28,13 @@ retain native contracts and are never pooled into the internal score.
 
 ## Separate artifacts
 
-- **SpatialEntail-Train:** matched answer-only and Natural supervision; an
+- **SpatialEntail-SINGLE-SFT:** matched answer-only and Natural supervision; an
   optional compact Symbolic view may be added only after its representation and
   token-reduction criterion are frozen.
-- **SpatialEntail-Dev:** checkpoint diagnostics and the bounded size comparison.
-- **SpatialEntail-Bench:** fixed evaluation modules, unavailable for selection.
+- **SpatialEntail-SINGLE-Dev:** checkpoint diagnostics and the bounded size
+  comparison.
+- **SpatialEntail-SINGLE-Bench:** fixed evaluation modules, unavailable for
+  selection.
 - **Engineering pools:** previously inspected pilots, smoke runs, demonstrations,
   and debugging examples; logged in the contamination ledger.
 
@@ -188,12 +191,13 @@ has guaranteed contamination-free evaluation.
 
 ## Statistical reporting
 
-Primary outcomes are strict accuracy for CORE, COMP, and SHIFT. Every formal
-group reports its cumulative score plus cell-level diagnostics under the same
-reporting rule. SHIFT records held-out-composition and depth-ladder labels as
-cell metadata, and depth additionally uses family-by-depth curves. Query and
-cell summaries remain descriptive rather than independent populations. No
-whole-benchmark headline is used.
+Primary outcomes on `SpatialEntail-SINGLE-Bench` are strict accuracy for CORE,
+COMP, and SHIFT. Every formal group reports its cumulative score plus
+cell-level diagnostics under the same reporting rule. SHIFT records
+held-out-composition and depth-ladder labels as cell metadata, and depth
+additionally uses family-by-depth curves. Query and cell summaries remain
+descriptive rather than independent populations. No whole-benchmark headline is
+used.
 
 At 100 examples, a cell near 50% accuracy has an approximate 95% half-width of
 9.6 points. Cells support descriptive profiles and large effects, not small

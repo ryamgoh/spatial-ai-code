@@ -92,9 +92,10 @@ verified derivation, but they should include only query-relevant reasoning.
 The reviewed [corpus and benchmark protocol](size-freeze-protocol.md) controls
 all sizes, roles, composition reservations, and central contrasts. Its sealed
 allocations supersede the former 17K and 5.8K-test programme. The primary study
-is one 4B model, answer-only and Natural packages, and separately reported CORE,
-COMP, and SHIFT evaluations. Each section reports its cumulative score and
-cell-level breakdown; SHIFT slice labels and depth curves are diagnostics. The release contains
+is one 4B model, answer-only and Natural packages, and separately reported
+`SpatialEntail-SINGLE-Bench` CORE, COMP, and SHIFT evaluations. Each section
+reports its cumulative score and cell-level breakdown; SHIFT slice labels and
+depth curves are diagnostics. The release contains
 8,000 Train, 775 Dev, and 4,300 Bench bases and passed uniqueness, context,
 coverage, semantic, replay, and quality gates.
 
@@ -227,7 +228,7 @@ are scored separately; deep answers use a common direct-answer instruction.
 
 The modes are different tasks, not interchangeable scoring options:
 
-- `SINGLE` applies the query-specific unique-answer rule: one possible Direction
+- `SpatialEntail-SINGLE` applies the query-specific unique-answer rule: one possible Direction
   or Count, or exactly one entailed Selection entity with no other possible
   entity; otherwise it returns `Cannot be determined`;
 - `ALL_POSSIBLE` requests every possible value in the query's declared candidate
@@ -235,9 +236,22 @@ The modes are different tasks, not interchangeable scoring options:
   not a domain of complete membership sets; and
 - `VISIBLE_POSSIBLE` requests the possible values displayed in the menu.
 
-Use explicit wording for each mode. Keep `SINGLE` as the primary task,
-`ALL_POSSIBLE` as the strict set-valued extension, and `VISIBLE_POSSIBLE` as a
-menu-sensitivity diagnostic.
+Use explicit wording for each mode. Keep `SpatialEntail-SINGLE` as the primary
+task, `SpatialEntail-ALL-POSSIBLE` as the strict set-valued extension, and
+`SpatialEntail-VISIBLE-POSSIBLE` as a menu-sensitivity diagnostic.
+
+The set-valued prompts define "possible" against the stated relations rather
+than a hidden true map: "Select every answer that could be true given the
+stated relations." `VISIBLE_POSSIBLE` adds that possible answers which are not
+listed do not affect the selection. `SpatialEntail-SINGLE-Bench` was sealed
+before this wording was fixed and uses only the unchanged `SINGLE` instruction.
+
+`SpatialEntail-ALL-POSSIBLE-Bench` uses full menus only: every possible value
+is displayed, so the complete set is always expressible. Partial-menu
+`ALL_POSSIBLE` items would let `Cannot be determined` absorb uncertainty and
+weaken the stricter contract. Partial menus belong to the
+`SpatialEntail-VISIBLE-POSSIBLE` probe, built from the same bases as the
+`ALL_POSSIBLE` bench so that menu coverage is the only changed variable.
 
 A fixed-budget comparison can contrast `SINGLE`-only training with a
 `SINGLE`/`ALL_POSSIBLE` mixture. Add `VISIBLE_POSSIBLE` training only if the

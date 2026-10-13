@@ -1722,10 +1722,13 @@ class SpatialGeneratorV2:
         premises = " ".join(premise_text)
         instruction = {
             AnswerMode.SINGLE: "Select exactly one answer.",
-            AnswerMode.ALL_POSSIBLE: "Select the complete set of possible answers.",
+            AnswerMode.ALL_POSSIBLE: (
+                "Select every answer that could be true given the stated relations."
+            ),
             AnswerMode.VISIBLE_POSSIBLE: (
-                "Select every listed answer that is possible; unlisted possibilities "
-                "do not affect the selection."
+                "Select every listed answer that could be true given the stated "
+                "relations; possible answers that are not listed do not affect "
+                "the selection."
             ),
         }[answer_mode]
         query = problem.query
@@ -1801,12 +1804,13 @@ def _system_prompt(mode: AnswerMode) -> str:
             "choose Cannot be determined."
         ),
         AnswerMode.ALL_POSSIBLE: (
-            "Choose every possible answer. If the menu contains only part of the "
-            "complete set, choose Cannot be determined."
+            "Choose every answer that could be true given the stated relations. "
+            "If the menu contains only part of that complete set, choose Cannot "
+            "be determined."
         ),
         AnswerMode.VISIBLE_POSSIBLE: (
-            "Choose every displayed option that is possible. Ignore possible values "
-            "that are not displayed."
+            "Choose every displayed option that could be true given the stated "
+            "relations. Ignore possible values that are not displayed."
         ),
     }[mode]
     return (

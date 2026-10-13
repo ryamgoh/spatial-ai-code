@@ -393,7 +393,7 @@ Detailed plans:
 | Formal validation and SpatialEval | Prove and validate the encoding; audit the untouched four-option release; validate counter-witnesses; create a separate five-option correction; compare general, reasoning, and compatible spatially fine-tuned LLMs on original, corrected, entailed-only, and ambiguous-only views | Does formal semantics expose consequential ambiguity and change conclusions about LLM capability? |
 | Benchmark calibration and prompting | Use the frozen development pool over query type, direction, ambiguity, proof depth, independent axes, and distractors; survey untuned LLMs; compare direct, generic-CoT, and Natural-axis prompts, with compact-symbol prompting only as a future token-efficiency extension | Is the benchmark valid, solvable, and structurally discriminative? |
 | SFT | Compare answer-only and verified Natural on the primary Qwen3.5-4B; a compact CoS-like token-efficiency arm is future optional work | Do verified worked solutions add value beyond task exposure? |
-| Generalisation and optional extensions | Train on the frozen 8K allocation; report CORE, COMP, and SHIFT with cumulative scores plus cell-level breakdowns; retain SHIFT slice labels and depth curves as diagnostics; evaluate SpatialMap-TQA-Corr separately, with StepGame optional | Do gains extrapolate beyond training depth and construction families, and can an optional extension justify its added cost? |
+| Generalisation and optional extensions | Train on `SpatialEntail-SINGLE-SFT`; report `SpatialEntail-SINGLE-Bench` CORE, COMP, and SHIFT with cumulative scores plus cell-level breakdowns; retain SHIFT slice labels and depth curves as diagnostics; evaluate SpatialMap-TQA-Corr separately, with StepGame optional | Do gains extrapolate beyond training depth and construction families, and can an optional extension justify its added cost? |
 
 Difficulty is not an end in itself. The benchmark should contain solvable,
 discriminative, and hard cells whose performance changes for identifiable
@@ -440,8 +440,9 @@ structural reasons.
 - Report seeds 42 and 43 separately, with their mean and range; use paired
   item-level bootstrap intervals within each seed rather than a strong
   seed-level confidence claim.
-- Treat `SINGLE` as the primary contract, `ALL_POSSIBLE` as a strict set-valued
-  extension, and `VISIBLE_POSSIBLE` as a menu-relative diagnostic.
+- Treat `SpatialEntail-SINGLE` as the completed primary contract,
+  `SpatialEntail-ALL-POSSIBLE` as a strict set-valued extension, and
+  `SpatialEntail-VISIBLE-POSSIBLE` as a menu-relative diagnostic.
 
 ## Success and limits
 

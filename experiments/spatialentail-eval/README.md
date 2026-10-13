@@ -1,12 +1,13 @@
-# SpatialEntail frozen benchmark evaluation
+# SpatialEntail-SINGLE frozen benchmark evaluation
 
 The current provisional measurements and open analysis items are tracked in
 [`RESULTS.md`](RESULTS.md).
 
 This evaluates the untuned Qwen3.5-4B baseline and the answer-only/Natural
-seed-42 adapters on all 4,300 sealed benchmark bases. It selects one answer-only
-row per base, so replayable certificates remain offline audit artifacts and no
-base is evaluated more than once.
+adapters on `SpatialEntail-SINGLE-Bench`: all 4,300 sealed benchmark bases under
+the open-world `SINGLE` answer contract. It selects one answer-only row per
+base, so replayable certificates remain offline audit artifacts and no base is
+evaluated more than once.
 
 Evaluation uses two passes from the same evaluated checkpoint: free generation,
 then constrained answer selection. The current `SINGLE` benchmark permits
@@ -16,7 +17,7 @@ compliance is diagnostic and does not determine semantic accuracy. Each run
 records stage-1 native accuracy and format validity alongside the primary
 stage-2 constrained accuracy.
 
-The benchmark has three formal reporting groups:
+`SpatialEntail-SINGLE-Bench` has three formal reporting groups:
 
 - CORE: 1,300 bases;
 - COMP: 1,200 matched-composition bases; and

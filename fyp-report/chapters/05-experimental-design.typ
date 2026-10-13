@@ -18,20 +18,20 @@ token-efficiency extension rather than a central formal-reasoning claim.
   caption: [Predeclared supervision contrasts.],
 ) <experimental-contrasts>
 
-Verified Natural versus answer-only is the central SFT comparison on the
-primary 4B model. Prompt-matched untuned evaluation provides context rather
-than another SFT arm. Compact Symbolic is optional and proceeds only after its
+Verified Natural versus answer-only is the central `SpatialEntail-SINGLE-SFT`
+comparison on the primary 4B model. Prompt-matched untuned evaluation provides
+context rather than another SFT arm. Compact Symbolic is optional and proceeds only after its
 notation and corpus-wide token reduction are demonstrated. Replayable NDJSON
 answer certificates are not an SFT arm.
 
 == Corpus and Benchmark Roles
 
-SpatialEntail-Train and SpatialEntail-Bench are distinct sealed artifacts. The
-production release contains 8,000 training bases, a nested 4,000-base subset,
-775 development bases, and 4,300 benchmark bases. The reviewed execution
-protocol supersedes the earlier seventeen-thousand-example and 5.8K-test plans.
-Equal cell counts describe an experimental sampling distribution, not the
-population of all spatial reasoning problems.
+`SpatialEntail-SINGLE-SFT` and `SpatialEntail-SINGLE-Bench` are distinct sealed
+artifacts. The production release contains 8,000 training bases, a nested
+4,000-base subset, 775 development bases, and 4,300 benchmark bases. The
+reviewed execution protocol supersedes the earlier seventeen-thousand-example
+and 5.8K-test plans. Equal cell counts describe an experimental sampling
+distribution, not the population of all spatial reasoning problems.
 
 The production assembler records exact role quotas, paired variants,
 contamination inputs, canonical instance signatures, declared skeleton families,

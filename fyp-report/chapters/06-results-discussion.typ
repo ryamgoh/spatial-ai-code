@@ -70,13 +70,77 @@ The sealed production release contains 8,000 Train, 775 Dev, and 4,300 Bench
 bases, together with a 4,000-base nested training subset. Its final Natural
 quality screen contains 485 items, all approved independently by both judges;
 this is a model-based readability screen, not a population-level human rating.
-Model benchmark evaluation remains pending, so no empty result tables are
-included. The central analysis compares answer-only with verified Natural SFT
-on CORE, COMP, and SHIFT. Each internal section will report its cumulative score
-and cell-level breakdown; SHIFT slice labels and depth curves remain diagnostic.
-External datasets remain separate from the internal benchmark. Gold certificates remain offline checks
-throughout. A compact Chain-of-Symbol-like extension is optional only if its
-frozen targets are shorter than Natural corpus-wide.
+The central analysis compares answer-only with verified Natural SFT on CORE,
+COMP, and SHIFT. Each internal section reports its cumulative score and
+cell-level breakdown; SHIFT slice labels and depth curves remain diagnostic.
+External datasets remain separate from the internal benchmark. Gold certificates
+remain offline checks throughout. A compact Chain-of-Symbol-like extension is
+optional only if its frozen targets are shorter than Natural corpus-wide.
+
+== SpatialEntail-SINGLE: First Frozen-Benchmark Result
+
+The first completed internal benchmark run evaluates the prompt-matched untuned
+Qwen3.5-4B baseline, `SpatialEntail-SINGLE-SFT` answer-only SFT, and
+`SpatialEntail-SINGLE-SFT` verified Natural SFT on
+`SpatialEntail-SINGLE-Bench`. The final score uses two-stage evaluation: the
+model first produces its native response, then the same evaluated checkpoint
+performs constrained one-letter answer selection. This makes semantic accuracy
+separate from answer-format compliance.
+
+#figure(
+  table(
+    columns: (1.45fr, auto, auto, auto, auto, auto, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header(
+      table.cell(rowspan: 2)[*Model*],
+      table.cell(colspan: 4)[*Benchmark sections*],
+      table.cell(colspan: 3)[*Answer-selection diagnostics*],
+      [*Overall*],
+      [*CORE*],
+      [*COMP*],
+      [*SHIFT*],
+      [*Stage 1 native*],
+      [*Stage 1 format*],
+      [*Stage 2 constrained*],
+    ),
+    [Untuned Qwen3.5-4B], [91.42%], [96.46%], [98.42%], [83.11%], [76.47%], [0.00%], [91.42%],
+    [Answer-only SFT], [86.02%], [93.92%], [97.58%], [72.61%], [73.44%], [59.79%], [86.02%],
+    [Verified Natural SFT], [97.91%], [99.46%], [99.75%], [95.56%], [95.23%], [94.28%], [97.91%],
+  ),
+  caption: [`SpatialEntail-SINGLE-Bench` accuracy and answer-selection diagnostics. Stage-2 constrained-choice accuracy is the primary metric; stage-1 columns are diagnostics.],
+) <results-frozen-single>
+
+The earlier all-zero untuned row was therefore an extraction artifact. The base
+model often produced semantically usable answers, but did not use the canonical
+`Answer: X` footer expected by the strict stage-1 scorer. Under constrained
+answer selection, the untuned baseline is strong on CORE and COMP, reaching
+96.46% and 98.42% respectively. These sections remain useful sanity checks and
+cell-level diagnostics, but the first run suggests that they are not the main
+source of discrimination for this base model.
+
+SHIFT carries the clearest first-pass signal. Natural SFT reaches 95.56% on
+SHIFT, compared with 83.11% for the untuned baseline and 72.61% for answer-only
+SFT. Answer-only SFT is the ablation arm: it exposes the model to the same
+questions and final labels as Natural SFT, but removes the checked worked
+solution. This controls for ordinary supervised task exposure. Its
+underperformance means that the Natural result cannot be explained by answer
+labels alone. In this run, answer exposure by itself does not improve the
+prompt-matched baseline and appears to reduce robustness on the structurally
+shifted section. Natural SFT is the only tested supervision format that improves
+both the overall benchmark and the SHIFT section.
+
+The strongest remaining weakness is depth-labelled Count. Answer-only is near
+zero on the count-depth cells, the untuned baseline remains between 24% and 40%,
+and Natural ranges from 76% to 100%. Direction depth is close to solved by the
+untuned and Natural models, so the useful difficulty is not simply longer
+prompts. The first result supports a narrower claim than "teaching spatial
+reasoning from scratch": verified Natural supervision improves robustness and
+structural generalisation over both answer-only SFT and the prompt-matched
+untuned baseline on `SpatialEntail-SINGLE-Bench`. The result remains a first
+seed; seed replication and external transfer are still required before making
+stronger claims. The natural next internal extension is
+`SpatialEntail-ALL-POSSIBLE`, with `SpatialEntail-VISIBLE-POSSIBLE` reserved as
+a menu-sensitive diagnostic.
 
 == Discussion and Threats
 

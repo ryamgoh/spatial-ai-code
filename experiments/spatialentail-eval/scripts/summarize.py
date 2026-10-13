@@ -147,7 +147,7 @@ def summarize(prepared_dir: Path) -> dict[str, Any]:
     (prepared_dir / "summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n"
     )
-    lines = ["# SpatialEntail Frozen Benchmark", ""]
+    lines = ["# SpatialEntail-SINGLE Frozen Benchmark", ""]
     lines.append("Stage 2 constrained-choice accuracy is the primary metric.")
     lines.append("")
     lines.append("| Model | Overall | CORE | COMP | SHIFT |")

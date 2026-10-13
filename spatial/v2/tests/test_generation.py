@@ -832,6 +832,39 @@ def test_zero_visible_possible_menu_maps_to_none_of_options() -> None:
     assert "The menu result is none-of-options" in sample.trace
 
 
+@pytest.mark.parametrize(
+    ("answer_mode", "instruction"),
+    (
+        (
+            AnswerMode.ALL_POSSIBLE,
+            "Select every answer that could be true given the stated relations.",
+        ),
+        (
+            AnswerMode.VISIBLE_POSSIBLE,
+            "Select every listed answer that could be true given the stated "
+            "relations; possible answers that are not listed do not affect the "
+            "selection.",
+        ),
+    ),
+)
+def test_set_valued_prompts_define_possible_against_stated_relations(
+    answer_mode: AnswerMode, instruction: str
+) -> None:
+    sample = SpatialGeneratorV2(seed=1711).generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=answer_mode,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            num_entities=4,
+            num_premises=3,
+        )
+    )
+    row = sample.as_sft_row()
+
+    assert f"Question: {instruction} " in sample.prompt
+    assert "could be true given the stated relations" in row["messages"][0]["content"]
+
+
 def test_map_scoped_which_keeps_hidden_objects_in_candidate_universe() -> None:
     prompt = (
         "Consider a map with multiple locations:\n\n"
