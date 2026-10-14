@@ -12,30 +12,33 @@ def _policy(**overrides) -> GenerationPolicy:
     return GenerationPolicy(
         answer_mode=AnswerMode.ALL_POSSIBLE,
         semantic_shape="ambiguous",
+        ordinary_option_target=5,
         **overrides,
     )
 
 
 @pytest.mark.parametrize("query_kind", ["direction", "which", "count"])
 @pytest.mark.parametrize("skeleton", ["mp", "iff", "dje", "csr"])
-@pytest.mark.parametrize("width", [2, 4])
-def test_boolean_skeletons_plant_exactly_width_possible_answers(
-    query_kind, skeleton, width
+@pytest.mark.parametrize("gold_size", [2, 4])
+def test_boolean_skeletons_plant_exactly_gold_size_answers(
+    query_kind, skeleton, gold_size
 ) -> None:
     sample = SpatialGeneratorV2(seed=9200).generate(
         _policy(
             query_kind=query_kind,
             possibility_skeleton=skeleton,
-            possibility_width=width,
-            num_entities=9,
-            num_premises=10,
+            possibility_gold_size=gold_size,
+            num_entities=10,
+            num_premises=11,
         ),
-        max_attempts=40,
+        max_attempts=60,
     )
 
     assert sample.generation_provenance.value == "proof-template-first"
     assert sample.menu_answer.status == "possibilities"
-    assert len(sample.menu_answer.letters) == width
+    assert len(sample.menu_answer.letters) == gold_size
+    assert len(sample.options) == 5
+    assert set(sample.menu_answer.letters) <= set(sample.options)
 
 
 @pytest.mark.parametrize("query_kind", ["direction", "which", "count"])
@@ -46,13 +49,45 @@ def test_depth_skeletons_leave_multiple_answers_open(query_kind, depth) -> None:
             query_kind=query_kind,
             possibility_skeleton="depth",
             possibility_depth=depth,
-            num_entities=2 * depth + 3,
-            num_premises=2 * depth + 4,
+            num_entities=2 * depth + 4,
+            num_premises=2 * depth + 5,
         ),
-        max_attempts=40,
+        max_attempts=60,
     )
 
     assert len(sample.menu_answer.letters) >= 2
+    assert len(sample.options) == 5
+    assert set(sample.menu_answer.letters) <= set(sample.options)
+
+
+@pytest.mark.parametrize("gold_size", [2, 3])
+def test_joint_count_skeleton_skips_intermediate_counts(gold_size) -> None:
+    sample = SpatialGeneratorV2(seed=9200).generate(
+        _policy(
+            query_kind="count",
+            possibility_skeleton="jcr",
+            possibility_gold_size=gold_size,
+            num_entities=9,
+            num_premises=10,
+        ),
+        max_attempts=60,
+    )
+
+    assert sample.analysis.possible_counts == (0, gold_size)
+    assert sample.difficulty["joint_count_dependency"]
+
+
+def test_gold_size_above_four_is_rejected() -> None:
+    with pytest.raises(ValueError, match="between 2 and 4"):
+        GenerationPolicy(
+            answer_mode=AnswerMode.ALL_POSSIBLE,
+            query_kind="which",
+            semantic_shape="ambiguous",
+            possibility_skeleton="mp",
+            possibility_gold_size=5,
+            num_entities=10,
+            num_premises=11,
+        )
 
 
 def test_skeletons_reject_unique_semantics() -> None:
@@ -64,20 +99,3 @@ def test_skeletons_reject_unique_semantics() -> None:
             num_entities=7,
             num_premises=8,
         )
-
-
-@pytest.mark.parametrize("width", [2, 3])
-def test_joint_count_skeleton_skips_intermediate_counts(width) -> None:
-    sample = SpatialGeneratorV2(seed=9200).generate(
-        _policy(
-            query_kind="count",
-            possibility_skeleton="jcr",
-            possibility_width=width,
-            num_entities=8,
-            num_premises=9,
-        ),
-        max_attempts=40,
-    )
-
-    assert sample.analysis.possible_counts == (0, width)
-    assert sample.difficulty["joint_count_dependency"]

@@ -26,8 +26,8 @@ from spatial.v2.study.evaluation import _eval_config, _slug, _task_yaml
 # Qwen3.5-4B tokenizer pin, matched to the SINGLE release.
 _TOKENIZER = "Qwen/Qwen3.5-4B"
 _REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
-# Direction menus show all eight compass options, so the decoder needs A-H.
-_CHOICES = list("ABCDEFGH")
+# Menus are fixed at five options, matching SINGLE and the external benchmarks.
+_CHOICES = list("ABCDE")
 _MODELS = {
     "untuned": None,
     "natural-seed-42": (
@@ -271,8 +271,8 @@ process_results_v2_answer = module.process_results_v2_answer
 Engineering-only bundle. It checks whether the untuned base model already
 solves the draft set-valued cells before any allocation is frozen. Rows are
 freshly generated and admitted through the shared context budget; the answer
-contract is `ALL_POSSIBLE` with full menus, so stage-2 decoding is constrained
-to a nonempty subset of A-H.
+contract is `ALL_POSSIBLE` on a fixed five-option menu, so stage-2 decoding is
+constrained to a nonempty subset of A-E.
 
 Transfer this directory with its ignored `data/` files and the Natural seed-42
 adapter, then submit from the repository root:

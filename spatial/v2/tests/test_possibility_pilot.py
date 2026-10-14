@@ -43,18 +43,18 @@ def test_pilot_bundle_is_set_valued_and_hash_consistent(tmp_path, monkeypatch):
             "natural-seed-42",
         ]
         assert receipt["allow_multiple_answers"] is True
-        assert receipt["choices"] == list("ABCDEFGH")
+        assert receipt["choices"] == list("ABCDE")
         for name, digest in receipt["file_sha256"].items():
             assert (
                 hashlib.sha256((out / name).read_bytes()).hexdigest() == digest
             )
         config = (out / "configs/untuned.yaml").read_text()
         assert "allow_multiple_answers: true" in config
-        assert "- H" in config
+        assert "- E" in config
         for script in (out / "slurm").glob("*.sh"):
             subprocess.run(["bash", "-n", str(script)], check=True)
         row = json.loads(
-            (out / "data/DIR-MP-ALT-W2.jsonl").read_text().splitlines()[0]
+            (out / "data/DIR-MP-ALT-G2.jsonl").read_text().splitlines()[0]
         )
         assert row["metadata"]["answer_mode"] == "all-possible"
         assert len(row["metadata"]["oracle_letters"]) == 2

@@ -183,7 +183,7 @@ class GenerationPolicy:
     composition: str | None = None
     possibility_skeleton: str | None = None
     possibility_depth: int = 2
-    possibility_width: int = 2
+    possibility_gold_size: int = 2
     generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:

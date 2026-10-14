@@ -85,20 +85,23 @@ def validate_possibility_policy(policy: Any) -> None:
         )
     if policy.possibility_depth < 1:
         raise ValueError("possibility_depth must be positive")
-    width = policy.possibility_width
+    gold_size = policy.possibility_gold_size
+    # A fixed five-option menu must show the complete possible set plus at least
+    # one distractor, so the planted gold set can hold at most four answers.
     if policy.possibility_skeleton in {"mp", "iff", "dje", "csr", "jcr"}:
-        maximum = len(Direction) - 1 if policy.query_kind.value == "direction" else 6
-        if not 2 <= width <= maximum:
-            raise ValueError(f"possibility_width must be between 2 and {maximum}")
+        if not 2 <= gold_size <= 4:
+            raise ValueError("possibility_gold_size must be between 2 and 4")
         if policy.query_kind.value != "direction":
-            needed = 3 + width + (1 if policy.possibility_skeleton == "dje" else 0)
+            needed = 3 + gold_size + (1 if policy.possibility_skeleton == "dje" else 0)
             if policy.num_entities < needed:
                 raise ValueError(
-                    f"{policy.possibility_skeleton} with width {width} requires "
-                    f"at least {needed} objects"
+                    f"{policy.possibility_skeleton} with gold size {gold_size} "
+                    f"requires at least {needed} objects"
                 )
-    elif width != 2:
-        raise ValueError("possibility_width applies only to Boolean and jcr skeletons")
+    elif gold_size != 2:
+        raise ValueError(
+            "possibility_gold_size applies only to Boolean and jcr skeletons"
+        )
     if policy.possibility_skeleton in {"depth", "noise"} and policy.possibility_depth < 2:
         raise ValueError("depth and noise skeletons require a chain of at least 2")
     if policy.possibility_skeleton == "noise" and policy.distractor_premises < 1:
@@ -164,7 +167,7 @@ def _direction_skeleton(
             )
         return premises, query, set(chain)
     trigger = direction_constraint(first, second, rng.choice(tuple(Direction)))
-    alternatives = tuple(rng.sample(list(Direction), policy.possibility_width))
+    alternatives = tuple(rng.sample(list(Direction), policy.possibility_gold_size))
     answers = Or(
         tuple(direction_constraint(target, reference, value) for value in alternatives)
     )
@@ -240,10 +243,10 @@ def _membership_skeleton(
         rng.shuffle(candidates)
         return premises, query_type(frozenset({direction}), reference, tuple(candidates)), used
     first, second, *rest = pool
-    width = policy.possibility_width
-    if len(rest) < width:
+    gold_size = policy.possibility_gold_size
+    if len(rest) < gold_size:
         raise PossibilityConstructionError("not enough membership candidates")
-    planted, others = rest[:width], rest[width:]
+    planted, others = rest[:gold_size], rest[gold_size:]
     trigger = direction_constraint(first, second, rng.choice(tuple(Direction)))
     any_planted = Or(tuple(member(candidate) for candidate in planted))
     if name == "mp":
@@ -258,7 +261,7 @@ def _membership_skeleton(
             Not(member(others[0])),
         ]
     elif name == "csr":
-        cases = _exclusive_cases(first, second, width, rng)
+        cases = _exclusive_cases(first, second, gold_size, rng)
         premises = [
             Or(cases),
             *(
@@ -267,7 +270,7 @@ def _membership_skeleton(
             ),
         ]
     elif name == "jcr":
-        # The planted group moves together, so only counts {0, width} are
+        # The planted group moves together, so only counts {0, gold_size} are
         # possible although every planted member is individually contingent.
         premises = [
             Or(

@@ -142,7 +142,7 @@ _GENERATION_KEYS = {
     "answer_mode",
     "possibility_skeleton",
     "possibility_depth",
-    "possibility_width",
+    "possibility_gold_size",
     "ordinary_option_target",
 }
 _QUERY_CODE = {
