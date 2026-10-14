@@ -24,6 +24,20 @@ class _StubTokenizer:
         return list(range(max(1, len(text) // 4)))
 
 
+def test_worker_count_uses_slurm_allocation_and_caps_at_cell_count(monkeypatch):
+    monkeypatch.setenv("SLURM_CPUS_PER_TASK", "256")
+    assert pilot._resolve_worker_count(None, cell_count=34) == 34
+    assert pilot._resolve_worker_count(8, cell_count=34) == 8
+
+
+def test_worker_count_rejects_invalid_values(monkeypatch):
+    monkeypatch.setenv("SLURM_CPUS_PER_TASK", "not-a-number")
+    with pytest.raises(ValueError, match="SLURM_CPUS_PER_TASK"):
+        pilot._resolve_worker_count(None, cell_count=34)
+    with pytest.raises(ValueError, match="workers must be positive"):
+        pilot._resolve_worker_count(0, cell_count=34)
+
+
 def test_pilot_bundle_is_set_valued_and_hash_consistent(tmp_path, monkeypatch):
     monkeypatch.setattr(pilot, "_tokenizer", lambda: _StubTokenizer())
     repo_root = Path(__file__).resolve().parents[3]
@@ -36,6 +50,7 @@ def test_pilot_bundle_is_set_valued_and_hash_consistent(tmp_path, monkeypatch):
             out,
             samples_per_cell=1,
             seed=42,
+            workers=2,
         )
         assert len(receipt["tasks"]) == 34
         assert [job["name"] for job in receipt["jobs"]] == [
@@ -44,6 +59,7 @@ def test_pilot_bundle_is_set_valued_and_hash_consistent(tmp_path, monkeypatch):
         ]
         assert receipt["allow_multiple_answers"] is True
         assert receipt["choices"] == list("ABCDE")
+        assert receipt["generation_workers"] == 2
         for name, digest in receipt["file_sha256"].items():
             assert (
                 hashlib.sha256((out / name).read_bytes()).hexdigest() == digest

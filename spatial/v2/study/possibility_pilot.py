@@ -13,12 +13,20 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from spatial.v2.benchmark_registry import CellReadiness, load_benchmark_registry
+from spatial.v2.benchmark_registry import (
+    BenchmarkCell,
+    CellReadiness,
+    load_benchmark_registry,
+)
 from spatial.v2.context_budget import ContextBudget, admit_row_group
 from spatial.v2.generation import SpatialGeneratorV2
 from spatial.v2.study.evaluation import _eval_config, _slug, _task_yaml
@@ -40,6 +48,96 @@ def _tokenizer():
     from transformers import AutoTokenizer
 
     return AutoTokenizer.from_pretrained(_TOKENIZER, revision=_REVISION)
+
+
+def _resolve_worker_count(requested: int | None, *, cell_count: int) -> int:
+    """Resolve usable generation workers without exceeding independent cells."""
+    if cell_count <= 0:
+        raise ValueError("cell_count must be positive")
+    raw: int | str = (
+        requested
+        if requested is not None
+        else os.environ.get("SLURM_CPUS_PER_TASK", "1")
+    )
+    try:
+        workers = int(raw)
+    except (TypeError, ValueError) as exc:
+        source = "workers" if requested is not None else "SLURM_CPUS_PER_TASK"
+        raise ValueError(f"{source} must be an integer, got {raw!r}") from exc
+    if workers <= 0:
+        raise ValueError("workers must be positive")
+    return min(workers, cell_count)
+
+
+def _generate_cell_rows(
+    cell: BenchmarkCell,
+    *,
+    samples_per_cell: int,
+    seed: int,
+) -> list[dict[str, Any]]:
+    """Generate one independent cell inside a worker process."""
+    generator = SpatialGeneratorV2(seed)
+    policy = cell.generation_policy()
+    return [
+        generator.generate(policy, max_attempts=200).as_sft_row()
+        for _ in range(samples_per_cell)
+    ]
+
+
+def _generate_ready_cells(
+    ready: list[BenchmarkCell],
+    *,
+    samples_per_cell: int,
+    seed: int,
+    workers: int,
+) -> dict[str, list[dict[str, Any]]]:
+    """Generate cells serially or in a bounded process pool."""
+    started = time.perf_counter()
+    generated: dict[str, list[dict[str, Any]]] = {}
+    print(
+        f"Generating {len(ready)} cells with {workers} worker process(es)",
+        file=sys.stderr,
+        flush=True,
+    )
+
+    if workers == 1:
+        for completed, (index, cell) in enumerate(enumerate(ready), start=1):
+            generated[cell.id] = _generate_cell_rows(
+                cell,
+                samples_per_cell=samples_per_cell,
+                seed=seed + index,
+            )
+            print(
+                f"[{completed}/{len(ready)}] generated {cell.id}",
+                file=sys.stderr,
+                flush=True,
+            )
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            futures = {
+                executor.submit(
+                    _generate_cell_rows,
+                    cell,
+                    samples_per_cell=samples_per_cell,
+                    seed=seed + index,
+                ): cell
+                for index, cell in enumerate(ready)
+            }
+            for completed, future in enumerate(as_completed(futures), start=1):
+                cell = futures[future]
+                try:
+                    generated[cell.id] = future.result()
+                except Exception as exc:
+                    raise RuntimeError(f"cell {cell.id}: generation failed") from exc
+                print(
+                    f"[{completed}/{len(ready)}] generated {cell.id}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+
+    elapsed = time.perf_counter() - started
+    print(f"Generation completed in {elapsed:.1f}s", file=sys.stderr, flush=True)
+    return generated
 
 
 def _pilot_wrapper(
@@ -121,6 +219,7 @@ def prepare_pilot(
     max_new_tokens: int = 12288,
     eval_max_tokens: int = 16384,
     repo_root: Path | None = None,
+    workers: int | None = None,
 ) -> dict[str, Any]:
     root = (repo_root or Path(__file__).resolve().parents[3]).resolve()
     output = output.resolve()
@@ -139,8 +238,6 @@ def prepare_pilot(
         max_new_tokens=max_new_tokens,
         tokenizer_revision=_REVISION,
     )
-    tokenizer = _tokenizer()
-
     files: dict[str, str] = {}
     task_records: list[dict[str, Any]] = []
     task_names: list[str] = []
@@ -160,13 +257,17 @@ process_results_v2_answer = module.process_results_v2_answer
 """
 
     ready = [c for c in registry.cells if c.readiness is CellReadiness.READY]
-    for index, cell in enumerate(ready):
-        generator = SpatialGeneratorV2(seed + index)
-        policy = cell.generation_policy()
+    generation_workers = _resolve_worker_count(workers, cell_count=len(ready))
+    generated = _generate_ready_cells(
+        ready,
+        samples_per_cell=samples_per_cell,
+        seed=seed,
+        workers=generation_workers,
+    )
+    tokenizer = _tokenizer()
+    for cell in ready:
         rows: list[dict[str, Any]] = []
-        for _ in range(samples_per_cell):
-            sample = generator.generate(policy, max_attempts=200)
-            row = sample.as_sft_row()
+        for row in generated[cell.id]:
             admission = admit_row_group([row], tokenizer, budget)
             if not admission.accepted:
                 raise RuntimeError(
@@ -240,6 +341,7 @@ process_results_v2_answer = module.process_results_v2_answer
         "registry_fingerprint": registry.fingerprint,
         "samples_per_cell": samples_per_cell,
         "seed": seed,
+        "generation_workers": generation_workers,
         "total_rows": total_rows,
         "choices": _CHOICES,
         "allow_multiple_answers": True,
@@ -292,12 +394,18 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--samples-per-cell", type=int, default=25)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--workers",
+        type=int,
+        help="generation processes (default: SLURM_CPUS_PER_TASK, otherwise 1)",
+    )
     args = parser.parse_args()
     receipt = prepare_pilot(
         args.registry,
         args.out,
         samples_per_cell=args.samples_per_cell,
         seed=args.seed,
+        workers=args.workers,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
 
