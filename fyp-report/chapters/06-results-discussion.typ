@@ -77,15 +77,16 @@ External datasets remain separate from the internal benchmark. Gold certificates
 remain offline checks throughout. A compact Chain-of-Symbol-like extension is
 optional only if its frozen targets are shorter than Natural corpus-wide.
 
-== SpatialEntail-SINGLE: First Frozen-Benchmark Result
+== SpatialEntail-SINGLE: Two-Seed Frozen-Benchmark Result
 
-The first completed internal benchmark run evaluates the prompt-matched untuned
-Qwen3.5-4B baseline, `SpatialEntail-SINGLE-SFT` answer-only SFT, and
-`SpatialEntail-SINGLE-SFT` verified Natural SFT on
-`SpatialEntail-SINGLE-Bench`. The final score uses two-stage evaluation: the
-model first produces its native response, then the same evaluated checkpoint
-performs constrained one-letter answer selection. This makes semantic accuracy
-separate from answer-format compliance.
+The completed internal benchmark evaluates the prompt-matched untuned
+Qwen3.5-4B baseline and two training seeds each of
+`SpatialEntail-SINGLE-SFT` answer-only and verified Natural SFT on the same
+4,300-example `SpatialEntail-SINGLE-Bench`. The final score uses two-stage
+evaluation: the model first produces its native response, then the same
+evaluated checkpoint performs constrained one-letter answer selection. This
+separates semantic accuracy from answer-format compliance without changing the
+checkpoint between stages.
 
 #figure(
   table(
@@ -104,43 +105,165 @@ separate from answer-format compliance.
       [*Stage 2 constrained*],
     ),
     [Untuned Qwen3.5-4B], [91.42%], [96.46%], [98.42%], [83.11%], [76.47%], [0.00%], [91.42%],
-    [Answer-only SFT], [86.02%], [93.92%], [97.58%], [72.61%], [73.44%], [59.79%], [86.02%],
-    [Verified Natural SFT], [97.91%], [99.46%], [99.75%], [95.56%], [95.23%], [94.28%], [97.91%],
+    [Answer-only SFT, seed 42], [86.02%], [93.92%], [97.58%], [72.61%], [73.44%], [59.79%], [86.02%],
+    [Answer-only SFT, seed 43], [99.44%], [99.92%], [99.75%], [98.89%], [97.63%], [96.63%], [99.44%],
+    [Verified Natural SFT, seed 42], [97.91%], [99.46%], [99.75%], [95.56%], [95.23%], [94.28%], [97.91%],
+    [Verified Natural SFT, seed 43], [96.77%], [99.54%], [99.67%], [92.83%], [96.14%], [98.07%], [96.77%],
   ),
-  caption: [`SpatialEntail-SINGLE-Bench` accuracy and answer-selection diagnostics. Stage-2 constrained-choice accuracy is the primary metric; stage-1 columns are diagnostics.],
+  caption: [`SpatialEntail-SINGLE-Bench` accuracy across two training seeds. Stage-2 constrained-choice accuracy is the primary metric; stage-1 columns are diagnostics.],
 ) <results-frozen-single>
 
-The earlier all-zero untuned row was therefore an extraction artifact. The base
-model often produced semantically usable answers, but did not use the canonical
-`Answer: X` footer expected by the strict stage-1 scorer. Under constrained
-answer selection, the untuned baseline is strong on CORE and COMP, reaching
-96.46% and 98.42% respectively. These sections remain useful sanity checks and
-cell-level diagnostics, but the first run suggests that they are not the main
-source of discrimination for this base model.
+The earlier all-zero untuned row was an extraction artifact. The base model
+often produced semantically usable answers, but did not use the canonical
+`Answer: X` footer expected by the strict stage-1 format scorer. Under
+constrained answer selection, the untuned baseline is already strong on CORE
+and COMP, reaching 96.46% and 98.42% respectively. These sections remain useful
+sanity checks and cell-level diagnostics, but are close to saturation for this
+base model.
 
-SHIFT carries the clearest first-pass signal. Natural SFT reaches 95.56% on
-SHIFT, compared with 83.11% for the untuned baseline and 72.61% for answer-only
-SFT. Answer-only SFT is the ablation arm: it exposes the model to the same
-questions and final labels as Natural SFT, but removes the checked worked
-solution. This controls for ordinary supervised task exposure. Its
-underperformance means that the Natural result cannot be explained by answer
-labels alone. In this run, answer exposure by itself does not improve the
-prompt-matched baseline and appears to reduce robustness on the structurally
-shifted section. Natural SFT is the only tested supervision format that improves
-both the overall benchmark and the SHIFT section.
+#figure(
+  table(
+    columns: (1.45fr, auto, auto, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header(
+      [*Supervision arm*],
+      [*Mean overall*],
+      [*Observed overall range*],
+      [*Mean SHIFT*],
+      [*Observed SHIFT range*],
+    ),
+    [Answer-only SFT], [92.73%], [86.02--99.44%], [85.75%], [72.61--98.89%],
+    [Verified Natural SFT], [97.34%], [96.77--97.91%], [94.19%], [92.83--95.56%],
+  ),
+  caption: [Descriptive two-seed means and observed ranges. Two seeds are insufficient for a strong variance estimate.],
+) <results-frozen-single-seeds>
 
-The strongest remaining weakness is depth-labelled Count. Answer-only is near
-zero on the count-depth cells, the untuned baseline remains between 24% and 40%,
-and Natural ranges from 76% to 100%. Direction depth is close to solved by the
-untuned and Natural models, so the useful difficulty is not simply longer
-prompts. The first result supports a narrower claim than "teaching spatial
-reasoning from scratch": verified Natural supervision improves robustness and
-structural generalisation over both answer-only SFT and the prompt-matched
-untuned baseline on `SpatialEntail-SINGLE-Bench`. The result remains a first
-seed; seed replication and external transfer are still required before making
-stronger claims. The natural next internal extension is
-`SpatialEntail-ALL-POSSIBLE`, with `SpatialEntail-VISIBLE-POSSIBLE` reserved as
-a menu-sensitive diagnostic.
+The two seeds change the interpretation of the ablation. Verified Natural SFT
+is consistently strong: seeds 42 and 43 score 97.91% and 96.77% overall, both
+above the 91.42% untuned baseline. Its two-seed mean is 97.34%, with an observed
+range of 1.14 percentage points. On SHIFT, both Natural checkpoints improve on
+the 83.11% baseline, producing a 94.19% mean and a 2.72-point observed range.
+This is evidence of replication across the two tested seeds, although it is not
+a population-level estimate of seed variance.
+
+Answer-only SFT behaves very differently. Seed 42 falls below the untuned model
+at 86.02%, whereas seed 43 is the strongest individual checkpoint at 99.44%,
+making only 24 errors across 4,300 examples. The corresponding 13.42-point
+overall range expands to 26.28 points on SHIFT. The seed-43 result is not merely
+a constrained-decoding rescue: it already reaches 97.63% native stage-1
+accuracy and 96.63% canonical-format validity. Answer-only therefore remains a
+valid matched-exposure ablation, but the two runs do not support the earlier
+claim that answer labels alone cannot produce the improvement. Instead, they
+show that answer-only supervision can reach very high accuracy while being much
+less stable across the observed seeds. Natural has the stronger two-seed mean
+and substantially narrower observed range, but does not win every individual
+run.
+
+SHIFT still carries most of the discriminative signal. Natural seed 43 remains
+near-perfect on CORE and COMP but falls with unseen depth: Count declines to
+72%, 70%, and 66% at depths 6--8, while Selection reaches 78%, 72%, and 68%.
+Natural seed 42 is stronger on these depth cells, yet both Natural checkpoints
+remain above the untuned SHIFT aggregate. Answer-only exposes the instability
+most clearly: seed 42 is near zero on depth-labelled Count, while seed 43 scores
+between 92% and 98% on the same cells. Direction depth is close to solved in
+most conditions, so the remaining difficulty is not simply longer prompts but
+deep Selection and Count reasoning.
+
+The result supports a narrower claim than "teaching spatial reasoning from
+scratch": on `SpatialEntail-SINGLE-Bench`, verified Natural supervision gives
+consistently strong performance and structural-shift improvement across the two
+tested seeds, whereas answer-only supervision has a higher observed sensitivity
+to training seed. The high untuned score and near-saturated tuned results also
+limit further discrimination under the single-answer contract. This motivates
+`SpatialEntail-ALL-POSSIBLE` as the next harder internal benchmark, with
+`SpatialEntail-VISIBLE-POSSIBLE` retained as a menu-sensitive diagnostic;
+external transfer remains necessary for broader generalisation claims.
+
+== SpatialEntail-ALL-POSSIBLE: Zero-Shot Contract-Transfer Pilot
+
+The next diagnostic asks whether a checkpoint trained only on
+`SpatialEntail-SINGLE-SFT` transfers to a set-valued answer contract. The draft
+`SpatialEntail-ALL-POSSIBLE` calibration pilot contains 34 cells with 25 fresh
+examples per cell, for 850 examples in total. Every question displays exactly
+five options, but the correct output is the complete non-empty subset of
+options that remain possible. This is an engineering pilot rather than a frozen
+benchmark: its purpose is to test transfer and cell difficulty before fixing a
+final allocation.
+
+#figure(
+  table(
+    columns: (1.45fr, auto, auto, auto, auto, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header(
+      [*Model*],
+      [*Exact set*],
+      [*Stage 1 exact*],
+      [*Stage 1 format*],
+      [*Gold covered*],
+      [*Over-inclusive*],
+      [*Missing gold*],
+    ),
+    [Untuned Qwen3.5-4B], [93.65%], [65.65%], [0.00%], [94.94%], [1.29%], [5.06%],
+    [Natural SINGLE-SFT, seed 42], [14.59%], [10.71%], [68.00%], [15.88%], [1.29%], [84.12%],
+  ),
+  caption: [`SpatialEntail-ALL-POSSIBLE` zero-shot transfer pilot. Stage-2 constrained exact-set accuracy is primary. Gold-covered predictions contain every correct option; over-inclusive predictions cover the gold set but add at least one option; missing-gold predictions omit at least one correct option.],
+) <results-all-possible-transfer>
+
+The untuned model reaches 93.65% exact-set accuracy, so expanding the answer
+space alone did not make the current draft difficult for the base model. Its
+stage-1 exact-set score is lower at 65.65%, while canonical stage-1 format
+validity is zero; as in SINGLE, the second constrained pass separates semantic
+selection from a preferred answer footer. The 94.94% gold-covered rate and
+1.29% over-inclusive rate show that its remaining errors are not explained by
+simply selecting every option.
+
+The Natural seed-42 adapter behaves in the opposite way. It produces the
+canonical stage-1 format on 68.00% of examples, yet reaches only 10.71% native
+and 14.59% constrained exact-set accuracy. Its predictions omit at least one
+gold answer on 84.12% of examples, while only 1.29% are over-inclusive. The
+failure is therefore not primarily formatting or indiscriminate over-selection.
+It is consistent with answer-contract specialisation: the adapter was trained
+to resolve and emit one answer under SINGLE, then was asked zero-shot to return
+a complete set.
+
+#figure(
+  table(
+    columns: (1.45fr, auto, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header([*Slice*], [*$N$*], [*Untuned*], [*Natural seed 42*]),
+    [Direction], [275], [89.09%], [13.45%],
+    [Selection], [275], [99.27%], [30.18%],
+    [Count], [300], [92.67%], [1.33%],
+    [Gold set size 2], [325], [99.08%], [28.00%],
+    [Gold set size 3], [25], [100.00%], [0.00%],
+    [Gold set size 4], [300], [93.67%], [6.33%],
+    [Depth 3], [75], [85.33%], [8.00%],
+    [Depth 5], [75], [77.33%], [6.67%],
+    [Joint Count reasoning], [50], [100.00%], [2.00%],
+    [Removable noise], [50], [92.00%], [6.00%],
+  ),
+  caption: [ALL-POSSIBLE exact-set accuracy by query family and overlapping structural diagnostics.],
+) <results-all-possible-breakdown>
+
+Count shows the sharpest transfer failure: the untuned model scores 92.67%,
+whereas Natural seed 42 scores 1.33%. Natural also falls from 28.00% with two
+gold answers to 6.33% with four, and reaches zero on the small three-answer
+Joint Count cell. The same adapter remains strong on the frozen SINGLE
+benchmark, so this pilot does not establish a general loss of spatial reasoning
+or a defect in Natural worked solutions. It establishes the narrower point that
+successful SINGLE SFT does not automatically transfer to complete set-valued
+prediction.
+
+No answer-only arm or additional training seed is added to this calibration
+pilot. Answer-only is the matched-supervision ablation for the completed SINGLE
+study; this pilot instead tests whether the selected Natural SINGLE checkpoint
+and the untuned base already satisfy a new answer contract. Repeating the same
+diagnostic would not address the more immediate design result: the Natural
+checkpoint needs explicit multi-answer exposure, while the untuned model nearly
+saturates the current draft. Consequently, these values are retained as pilot
+evidence rather than final benchmark scores. The ALL-POSSIBLE cells must be
+audited and hardened before freezing, and any subsequent MULTI-SFT study must
+evaluate set completeness directly.
 
 == Discussion and Threats
 

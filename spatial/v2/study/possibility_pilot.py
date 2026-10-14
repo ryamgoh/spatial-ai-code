@@ -3,9 +3,9 @@
 This is an engineering-only bundle, not a sealed benchmark. It generates a
 small number of rows per draft cell, admits them through the shared context
 budget, and writes lm-eval tasks, two model configs (untuned and the Natural
-seed-42 adapter), Slurm wrappers, and a summary job. The point is to see
-whether the untuned base model already solves the set-valued cells before any
-allocation is frozen.
+seed-42 adapter), and Slurm wrappers. A repository-level summarizer aggregates
+the completed results. The point is to see whether the untuned base model
+already solves the set-valued cells before any allocation is frozen.
 """
 
 from __future__ import annotations
@@ -334,6 +334,7 @@ process_results_v2_answer = module.process_results_v2_answer
         "spatial/v2/study/possibility_pilot.py",
         "spatial/v2/possibility.py",
         "experiments/spatialentail-eval/jobs/eval.sh",
+        "experiments/spatialentail-allpossible-pilot/scripts/summarize.py",
     )
     receipt = {
         "schema": "spatialentail-all-possible-pilot-v1",
@@ -382,6 +383,13 @@ adapter, then submit from the repository root:
 ```sh
 sbatch experiments/spatialentail-allpossible-pilot/prepared/slurm/untuned.sh
 sbatch experiments/spatialentail-allpossible-pilot/prepared/slurm/natural-seed-42.sh
+```
+
+After both jobs complete, aggregate the exact-set and diagnostic results:
+
+```sh
+python3 experiments/spatialentail-allpossible-pilot/scripts/summarize.py \
+  experiments/spatialentail-allpossible-pilot/prepared
 ```
 """
     )
