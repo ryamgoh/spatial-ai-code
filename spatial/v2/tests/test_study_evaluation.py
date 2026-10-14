@@ -85,6 +85,8 @@ def test_frozen_evaluation_selects_one_answer_row_per_base(tmp_path: Path) -> No
         "untuned",
         "answer-only-seed-42",
         "natural-seed-42",
+        "answer-only-seed-43",
+        "natural-seed-43",
     ]
     for config_path in sorted((output / "configs").glob("*.yaml")):
         assert "allow_multiple_answers: false" in config_path.read_text()

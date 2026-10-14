@@ -28,6 +28,12 @@ MODEL_SPECS = {
     "natural-seed-42": (
         "experiments/spatialentail-sft/prepared-final/models/natural-seed-42"
     ),
+    "answer-only-seed-43": (
+        "experiments/spatialentail-sft/prepared-final/models/answer-only-seed-43"
+    ),
+    "natural-seed-43": (
+        "experiments/spatialentail-sft/prepared-final/models/natural-seed-43"
+    ),
 }
 _SAFE = re.compile(r"[^a-z0-9]+")
 
@@ -103,6 +109,8 @@ def _eval_config(
     max_model_len: int,
     max_new_tokens: int,
     lora_path: str | None,
+    choices: list[str] | None = None,
+    allow_multiple_answers: bool = False,
 ) -> str:
     config = {
         "model": "vllm_staged_pass",
@@ -116,8 +124,8 @@ def _eval_config(
             "dtype": "bfloat16",
             "gpu_memory_utilization": 0.85,
             "max_model_len": max_model_len,
-            "choices": list("ABCDE"),
-            "allow_multiple_answers": False,
+            "choices": choices or list("ABCDE"),
+            "allow_multiple_answers": allow_multiple_answers,
             "record_stage1": True,
             "add_special_tokens": False,
         },
