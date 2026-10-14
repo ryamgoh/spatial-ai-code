@@ -153,3 +153,19 @@ certificate, and passed the prompt round trip.
    transfer to the stricter contract.
 5. Build the paired `SpatialEntail-VISIBLE-POSSIBLE` probe from the same bases
    with partial menus.
+
+The engineering pool can be prepared as a detached one-hour Slurm job. The
+script requests CPU and memory only, uses the cluster's default partition, and
+sends END/FAIL/TIME_LIMIT mail to the configured NUS address:
+
+```sh
+sbatch experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+```
+
+Override the output or sample count without editing the script:
+
+```sh
+PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-v2 \
+SAMPLES_PER_CELL=25 \
+sbatch experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+```
