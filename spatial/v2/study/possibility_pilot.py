@@ -11,8 +11,10 @@ already solves the set-valued cells before any allocation is frozen.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
+import math
 import os
 import sys
 import time
@@ -30,12 +32,23 @@ from spatial.v2.benchmark_registry import (
 from spatial.v2.context_budget import ContextBudget, admit_row_group
 from spatial.v2.generation import SpatialGeneratorV2
 from spatial.v2.study.evaluation import _eval_config, _slug, _task_yaml
+from spatial.v2.supervision_controls import apply_supervision_arm
 
 # Qwen3.5-4B tokenizer pin, matched to the SINGLE release.
 _TOKENIZER = "Qwen/Qwen3.5-4B"
 _REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 # Menus are fixed at five options, matching SINGLE and the external benchmarks.
 _CHOICES = list("ABCDE")
+_LENGTH_THRESHOLDS = (12288, 16384, 20000, 24576, 32768)
+_GENERATION_ENVIRONMENT_FILES = (
+    "spatial/v2/generation.py",
+    "spatial/v2/possibility.py",
+    "spatial/v2/proofs.py",
+    "spatial/v2/answer_certificates.py",
+    "spatial/v2/which_certificates.py",
+    "spatial/v2/solver.py",
+    "spatial/v2/text.py",
+)
 _MODELS = {
     "untuned": None,
     "natural-seed-42": (
@@ -87,10 +100,160 @@ def _generate_cell_rows(
     """Generate one independent cell inside a worker process."""
     generator = SpatialGeneratorV2(seed)
     policy = cell.generation_policy()
-    return [
-        generator.generate(policy, max_attempts=200).as_sft_row()
-        for _ in range(samples_per_cell)
-    ]
+    rows = []
+    for _ in range(samples_per_cell):
+        sample = generator.generate(policy, max_attempts=200)
+        rows.append(sample.as_sft_row(include_audit=True))
+    return rows
+
+
+def _evaluation_row(natural_row: dict[str, Any]) -> dict[str, Any]:
+    row = apply_supervision_arm(natural_row, "answer-only")
+    row.pop("audit", None)
+    return row
+
+
+def _measure_natural_row(row: dict[str, Any], tokenizer: Any) -> dict[str, int]:
+    messages = row["messages"]
+    assistant = messages[-1]["content"]
+    training_text = tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=False
+    )
+    evaluation_prompt = tokenizer.apply_chat_template(
+        messages[:-1], tokenize=False, add_generation_prompt=True
+    )
+    return {
+        "training_model_tokens": len(
+            tokenizer.encode(training_text, add_special_tokens=False)
+        ),
+        "evaluation_prompt_model_tokens": len(
+            tokenizer.encode(evaluation_prompt, add_special_tokens=False)
+        ),
+        "natural_target_model_tokens": len(
+            tokenizer.encode(assistant, add_special_tokens=False)
+        ),
+    }
+
+
+def _distribution(values: list[int]) -> dict[str, Any]:
+    ordered = sorted(values)
+    if not ordered:
+        raise ValueError("length statistics require at least one value")
+
+    def percentile(fraction: float) -> int:
+        return ordered[max(0, math.ceil(fraction * len(ordered)) - 1)]
+
+    return {
+        "count": len(ordered),
+        "min": ordered[0],
+        "p50": percentile(0.50),
+        "p90": percentile(0.90),
+        "p95": percentile(0.95),
+        "p99": percentile(0.99),
+        "max": ordered[-1],
+        "over_threshold": {
+            str(threshold): sum(value > threshold for value in ordered)
+            for threshold in _LENGTH_THRESHOLDS
+        },
+    }
+
+
+def _length_statistics(measurements: dict[str, list[dict[str, int]]]) -> dict[str, Any]:
+    fields = (
+        "training_model_tokens",
+        "evaluation_prompt_model_tokens",
+        "natural_target_model_tokens",
+    )
+    flattened = [item for rows in measurements.values() for item in rows]
+    return {
+        "schema": "spatialentail-natural-length-statistics-v1",
+        "thresholds": list(_LENGTH_THRESHOLDS),
+        "overall": {
+            field: _distribution([item[field] for item in flattened])
+            for field in fields
+        },
+        "cells": {
+            cell_id: {
+                field: _distribution([item[field] for item in rows])
+                for field in fields
+            }
+            for cell_id, rows in sorted(measurements.items())
+        },
+    }
+
+
+def _generation_cache_path(output: Path) -> Path:
+    return output.with_name(output.name + ".generation-cache")
+
+
+def _cache_contract(
+    root: Path,
+    registry_fingerprint: str,
+    *,
+    samples_per_cell: int,
+    seed: int,
+) -> dict[str, Any]:
+    return {
+        "schema": "spatialentail-all-possible-generation-cache-v1",
+        "registry_fingerprint": registry_fingerprint,
+        "samples_per_cell": samples_per_cell,
+        "seed": seed,
+        "environment_sha256": {
+            name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+            for name in _GENERATION_ENVIRONMENT_FILES
+        },
+    }
+
+
+def _write_generation_cache(
+    cache: Path,
+    generated: dict[str, list[dict[str, Any]]],
+    contract: dict[str, Any],
+) -> None:
+    if cache.exists():
+        raise FileExistsError(f"generation cache already exists: {cache}")
+    source = cache / "source-natural"
+    source.mkdir(parents=True)
+    file_sha256 = {}
+    for cell_id, rows in sorted(generated.items()):
+        content = "".join(
+            json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in rows
+        )
+        name = f"source-natural/{cell_id}.jsonl"
+        (cache / name).write_text(content)
+        file_sha256[name] = hashlib.sha256(content.encode()).hexdigest()
+    manifest = {**contract, "file_sha256": file_sha256}
+    (cache / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    )
+
+
+def _load_generation_cache(
+    cache: Path,
+    contract: dict[str, Any],
+    cell_ids: list[str],
+) -> dict[str, list[dict[str, Any]]]:
+    manifest_path = cache / "manifest.json"
+    if not manifest_path.is_file():
+        raise ValueError(f"incomplete generation cache: {cache}")
+    manifest = json.loads(manifest_path.read_text())
+    actual_contract = {key: manifest.get(key) for key in contract}
+    if actual_contract != contract:
+        raise ValueError(f"generation cache contract changed: {cache}")
+    generated = {}
+    for cell_id in cell_ids:
+        name = f"source-natural/{cell_id}.jsonl"
+        path = cache / name
+        content = path.read_text()
+        if hashlib.sha256(content.encode()).hexdigest() != manifest[
+            "file_sha256"
+        ].get(name):
+            raise ValueError(f"generation cache file changed: {name}")
+        rows = [json.loads(line) for line in content.splitlines()]
+        if len(rows) != int(contract["samples_per_cell"]):
+            raise ValueError(f"generation cache row count changed: {name}")
+        generated[cell_id] = rows
+    return generated
 
 
 def _generate_ready_cells(
@@ -242,7 +405,7 @@ def prepare_pilot(
     registry = load_benchmark_registry(registry_path)
     budget = ContextBudget(
         tokenizer_name=_TOKENIZER,
-        train_max_tokens=max_new_tokens,
+        train_max_tokens=eval_max_tokens,
         eval_max_tokens=eval_max_tokens,
         max_new_tokens=max_new_tokens,
         tokenizer_revision=_REVISION,
@@ -267,29 +430,59 @@ process_results_v2_answer = module.process_results_v2_answer
 
     ready = [c for c in registry.cells if c.readiness is CellReadiness.READY]
     generation_workers = _resolve_worker_count(workers, cell_count=len(ready))
-    generated = _generate_ready_cells(
-        ready,
+    cache = _generation_cache_path(output)
+    cache_contract = _cache_contract(
+        root,
+        registry.fingerprint,
         samples_per_cell=samples_per_cell,
         seed=seed,
-        workers=generation_workers,
     )
+    if cache.exists():
+        print(f"Reusing generation cache at {cache}", file=sys.stderr, flush=True)
+        generated = _load_generation_cache(
+            cache, cache_contract, [cell.id for cell in ready]
+        )
+    else:
+        generated = _generate_ready_cells(
+            ready,
+            samples_per_cell=samples_per_cell,
+            seed=seed,
+            workers=generation_workers,
+        )
+        _write_generation_cache(cache, generated, cache_contract)
+        print(f"Saved generation cache at {cache}", file=sys.stderr, flush=True)
     tokenizer = _tokenizer()
+    measurements: dict[str, list[dict[str, int]]] = {}
     for cell in ready:
         rows: list[dict[str, Any]] = []
-        for row in generated[cell.id]:
-            admission = admit_row_group([row], tokenizer, budget)
+        natural_rows = []
+        cell_measurements = []
+        for cached_row in generated[cell.id]:
+            natural_row = copy.deepcopy(cached_row)
+            measurement = _measure_natural_row(natural_row, tokenizer)
+            natural_row.setdefault("metadata", {})["length_diagnostics"] = measurement
+            natural_rows.append(natural_row)
+            cell_measurements.append(measurement)
+            evaluation_row = _evaluation_row(natural_row)
+            admission = admit_row_group([evaluation_row], tokenizer, budget)
             if not admission.accepted:
                 raise RuntimeError(
-                    f"cell {cell.id}: row exceeded the context budget: "
+                    f"cell {cell.id}: evaluation row exceeded the context budget: "
                     f"{admission.rejection_reasons}"
                 )
             rows.append(admission.rows[0])
+        measurements[cell.id] = cell_measurements
         total_rows += len(rows)
         task_name = f"spatialentail_allpossible_{_slug(cell.id)}"
         data_name = f"data/{cell.id}.jsonl"
+        source_name = f"source-natural/{cell.id}.jsonl"
         data_path = "../" + str((output / data_name).relative_to(root))
         files[data_name] = "".join(
             json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n" for row in rows
+        )
+        files[source_name] = "".join(
+            json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
+            for row in natural_rows
         )
         files[f"tasks/{task_name}.yaml"] = _task_yaml(task_name, data_path, max_new_tokens)
         task_records.append(
@@ -304,6 +497,11 @@ process_results_v2_answer = module.process_results_v2_answer
             }
         )
         task_names.append(task_name)
+
+    length_statistics = _length_statistics(measurements)
+    files["target-length-stats.json"] = (
+        json.dumps(length_statistics, indent=2, sort_keys=True) + "\n"
+    )
 
     include_path = "../" + str((output / "tasks").relative_to(root))
     jobs = []
@@ -343,6 +541,7 @@ process_results_v2_answer = module.process_results_v2_answer
         "spatial/v2/study/evaluation.py",
         "spatial/v2/study/possibility_pilot.py",
         "spatial/v2/possibility.py",
+        "spatial/v2/supervision_controls.py",
         "experiments/spatialentail-eval/jobs/eval.sh",
         "experiments/spatialentail-allpossible-pilot/scripts/summarize.py",
     )
@@ -356,6 +555,15 @@ process_results_v2_answer = module.process_results_v2_answer
         "total_rows": total_rows,
         "choices": _CHOICES,
         "allow_multiple_answers": True,
+        "context_budget": {
+            "tokenizer_name": budget.tokenizer_name,
+            "tokenizer_revision": budget.tokenizer_revision,
+            "train_max_tokens": budget.train_max_tokens,
+            "eval_max_tokens": budget.eval_max_tokens,
+            "max_new_tokens": budget.max_new_tokens,
+        },
+        "natural_length_statistics": length_statistics,
+        "generation_cache": str(cache.relative_to(root)),
         "tasks": task_records,
         "jobs": jobs,
         "environment_sha256": {
@@ -383,10 +591,14 @@ process_results_v2_answer = module.process_results_v2_answer
         f"""# SpatialEntail-ALL-POSSIBLE calibration pilot
 
 Engineering-only bundle. It checks whether the untuned base model already
-solves the draft set-valued cells before any allocation is frozen. Rows are
-freshly generated and admitted through the shared context budget; the answer
-contract is `ALL_POSSIBLE` on a fixed five-option menu, so stage-2 decoding is
-constrained to a nonempty subset of A-E.
+solves the draft set-valued cells before any allocation is frozen. Every sample
+is generated with a replay-checked certificate. Full Natural source rows are
+preserved under `source-natural/` and measured in `target-length-stats.json`;
+they are not culled by a provisional training limit. Derived answer-only rows
+under `data/` are admitted for evaluation, where the answer contract is
+`ALL_POSSIBLE` on a fixed five-option menu and stage-2 decoding is constrained
+to a nonempty subset of A-E. The resumable generation cache is recorded in
+`jobs.json`.
 
 Transfer this directory with its ignored `data/` files and the Natural seed-42
 adapter, then submit from the repository root:

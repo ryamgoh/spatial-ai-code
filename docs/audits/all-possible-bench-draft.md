@@ -200,6 +200,23 @@ and the hardening pilot's 20,000-token target / 32,768-token evaluation budget.
 Real Qwen tokenizer admission remains a cluster-side check because the local
 macOS environment does not install the Linux/CUDA evaluation dependency set.
 
+The first 25-per-cell cluster preparation generated all 350 certified samples
+but rejected a correlated Count row at admission because the writer treated its
+checked Natural trace as though a provisional 20,000-token training limit were
+already final. Benchmark evaluation does not consume that target: the loader
+uses the prompt and solver-authored oracle metadata. The corrected writer keeps
+both views. It preserves every full Natural row and certificate under
+`source-natural/`, records overall and per-cell min/p50/p90/p95/p99/max token
+statistics plus counts over 12K/16K/20K/24K/32K, and derives answer-only rows
+under `data/` for evaluation admission. Natural rows are not silently culled;
+their measured distribution informs the later MULTI-SFT context decision.
+
+Generation is also cached before tokenizer measurement. The cache contract pins
+the registry, seed, requested rows per cell, generator/solver/proof sources, and
+every cached file hash. A rerun with the same contract reuses the certified rows;
+a changed contract fails closed. Thus a tokenizer or packaging failure after a
+long generation pass no longer discards the generated source pool.
+
 ## Next steps
 
 1. Prepare 25 examples per hardening cell and evaluate only the untuned model
