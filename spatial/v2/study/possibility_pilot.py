@@ -43,6 +43,7 @@ _LENGTH_THRESHOLDS = (12288, 16384, 20000, 24576, 32768)
 _GENERATION_ENVIRONMENT_FILES = (
     "spatial/v2/generation.py",
     "spatial/v2/possibility.py",
+    "spatial/v2/study/possibility_pilot.py",
     "spatial/v2/proofs.py",
     "spatial/v2/answer_certificates.py",
     "spatial/v2/which_certificates.py",
@@ -72,10 +73,10 @@ def _tokenizer():
     return AutoTokenizer.from_pretrained(_TOKENIZER, revision=_REVISION)
 
 
-def _resolve_worker_count(requested: int | None, *, cell_count: int) -> int:
-    """Resolve usable generation workers without exceeding independent cells."""
-    if cell_count <= 0:
-        raise ValueError("cell_count must be positive")
+def _resolve_worker_count(requested: int | None, *, work_item_count: int) -> int:
+    """Resolve usable generation workers without exceeding independent samples."""
+    if work_item_count <= 0:
+        raise ValueError("work_item_count must be positive")
     raw: int | str = (
         requested
         if requested is not None
@@ -88,23 +89,24 @@ def _resolve_worker_count(requested: int | None, *, cell_count: int) -> int:
         raise ValueError(f"{source} must be an integer, got {raw!r}") from exc
     if workers <= 0:
         raise ValueError("workers must be positive")
-    return min(workers, cell_count)
+    return min(workers, work_item_count)
 
 
-def _generate_cell_rows(
+def _sample_seed(base_seed: int, cell_id: str, sample_index: int) -> int:
+    payload = f"{base_seed}:{cell_id}:{sample_index}".encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
+
+
+def _generate_one_row(
     cell: BenchmarkCell,
     *,
-    samples_per_cell: int,
     seed: int,
-) -> list[dict[str, Any]]:
-    """Generate one independent cell inside a worker process."""
+) -> dict[str, Any]:
+    """Generate one independently seeded sample inside a worker process."""
     generator = SpatialGeneratorV2(seed)
     policy = cell.generation_policy()
-    rows = []
-    for _ in range(samples_per_cell):
-        sample = generator.generate(policy, max_attempts=200)
-        rows.append(sample.as_sft_row(include_audit=True))
-    return rows
+    sample = generator.generate(policy, max_attempts=200)
+    return sample.as_sft_row(include_audit=True)
 
 
 def _evaluation_row(natural_row: dict[str, Any]) -> dict[str, Any]:
@@ -265,22 +267,36 @@ def _generate_ready_cells(
 ) -> dict[str, list[dict[str, Any]]]:
     """Generate cells serially or in a bounded process pool."""
     started = time.perf_counter()
-    generated: dict[str, list[dict[str, Any]]] = {}
+    generated: dict[str, list[dict[str, Any] | None]] = {
+        cell.id: [None] * samples_per_cell for cell in ready
+    }
+    work_items = [
+        (
+            cell,
+            sample_index,
+            _sample_seed(seed, cell.id, sample_index),
+        )
+        for cell in ready
+        for sample_index in range(samples_per_cell)
+    ]
     print(
-        f"Generating {len(ready)} cells with {workers} worker process(es)",
+        f"Generating {len(work_items)} samples across {len(ready)} cells with "
+        f"{workers} worker process(es)",
         file=sys.stderr,
         flush=True,
     )
 
     if workers == 1:
-        for completed, (index, cell) in enumerate(enumerate(ready), start=1):
-            generated[cell.id] = _generate_cell_rows(
+        for completed, (cell, sample_index, sample_seed) in enumerate(
+            work_items, start=1
+        ):
+            generated[cell.id][sample_index] = _generate_one_row(
                 cell,
-                samples_per_cell=samples_per_cell,
-                seed=seed + index,
+                seed=sample_seed,
             )
             print(
-                f"[{completed}/{len(ready)}] generated {cell.id}",
+                f"[{completed}/{len(work_items)}] generated {cell.id} "
+                f"sample {sample_index + 1}/{samples_per_cell}",
                 file=sys.stderr,
                 flush=True,
             )
@@ -288,28 +304,35 @@ def _generate_ready_cells(
         with ProcessPoolExecutor(max_workers=workers) as executor:
             futures = {
                 executor.submit(
-                    _generate_cell_rows,
+                    _generate_one_row,
                     cell,
-                    samples_per_cell=samples_per_cell,
-                    seed=seed + index,
-                ): cell
-                for index, cell in enumerate(ready)
+                    seed=sample_seed,
+                ): (cell, sample_index)
+                for cell, sample_index, sample_seed in work_items
             }
             for completed, future in enumerate(as_completed(futures), start=1):
-                cell = futures[future]
+                cell, sample_index = futures[future]
                 try:
-                    generated[cell.id] = future.result()
+                    generated[cell.id][sample_index] = future.result()
                 except Exception as exc:
-                    raise RuntimeError(f"cell {cell.id}: generation failed") from exc
+                    raise RuntimeError(
+                        f"cell {cell.id} sample {sample_index}: generation failed"
+                    ) from exc
                 print(
-                    f"[{completed}/{len(ready)}] generated {cell.id}",
+                    f"[{completed}/{len(work_items)}] generated {cell.id} "
+                    f"sample {sample_index + 1}/{samples_per_cell}",
                     file=sys.stderr,
                     flush=True,
                 )
 
     elapsed = time.perf_counter() - started
     print(f"Generation completed in {elapsed:.1f}s", file=sys.stderr, flush=True)
-    return generated
+    if any(row is None for rows in generated.values() for row in rows):
+        raise RuntimeError("generation completed with missing sample slots")
+    return {
+        cell_id: [row for row in rows if row is not None]
+        for cell_id, rows in generated.items()
+    }
 
 
 def _pilot_wrapper(
@@ -429,7 +452,9 @@ process_results_v2_answer = module.process_results_v2_answer
 """
 
     ready = [c for c in registry.cells if c.readiness is CellReadiness.READY]
-    generation_workers = _resolve_worker_count(workers, cell_count=len(ready))
+    generation_workers = _resolve_worker_count(
+        workers, work_item_count=len(ready) * samples_per_cell
+    )
     cache = _generation_cache_path(output)
     cache_contract = _cache_contract(
         root,
@@ -552,6 +577,8 @@ process_results_v2_answer = module.process_results_v2_answer
         "samples_per_cell": samples_per_cell,
         "seed": seed,
         "generation_workers": generation_workers,
+        "generation_work_items": len(ready) * samples_per_cell,
+        "generation_parallelism": "sample",
         "total_rows": total_rows,
         "choices": _CHOICES,
         "allow_multiple_answers": True,

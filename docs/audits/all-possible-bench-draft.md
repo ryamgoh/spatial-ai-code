@@ -217,6 +217,15 @@ every cached file hash. A rerun with the same contract reuses the certified rows
 a changed contract fails closed. Thus a tokenizer or packaging failure after a
 long generation pass no longer discards the generated source pool.
 
+The first cluster run also exposed a parallelism tail: one process handled all
+25 samples for a cell, so the job used at most 14 CPUs and then waited for the
+slowest composed cell for 2,175 seconds. Generation now treats each
+`(cell, sample)` pair as an independently and deterministically seeded work
+item. A 14-cell × 25-sample pool therefore exposes 350 process-pool tasks and
+can use more workers than cells while restoring rows in stable cell/sample
+order. The integration regression runs 28 samples with 28 workers and completes
+in essentially the same wall time as the former 14-sample/14-worker path.
+
 ## Next steps
 
 1. Prepare 25 examples per hardening cell and evaluate only the untuned model
@@ -240,13 +249,26 @@ sends END/FAIL/TIME_LIMIT mail to the configured NUS address:
 sbatch experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
 ```
 
-Prepare the separate hardening registry with one process per cell:
+Inspect the largest CPU count and memory available on one normal node. The
+Python process pool is single-node; a 256-CPU user quota does not imply that one
+node has 256 CPUs.
 
 ```sh
-sbatch --partition=normal --cpus-per-task=14 \
+sinfo -N -h -p normal -o "%N %c %m %t" | sort -k2,2nr | head
+```
+
+Prepare the separate hardening registry with sample-level parallelism. On a
+node offering at least 128 CPUs and 128 GiB, use:
+
+```sh
+sbatch --partition=normal --cpus-per-task=128 --mem=128G \
   --export=ALL,PILOT_REGISTRY=spatial/v2/all-possible-hardening-cells.yaml,PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-hardening,SAMPLES_PER_CELL=25,MAX_NEW_TOKENS=20000,EVAL_MAX_TOKENS=32768 \
   experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
 ```
+
+If the largest eligible node has 64 CPUs, request 64 CPUs and about 64 GiB
+instead. Requesting 256 CPUs from a one-node process-pool job will remain queued
+or be rejected unless a single eligible node actually has that capacity.
 
 After preparation, submit only untuned:
 

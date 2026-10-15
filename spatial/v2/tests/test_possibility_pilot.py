@@ -61,27 +61,53 @@ def test_generation_preserves_natural_source_and_derives_evaluation_row(monkeypa
 
     monkeypatch.setattr(pilot, "SpatialGeneratorV2", _Generator)
 
-    rows = pilot._generate_cell_rows(_Cell(), samples_per_cell=1, seed=42)
+    natural_row = pilot._generate_one_row(_Cell(), seed=42)
 
-    assert rows[0]["messages"][-1]["content"].startswith("<think>\n")
-    assert "evidence " * 10 in rows[0]["messages"][-1]["content"]
-    evaluation_row = pilot._evaluation_row(rows[0])
+    assert natural_row["messages"][-1]["content"].startswith("<think>\n")
+    assert "evidence " * 10 in natural_row["messages"][-1]["content"]
+    evaluation_row = pilot._evaluation_row(natural_row)
     assert evaluation_row["messages"][-1]["content"] == "Answer: A, B"
     assert evaluation_row["metadata"]["supervision_arm"] == "answer-only"
 
 
-def test_worker_count_uses_slurm_allocation_and_caps_at_cell_count(monkeypatch):
+def test_worker_count_uses_slurm_allocation_and_caps_at_work_items(monkeypatch):
     monkeypatch.setenv("SLURM_CPUS_PER_TASK", "256")
-    assert pilot._resolve_worker_count(None, cell_count=34) == 34
-    assert pilot._resolve_worker_count(8, cell_count=34) == 8
+    assert pilot._resolve_worker_count(None, work_item_count=350) == 256
+    assert pilot._resolve_worker_count(8, work_item_count=350) == 8
+    assert pilot._resolve_worker_count(512, work_item_count=350) == 350
 
 
 def test_worker_count_rejects_invalid_values(monkeypatch):
     monkeypatch.setenv("SLURM_CPUS_PER_TASK", "not-a-number")
     with pytest.raises(ValueError, match="SLURM_CPUS_PER_TASK"):
-        pilot._resolve_worker_count(None, cell_count=34)
+        pilot._resolve_worker_count(None, work_item_count=350)
     with pytest.raises(ValueError, match="workers must be positive"):
-        pilot._resolve_worker_count(0, cell_count=34)
+        pilot._resolve_worker_count(0, work_item_count=350)
+
+
+def test_sample_level_generation_is_deterministic_and_ordered(monkeypatch):
+    class _Cell:
+        def __init__(self, cell_id):
+            self.id = cell_id
+
+    monkeypatch.setattr(
+        pilot,
+        "_generate_one_row",
+        lambda cell, *, seed: {"cell": cell.id, "seed": seed},
+    )
+    cells = [_Cell("CELL-A"), _Cell("CELL-B")]
+
+    first = pilot._generate_ready_cells(
+        cells, samples_per_cell=3, seed=42, workers=1
+    )
+    second = pilot._generate_ready_cells(
+        cells, samples_per_cell=3, seed=42, workers=1
+    )
+
+    assert first == second
+    assert [row["cell"] for row in first["CELL-A"]] == ["CELL-A"] * 3
+    seeds = [row["seed"] for rows in first.values() for row in rows]
+    assert len(seeds) == len(set(seeds)) == 6
 
 
 def test_generation_cache_is_hash_checked_and_reusable(tmp_path):
@@ -194,14 +220,16 @@ def test_hardening_bundle_preserves_comp_and_shift_sections(monkeypatch):
         receipt = pilot.prepare_pilot(
             repo_root / "spatial/v2/all-possible-hardening-cells.yaml",
             out,
-            samples_per_cell=1,
+            samples_per_cell=2,
             seed=43,
             max_new_tokens=20000,
             eval_max_tokens=32768,
-            workers=14,
+            workers=28,
         )
-        assert receipt["total_rows"] == 14
-        assert receipt["generation_workers"] == 14
+        assert receipt["total_rows"] == 28
+        assert receipt["generation_workers"] == 28
+        assert receipt["generation_work_items"] == 28
+        assert receipt["generation_parallelism"] == "sample"
         assert {task["section"] for task in receipt["tasks"]} == {"comp", "shift"}
         row = json.loads(
             (out / "data/SEL-COMP-CSR-TRC-ALT-G2-D2.jsonl")
@@ -222,7 +250,7 @@ def test_hardening_bundle_preserves_comp_and_shift_sections(monkeypatch):
         assert source["messages"][-1]["content"].startswith("<think>\n")
         assert "answer_certificate" in source["audit"]
         stats = json.loads((out / "target-length-stats.json").read_text())
-        assert stats["overall"]["training_model_tokens"]["count"] == 14
+        assert stats["overall"]["training_model_tokens"]["count"] == 28
         assert receipt["generation_cache"] == str(cache.relative_to(repo_root))
     finally:
         if out.exists():
