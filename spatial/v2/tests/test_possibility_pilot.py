@@ -93,7 +93,11 @@ def test_sample_level_generation_is_deterministic_and_ordered(monkeypatch):
     monkeypatch.setattr(
         pilot,
         "_generate_one_row",
-        lambda cell, *, seed: {"cell": cell.id, "seed": seed},
+        lambda cell, *, seed, uniqueness_retry=0: {
+            "cell": cell.id,
+            "seed": seed,
+            "metadata": {"structure_signature": f"{cell.id}-{seed}"},
+        },
     )
     cells = [_Cell("CELL-A"), _Cell("CELL-B")]
 
@@ -110,6 +114,32 @@ def test_sample_level_generation_is_deterministic_and_ordered(monkeypatch):
     assert len(seeds) == len(set(seeds)) == 6
 
 
+def test_sample_level_generation_replaces_duplicate_structures(monkeypatch):
+    class _Cell:
+        id = "CELL"
+
+    monkeypatch.setattr(
+        pilot,
+        "_generate_one_row",
+        lambda cell, *, seed, uniqueness_retry=0: {
+            "metadata": {
+                "structure_signature": (
+                    "duplicate" if uniqueness_retry == 0 else f"replacement-{seed}"
+                ),
+                "uniqueness_retry": uniqueness_retry,
+            }
+        },
+    )
+
+    generated = pilot._generate_ready_cells(
+        [_Cell()], samples_per_cell=2, seed=42, workers=1
+    )
+
+    signatures = [row["metadata"]["structure_signature"] for row in generated["CELL"]]
+    assert len(signatures) == len(set(signatures)) == 2
+    assert [row["metadata"]["uniqueness_retry"] for row in generated["CELL"]] == [0, 1]
+
+
 def test_generation_cache_is_hash_checked_and_reusable(tmp_path):
     cache = tmp_path / "cache"
     contract = {
@@ -119,7 +149,15 @@ def test_generation_cache_is_hash_checked_and_reusable(tmp_path):
         "seed": 42,
         "environment_sha256": {"generator": "hash"},
     }
-    generated = {"CELL": [{"id": "row", "messages": [], "metadata": {}}]}
+    generated = {
+        "CELL": [
+            {
+                "id": "row",
+                "messages": [],
+                "metadata": {"structure_signature": "unique"},
+            }
+        ]
+    }
 
     pilot._write_generation_cache(cache, generated, contract)
 
@@ -252,6 +290,44 @@ def test_hardening_bundle_preserves_comp_and_shift_sections(monkeypatch):
         stats = json.loads((out / "target-length-stats.json").read_text())
         assert stats["overall"]["training_model_tokens"]["count"] == 28
         assert receipt["generation_cache"] == str(cache.relative_to(repo_root))
+    finally:
+        if out.exists():
+            import shutil
+
+            shutil.rmtree(out)
+        if cache.exists():
+            import shutil
+
+            shutil.rmtree(cache)
+
+
+def test_count_hardening_bundle_is_small_unique_and_shift_only(monkeypatch):
+    monkeypatch.setattr(pilot, "_tokenizer", lambda: _StubTokenizer())
+    repo_root = Path(__file__).resolve().parents[3]
+    out = repo_root / "experiments/spatialentail-allpossible-pilot/_pytest-count"
+    cache = pilot._generation_cache_path(out)
+    if out.exists():
+        pytest.skip("stale Count hardening output present")
+    try:
+        receipt = pilot.prepare_pilot(
+            repo_root / "spatial/v2/all-possible-count-hardening-cells.yaml",
+            out,
+            samples_per_cell=2,
+            seed=44,
+            max_new_tokens=20000,
+            eval_max_tokens=32768,
+            workers=4,
+        )
+        assert receipt["total_rows"] == 4
+        assert receipt["generation_work_items"] == 4
+        assert {task["section"] for task in receipt["tasks"]} == {"shift"}
+        signatures = []
+        for path in (out / "source-natural").glob("*.jsonl"):
+            signatures.extend(
+                json.loads(line)["metadata"]["structure_signature"]
+                for line in path.read_text().splitlines()
+            )
+        assert len(signatures) == len(set(signatures)) == 4
     finally:
         if out.exists():
             import shutil

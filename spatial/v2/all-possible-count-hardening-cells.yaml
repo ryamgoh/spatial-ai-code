@@ -1,0 +1,33 @@
+# Targeted Count-only hardening calibration. Not frozen or sealed.
+version: 1
+cells:
+- id: CNT-SHIFT-IFF-JCR-ALT-G3
+  readiness: ready
+  query_kind: count
+  capability_lenses: [RR, LR, MTR]
+  reasoning_structures: [IFF]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    ordinary_option_target: 5
+    possibility_skeleton: factor-count
+    possibility_gold_size: 3
+    num_entities: 10
+    num_premises: 10
+- id: CNT-SHIFT-IFF-JCR-ALT-G4
+  readiness: ready
+  query_kind: count
+  capability_lenses: [RR, LR, MTR]
+  reasoning_structures: [IFF]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+  generation:
+    answer_mode: all-possible
+    semantic_shape: ambiguous
+    ordinary_option_target: 5
+    possibility_skeleton: factor-count
+    possibility_gold_size: 4
+    num_entities: 10
+    num_premises: 10

@@ -290,3 +290,18 @@ def test_all_possible_hardening_registry_is_separate_and_composed() -> None:
         policy = cell.generation_policy()
         assert policy.answer_mode.value == "all-possible"
         assert policy.ordinary_option_target == 5
+
+
+def test_all_possible_count_hardening_registry_is_targeted() -> None:
+    path = Path(__file__).parents[1] / "all-possible-count-hardening-cells.yaml"
+    registry = load_benchmark_registry(path)
+
+    assert len(registry.cells) == 2
+    assert {cell.generation["possibility_gold_size"] for cell in registry.cells} == {
+        3,
+        4,
+    }
+    for cell in registry.cells:
+        assert cell.query_kind.value == "count"
+        assert cell.generation["possibility_skeleton"] == "factor-count"
+        assert cell.generation_policy().ordinary_option_target == 5

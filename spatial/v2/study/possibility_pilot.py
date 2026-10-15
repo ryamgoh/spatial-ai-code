@@ -92,8 +92,10 @@ def _resolve_worker_count(requested: int | None, *, work_item_count: int) -> int
     return min(workers, work_item_count)
 
 
-def _sample_seed(base_seed: int, cell_id: str, sample_index: int) -> int:
-    payload = f"{base_seed}:{cell_id}:{sample_index}".encode()
+def _sample_seed(
+    base_seed: int, cell_id: str, sample_index: int, uniqueness_retry: int = 0
+) -> int:
+    payload = f"{base_seed}:{cell_id}:{sample_index}:{uniqueness_retry}".encode()
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
 
 
@@ -101,12 +103,91 @@ def _generate_one_row(
     cell: BenchmarkCell,
     *,
     seed: int,
+    uniqueness_retry: int = 0,
 ) -> dict[str, Any]:
     """Generate one independently seeded sample inside a worker process."""
     generator = SpatialGeneratorV2(seed)
     policy = cell.generation_policy()
     sample = generator.generate(policy, max_attempts=200)
-    return sample.as_sft_row(include_audit=True)
+    row = sample.as_sft_row(include_audit=True)
+    row.setdefault("metadata", {})["uniqueness_retry"] = uniqueness_retry
+    return row
+
+
+def _duplicate_slots(
+    generated: dict[str, list[dict[str, Any] | None]], ready: list[BenchmarkCell]
+) -> list[tuple[BenchmarkCell, int]]:
+    seen = set()
+    duplicates = []
+    for cell in ready:
+        for sample_index, row in enumerate(generated[cell.id]):
+            if row is None:
+                continue
+            signature = row.get("metadata", {}).get("structure_signature")
+            if not isinstance(signature, str) or not signature:
+                raise ValueError(f"cell {cell.id}: generated row lacks structure signature")
+            if signature in seen:
+                duplicates.append((cell, sample_index))
+            else:
+                seen.add(signature)
+    return duplicates
+
+
+def _replace_duplicate_structures(
+    generated: dict[str, list[dict[str, Any] | None]],
+    ready: list[BenchmarkCell],
+    *,
+    seed: int,
+    workers: int,
+    max_rounds: int = 50,
+) -> None:
+    retries: dict[tuple[str, int], int] = {}
+    for _ in range(max_rounds):
+        duplicates = _duplicate_slots(generated, ready)
+        if not duplicates:
+            return
+        print(
+            f"Regenerating {len(duplicates)} duplicate canonical structure(s)",
+            file=sys.stderr,
+            flush=True,
+        )
+        work = []
+        for cell, sample_index in duplicates:
+            key = (cell.id, sample_index)
+            retries[key] = retries.get(key, 0) + 1
+            retry = retries[key]
+            work.append(
+                (
+                    cell,
+                    sample_index,
+                    retry,
+                    _sample_seed(seed, cell.id, sample_index, retry),
+                )
+            )
+        if workers == 1:
+            for cell, sample_index, retry, sample_seed in work:
+                generated[cell.id][sample_index] = _generate_one_row(
+                    cell, seed=sample_seed, uniqueness_retry=retry
+                )
+        else:
+            with ProcessPoolExecutor(max_workers=min(workers, len(work))) as executor:
+                futures = {
+                    executor.submit(
+                        _generate_one_row,
+                        cell,
+                        seed=sample_seed,
+                        uniqueness_retry=retry,
+                    ): (cell, sample_index)
+                    for cell, sample_index, retry, sample_seed in work
+                }
+                for future in as_completed(futures):
+                    cell, sample_index = futures[future]
+                    generated[cell.id][sample_index] = future.result()
+    remaining = _duplicate_slots(generated, ready)
+    raise RuntimeError(
+        f"could not obtain unique canonical structures after {max_rounds} rounds; "
+        f"remaining duplicates: {len(remaining)}"
+    )
 
 
 def _evaluation_row(natural_row: dict[str, Any]) -> dict[str, Any]:
@@ -243,6 +324,7 @@ def _load_generation_cache(
     if actual_contract != contract:
         raise ValueError(f"generation cache contract changed: {cache}")
     generated = {}
+    signatures = set()
     for cell_id in cell_ids:
         name = f"source-natural/{cell_id}.jsonl"
         path = cache / name
@@ -254,6 +336,13 @@ def _load_generation_cache(
         rows = [json.loads(line) for line in content.splitlines()]
         if len(rows) != int(contract["samples_per_cell"]):
             raise ValueError(f"generation cache row count changed: {name}")
+        for row in rows:
+            signature = row.get("metadata", {}).get("structure_signature")
+            if not isinstance(signature, str) or not signature:
+                raise ValueError(f"generation cache row lacks structure: {name}")
+            if signature in signatures:
+                raise ValueError(f"generation cache contains duplicate structure: {name}")
+            signatures.add(signature)
         generated[cell_id] = rows
     return generated
 
@@ -293,6 +382,7 @@ def _generate_ready_cells(
             generated[cell.id][sample_index] = _generate_one_row(
                 cell,
                 seed=sample_seed,
+                uniqueness_retry=0,
             )
             print(
                 f"[{completed}/{len(work_items)}] generated {cell.id} "
@@ -307,6 +397,7 @@ def _generate_ready_cells(
                     _generate_one_row,
                     cell,
                     seed=sample_seed,
+                    uniqueness_retry=0,
                 ): (cell, sample_index)
                 for cell, sample_index, sample_seed in work_items
             }
@@ -329,6 +420,9 @@ def _generate_ready_cells(
     print(f"Generation completed in {elapsed:.1f}s", file=sys.stderr, flush=True)
     if any(row is None for rows in generated.values() for row in rows):
         raise RuntimeError("generation completed with missing sample slots")
+    _replace_duplicate_structures(
+        generated, ready, seed=seed, workers=workers
+    )
     return {
         cell_id: [row for row in rows if row is not None]
         for cell_id, rows in generated.items()
@@ -579,6 +673,11 @@ process_results_v2_answer = module.process_results_v2_answer
         "generation_workers": generation_workers,
         "generation_work_items": len(ready) * samples_per_cell,
         "generation_parallelism": "sample",
+        "generation_duplicate_replacements": sum(
+            int(row.get("metadata", {}).get("uniqueness_retry", 0) > 0)
+            for rows in generated.values()
+            for row in rows
+        ),
         "total_rows": total_rows,
         "choices": _CHOICES,
         "allow_multiple_answers": True,

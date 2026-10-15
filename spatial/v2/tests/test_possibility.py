@@ -167,6 +167,33 @@ def test_case_count_requires_complete_branch_membership_assignments(gold_size) -
     )
 
 
+@pytest.mark.parametrize(
+    ("gold_size", "expected_counts"),
+    ((3, (0, 2, 4)), (4, (0, 2, 3, 5))),
+)
+def test_factor_count_combines_independent_correlated_groups(
+    gold_size, expected_counts
+) -> None:
+    sample = SpatialGeneratorV2(seed=9500 + gold_size).generate(
+        _policy(
+            query_kind="count",
+            possibility_skeleton="factor-count",
+            possibility_gold_size=gold_size,
+            num_entities=10,
+            num_premises=10,
+        ),
+        max_attempts=100,
+    )
+
+    assert sample.analysis.possible_counts == expected_counts
+    assert len(sample.menu_answer.letters) == gold_size
+    assert sample.difficulty["direct_query_relation"] is False
+    assert sample.difficulty["joint_count_dependency"]
+    _assert_no_disjunction_enumerates_query_answers(
+        sample.problem.premise, sample.problem.query
+    )
+
+
 def test_gold_size_above_four_is_rejected() -> None:
     with pytest.raises(ValueError, match="between 2 and 4"):
         GenerationPolicy(

@@ -265,6 +265,109 @@ evidence rather than final benchmark scores. The ALL-POSSIBLE cells must be
 audited and hardened before freezing, and any subsequent MULTI-SFT study must
 evaluate set completeness directly.
 
+=== Hardened untuned calibration
+
+The response audit found that 600 of the first pilot's 850 examples placed the
+complete query-level alternative set in one visible Boolean disjunction. Those
+cells measured basic contract reading rather than composed possible-world
+reasoning. A separate hardening registry therefore preserves the first pilot as
+diagnostic evidence and introduces 14 new cells: five COMP cells combine
+exclusive cases with relational chains or complete correlated Count worlds,
+while nine SHIFT cells extend Direction to depth 9 and Selection/Count to depth
+7. The prompt explicitly states the open-world and qualitative-distance
+semantics, and every cell still uses a fixed five-option menu.
+
+The hardened engineering pool contains 25 examples per cell, or 350 examples.
+It was evaluated only on untuned Qwen3.5-4B because its purpose is benchmark
+calibration, not another supervision ablation. All prepared-file hashes and all
+14 task outputs validate against the generation receipt.
+
+#figure(
+  table(
+    columns: (1.45fr, auto, auto, auto, auto, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header(
+      [*Model*],
+      [*Exact set*],
+      [*Stage 1 exact*],
+      [*Stage 1 format*],
+      [*Gold covered*],
+      [*Over-inclusive*],
+      [*Missing gold*],
+    ),
+    [Untuned Qwen3.5-4B], [82.29%], [42.29%], [0.57%], [88.57%], [6.29%], [11.43%],
+  ),
+  caption: [Untuned accuracy on the 350-example hardened ALL-POSSIBLE calibration pool. Stage-2 constrained exact-set accuracy remains primary.],
+) <results-all-possible-hardened>
+
+Hardening reduces untuned exact-set accuracy from 93.65% to 82.29%. Of the 350
+examples, 148 are exact in both stages, 140 additional decisions are recovered
+by constrained stage 2, and 62 remain semantically incorrect. Stage 2 does not
+degrade any stage-1 exact decision. Among the remaining errors, 40 omit at least
+one gold option and 22 contain the gold set plus one or more extras. Response
+inspection shows depth-related semantic failures and unstable repetitive
+reasoning, commonly collapsing a multi-answer result to one option or expanding
+it to all five; the discrepancy is not a scorer or oracle mismatch.
+
+#figure(
+  table(
+    columns: (1.45fr, auto, auto),
+    align: (x, y) => if x == 0 { left } else { center },
+    table.header([*Slice*], [*$N$*], [*Exact-set accuracy*]),
+    [COMP], [125], [92.00%],
+    [SHIFT], [225], [76.89%],
+    [Direction], [75], [53.33%],
+    [Selection], [150], [85.33%],
+    [Count], [125], [96.00%],
+    [Depth 2], [50], [84.00%],
+    [Depth 3], [50], [82.00%],
+    [Depth 5], [75], [82.67%],
+    [Depth 7], [75], [80.00%],
+    [Depth 9], [25], [40.00%],
+  ),
+  caption: [Hardened ALL-POSSIBLE accuracy by overlapping section, query-family, and depth slices.],
+) <results-all-possible-hardened-breakdown>
+
+The resulting gradient is useful rather than uniformly difficult. COMP remains
+a strong matched/compositional check at 92.00%, whereas SHIFT falls to 76.89%.
+Direction carries the clearest headroom: its D5 and D7 cells each score 60%, and
+D9 scores 40%. Selection falls from 99.27% in the first pilot to 85.33% after
+removing direct enumeration. Count remains close to saturation at 96.00%, so
+the next generator change should target Count specifically instead of
+redesigning the successful Direction and Selection cells.
+
+=== Lessons and next actions
+
+The two pilots show that a larger answer space is not sufficient by itself:
+difficulty comes from how alternatives are derived. Directly displaying a gold
+disjunction leaves little headroom, while branch composition and qualitative
+depth expose substantial weaknesses. They also show that successful SINGLE SFT
+does not imply set-complete prediction: the Natural seed-42 transfer failure is
+dominated by omitted answers. MULTI-SFT must therefore include explicit
+set-valued supervision and be evaluated by exact-set completeness.
+
+The generation run also measures the prospective Natural supervision cost
+without culling any candidate. Across 350 full Natural rows, the complete
+training sequence has median 2,172 tokens, p95 19,202, p99 19,925, and maximum
+20,264. Seventy-five rows exceed 12,288 tokens, 62 exceed 16,384, and only three
+exceed 20,000; none exceeds 24,576. A 24,576-token MULTI-SFT context would
+therefore admit this pool in full, although shortening the three longest
+correlated-Count renderings remains an alternative. Certificates remain offline
+audit artifacts; full Natural source rows and answer-only evaluation views are
+stored separately.
+
+This remains an engineering pool, not the final benchmark. Three of its 350
+rows repeat another canonical structure within one Selection COMP cell, even
+though their surface names and option mappings differ. Before freezing, the
+pipeline will enforce canonical uniqueness, add one narrow Count-hardening
+extension, fix per-cell allocations, and audit structural disjointness from all
+training and development splits. The resulting
+`SpatialEntail-ALL-POSSIBLE-Bench` can then be sealed. Only after that boundary
+is fixed will the study generate `SpatialEntail-MULTI-SFT`, train the Natural
+multi-contract model, and compare untuned, SINGLE-to-MULTI transfer, and
+MULTI-SFT on the frozen benchmark. The answer-only ablation remains confined to
+the completed SINGLE study.
+
 == Discussion and Threats
 
 The semantic audit already establishes that a latent-world answer can remain

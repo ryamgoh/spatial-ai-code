@@ -270,6 +270,44 @@ If the largest eligible node has 64 CPUs, request 64 CPUs and about 64 GiB
 instead. Requesting 256 CPUs from a one-node process-pool job will remain queued
 or be rejected unless a single eligible node actually has that capacity.
 
+## Pre-freeze uniqueness and targeted Count extension
+
+The hardened untuned calibration scores 82.29% overall: COMP 92.00%, SHIFT
+76.89%, Direction 53.33%, Selection 85.33%, and Count 96.00%. Direction D5/D7
+at 60% and D9 at 40% provide sufficient headroom to freeze after the normal
+disjointness checks. Selection G4 and D7 are also discriminative; its easier G2
+and D5 cells remain useful anchors but should receive lower final allocation.
+The existing Count cells are retained as sanity checks rather than the primary
+Count discriminator.
+
+Generation now enforces canonical-structure uniqueness globally. Rows are
+scanned in stable cell/sample order; any repeated signature is deterministically
+regenerated with a retry-specific seed. Cache loading rejects missing or repeated
+signatures, and the receipt records how many slots required replacement. This
+removes the three duplicates observed in the 350-example engineering pool before
+any final benchmark is sealed.
+
+A separate two-cell Count hardening registry lives at
+`spatial/v2/all-possible-count-hardening-cells.yaml`. Its `factor-count`
+skeleton uses two independent latent spatial facts, each equivalent to a
+correlated candidate group. The possible counts are `{0, 2, 4}` for G3 and
+`{0, 2, 3, 5}` for G4. No visible disjunction enumerates those counts, and the
+groups must be combined to obtain the complete set. An attempted multi-hop
+version was rejected because certificate construction was not operationally
+feasible; the IFF-based version stays within the replay-tested proof boundary
+and probes both cells in about two seconds locally.
+
+Prepare only this 50-example Count calibration pool:
+
+```sh
+sbatch --partition=normal --cpus-per-task=50 --mem=50G \
+  --export=ALL,PILOT_REGISTRY=spatial/v2/all-possible-count-hardening-cells.yaml,PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-count-hardening,SAMPLES_PER_CELL=25,MAX_NEW_TOKENS=20000,EVAL_MAX_TOKENS=32768 \
+  experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+```
+
+After preparation, submit only its untuned job. These two cells are merged into
+the final allocation only if they create material Count headroom.
+
 After preparation, submit only untuned:
 
 ```sh
