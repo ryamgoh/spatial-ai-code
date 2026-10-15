@@ -6,6 +6,17 @@ import pytest
 
 from spatial.v2.generation import GenerationPolicy, SpatialGeneratorV2
 from spatial.v2.grading import AnswerMode
+from spatial.v2.solver import (
+    And,
+    CountQuery,
+    DirectionQuery,
+    Iff,
+    Implies,
+    Not,
+    Or,
+    RelationConstraint,
+    WhichQuery,
+)
 
 
 def _policy(**overrides) -> GenerationPolicy:
@@ -75,6 +86,85 @@ def test_joint_count_skeleton_skips_intermediate_counts(gold_size) -> None:
 
     assert sample.analysis.possible_counts == (0, gold_size)
     assert sample.difficulty["joint_count_dependency"]
+
+
+def _children(formula):
+    if isinstance(formula, (And, Or)):
+        return formula.operands
+    if isinstance(formula, (Implies, Iff)):
+        return (
+            (formula.antecedent, formula.consequent)
+            if isinstance(formula, Implies)
+            else (formula.left, formula.right)
+        )
+    if isinstance(formula, Not):
+        return (formula.operand,)
+    return ()
+
+
+def _query_atom(atom, query) -> bool:
+    if not isinstance(atom, RelationConstraint):
+        return False
+    if isinstance(query, DirectionQuery):
+        return atom.subject == query.target and atom.reference == query.reference
+    if isinstance(query, (WhichQuery, CountQuery)):
+        return (
+            atom.subject in query.candidates
+            and atom.reference == query.reference
+            and bool(atom.allowed & query.directions)
+        )
+    raise AssertionError(type(query))
+
+
+def _assert_no_disjunction_enumerates_query_answers(formula, query) -> None:
+    if isinstance(formula, Or):
+        assert not any(_query_atom(operand, query) for operand in formula.operands)
+    for child in _children(formula):
+        _assert_no_disjunction_enumerates_query_answers(child, query)
+
+
+@pytest.mark.parametrize("gold_size", [2, 4])
+def test_case_chain_hides_answers_behind_branches_and_multihop_proofs(
+    gold_size,
+) -> None:
+    sample = SpatialGeneratorV2(seed=9300 + gold_size).generate(
+        _policy(
+            query_kind="which",
+            possibility_skeleton="case-chain",
+            possibility_gold_size=gold_size,
+            possibility_depth=2,
+            num_entities=13,
+            num_premises=15,
+        ),
+        max_attempts=60,
+    )
+
+    assert len(sample.menu_answer.letters) == gold_size
+    assert sample.difficulty["direct_query_relation"] is False
+    _assert_no_disjunction_enumerates_query_answers(
+        sample.problem.premise, sample.problem.query
+    )
+
+
+@pytest.mark.parametrize("gold_size", [2, 4])
+def test_case_count_requires_complete_branch_membership_assignments(gold_size) -> None:
+    sample = SpatialGeneratorV2(seed=9400 + gold_size).generate(
+        _policy(
+            query_kind="count",
+            possibility_skeleton="case-count",
+            possibility_gold_size=gold_size,
+            num_entities=10,
+            num_premises=10,
+        ),
+        max_attempts=60,
+    )
+
+    assert len(sample.analysis.possible_counts) == gold_size
+    assert len(sample.menu_answer.letters) == gold_size
+    assert sample.difficulty["joint_count_dependency"]
+    _assert_no_disjunction_enumerates_query_answers(
+        sample.problem.premise, sample.problem.query
+    )
 
 
 def test_gold_size_above_four_is_rejected() -> None:

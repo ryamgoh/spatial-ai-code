@@ -1846,6 +1846,10 @@ def _system_prompt(mode: AnswerMode) -> str:
     }[mode]
     return (
         "Solve the spatial reasoning problem from the stated relations. "
+        "Treat the statements as open-world constraints: Unstated relations "
+        "remain unknown rather than false. Direction words specify qualitative "
+        "coordinate ordering and do not imply equal unit distances. An answer "
+        "is possible when at least one arrangement satisfies every statement. "
         f"{contract} Return the selected option letter or letters."
     )
 

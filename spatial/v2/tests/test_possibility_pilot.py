@@ -79,3 +79,38 @@ def test_pilot_bundle_is_set_valued_and_hash_consistent(tmp_path, monkeypatch):
             import shutil
 
             shutil.rmtree(out)
+
+
+def test_hardening_bundle_preserves_comp_and_shift_sections(monkeypatch):
+    monkeypatch.setattr(pilot, "_tokenizer", lambda: _StubTokenizer())
+    repo_root = Path(__file__).resolve().parents[3]
+    out = repo_root / "experiments/spatialentail-allpossible-pilot/_pytest-hardening"
+    if out.exists():
+        pytest.skip("stale hardening pilot output present")
+    try:
+        receipt = pilot.prepare_pilot(
+            repo_root / "spatial/v2/all-possible-hardening-cells.yaml",
+            out,
+            samples_per_cell=1,
+            seed=43,
+            max_new_tokens=20000,
+            eval_max_tokens=32768,
+            workers=14,
+        )
+        assert receipt["total_rows"] == 14
+        assert receipt["generation_workers"] == 14
+        assert {task["section"] for task in receipt["tasks"]} == {"comp", "shift"}
+        row = json.loads(
+            (out / "data/SEL-COMP-CSR-TRC-ALT-G2-D2.jsonl")
+            .read_text()
+            .splitlines()[0]
+        )
+        assert "Unstated relations remain unknown rather than false" in row[
+            "messages"
+        ][0]["content"]
+        assert "do not imply equal unit distances" in row["messages"][0]["content"]
+    finally:
+        if out.exists():
+            import shutil
+
+            shutil.rmtree(out)

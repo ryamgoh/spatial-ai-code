@@ -270,3 +270,23 @@ def test_all_possible_registry_cells_are_set_valued_alternatives() -> None:
         assert policy.answer_mode.value == "all-possible"
         assert policy.menu_coverage.value == "full"
         assert policy.possibility_skeleton is not None
+
+
+def test_all_possible_hardening_registry_is_separate_and_composed() -> None:
+    path = Path(__file__).parents[1] / "all-possible-hardening-cells.yaml"
+    registry = load_benchmark_registry(path)
+
+    assert len(registry.cells) == 14
+    assert all("-COMP-" in cell.id or "-SHIFT-" in cell.id for cell in registry.cells)
+    assert any(
+        cell.generation.get("possibility_skeleton") == "case-chain"
+        for cell in registry.cells
+    )
+    assert any(
+        cell.generation.get("possibility_skeleton") == "case-count"
+        for cell in registry.cells
+    )
+    for cell in registry.cells:
+        policy = cell.generation_policy()
+        assert policy.answer_mode.value == "all-possible"
+        assert policy.ordinary_option_target == 5

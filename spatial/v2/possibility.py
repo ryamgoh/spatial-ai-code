@@ -46,6 +46,8 @@ POSSIBILITY_SKELETONS = {
     "csr": (frozenset({"direction", "which", "count"}), 5),
     "jcr": (frozenset({"count"}), 5),
     "noise": (frozenset({"direction", "which"}), 5),
+    "case-chain": (frozenset({"which"}), 13),
+    "case-count": (frozenset({"count"}), 8),
 }
 
 
@@ -58,6 +60,8 @@ POSSIBILITY_STRUCTURES = {
     "csr": ("CSR",),
     "jcr": ("CSR",),
     "noise": ("TRC",),
+    "case-chain": ("CSR", "TRC"),
+    "case-count": ("CSR",),
 }
 
 
@@ -88,22 +92,57 @@ def validate_possibility_policy(policy: Any) -> None:
     gold_size = policy.possibility_gold_size
     # A fixed five-option menu must show the complete possible set plus at least
     # one distractor, so the planted gold set can hold at most four answers.
-    if policy.possibility_skeleton in {"mp", "iff", "dje", "csr", "jcr"}:
+    if policy.possibility_skeleton in {
+        "mp",
+        "iff",
+        "dje",
+        "csr",
+        "jcr",
+        "case-chain",
+        "case-count",
+    }:
         if not 2 <= gold_size <= 4:
             raise ValueError("possibility_gold_size must be between 2 and 4")
-        if policy.query_kind.value != "direction":
+        if (
+            policy.possibility_skeleton in {"mp", "iff", "dje", "csr", "jcr"}
+            and policy.query_kind.value != "direction"
+        ):
             needed = 3 + gold_size + (1 if policy.possibility_skeleton == "dje" else 0)
             if policy.num_entities < needed:
                 raise ValueError(
                     f"{policy.possibility_skeleton} with gold size {gold_size} "
                     f"requires at least {needed} objects"
                 )
+        if policy.possibility_skeleton == "case-chain":
+            needed = 8 + 5 * (policy.possibility_depth - 1)
+            if policy.num_entities < needed:
+                raise ValueError(
+                    f"case-chain with depth {policy.possibility_depth} requires "
+                    f"at least {needed} objects"
+                )
+            minimum_premises = (
+                1
+                + 5 * policy.possibility_depth
+                + policy.possibility_gold_size
+            )
+            if policy.num_premises < minimum_premises:
+                raise ValueError(
+                    f"case-chain with depth {policy.possibility_depth} and gold "
+                    f"size {gold_size} requires at least {minimum_premises} premises"
+                )
+        if policy.possibility_skeleton == "case-count" and policy.num_entities < 8:
+            raise ValueError("case-count requires at least 8 objects")
     elif gold_size != 2:
         raise ValueError(
             "possibility_gold_size applies only to Boolean and jcr skeletons"
         )
-    if policy.possibility_skeleton in {"depth", "noise"} and policy.possibility_depth < 2:
-        raise ValueError("depth and noise skeletons require a chain of at least 2")
+    if (
+        policy.possibility_skeleton in {"depth", "noise", "case-chain"}
+        and policy.possibility_depth < 2
+    ):
+        raise ValueError(
+            "depth, noise, and case-chain skeletons require a chain of at least 2"
+        )
     if policy.possibility_skeleton == "noise" and policy.distractor_premises < 1:
         raise ValueError("noise possibility skeleton requires distractor premises")
     if policy.possibility_skeleton != "noise" and policy.distractor_premises:
@@ -204,6 +243,68 @@ def _membership_skeleton(
     reference, *pool = nodes
     direction = policy.query_direction or rng.choice(_DIAGONALS)
     member = lambda candidate: direction_constraint(candidate, reference, direction)
+    if name == "case-chain":
+        first, second, *rest = pool
+        candidates, intermediate_pool = rest[:5], rest[5:]
+        cases = _exclusive_cases(first, second, policy.possibility_gold_size, rng)
+        premises: list[SpatialFormula] = [Or(cases)]
+        opposite = _opposite(direction)
+        cursor = 0
+        for index, candidate in enumerate(candidates):
+            intermediate = intermediate_pool[
+                cursor : cursor + policy.possibility_depth - 1
+            ]
+            cursor += policy.possibility_depth - 1
+            chain = [reference, *intermediate, candidate]
+            atoms = _exact_chain(
+                chain, direction if index < policy.possibility_gold_size else opposite
+            )
+            if index < policy.possibility_gold_size:
+                premises.append(Implies(cases[index], atoms[0]))
+                premises.extend(atoms[1:])
+                premises.append(
+                    Implies(
+                        Not(cases[index]),
+                        direction_constraint(candidate, reference, opposite),
+                    )
+                )
+            else:
+                premises.extend(atoms)
+        rng.shuffle(candidates)
+        return (
+            premises,
+            WhichQuery(frozenset({direction}), reference, tuple(candidates)),
+            {reference, first, second, *candidates, *intermediate_pool[:cursor]},
+        )
+    if name == "case-count":
+        first, second, *rest = pool
+        candidates = rest[:5]
+        cases = _exclusive_cases(first, second, policy.possibility_gold_size, rng)
+        counts = {
+            2: (0, 5),
+            3: (0, 2, 5),
+            4: (0, 1, 3, 5),
+        }[policy.possibility_gold_size]
+        counts = tuple(rng.sample(counts, len(counts)))
+        opposite = _opposite(direction)
+        premises = [Or(cases)]
+        for case, count in zip(cases, counts, strict=True):
+            included = set(rng.sample(candidates, count))
+            assignment = tuple(
+                direction_constraint(
+                    candidate,
+                    reference,
+                    direction if candidate in included else opposite,
+                )
+                for candidate in candidates
+            )
+            premises.append(Implies(case, And(assignment)))
+        rng.shuffle(candidates)
+        return (
+            premises,
+            CountQuery(frozenset({direction}), reference, tuple(candidates)),
+            {reference, first, second, *candidates},
+        )
     if name in {"depth", "noise"}:
         depth = policy.possibility_depth
         needed = 2 * (depth - 1) + 2
@@ -302,6 +403,20 @@ def _exclusive_cases(
         direction_constraint(first, second, value)
         for value in rng.sample(list(Direction), count)
     )
+
+
+def _exact_chain(
+    chain: list[str], direction: Direction
+) -> list[SpatialFormula]:
+    return [
+        direction_constraint(subject, previous, direction)
+        for previous, subject in pairwise(chain)
+    ]
+
+
+def _opposite(direction: Direction) -> Direction:
+    x_sign, y_sign = direction_signs(direction)
+    return _DIRECTION_BY_SIGNS[(-x_sign, -y_sign)]
 
 
 def _open_axis_chain(chain: list[str], rng: Any) -> list[SpatialFormula]:

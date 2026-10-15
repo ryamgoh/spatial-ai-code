@@ -44,6 +44,15 @@ _MODELS = {
 }
 
 
+def _section(cell_id: str) -> str:
+    parts = cell_id.split("-")
+    if "COMP" in parts:
+        return "comp"
+    if "SHIFT" in parts:
+        return "shift"
+    return "matched"
+
+
 def _tokenizer():
     from transformers import AutoTokenizer
 
@@ -288,6 +297,7 @@ process_results_v2_answer = module.process_results_v2_answer
                 "task": task_name,
                 "role": "bench-all-possible",
                 "component": cell.query_kind.value,
+                "section": _section(cell.id),
                 "cell": cell.id,
                 "query_kind": cell.query_kind.value,
                 "count": len(rows),
@@ -368,8 +378,9 @@ process_results_v2_answer = module.process_results_v2_answer
     (output / "results").mkdir()
     (output / "results/.gitkeep").write_text("")
     (output / "jobs.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+    output_relative = output.relative_to(root)
     (output / "README.md").write_text(
-        """# SpatialEntail-ALL-POSSIBLE calibration pilot
+        f"""# SpatialEntail-ALL-POSSIBLE calibration pilot
 
 Engineering-only bundle. It checks whether the untuned base model already
 solves the draft set-valued cells before any allocation is frozen. Rows are
@@ -381,15 +392,15 @@ Transfer this directory with its ignored `data/` files and the Natural seed-42
 adapter, then submit from the repository root:
 
 ```sh
-sbatch experiments/spatialentail-allpossible-pilot/prepared/slurm/untuned.sh
-sbatch experiments/spatialentail-allpossible-pilot/prepared/slurm/natural-seed-42.sh
+sbatch {output_relative}/slurm/untuned.sh
+sbatch {output_relative}/slurm/natural-seed-42.sh
 ```
 
 After both jobs complete, aggregate the exact-set and diagnostic results:
 
 ```sh
 python3 experiments/spatialentail-allpossible-pilot/scripts/summarize.py \
-  experiments/spatialentail-allpossible-pilot/prepared
+  {output_relative}
 ```
 """
     )
@@ -402,6 +413,8 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--samples-per-cell", type=int, default=25)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--max-new-tokens", type=int, default=12288)
+    parser.add_argument("--eval-max-tokens", type=int, default=16384)
     parser.add_argument(
         "--workers",
         type=int,
@@ -413,6 +426,8 @@ def main() -> None:
         args.out,
         samples_per_cell=args.samples_per_cell,
         seed=args.seed,
+        max_new_tokens=args.max_new_tokens,
+        eval_max_tokens=args.eval_max_tokens,
         workers=args.workers,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))

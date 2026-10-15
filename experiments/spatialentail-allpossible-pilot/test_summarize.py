@@ -6,7 +6,9 @@ from pathlib import Path
 import pytest
 
 MODULE = Path(__file__).with_name("scripts") / "summarize.py"
-SPEC = importlib.util.spec_from_file_location("spatialentail_allpossible_summary", MODULE)
+SPEC = importlib.util.spec_from_file_location(
+    "spatialentail_allpossible_summary", MODULE
+)
 assert SPEC and SPEC.loader
 SUMMARY = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = SUMMARY
@@ -28,6 +30,7 @@ def test_summary_reports_set_errors_and_cell_factors(tmp_path: Path) -> None:
             "task": "direction-g2",
             "role": "bench-all-possible",
             "component": "direction",
+            "section": "comp",
             "cell": "DIR-MP-ALT-G2",
             "query_kind": "direction",
             "count": 25,
@@ -36,6 +39,7 @@ def test_summary_reports_set_errors_and_cell_factors(tmp_path: Path) -> None:
             "task": "count-depth",
             "role": "bench-all-possible",
             "component": "count",
+            "section": "shift",
             "cell": "CNT-TRC-ALT-D5",
             "query_kind": "count",
             "count": 25,
@@ -79,6 +83,10 @@ def test_summary_reports_set_errors_and_cell_factors(tmp_path: Path) -> None:
     assert model["query_accuracy"] == {
         "count": {"count": 25, "exact_set_accuracy": 0.4},
         "direction": {"count": 25, "exact_set_accuracy": 0.8},
+    }
+    assert model["section_accuracy"] == {
+        "comp": {"count": 25, "exact_set_accuracy": 0.8},
+        "shift": {"count": 25, "exact_set_accuracy": 0.4},
     }
     assert model["gold_size_accuracy"] == {
         "2": {"count": 25, "exact_set_accuracy": 0.8}

@@ -74,13 +74,19 @@ def _model_summary(
             raise ValueError(f"task {task_name}: loose accuracy is below strict")
         cell_name = str(task["cell"])
         parts = cell_name.split("-")
+        reasoning = "+".join(
+            part
+            for part in parts
+            if part in {"ARC", "TRC", "AXC", "MP", "IFF", "NEG", "DJE", "CSR"}
+        )
         cells[task_name] = {
             **task,
             "strict_acc": strict,
             "loose_acc": loose,
             "stage1_acc": _metric(result, "stage1_acc"),
             "stage1_format_valid": _metric(result, "stage1_format_valid"),
-            "reasoning_family": parts[1],
+            "section": str(task.get("section") or "matched"),
+            "reasoning_family": reasoning,
             "gold_size": _tag(cell_name, "G"),
             "depth": _tag(cell_name, "D"),
             "diagnostic": (
@@ -106,6 +112,7 @@ def _model_summary(
         "stage1_exact_set_accuracy": stage1,
         "stage1_format_validity": stage1_format,
         "query_accuracy": _breakdown(cells, lambda cell: str(cell["query_kind"])),
+        "section_accuracy": _breakdown(cells, lambda cell: str(cell["section"])),
         "reasoning_accuracy": _breakdown(
             cells, lambda cell: str(cell["reasoning_family"])
         ),
@@ -170,10 +177,12 @@ def _render_markdown(summary: dict[str, Any]) -> str:
     lines = [
         "# SpatialEntail-ALL-POSSIBLE calibration pilot",
         "",
-        "Engineering-only zero-shot transfer result; this draft pilot is not a frozen benchmark.",
+        "Engineering-only zero-shot transfer result; this draft pilot is not a "
+        "frozen benchmark.",
         "Stage-2 constrained exact-set accuracy is the primary metric.",
         "",
-        "| Model | Exact set | Stage 1 exact set | Stage 1 format | Gold covered | Over-inclusive | Missing gold |",
+        "| Model | Exact set | Stage 1 exact set | Stage 1 format | Gold covered "
+        "| Over-inclusive | Missing gold |",
         "|---|---:|---:|---:|---:|---:|---:|",
     ]
     for name, model in models.items():
@@ -189,6 +198,7 @@ def _render_markdown(summary: dict[str, Any]) -> str:
             f"{_display(model['missing_gold_rate'])} |"
         )
     lines.append("")
+    lines.extend(_breakdown_lines("Section", "section_accuracy", models))
     lines.extend(_breakdown_lines("Query kind", "query_accuracy", models))
     lines.extend(
         _breakdown_lines("Reasoning family", "reasoning_accuracy", models)

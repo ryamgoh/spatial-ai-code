@@ -863,6 +863,8 @@ def test_set_valued_prompts_define_possible_against_stated_relations(
 
     assert f"Question: {instruction} " in sample.prompt
     assert "could be true given the stated relations" in row["messages"][0]["content"]
+    assert "Unstated relations remain unknown rather than false" in row["messages"][0]["content"]
+    assert "do not imply equal unit distances" in row["messages"][0]["content"]
 
 
 def test_map_scoped_which_keeps_hidden_objects_in_candidate_universe() -> None:

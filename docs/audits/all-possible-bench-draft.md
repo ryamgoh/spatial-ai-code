@@ -1,7 +1,8 @@
 # SpatialEntail-ALL-POSSIBLE-Bench: draft cell registry and feasibility pilot
 
-Status: draft, 2026-10-14. Not frozen, not sealed, and no model has been
-evaluated on it. The registry is `spatial/v2/all-possible-cells.yaml`; the
+Status: hardening, updated 2026-10-15. Not frozen or sealed. The first
+calibration registry is `spatial/v2/all-possible-cells.yaml`; the separate
+hardening registry is `spatial/v2/all-possible-hardening-cells.yaml`. The
 generator is `spatial/v2/possibility.py`.
 
 ## Purpose
@@ -29,7 +30,10 @@ cell plants two or more possible answers.
   answers are omitted, are reserved for the `SpatialEntail-VISIBLE-POSSIBLE`
   probe.
 - Prompt instruction: "Select every answer that could be true given the stated
-  relations."
+  relations." The hardening prompt also makes the semantic contract explicit:
+  unstated relations remain unknown rather than false, possibility means truth
+  in at least one arrangement satisfying every statement, and direction words
+  constrain qualitative coordinate order rather than equal unit distances.
 - Primary metric: exact-set accuracy. Diagnostics: per-option precision and
   recall, over- and under-inclusion, and accuracy by gold set size.
 - Stage-2 constrained decoding already supports 1–N answer subsets over A–E.
@@ -130,10 +134,10 @@ certificate, and passed the prompt round trip.
 2. **Depth and noise cells plant small sets.** Direction depth cells always
    give 3 possible directions; Selection and Count depth cells always give 2.
    Larger open sets would need more open chains.
-3. **Not calibrated on a model yet.** The pilot shows the cells can be
-   generated; it does not show they are hard. The next step is an untuned
-   Qwen3.5-4B run on an engineering pool of about 25 per cell before choosing
-   allocations, as was done for SINGLE.
+3. **The original Boolean cells directly expose alternatives.** A true trigger
+   often implies one disjunction containing the complete query-level gold set.
+   This is useful as a matched contract check, but it is not sufficient as a
+   compositional benchmark cell.
 4. **No disjointness audit yet.** Freezing requires canonical-structure
    disjointness from every `SpatialEntail-SINGLE` split, as in the SINGLE
    release.
@@ -141,16 +145,73 @@ certificate, and passed the prompt round trip.
    because every one of the eight directions needs a witness or a refutation,
    even though only five are shown in the menu.
 
+## First model calibration and response audit
+
+The 34-cell pool was prepared with 25 examples per cell and evaluated using the
+same two-stage protocol as SINGLE. This is retained as engineering evidence,
+not reported as a frozen benchmark score.
+
+| Model | Exact set | Stage 1 exact | Stage 1 format | Gold covered | Missing gold |
+|---|---:|---:|---:|---:|---:|
+| Untuned Qwen3.5-4B | 93.65% | 65.65% | 0.00% | 94.94% | 5.06% |
+| Natural SINGLE-SFT seed 42 | 14.59% | 10.71% | 68.00% | 15.88% | 84.12% |
+
+The Natural adapter result is a contract-transfer failure dominated by omitted
+gold answers, not formatting or indiscriminate over-selection. It does not show
+that Natural supervision generally damages spatial reasoning: the adapter was
+trained to emit one SINGLE answer and was evaluated zero-shot on complete-set
+prediction.
+
+The untuned response archive rules out a scorer or metadata leak: all 850
+predictions rescore exactly, all base IDs and structure signatures are unique,
+the inference argument contains the rendered prompt rather than oracle metadata,
+and option letters are balanced. Stage 2 preserves all 558 native exact answers
+and recovers 238 additional responses whose prose or compact footer contains the
+right decision; it leaves 54 semantic errors (43 missing-gold and 11
+over-inclusive).
+
+The near-saturation is structural. Direct G2/G4 Boolean cells make up 600 of
+850 examples and score 96.33% untuned. They commonly place the complete set of
+possible query answers in one visible disjunction. Depth is more useful: D3
+scores 85.33%, D5 scores 77.33%, and `DIR-TRC-ALT-D5` scores 52%. Count CSR
+errors also expose a meaningful open-world distinction, while Direction depth
+errors show that the qualitative, non-unit-distance contract must be explicit.
+
+## Separate hardening registry
+
+The original registry remains unchanged so the calibration is reproducible.
+The 14-cell hardening registry has two sections:
+
+- **COMP:** `case-chain` Selection cells put each possible candidate behind an
+  exclusive case and a two- or three-link relational chain. No query-answer atom
+  appears as an operand of a disjunction. `case-count` cells make each exclusive
+  branch specify a complete five-candidate world with a different count, so the
+  set of possible counts must be computed rather than read from one formula.
+- **SHIFT:** certified Direction, Selection, and Count depth cells extend to D7
+  and Direction to D9. The existing certificate builder supports these cells;
+  branch-composed Direction was deliberately not admitted because its
+  cross-case transitive refutations are outside the current proof-construction
+  boundary.
+
+Every one of the 14 cells generated a checked example with a replayable answer
+certificate. The complete one-example-per-cell prepared-bundle integration test
+passes in 55 seconds with 14 worker processes, a deterministic tokenizer stub,
+and the hardening pilot's 20,000-token target / 32,768-token evaluation budget.
+Real Qwen tokenizer admission remains a cluster-side check because the local
+macOS environment does not install the Linux/CUDA evaluation dependency set.
+
 ## Next steps
 
-1. Generate an untuned engineering pool, about 25 per cell, and evaluate it with
-   stage-2 constrained decoding.
-2. Drop or harden any cell the untuned model saturates; keep cells with clear
-   headroom.
+1. Prepare 25 examples per hardening cell and evaluate only the untuned model
+   with stage-2 constrained decoding.
+2. Audit the hardening responses and retain structures with clear headroom;
+   scores are a saturation diagnostic, not a rule for selecting individual
+   model failures.
 3. Fix per-cell allocations, run the disjointness audit, and seal
    `SpatialEntail-ALL-POSSIBLE-Bench`.
-4. Evaluate untuned and the `SpatialEntail-SINGLE-SFT` adapters on it to measure
-   transfer to the stricter contract.
+4. Train and evaluate MULTI-SFT only after the benchmark contract and allocation
+   are frozen. The completed SINGLE answer-only ablation is not repeated for this
+   calibration.
 5. Build the paired `SpatialEntail-VISIBLE-POSSIBLE` probe from the same bases
    with partial menus.
 
@@ -162,10 +223,16 @@ sends END/FAIL/TIME_LIMIT mail to the configured NUS address:
 sbatch experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
 ```
 
-Override the output or sample count without editing the script:
+Prepare the separate hardening registry with one process per cell:
 
 ```sh
-PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-v2 \
-SAMPLES_PER_CELL=25 \
-sbatch experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+sbatch --partition=normal --cpus-per-task=14 \
+  --export=ALL,PILOT_REGISTRY=spatial/v2/all-possible-hardening-cells.yaml,PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-hardening,SAMPLES_PER_CELL=25,MAX_NEW_TOKENS=20000,EVAL_MAX_TOKENS=32768 \
+  experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+```
+
+After preparation, submit only untuned:
+
+```sh
+sbatch experiments/spatialentail-allpossible-pilot/prepared-hardening/slurm/untuned.sh
 ```
