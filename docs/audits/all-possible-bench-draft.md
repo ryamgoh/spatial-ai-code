@@ -314,16 +314,19 @@ The Count calibration scores 88% on correlated G3 and 100% on G4. G3 is kept as
 the Count SHIFT discriminator; G4 is dropped rather than iterating toward a
 Qwen-specific failure. The freeze-candidate registry is
 `spatial/v2/all-possible-final-cells.yaml` with a uniform 100 fresh examples per
-cell (1,100 total):
+cell (2,200 total). The matrix is structural rather than selected only from
+Qwen failures:
 
-- COMP anchors: Selection G2/G4 D2 and correlated Count G3;
-- SHIFT Direction: D5, D7, D9;
-- SHIFT Selection: G2/G4 D3 and relational D7;
-- SHIFT Count: relational D5 and independent-factor G3.
+- COMP anchors: Selection G2/G3/G4 D2 and correlated Count G2/G3/G4;
+- SHIFT Direction: every depth D5 through D9;
+- SHIFT Selection: G2/G3/G4 D3 and every relational depth D5 through D7;
+- SHIFT Count: every relational depth D5 through D7 and independent-factor
+  G3/G4.
 
-This gives three Direction, five Selection, and three Count cells. Easier cells
-are retained as anchors; Direction depth and the selected G4/G3 cells carry the
-main discrimination. The calibration examples themselves are not frozen.
+This gives five Direction, nine Selection, and eight Count cells. Easier and
+saturated cells are retained as transparent anchors, while macro query-family
+and slice results prevent the larger Selection/Count grids from hiding the
+Direction result. The calibration examples themselves are not frozen.
 
 Final generation enforces two boundaries in the generator: global canonical
 uniqueness within the new pool and structural exclusion against every JSONL row
@@ -339,7 +342,7 @@ sbatch --partition=normal --cpus-per-task=128 --mem=128G \
   experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
 ```
 
-The output is still called a freeze *candidate* until its 1,100 rows, cell
+The output is still called a freeze *candidate* until its 2,200 rows, cell
 allocation, source/evaluation pairing, certificate presence, hashes, uniqueness,
 and disjointness receipt are checked. Model evaluation begins only after that
 validation is recorded and the candidate is sealed.

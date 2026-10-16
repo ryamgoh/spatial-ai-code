@@ -311,16 +311,29 @@ def test_all_possible_final_registry_has_frozen_cell_matrix() -> None:
     path = Path(__file__).parents[1] / "all-possible-final-cells.yaml"
     registry = load_benchmark_registry(path)
 
-    assert len(registry.cells) == 11
-    assert sum("-COMP-" in cell.id for cell in registry.cells) == 3
-    assert sum("-SHIFT-" in cell.id for cell in registry.cells) == 8
+    assert len(registry.cells) == 22
+    assert sum("-COMP-" in cell.id for cell in registry.cells) == 6
+    assert sum("-SHIFT-" in cell.id for cell in registry.cells) == 16
     assert {
         kind.value: sum(cell.query_kind is kind for cell in registry.cells)
         for kind in QueryKind
-    } == {"direction": 3, "which": 5, "count": 3}
+    } == {"direction": 5, "which": 9, "count": 8}
     assert "CNT-SHIFT-IFF-JCR-ALT-G3" in {
         cell.id for cell in registry.cells
     }
-    assert "CNT-SHIFT-IFF-JCR-ALT-G4" not in {
+    assert "CNT-SHIFT-IFF-JCR-ALT-G4" in {
         cell.id for cell in registry.cells
     }
+    direction_depths = {
+        cell.generation["possibility_depth"]
+        for cell in registry.cells
+        if cell.query_kind is QueryKind.DIRECTION
+    }
+    assert direction_depths == {5, 6, 7, 8, 9}
+    selection_gold_sizes = {
+        cell.generation["possibility_gold_size"]
+        for cell in registry.cells
+        if cell.query_kind is QueryKind.WHICH
+        and cell.generation.get("possibility_skeleton") == "case-chain"
+    }
+    assert selection_gold_sizes == {2, 3, 4}

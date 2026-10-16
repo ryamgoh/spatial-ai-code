@@ -342,9 +342,10 @@ incorrect independence assumption, one incorrect merger of the latent groups,
 and one repetitive over-inclusive response. This provides modest Count
 headroom, but also confirms that Count is intrinsically easier for this base
 model under the current ontology. The final allocation therefore retains G3 as
-a SHIFT discriminator, relational Count D5 as a second scored cell, and one
-easy COMP Count anchor. It drops correlated G4 rather than iterating until a
-template is tailored to defeat Qwen.
+a SHIFT discriminator while retaining G4 as a transparent saturated anchor.
+The final matrix is selected structurally rather than only from cells where
+Qwen fails: it includes G2/G3/G4 for the applicable set-size grids, consecutive
+Direction depths D5--D9, and consecutive Selection/Count depths D5--D7.
 
 === Lessons and next actions
 

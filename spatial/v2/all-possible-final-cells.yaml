@@ -1,5 +1,5 @@
 # SpatialEntail-ALL-POSSIBLE-Bench freeze-candidate registry.
-# Uniform allocation: 100 fresh examples per cell, 1,100 total.
+# Uniform allocation: 100 fresh examples per cell, 2,200 total.
 version: 1
 cells:
 - id: SEL-COMP-CSR-TRC-ALT-G2-D2
@@ -18,6 +18,22 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-chain, possibility_gold_size: 4, possibility_depth: 2, num_entities: 13, num_premises: 15}
+- id: SEL-COMP-CSR-TRC-ALT-G3-D2
+  readiness: ready
+  query_kind: which
+  capability_lenses: [RR, LR, MTR]
+  reasoning_structures: [CSR, TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-chain, possibility_gold_size: 3, possibility_depth: 2, num_entities: 13, num_premises: 15}
+- id: CNT-COMP-CSR-JCR-ALT-G2
+  readiness: ready
+  query_kind: count
+  capability_lenses: [LR, MTR]
+  reasoning_structures: [CSR]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-count, possibility_gold_size: 2, num_entities: 10, num_premises: 10}
 - id: CNT-COMP-CSR-JCR-ALT-G3
   readiness: ready
   query_kind: count
@@ -26,6 +42,14 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-count, possibility_gold_size: 3, num_entities: 10, num_premises: 10}
+- id: CNT-COMP-CSR-JCR-ALT-G4
+  readiness: ready
+  query_kind: count
+  capability_lenses: [LR, MTR]
+  reasoning_structures: [CSR]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-count, possibility_gold_size: 4, num_entities: 10, num_premises: 10}
 - id: DIR-SHIFT-TRC-ALT-D5
   readiness: ready
   query_kind: direction
@@ -42,6 +66,22 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 7, num_entities: 18, num_premises: 19}
+- id: DIR-SHIFT-TRC-ALT-D6
+  readiness: ready
+  query_kind: direction
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 6, num_entities: 16, num_premises: 17}
+- id: DIR-SHIFT-TRC-ALT-D8
+  readiness: ready
+  query_kind: direction
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 8, num_entities: 20, num_premises: 21}
 - id: DIR-SHIFT-TRC-ALT-D9
   readiness: ready
   query_kind: direction
@@ -66,6 +106,30 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-chain, possibility_gold_size: 4, possibility_depth: 3, num_entities: 18, num_premises: 20}
+- id: SEL-SHIFT-CSR-TRC-ALT-G3-D3
+  readiness: ready
+  query_kind: which
+  capability_lenses: [RR, LR, MTR]
+  reasoning_structures: [CSR, TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: case-chain, possibility_gold_size: 3, possibility_depth: 3, num_entities: 18, num_premises: 20}
+- id: SEL-SHIFT-TRC-ALT-D5
+  readiness: ready
+  query_kind: which
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 5, num_entities: 14, num_premises: 15}
+- id: SEL-SHIFT-TRC-ALT-D6
+  readiness: ready
+  query_kind: which
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 6, num_entities: 16, num_premises: 17}
 - id: SEL-SHIFT-TRC-ALT-D7
   readiness: ready
   query_kind: which
@@ -82,6 +146,22 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 5, num_entities: 14, num_premises: 15}
+- id: CNT-SHIFT-TRC-ALT-D6
+  readiness: ready
+  query_kind: count
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 6, num_entities: 16, num_premises: 17}
+- id: CNT-SHIFT-TRC-ALT-D7
+  readiness: ready
+  query_kind: count
+  capability_lenses: [RR, MTR]
+  reasoning_structures: [TRC]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: depth, possibility_depth: 7, num_entities: 18, num_premises: 19}
 - id: CNT-SHIFT-IFF-JCR-ALT-G3
   readiness: ready
   query_kind: count
@@ -90,3 +170,11 @@ cells:
   semantic_status: ALT
   evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
   generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: factor-count, possibility_gold_size: 3, num_entities: 10, num_premises: 10}
+- id: CNT-SHIFT-IFF-JCR-ALT-G4
+  readiness: ready
+  query_kind: count
+  capability_lenses: [LR, MTR]
+  reasoning_structures: [IFF]
+  semantic_status: ALT
+  evidence_obligations: [possibility-witness, candidate-exclusion, joint-count]
+  generation: {answer_mode: all-possible, semantic_shape: ambiguous, ordinary_option_target: 5, possibility_skeleton: factor-count, possibility_gold_size: 4, num_entities: 10, num_premises: 10}
