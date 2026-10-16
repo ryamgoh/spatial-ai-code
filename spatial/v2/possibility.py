@@ -136,8 +136,8 @@ def validate_possibility_policy(policy: Any) -> None:
         if policy.possibility_skeleton == "case-count" and policy.num_entities < 8:
             raise ValueError("case-count requires at least 8 objects")
         if policy.possibility_skeleton == "factor-count":
-            if gold_size not in {3, 4}:
-                raise ValueError("factor-count supports gold size 3 or 4")
+            if gold_size not in {2, 3, 4}:
+                raise ValueError("factor-count supports gold size 2, 3, or 4")
             if policy.num_entities < 10 or policy.num_premises < 9:
                 raise ValueError(
                     "factor-count requires at least 10 objects and 9 premises"
@@ -322,13 +322,17 @@ def _membership_skeleton(
             direction_constraint(first, second, rng.choice(tuple(Direction))),
             direction_constraint(third, fourth, rng.choice(tuple(Direction))),
         )
-        group_sizes = (
-            (2, 2) if policy.possibility_gold_size == 3 else (2, 3)
-        )
+        group_sizes = {
+            2: (5,),
+            3: (2, 2),
+            4: (2, 3),
+        }[policy.possibility_gold_size]
         opposite = _opposite(direction)
         premises = []
         cursor = 0
-        for trigger, group_size in zip(triggers, group_sizes, strict=True):
+        for trigger, group_size in zip(
+            triggers[: len(group_sizes)], group_sizes, strict=True
+        ):
             for _ in range(group_size):
                 candidate = candidates[cursor]
                 premises.append(Iff(trigger, member(candidate)))

@@ -169,7 +169,7 @@ def test_case_count_requires_complete_branch_membership_assignments(gold_size) -
 
 @pytest.mark.parametrize(
     ("gold_size", "expected_counts"),
-    ((3, (0, 2, 4)), (4, (0, 2, 3, 5))),
+    ((2, (0, 5)), (3, (0, 2, 4)), (4, (0, 2, 3, 5))),
 )
 def test_factor_count_combines_independent_correlated_groups(
     gold_size, expected_counts

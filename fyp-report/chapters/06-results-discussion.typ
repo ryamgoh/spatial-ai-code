@@ -344,8 +344,9 @@ headroom, but also confirms that Count is intrinsically easier for this base
 model under the current ontology. The final allocation therefore retains G3 as
 a SHIFT discriminator while retaining G4 as a transparent saturated anchor.
 The final matrix is selected structurally rather than only from cells where
-Qwen fails: it includes G2/G3/G4 for the applicable set-size grids, consecutive
-Direction depths D5--D9, and consecutive Selection/Count depths D5--D7.
+Qwen fails: Direction, Selection, and Count each include G2/G3/G4 set-size
+anchors and consecutive D5--D9 depth curves. This permits literal per-query
+gold-size and depth plots rather than interpolating across skipped values.
 
 === Lessons and next actions
 
