@@ -333,8 +333,18 @@ a strong matched/compositional check at 92.00%, whereas SHIFT falls to 76.89%.
 Direction carries the clearest headroom: its D5 and D7 cells each score 60%, and
 D9 scores 40%. Selection falls from 99.27% in the first pilot to 85.33% after
 removing direct enumeration. Count remains close to saturation at 96.00%, so
-the next generator change should target Count specifically instead of
-redesigning the successful Direction and Selection cells.
+a separate two-cell Count calibration tests independent correlated factors
+without redesigning the successful Direction and Selection cells.
+
+The correlated Count G3 cell reaches 88% exact-set accuracy, while G4 remains
+fully solved at 100%; combined accuracy is 94%. The three G3 errors reflect one
+incorrect independence assumption, one incorrect merger of the latent groups,
+and one repetitive over-inclusive response. This provides modest Count
+headroom, but also confirms that Count is intrinsically easier for this base
+model under the current ontology. The final allocation therefore retains G3 as
+a SHIFT discriminator, relational Count D5 as a second scored cell, and one
+easy COMP Count anchor. It drops correlated G4 rather than iterating until a
+template is tailored to defeat Qwen.
 
 === Lessons and next actions
 
@@ -359,9 +369,10 @@ stored separately.
 This remains an engineering pool, not the final benchmark. Three of its 350
 rows repeat another canonical structure within one Selection COMP cell, even
 though their surface names and option mappings differ. Before freezing, the
-pipeline will enforce canonical uniqueness, add one narrow Count-hardening
-extension, fix per-cell allocations, and audit structural disjointness from all
-training and development splits. The resulting
+pipeline will enforce canonical uniqueness, fix per-cell allocations, and audit
+structural disjointness from all training and development splits. Canonical
+uniqueness and the Count extension are now implemented; the remaining step is
+to generate the fresh selected pool and run the disjointness audit. The resulting
 `SpatialEntail-ALL-POSSIBLE-Bench` can then be sealed. Only after that boundary
 is fixed will the study generate `SpatialEntail-MULTI-SFT`, train the Natural
 multi-contract model, and compare untuned, SINGLE-to-MULTI transfer, and

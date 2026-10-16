@@ -305,3 +305,22 @@ def test_all_possible_count_hardening_registry_is_targeted() -> None:
         assert cell.query_kind.value == "count"
         assert cell.generation["possibility_skeleton"] == "factor-count"
         assert cell.generation_policy().ordinary_option_target == 5
+
+
+def test_all_possible_final_registry_has_frozen_cell_matrix() -> None:
+    path = Path(__file__).parents[1] / "all-possible-final-cells.yaml"
+    registry = load_benchmark_registry(path)
+
+    assert len(registry.cells) == 11
+    assert sum("-COMP-" in cell.id for cell in registry.cells) == 3
+    assert sum("-SHIFT-" in cell.id for cell in registry.cells) == 8
+    assert {
+        kind.value: sum(cell.query_kind is kind for cell in registry.cells)
+        for kind in QueryKind
+    } == {"direction": 3, "which": 5, "count": 3}
+    assert "CNT-SHIFT-IFF-JCR-ALT-G3" in {
+        cell.id for cell in registry.cells
+    }
+    assert "CNT-SHIFT-IFF-JCR-ALT-G4" not in {
+        cell.id for cell in registry.cells
+    }

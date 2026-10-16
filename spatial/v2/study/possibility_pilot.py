@@ -115,9 +115,11 @@ def _generate_one_row(
 
 
 def _duplicate_slots(
-    generated: dict[str, list[dict[str, Any] | None]], ready: list[BenchmarkCell]
+    generated: dict[str, list[dict[str, Any] | None]],
+    ready: list[BenchmarkCell],
+    excluded_signatures: set[str] | None = None,
 ) -> list[tuple[BenchmarkCell, int]]:
-    seen = set()
+    seen = set(excluded_signatures or ())
     duplicates = []
     for cell in ready:
         for sample_index, row in enumerate(generated[cell.id]):
@@ -139,11 +141,12 @@ def _replace_duplicate_structures(
     *,
     seed: int,
     workers: int,
+    excluded_signatures: set[str] | None = None,
     max_rounds: int = 50,
 ) -> None:
     retries: dict[tuple[str, int], int] = {}
     for _ in range(max_rounds):
-        duplicates = _duplicate_slots(generated, ready)
+        duplicates = _duplicate_slots(generated, ready, excluded_signatures)
         if not duplicates:
             return
         print(
@@ -183,7 +186,7 @@ def _replace_duplicate_structures(
                 for future in as_completed(futures):
                     cell, sample_index = futures[future]
                     generated[cell.id][sample_index] = future.result()
-    remaining = _duplicate_slots(generated, ready)
+    remaining = _duplicate_slots(generated, ready, excluded_signatures)
     raise RuntimeError(
         f"could not obtain unique canonical structures after {max_rounds} rounds; "
         f"remaining duplicates: {len(remaining)}"
@@ -269,18 +272,41 @@ def _generation_cache_path(output: Path) -> Path:
     return output.with_name(output.name + ".generation-cache")
 
 
+def _load_structure_signatures(paths: tuple[Path, ...]) -> set[str]:
+    signatures = set()
+    for source in paths:
+        files = sorted(source.rglob("*.jsonl")) if source.is_dir() else [source]
+        if not files or any(not path.is_file() for path in files):
+            raise FileNotFoundError(f"disjointness source has no JSONL rows: {source}")
+        for path in files:
+            for line in path.read_text().splitlines():
+                signature = json.loads(line).get("metadata", {}).get(
+                    "structure_signature"
+                )
+                if not isinstance(signature, str) or not signature:
+                    raise ValueError(f"row lacks structure signature: {path}")
+                signatures.add(signature)
+    return signatures
+
+
 def _cache_contract(
     root: Path,
     registry_fingerprint: str,
     *,
     samples_per_cell: int,
     seed: int,
+    excluded_signatures: set[str] | None = None,
 ) -> dict[str, Any]:
+    excluded_signatures = excluded_signatures or set()
     return {
         "schema": "spatialentail-all-possible-generation-cache-v1",
         "registry_fingerprint": registry_fingerprint,
         "samples_per_cell": samples_per_cell,
         "seed": seed,
+        "excluded_structure_count": len(excluded_signatures),
+        "excluded_structures_sha256": hashlib.sha256(
+            "\n".join(sorted(excluded_signatures)).encode()
+        ).hexdigest(),
         "environment_sha256": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
             for name in _GENERATION_ENVIRONMENT_FILES
@@ -353,6 +379,7 @@ def _generate_ready_cells(
     samples_per_cell: int,
     seed: int,
     workers: int,
+    excluded_signatures: set[str] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Generate cells serially or in a bounded process pool."""
     started = time.perf_counter()
@@ -421,7 +448,11 @@ def _generate_ready_cells(
     if any(row is None for rows in generated.values() for row in rows):
         raise RuntimeError("generation completed with missing sample slots")
     _replace_duplicate_structures(
-        generated, ready, seed=seed, workers=workers
+        generated,
+        ready,
+        seed=seed,
+        workers=workers,
+        excluded_signatures=excluded_signatures,
     )
     return {
         cell_id: [row for row in rows if row is not None]
@@ -509,6 +540,7 @@ def prepare_pilot(
     eval_max_tokens: int = 16384,
     repo_root: Path | None = None,
     workers: int | None = None,
+    disjoint_from: tuple[Path, ...] = (),
 ) -> dict[str, Any]:
     root = (repo_root or Path(__file__).resolve().parents[3]).resolve()
     output = output.resolve()
@@ -520,6 +552,9 @@ def prepare_pilot(
         raise ValueError("samples_per_cell must be positive")
 
     registry = load_benchmark_registry(registry_path)
+    excluded_signatures = _load_structure_signatures(
+        tuple(path.resolve() for path in disjoint_from)
+    )
     budget = ContextBudget(
         tokenizer_name=_TOKENIZER,
         train_max_tokens=eval_max_tokens,
@@ -555,6 +590,7 @@ process_results_v2_answer = module.process_results_v2_answer
         registry.fingerprint,
         samples_per_cell=samples_per_cell,
         seed=seed,
+        excluded_signatures=excluded_signatures,
     )
     if cache.exists():
         print(f"Reusing generation cache at {cache}", file=sys.stderr, flush=True)
@@ -567,6 +603,7 @@ process_results_v2_answer = module.process_results_v2_answer
             samples_per_cell=samples_per_cell,
             seed=seed,
             workers=generation_workers,
+            excluded_signatures=excluded_signatures,
         )
         _write_generation_cache(cache, generated, cache_contract)
         print(f"Saved generation cache at {cache}", file=sys.stderr, flush=True)
@@ -678,6 +715,10 @@ process_results_v2_answer = module.process_results_v2_answer
             for rows in generated.values()
             for row in rows
         ),
+        "excluded_structure_count": len(excluded_signatures),
+        "excluded_structures_sha256": cache_contract[
+            "excluded_structures_sha256"
+        ],
         "total_rows": total_rows,
         "choices": _CHOICES,
         "allow_multiple_answers": True,
@@ -754,6 +795,13 @@ def main() -> None:
     parser.add_argument("--max-new-tokens", type=int, default=12288)
     parser.add_argument("--eval-max-tokens", type=int, default=16384)
     parser.add_argument(
+        "--disjoint-from",
+        action="append",
+        default=[],
+        type=Path,
+        help="JSONL file or directory whose structure signatures must be excluded",
+    )
+    parser.add_argument(
         "--workers",
         type=int,
         help="generation processes (default: SLURM_CPUS_PER_TASK, otherwise 1)",
@@ -767,6 +815,7 @@ def main() -> None:
         max_new_tokens=args.max_new_tokens,
         eval_max_tokens=args.eval_max_tokens,
         workers=args.workers,
+        disjoint_from=tuple(args.disjoint_from),
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
 

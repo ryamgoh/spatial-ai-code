@@ -308,6 +308,42 @@ sbatch --partition=normal --cpus-per-task=50 --mem=50G \
 After preparation, submit only its untuned job. These two cells are merged into
 the final allocation only if they create material Count headroom.
 
+## Freeze-candidate matrix
+
+The Count calibration scores 88% on correlated G3 and 100% on G4. G3 is kept as
+the Count SHIFT discriminator; G4 is dropped rather than iterating toward a
+Qwen-specific failure. The freeze-candidate registry is
+`spatial/v2/all-possible-final-cells.yaml` with a uniform 100 fresh examples per
+cell (1,100 total):
+
+- COMP anchors: Selection G2/G4 D2 and correlated Count G3;
+- SHIFT Direction: D5, D7, D9;
+- SHIFT Selection: G2/G4 D3 and relational D7;
+- SHIFT Count: relational D5 and independent-factor G3.
+
+This gives three Direction, five Selection, and three Count cells. Easier cells
+are retained as anchors; Direction depth and the selected G4/G3 cells carry the
+main discrimination. The calibration examples themselves are not frozen.
+
+Final generation enforces two boundaries in the generator: global canonical
+uniqueness within the new pool and structural exclusion against every JSONL row
+in the sealed SINGLE release. Exclusion paths are included in the generation
+cache contract by signature count and hash, so changing the reference corpus
+invalidates cache reuse.
+
+Prepare the fresh freeze candidate on a 128-CPU node:
+
+```sh
+sbatch --partition=normal --cpus-per-task=128 --mem=128G \
+  --export=ALL,PILOT_REGISTRY=spatial/v2/all-possible-final-cells.yaml,PILOT_OUT=experiments/spatialentail-allpossible-pilot/prepared-final-candidate,SAMPLES_PER_CELL=100,MAX_NEW_TOKENS=20000,EVAL_MAX_TOKENS=32768,PILOT_DISJOINT_FROM=results/spatialentail-study/release-final \
+  experiments/spatialentail-allpossible-pilot/slurm/prepare.sh
+```
+
+The output is still called a freeze *candidate* until its 1,100 rows, cell
+allocation, source/evaluation pairing, certificate presence, hashes, uniqueness,
+and disjointness receipt are checked. Model evaluation begins only after that
+validation is recorded and the candidate is sealed.
+
 After preparation, submit only untuned:
 
 ```sh

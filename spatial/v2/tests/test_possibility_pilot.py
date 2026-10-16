@@ -140,6 +140,47 @@ def test_sample_level_generation_replaces_duplicate_structures(monkeypatch):
     assert [row["metadata"]["uniqueness_retry"] for row in generated["CELL"]] == [0, 1]
 
 
+def test_generation_regenerates_structures_found_in_exclusion_set(monkeypatch):
+    class _Cell:
+        id = "CELL"
+
+    monkeypatch.setattr(
+        pilot,
+        "_generate_one_row",
+        lambda cell, *, seed, uniqueness_retry=0: {
+            "metadata": {
+                "structure_signature": (
+                    "excluded" if uniqueness_retry == 0 else f"replacement-{seed}"
+                ),
+                "uniqueness_retry": uniqueness_retry,
+            }
+        },
+    )
+
+    generated = pilot._generate_ready_cells(
+        [_Cell()],
+        samples_per_cell=1,
+        seed=42,
+        workers=1,
+        excluded_signatures={"excluded"},
+    )
+
+    row = generated["CELL"][0]
+    assert row["metadata"]["structure_signature"] != "excluded"
+    assert row["metadata"]["uniqueness_retry"] == 1
+
+
+def test_structure_signature_loader_reads_jsonl_files_and_directories(tmp_path):
+    first = tmp_path / "first.jsonl"
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    second = nested / "second.jsonl"
+    first.write_text(json.dumps({"metadata": {"structure_signature": "a"}}) + "\n")
+    second.write_text(json.dumps({"metadata": {"structure_signature": "b"}}) + "\n")
+
+    assert pilot._load_structure_signatures((first, nested)) == {"a", "b"}
+
+
 def test_generation_cache_is_hash_checked_and_reusable(tmp_path):
     cache = tmp_path / "cache"
     contract = {
