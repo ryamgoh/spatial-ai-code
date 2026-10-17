@@ -367,6 +367,44 @@ its feasible L range instead of fabricating impossible cells. Support size,
 proof size, branching, and token length remain continuous diagnostics rather
 than new task labels or a composite difficulty score.
 
+=== Rejected first full randomized-v2 calibration
+
+The first full L6/X6 calibration generated all 2,400 requested rows but was
+rejected after a row-level audit. All rows matched their requested L and X,
+used five-option menus, passed prompt round trips, and contained no sampled CSR
+steps. For each query family, 23 of the 25 ordered linear transitions were
+eligible and succeeded in 20/20 attempts. The two excluded transitions were
+the expected typed limitations `TRC→DJE` and `TRC→DN`.
+
+The run used 128 workers and recorded 155.8 seconds for row generation. It
+accepted 2,400 rows from 3,052 candidate trials, an aggregate acceptance rate
+of 78.64%. Two thousand rows succeeded on their first attempt; the
+95th-percentile rejection count was two and the maximum was eleven. It produced
+2,395 unique canonical structures. The five surplus duplicates were confined
+to four minimum-length, X0 Count collision groups and would have been replaced
+under the stricter headline-candidate policy.
+
+The blocking defect concerned gold-set preservation. Twenty-eight rows (1.17%)
+had fewer solved answers than their declared G. Selection contributed 24:
+five declared G2 rows realised G1, ten G3 rows realised G1 or G2, and nine G4
+rows realised G2 or G3. Count contributed four: two G3 rows realised G2 and
+two G4 rows realised G3. A deterministic Selection G2/L2/X0 reproduction
+showed that the exclusion-first base correctly allowed both planted answers,
+after which a lifted random proof prefix reused a query candidate and made one
+answer impossible. Admission checked only whether the result remained broadly
+ambiguous; it did not assert that the solved answer-set size still equalled the
+requested G.
+
+This run is retained as engineering evidence but is not used to freeze the
+benchmark or generate SFT data. The required correction is to isolate
+proof-prefix auxiliary objects from query candidates, add an exact post-solver
+G check, and lock the recorded seed into a regression test before repeating the
+calibration. The
+row-level audit also measured Natural-target whitespace counts of median 771,
+p95 1,080, and maximum 1,465, and complete-message counts of median 1,004 and
+maximum 1,746. These values are lexical diagnostics rather than exact counts
+from the pinned Qwen tokenizer.
+
 === Lessons and next actions
 
 The two pilots show that a larger answer space is not sufficient by itself:

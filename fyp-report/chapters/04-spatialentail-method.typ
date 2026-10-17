@@ -161,6 +161,27 @@ contribute to realised certificate depth, but it is not an interchangeable
 linear transition token. Visible `NOT` syntax and the legacy `NEG` label do not
 by themselves establish a `DN` inference.
 
+SpatialEntail uses a bounded propositional fragment whose basic propositions
+are concrete pairwise spatial relations. It supplements the Boolean rules with
+checked operations for decomposing, inverting, composing, and recombining
+spatial directions. It is not intended to provide complete coverage of
+classical propositional logic. Its formula language already supports NOT, AND,
+OR, implication, and equivalence, and its checker supports double-negation
+elimination, disjunctive syllogism, contradiction, and scoped refutation. It
+does not implement every associated inference or equivalence, including
+reusable negation introduction, double-negation introduction, general Boolean
+normalization, and complement-aware disjunct elimination.
+
+This boundary creates a specific typed-transition limitation. TRC derives an
+exact positive spatial atom, while the implemented DJE rule requires an
+explicit disjunction and negated alternative and DN requires an explicitly
+double-negated formula. The direct transitions `TRC→DJE` and `TRC→DN` are
+therefore outside the constructive grammar. This does not separate Boolean
+from spatial reasoning: the reverse transitions `DJE→TRC` and `DN→TRC`, as
+well as longer compositions such as `TRC→MP→DJE`, remain supported. Extending
+the calculus is valid future work, but complete classical propositional
+coverage is outside this FYP's scope.
+
 Thus `CNT-CSR-JCR-UNI` means a Count query, a case-split proof motif, a
 joint-Count evidence obligation, and a unique outcome; it does not mean the
 ordered sequence `CNT→CSR→JCR→UNI`.

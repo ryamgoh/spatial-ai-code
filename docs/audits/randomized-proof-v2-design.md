@@ -64,6 +64,64 @@ query family retains fewer than six reliable edges. Seed 42 subsequently
 partitions eligible edges 75% seen and 25% held out while retaining an
 L8-capable seen graph.
 
+### Rejected first full calibration
+
+The first 2,400-row L6/X6 calibration completed on 17 October 2026 but is
+retained only as engineering evidence. All rows matched their requested L and
+X, used five-option menus, passed prompt round trips, and contained no sampled
+CSR steps. The transition probe found the same 23 eligible edges for all three
+query families; every eligible edge succeeded in 20/20 attempts, while the two
+typed exclusions `TRC->DJE` and `TRC->DN` failed in 0/20 attempts as expected.
+At 128 workers, the recorded row-generation phase took 155.8 seconds. The pool
+accepted 2,400 rows from 3,052 candidate trials (78.64% aggregate acceptance),
+with 2,000 rows accepted on their first attempt, a 95th-percentile rejection
+count of two, and a maximum of eleven.
+
+The audit nevertheless found a release-blocking gold-set preservation defect:
+28 rows (1.17%) had fewer solved answers than their declared G. Selection
+accounted for 24 rows: five declared G2 rows realised G1, ten declared G3 rows
+realised G1 or G2, and nine declared G4 rows realised G2 or G3. Count accounted
+for four rows: two G3 rows realised G2 and two G4 rows realised G3. A pinned
+Selection G2/L2/X0 seed reproduced the fault deterministically: the base
+exclusion skeleton allowed both High School and University, but the lifted
+random proof prefix introduced an additional relation involving High School
+and left only University possible. Admission checked only the broad ambiguous
+shape, not equality between the solved answer-set size and requested G.
+
+The same audit found 2,395 unique canonical structures. The five surplus
+duplicates occurred across four small Count collision groups at their minimum
+feasible L and X0; duplicates are permitted in disposable calibration but not
+in the headline candidate. Natural-target whitespace counts had median 771,
+p95 1,080, and maximum 1,465; complete-message whitespace counts had median
+1,004 and maximum 1,746. These are lexical proxies, not pinned-tokenizer
+measurements.
+
+This calibration must not seed the headline benchmark or SFT release. The
+replacement must isolate proof-prefix auxiliaries from query candidates and
+enforce `realised gold-set size == requested G` after solving. A regression test
+must retain the failing seed, and a multi-seed property check must cover
+Selection and Count before the 2,400 rows are regenerated.
+
+SpatialEntail uses a bounded propositional fragment whose basic propositions
+are concrete pairwise spatial relations. It supplements the Boolean rules with
+checked operations for decomposing, inverting, composing, and recombining
+spatial directions. This is not a claim of complete coverage of classical
+propositional logic. The formula language supports NOT, AND, OR, implication,
+and equivalence; the checker supports double-negation elimination, disjunctive
+syllogism, contradiction, and scoped refutation. It does not provide every
+associated inference or equivalence, such as reusable negation introduction,
+double-negation introduction, general Boolean normalization, or
+complement-aware disjunct elimination.
+
+This boundary creates a specific typing limitation. TRC derives an exact
+positive spatial atom, whereas the current DJE primitive consumes an explicit
+disjunction and negated alternative, and DN consumes an explicitly
+double-negated formula. Consequently, `TRC->DJE` and `TRC->DN` are not direct
+edges in this constructor. This does not prevent Boolean and spatial reasoning
+from co-occurring: `DJE->TRC`, `DN->TRC`, and longer paths such as
+`TRC->MP->DJE` remain available. Extending the calculus is valid future work,
+but complete classical propositional coverage is outside this FYP's scope.
+
 ## Frozen-candidate allocation
 
 The candidate contains 3,600 fresh bases: 900 SINGLE and 2,700 ALL-POSSIBLE.
