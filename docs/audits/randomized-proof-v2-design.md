@@ -50,6 +50,11 @@ sizes, and L1--L8. Infeasible low-L Count cells are not fabricated: complete
 G2/G3/G4 Count certificates currently have audited minima L2/L3/L4 because
 excluded counts require assignment refutations. Each query/gold group retains
 200 calibration examples by reallocating uniformly over its feasible L range.
+Calibration is disposable engineering evidence, so repeated canonical
+structures are counted in its receipt rather than causing the completed pool to
+be discarded. The fresh headline benchmark remains strictly unique: duplicate
+slots are deterministically regenerated until unique or the bounded replacement
+budget fails.
 
 All 36 ordered rule pairs receive 20 seeded capability attempts. A transition
 is eligible after 16 successful replays. Seed 42 partitions eligible edges 75%

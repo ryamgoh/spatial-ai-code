@@ -568,6 +568,70 @@ def _calibration_seed(
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
 
 
+def _duplicate_structure_indices(rows: list[dict[str, Any]]) -> list[int]:
+    seen: set[str] = set()
+    duplicates = []
+    for index, row in enumerate(rows):
+        signature = row.get("metadata", {}).get("structure_signature")
+        if not isinstance(signature, str) or not signature:
+            raise ValueError(f"row {index} lacks a canonical structure signature")
+        if signature in seen:
+            duplicates.append(index)
+        else:
+            seen.add(signature)
+    return duplicates
+
+
+def _replacement_seed(original: int, retry: int) -> int:
+    payload = f"{original}:canonical-replacement:{retry}".encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
+
+
+def _replace_headline_duplicates(
+    rows: list[dict[str, Any]],
+    work: list[tuple[str, int, str, int, int, int, int]],
+    *,
+    workers: int,
+    max_rounds: int = 50,
+) -> int:
+    """Regenerate only repeated final-benchmark structures."""
+    replacement_count = 0
+    retries: dict[int, int] = {}
+    for _ in range(max_rounds):
+        duplicates = _duplicate_structure_indices(rows)
+        if not duplicates:
+            return replacement_count
+        replacement_count += len(duplicates)
+        replacement_work = []
+        for index in duplicates:
+            retries[index] = retries.get(index, 0) + 1
+            original = work[index]
+            replacement_work.append(
+                (
+                    index,
+                    (*original[:-2], _replacement_seed(original[-2], retries[index]), original[-1]),
+                )
+            )
+        if workers == 1:
+            for index, item in replacement_work:
+                rows[index] = _headline_row(*item)
+        else:
+            with ProcessPoolExecutor(
+                max_workers=min(workers, len(replacement_work))
+            ) as executor:
+                futures = {
+                    executor.submit(_headline_row, *item): index
+                    for index, item in replacement_work
+                }
+                for future in as_completed(futures):
+                    rows[futures[future]] = future.result()
+    remaining = len(_duplicate_structure_indices(rows))
+    raise RuntimeError(
+        f"could not obtain a unique benchmark after {max_rounds} replacement "
+        f"rounds; {remaining} duplicate rows remain"
+    )
+
+
 def _randomized_policy(query: QueryKind, gold: int) -> GenerationPolicy:
     if gold == 1:
         return GenerationPolicy(
@@ -842,6 +906,15 @@ def prepare_calibration(
     if requested_workers <= 0:
         raise ValueError("workers must be positive")
     worker_count = min(requested_workers, len(work))
+    transition_probe = (
+        probe_transition_capability(
+            seed=seed,
+            attempts=20,
+            workers=worker_count,
+        )
+        if run_transition_probe
+        else None
+    )
     rows: list[dict[str, Any] | None] = [None] * len(work)
     started = time.perf_counter()
     print(
@@ -869,20 +942,9 @@ def prepare_calibration(
                         flush=True,
                     )
     admitted = [row for row in rows if row is not None]
-    signatures = [row["metadata"]["structure_signature"] for row in admitted]
     if len(admitted) != len(work):
         raise RuntimeError("calibration generation left empty work slots")
-    if len(signatures) != len(set(signatures)):
-        raise RuntimeError("calibration contains duplicate canonical structures")
-    transition_probe = (
-        probe_transition_capability(
-            seed=seed,
-            attempts=20,
-            workers=worker_count,
-        )
-        if run_transition_probe
-        else None
-    )
+    duplicate_indices = _duplicate_structure_indices(admitted)
     output.mkdir(parents=True)
     content = "".join(
         json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
@@ -899,6 +961,8 @@ def prepare_calibration(
         "gold_sizes": list(gold_sizes),
         "workers": worker_count,
         "elapsed_seconds": elapsed,
+        "unique_structures": len(admitted) - len(duplicate_indices),
+        "duplicate_structure_rows": len(duplicate_indices),
         "transition_probe": transition_probe,
         "study": study_manifest(design),
     }
@@ -980,11 +1044,13 @@ def prepare_headline_benchmark(
                         flush=True,
                     )
     admitted = [row for row in rows if row is not None]
-    signatures = [row["metadata"]["structure_signature"] for row in admitted]
     if len(admitted) != 3600:
         raise RuntimeError("headline benchmark did not produce 3,600 rows")
-    if len(signatures) != len(set(signatures)):
-        raise RuntimeError("headline benchmark contains duplicate structures")
+    replacement_count = _replace_headline_duplicates(
+        admitted,
+        work,
+        workers=worker_count,
+    )
     output.mkdir(parents=True)
     (output / "source-natural.jsonl").write_text(
         "".join(
@@ -998,6 +1064,8 @@ def prepare_headline_benchmark(
         "rows": len(admitted),
         "workers": worker_count,
         "elapsed_seconds": time.perf_counter() - started,
+        "canonical_replacements": replacement_count,
+        "unique_structures": len(admitted),
         "calibration_manifest_sha256": hashlib.sha256(
             calibration_manifest.read_bytes()
         ).hexdigest(),

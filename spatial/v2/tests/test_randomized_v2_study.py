@@ -4,6 +4,7 @@ from spatial.v2.generation import QueryKind
 from spatial.v2.study.randomized_v2 import (
     RandomizedStudyDesign,
     _calibration_row,
+    _duplicate_structure_indices,
     benchmark_partition_quotas,
     calibration_length_quotas,
     pair_marginal_quotas,
@@ -53,6 +54,11 @@ def test_study_manifest_has_expected_contract_totals() -> None:
         sum(quotas.values()) == 2000
         for quotas in manifest["training"]["multi_length_by_gold"].values()
     )
+    assert sum(manifest["training"]["single_distractors"].values()) == 8000
+    assert all(
+        sum(quotas.values()) == 2000
+        for quotas in manifest["training"]["multi_distractors_by_gold"].values()
+    )
 
 
 def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
@@ -68,11 +74,17 @@ def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
             path,
             study_manifest(RandomizedStudyDesign(train_max_l=6)),
         )
-    assert sum(manifest["training"]["single_distractors"].values()) == 8000
-    assert all(
-        sum(quotas.values()) == 2000
-        for quotas in manifest["training"]["multi_distractors_by_gold"].values()
-    )
+
+
+def test_calibration_duplicate_detection_reports_rows_without_rejecting_pool() -> None:
+    rows = [
+        {"metadata": {"structure_signature": "a"}},
+        {"metadata": {"structure_signature": "b"}},
+        {"metadata": {"structure_signature": "a"}},
+        {"metadata": {"structure_signature": "b"}},
+    ]
+
+    assert _duplicate_structure_indices(rows) == [2, 3]
 
 
 def test_marginal_pairing_preserves_both_exact_distributions() -> None:
