@@ -64,7 +64,6 @@ class RandomizedStudyDesign:
     benchmark_x_ratio: float = 1.10
     training_l_ratio: float = 1.40
     training_x_ratio: float = 1.25
-    max_case_splits: int = 1
 
     def __post_init__(self) -> None:
         if not 4 <= self.train_max_l < self.eval_max_l <= 8:
@@ -81,8 +80,6 @@ class RandomizedStudyDesign:
             )
         ):
             raise ValueError("all exponential ratios must be positive")
-        if not 0 <= self.max_case_splits <= self.eval_max_l:
-            raise ValueError("max_case_splits must be between zero and eval_max_l")
 
 
 DEFAULT_DESIGN = RandomizedStudyDesign()
@@ -589,7 +586,7 @@ def _replacement_seed(original: int, retry: int) -> int:
 
 def _replace_headline_duplicates(
     rows: list[dict[str, Any]],
-    work: list[tuple[str, int, str, int, int, int, int]],
+    work: list[tuple[str, int, str, int, int, int]],
     *,
     workers: int,
     max_rounds: int = 50,
@@ -609,7 +606,7 @@ def _replace_headline_duplicates(
             replacement_work.append(
                 (
                     index,
-                    (*original[:-2], _replacement_seed(original[-2], retries[index]), original[-1]),
+                    (*original[:-1], _replacement_seed(original[-1], retries[index])),
                 )
             )
         if workers == 1:
@@ -663,7 +660,6 @@ def _calibration_row(
     length: int,
     distractors: int,
     seed: int,
-    max_case_splits: int = 1,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     generator = SpatialGeneratorV2(seed)
@@ -674,7 +670,6 @@ def _calibration_row(
         RandomProofPolicy(
             length,
             distractors,
-            max_case_splits=max_case_splits,
             forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
             transition_partition=TransitionPartition(transitions, frozenset()),
         ),
@@ -712,7 +707,6 @@ def _transition_probe_attempt(
                 2,
                 0,
                 allowed_rules=tuple(dict.fromkeys(edge)),
-                max_case_splits=1,
                 transition_partition=TransitionPartition(frozenset({edge}), frozenset()),
             ),
             max_attempts=20,
@@ -815,7 +809,6 @@ def _headline_row(
     length: int,
     distractors: int,
     seed: int,
-    max_case_splits: int = 1,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     benchmark_partition = BenchmarkPartition(partition_value)
@@ -839,7 +832,6 @@ def _headline_row(
                     distractors,
                     require_heldout_transition=require_heldout,
                     transition_partition=proof_partition,
-                    max_case_splits=max_case_splits,
                     forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
                 ),
                 max_attempts=2_000,
@@ -904,7 +896,6 @@ def prepare_calibration(
                             length,
                             cursor % (design.eval_max_x + 1),
                             _calibration_seed(seed, query, gold, length, local_index),
-                            design.max_case_splits,
                         )
                     )
                     cursor += 1
@@ -1023,7 +1014,6 @@ def prepare_headline_benchmark(
                                 length * 100 + distractors,
                                 sample_index,
                             ),
-                            design.max_case_splits,
                         )
                     )
     requested_workers = workers or int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))

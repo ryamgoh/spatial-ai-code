@@ -143,11 +143,6 @@ def _backward_step(
         return Not(eliminated)
     if rule is SemanticRule.DN:
         return Not(Not(output))
-    if rule is SemanticRule.CSR:
-        first = atoms.next()
-        second = atoms.next()
-        side_premises.extend((Implies(first, output), Implies(second, output)))
-        return Or((first, second))
     if rule is SemanticRule.TRC:
         if not isinstance(output, RelationConstraint):
             raise RandomProofConstructionError(
@@ -216,9 +211,9 @@ def _proof_and_distractor_objects(
         )
     leaves = tuple(spare[:distractor_count])
     proof_pool = spare[distractor_count:]
-    # Five objects provide ten distinct pairs, enough for an L8 path with at
-    # most one CSR step. Reusing this bounded core avoids bloating the solver
-    # domain merely to obtain fresh propositional atoms.
+    # Five objects provide ten distinct pairs, enough for an L8 linear path.
+    # Reusing this bounded core avoids bloating the solver domain merely to
+    # obtain fresh propositional atoms.
     proof_core = tuple(proof_pool[:5])
     atom_objects = tuple(obj for obj in objects if obj not in leaves)
     return atom_objects, proof_core

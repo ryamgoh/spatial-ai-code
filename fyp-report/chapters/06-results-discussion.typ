@@ -347,11 +347,12 @@ relational chain, but simultaneously increases premises, entities, removable
 noise, and prompt length; it cannot by itself identify general proof depth as
 the cause of the D9 drop.
 
-The replacement v2 design samples ordered proof graphs and admits them by their
-replayed certificates. Semantic length $L$ is the longest dependency path of
-MP, IFF elimination, disjunctive elimination, case split, double-negation
-elimination, and transitive relational composition; proof bookkeeping does not
-increase $L$. Verified distractor count $X$ is kept separate. Training covers
+The replacement v2 design samples ordered linear paths over MP, IFF
+elimination, disjunctive elimination, double-negation elimination, and
+transitive relational composition, then admits them by their replayed
+certificates. Case split remains a measured branching rule rather than a
+sampled path token. Semantic length $L$ is the longest semantic dependency path;
+proof bookkeeping does not increase $L$. Verified distractor count $X$ is kept separate. Training covers
 L1--L5, X0--X5, and training-seen ordered transitions. Four disjoint evaluation
 partitions then compare fresh matched structures against one-factor length
 (L6--L8), noise (X6--X8), or ordered-transition OOD cases. Complete feasible
@@ -403,9 +404,10 @@ are never mislabeled as no-answer spatial questions: a separate paired
 consistency diagnostic adds one closing edge to a satisfiable chain and requires
 deletion-minimal contradiction evidence.
 
-Randomized v2 also separates semantic depth from proof branching. A sampled
-prefix contains at most one case split; repeated case splits would create an
-accidental exponential branch tree rather than a controlled L curve. Direction
+Randomized v2 also separates semantic depth from proof branching. Case split
+is measured in realised certificates but is not sampled as a linear
+transformation; treating it as interchangeable would create accidental branch
+expansion rather than a controlled L curve. Direction
 and Selection construct ALL-POSSIBLE answers through necessary non-gold
 exclusions, while Count retains complete correlated-assignment evidence with
 five declared candidates. Fresh leaf objects make X distractors constructively

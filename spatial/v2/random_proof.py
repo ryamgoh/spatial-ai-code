@@ -15,7 +15,6 @@ class SemanticRule(str, Enum):
     MP = "MP"
     IFF = "IFF"
     DJE = "DJE"
-    CSR = "CSR"
     DN = "DN"
     TRC = "TRC"
 
@@ -26,7 +25,6 @@ PROOF_RULE_LABELS = {
     SemanticRule.MP: "modus-ponens",
     SemanticRule.IFF: "iff-elimination",
     SemanticRule.DJE: "disjunctive-syllogism",
-    SemanticRule.CSR: "case-split",
     SemanticRule.DN: "double-negation",
     SemanticRule.TRC: "axis-transitivity",
 }
@@ -41,7 +39,6 @@ class RandomProofPolicy:
     allowed_rules: tuple[SemanticRule, ...] = tuple(SemanticRule)
     require_heldout_transition: bool = False
     transition_partition: TransitionPartition | None = None
-    max_case_splits: int | None = None
     forbidden_final_rules: tuple[SemanticRule, ...] = ()
 
     def __post_init__(self) -> None:
@@ -57,8 +54,6 @@ class RandomProofPolicy:
         object.__setattr__(self, "allowed_rules", normalized)
         if self.require_heldout_transition and self.semantic_length < 2:
             raise ValueError("a held-out transition requires semantic_length >= 2")
-        if self.max_case_splits is not None and self.max_case_splits < 0:
-            raise ValueError("max_case_splits must be non-negative")
         forbidden = tuple(
             SemanticRule(rule) for rule in self.forbidden_final_rules
         )
@@ -220,12 +215,9 @@ def sample_policy_path(
             policy.resolved_partition(),
             require_exactly_one_heldout=policy.require_heldout_transition,
         )
-        if (
-            policy.max_case_splits is None
-            or path.count(SemanticRule.CSR) <= policy.max_case_splits
-        ) and (not path or path[-1] not in policy.forbidden_final_rules):
+        if not path or path[-1] not in policy.forbidden_final_rules:
             return path
-    raise ValueError("no rule path satisfied max_case_splits")
+    raise ValueError("no rule path satisfied the policy constraints")
 
 
 def exponential_quotas(
@@ -277,7 +269,7 @@ def constructively_supported_transitions() -> frozenset[Transition]:
     compound inputs to the preceding step, so those three transitions cannot
     immediately follow TRC in the constructive grammar.
     """
-    blocked_after_trc = {SemanticRule.DJE, SemanticRule.CSR, SemanticRule.DN}
+    blocked_after_trc = {SemanticRule.DJE, SemanticRule.DN}
     return frozenset(
         (first, second)
         for first in SemanticRule

@@ -95,22 +95,15 @@ def test_random_proof_policy_validates_requested_bounds() -> None:
         RandomProofPolicy(1, 0, require_heldout_transition=True)
 
 
-def test_policy_sampler_caps_case_split_branching_without_reducing_l() -> None:
-    partition = TransitionPartition(
-        constructively_supported_transitions(), frozenset()
+def test_linear_rule_alphabet_excludes_branching_case_split() -> None:
+    assert tuple(SemanticRule) == (
+        SemanticRule.MP,
+        SemanticRule.IFF,
+        SemanticRule.DJE,
+        SemanticRule.DN,
+        SemanticRule.TRC,
     )
-    path = sample_policy_path(
-        random.Random(42),
-        RandomProofPolicy(
-            8,
-            0,
-            transition_partition=partition,
-            max_case_splits=1,
-        ),
-    )
-
-    assert len(path) == 8
-    assert path.count(SemanticRule.CSR) <= 1
+    assert len(constructively_supported_transitions()) < 25
 
 
 def test_policy_sampler_can_forbid_incompatible_terminal_rules() -> None:

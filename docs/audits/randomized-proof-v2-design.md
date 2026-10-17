@@ -17,19 +17,20 @@ uniqueness, disjointness, and hashes pass.
 Support size, proof size, branches, relational length, and token length are
 recorded continuously. They are not cells or invented difficulty scores.
 
-The semantic grammar is MP, IFF elimination, disjunctive elimination, case
-split, double-negation elimination, and transitive relational composition.
-Complete feasible rule paths are sampled uniformly using dynamic-programming
-completion counts. Prompt premise order is shuffled independently from proof
-order. The certificate, not generator intent, determines realised L.
+The sampled linear grammar is MP, IFF elimination, disjunctive elimination,
+double-negation elimination, and transitive relational composition. Complete
+feasible paths over these five transformations are sampled uniformly using
+dynamic-programming completion counts. Prompt premise order is shuffled
+independently from proof order. The certificate, not generator intent,
+determines realised L.
 
-Generation separates sequential depth from branching: a randomized prefix may
-contain at most one case-split step, while branch count and proof size remain
-reported diagnostics. Without this bound, repeated case splits create an
-accidental exponential branch tree rather than a controlled L curve. Direction
-and Selection use exclusion-first ALL-POSSIBLE skeletons: gold values remain
-open-world possible and the proof derives necessary non-gold exclusions. Count
-retains correlated assignment evidence with a five-candidate cap.
+Generation separates sequential transformations from branching. Case split
+remains a semantic certificate rule and contributes to realised L, proof size,
+and branch diagnostics, but it is not sampled as an interchangeable linear
+token: its branches already contain implication steps. Direction and Selection
+use exclusion-first ALL-POSSIBLE skeletons, where gold values remain open-world
+possible and the proof derives necessary non-gold exclusions. Count retains
+correlated assignment evidence with a five-candidate cap.
 
 The construction pool reserves fresh leaf objects for X distractors and a small
 proof-atom core, then removes unused names before solving. The known
@@ -56,7 +57,7 @@ be discarded. The fresh headline benchmark remains strictly unique: duplicate
 slots are deterministically regenerated until unique or the bounded replacement
 budget fails.
 
-All 36 ordered rule pairs receive 20 seeded capability attempts. A transition
+All 25 ordered linear-rule pairs receive 20 seeded capability attempts. A transition
 is eligible after 16 successful exact-path replays; failing pairs are filtered
 rather than treated as a failed calibration. Calibration fails only when a
 query family retains fewer than six reliable edges. Seed 42 subsequently

@@ -91,9 +91,10 @@ previously inspected pilots are excluded from final evaluation and initializatio
 
 The fixed v1 registry remains the evidence source for its reported
 CORE/COMP/SHIFT results; v2 does not reuse those labels. It samples ordered
-proof graphs over MP, IFF elimination, disjunctive elimination, case split,
-double-negation elimination, and transitive relational composition. The
-replayed certificate measures semantic dependency length $L$, while $X$ counts
+linear paths over MP, IFF elimination, disjunctive elimination,
+double-negation elimination, and transitive relational composition. Case split
+remains a measured branching rule rather than an interchangeable path token.
+The replayed certificate measures semantic dependency length $L$, while $X$ counts
 atomic distractor premises whose joint removal leaves the complete answer
 unchanged. Support size and proof size remain continuous diagnostics.
 
