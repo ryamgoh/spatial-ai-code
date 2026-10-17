@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from spatial.v2.generation import QueryKind
@@ -9,6 +11,7 @@ from spatial.v2.study.randomized_v2 import (
     calibration_length_quotas,
     pair_marginal_quotas,
     prepare_calibration,
+    prepare_headline_benchmark,
     study_manifest,
     training_assignments,
     write_or_verify_manifest,
@@ -41,6 +44,28 @@ def test_count_gold_dependent_minimum_is_reflected_without_shrinking_group() -> 
         7: 2,
         8: 2,
     }
+
+
+@pytest.mark.parametrize(
+    ("gold", "expected_lengths"),
+    (
+        (1, {2, 3, 4, 5, 6}),
+        (2, {4, 5, 6}),
+        (3, {5, 6}),
+        (4, {6}),
+    ),
+)
+def test_count_composition_reserves_two_prefix_steps_for_heldout_edge(
+    gold: int, expected_lengths: set[int]
+) -> None:
+    composition = next(
+        quota
+        for quota in benchmark_partition_quotas(QueryKind.COUNT, gold)
+        if quota.partition is randomized_v2.BenchmarkPartition.COMPOSITION_OOD
+    )
+
+    assert set(composition.length) == expected_lengths
+    assert sum(composition.length.values()) == 60
 
 
 def test_study_manifest_has_expected_contract_totals() -> None:
@@ -86,7 +111,28 @@ def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
     with pytest.raises(FileExistsError, match="different study design"):
         write_or_verify_manifest(
             path,
-            study_manifest(RandomizedStudyDesign(train_max_l=5)),
+            study_manifest(RandomizedStudyDesign(train_max_x=5)),
+        )
+
+
+def test_benchmark_rejects_calibration_with_superseded_study_manifest(
+    tmp_path,
+) -> None:
+    calibration = {
+        "schema": "spatialentail-randomized-v2-calibration-v1",
+        "rows": 2400,
+        "transition_probe": {},
+        "study": study_manifest(),
+    }
+    calibration["study"]["benchmark"]["count-g2"][-1]["length"] = {"2": 60}
+    manifest_path = tmp_path / "calibration.json"
+    manifest_path.write_text(json.dumps(calibration))
+
+    with pytest.raises(ValueError, match="superseded study manifest"):
+        prepare_headline_benchmark(
+            tmp_path / "benchmark",
+            calibration_manifest=manifest_path,
+            workers=0,
         )
 
 

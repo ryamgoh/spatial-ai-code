@@ -34,6 +34,7 @@ from spatial.v2.random_proof import (
     deterministic_transition_partition,
     exponential_quotas,
 )
+from spatial.v2.random_proof_generation import possibility_backbone_length
 
 
 class BenchmarkPartition(str, Enum):
@@ -96,6 +97,20 @@ def minimum_semantic_length(query_kind: QueryKind, gold_size: int) -> int:
     return gold_size
 
 
+def minimum_composition_length(query_kind: QueryKind, gold_size: int) -> int:
+    """Reserve two linear prefix steps for one held-out ordered transition."""
+    if gold_size == 1:
+        base_length = 0
+    else:
+        skeleton = "dje" if query_kind is QueryKind.COUNT else "exclude"
+        base_length = possibility_backbone_length(
+            query_kind.value, skeleton, gold_size
+        )
+        if base_length is None:
+            raise ValueError("composition requires a known possibility backbone")
+    return max(minimum_semantic_length(query_kind, gold_size), base_length + 2)
+
+
 def calibration_length_quotas(
     query_kind: QueryKind,
     gold_size: int,
@@ -114,9 +129,12 @@ def benchmark_partition_quotas(
 ) -> tuple[PartitionQuota, ...]:
     minimum = minimum_semantic_length(query_kind, gold_size)
     matched_lengths = range(minimum, design.train_max_l + 1)
-    composition_lengths = range(max(2, minimum), design.train_max_l + 1)
+    composition_lengths = range(
+        minimum_composition_length(query_kind, gold_size),
+        design.train_max_l + 1,
+    )
     if not tuple(matched_lengths) or not tuple(composition_lengths):
-        raise ValueError("query/gold combination has no matched feasible L allocation")
+        raise ValueError("query/gold combination has no feasible L allocation")
     return (
         PartitionQuota(
             BenchmarkPartition.MATCHED,
@@ -818,6 +836,12 @@ def _headline_row(
     benchmark_partition = BenchmarkPartition(partition_value)
     transition_partition = deterministic_transition_partition(42)
     require_heldout = benchmark_partition is BenchmarkPartition.COMPOSITION_OOD
+    composition_minimum = minimum_composition_length(query, gold)
+    if require_heldout and length < composition_minimum:
+        raise ValueError(
+            f"{query.value} G{gold} composition requires at least "
+            f"L{composition_minimum}"
+        )
     proof_partition = (
         transition_partition
         if require_heldout
@@ -994,6 +1018,11 @@ def prepare_headline_benchmark(
         design = RandomizedStudyDesign(**calibration["study"]["design"])
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("calibration manifest lacks a valid frozen study design") from exc
+    expected_study = json.loads(json.dumps(study_manifest(design)))
+    if calibration["study"] != expected_study:
+        raise ValueError(
+            "calibration uses a superseded study manifest; regenerate calibration"
+        )
     work = []
     for query in QueryKind:
         for gold in range(1, 5):

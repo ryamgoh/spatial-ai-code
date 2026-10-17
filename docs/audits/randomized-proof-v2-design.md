@@ -102,6 +102,47 @@ enforce `realised gold-set size == requested G` after solving. A regression test
 must retain the failing seed, and a multi-seed property check must cover
 Selection and Count before the 2,400 rows are regenerated.
 
+### Corrected full calibration
+
+The replacement run applies both safeguards and passes the row-level audit.
+All 2,400 rows have exact requested G, L, and X; all use five-option menus,
+pass prompt round trips and process checks, carry replayable answer
+certificates, and contain no sampled CSR or branch steps. Each of the twelve
+query-by-G groups contains 200 rows, and every declared L quota matches the
+realised distribution. X0--X8 is near-uniform within every group, with 22 or
+23 rows at each value.
+
+The transition result is unchanged and clean: all 23 constructively supported
+edges succeed in 20/20 attempts for every query family, while `TRC->DJE` and
+`TRC->DN` remain the only typed exclusions at 0/20. The 17 seen and six held-out
+edges are disjoint and cover all eligible transitions. At 128 workers, the
+recorded row-generation phase took 162.4 seconds. The corrected pool accepted
+2,400 rows from 4,843 candidate trials (49.56% aggregate acceptance); the
+median rejection count was zero, p95 was five, and the maximum was twenty.
+This remains comfortably above the predeclared 5% acceptance floor.
+
+The pool contains 2,395 unique canonical structures and the same five surplus
+Count duplicates, which are permitted only for calibration. Natural-target
+whitespace counts have median 749, p95 1,042, and maximum 1,400; complete
+messages have median 982 and maximum 1,684. These remain lexical proxies until
+the pinned Qwen tokenizer is applied during release preparation. The corrected
+run passes its row-level structural audit; its initially embedded benchmark
+allocation was subsequently superseded by the feasibility correction below.
+
+### Rejected first headline-generation attempt
+
+The first headline job reached 3,500 of 3,600 scheduled rows before failing on
+Count G2 COMPOSITION-OOD at L2/X0. This was an impossible quota rather than a
+stochastic generation failure. The Count G2 certificate already consumes L2,
+leaving a zero-step random prefix, while one held-out ordered transition needs
+two consecutive prefix steps. The same defect affected Count G3 composition
+below L5 and Count G4 composition below L6. The corrected allocation starts
+these groups at G2/L4, G3/L5, and G4/L6. A direct Count G2/L4/X0 smoke test
+produced exact G2 and L4 with one held-out transition. Because the previous
+calibration receipt embeds the superseded allocation, regenerate its receipt
+before preparing the headline candidate; its 2,400 rows remain valid diagnostic
+evidence.
+
 SpatialEntail uses a bounded propositional fragment whose basic propositions
 are concrete pairwise spatial relations. It supplements the Boolean rules with
 checked operations for decomposing, inverting, composing, and recombining
@@ -132,12 +173,18 @@ Every query/gold group contains:
 | MATCHED | 120 | feasible L1--L6 | X0--X6 | seen |
 | LENGTH-OOD | 60 | L7--L8 | X0--X6 | seen |
 | NOISE-OOD | 60 | feasible L1--L6 | X7--X8 | seen |
-| COMPOSITION-OOD | 60 | feasible L2--L6 | X0--X6 | exactly one held-out |
+| COMPOSITION-OOD | 60 | DIR/SEL L2--L6; CNT L(G+2)--L6 | X0--X6 | exactly one held-out |
 
 No headline item combines OOD factors. Within each allowed interval, quotas use
 the predeclared maximum-entropy tilt `P(k) proportional to r^k`: benchmark
 `r_L=1.15`, benchmark `r_X=1.10`, training `r_L=1.40`, and training `r_X=1.25`.
 Largest-remainder rounding makes integer marginals deterministic.
+
+A COMPOSITION-OOD row must reserve at least two consecutive sampled steps for
+its held-out edge. Direction, Selection, and SINGLE Count have no intrinsic
+possibility backbone, so L2 is sufficient. ALL-POSSIBLE Count already uses G
+certificate steps before the sampled prefix; its feasible composition minima
+are therefore G2/L4, G3/L5, and G4/L6.
 
 ## Contracts and diagnostics
 
@@ -147,9 +194,39 @@ certificate but selects only visible possible values. `visible_gold_size`
 controls V0 through VG; V0 reserves one of the five slots for None of the
 Options.
 
-VISIBLE is generator-capable but excluded from the first SFT study. A separate
-300-example diagnostic covers direct L0, ambiguous SINGLE, true Selection
-no-match, and zero-visible menus.
+VISIBLE is generator-capable but excluded from SFT. It is retained as a third
+evaluation contract: a paired transfer diagnostic rather than another training
+arm or part of the 3,600-example headline score.
+
+### Paired VISIBLE-POSSIBLE transfer plan
+
+After the headline candidate is frozen, generate a separate, structurally
+disjoint paired pool with five bases from every query-by-G-by-partition stratum:
+three queries, G2--G4, and MATCHED, LENGTH-OOD, NOISE-OOD, and
+COMPOSITION-OOD. This gives 180 diagnostic bases. Each base produces one
+ALL-POSSIBLE control and the G+1 VISIBLE views V0 through VG while preserving
+the problem, analysis, certificate, and fixed five-option A--E menu. The pool
+therefore contains 720 VISIBLE views--180 G2, 240 G3, and 300 G4--plus 180
+paired ALL controls, or 900 prompts in total. V0 requires `None of the Options`;
+V1 through V(G-1) test partial visibility; and VG isolates the effect of
+VISIBLE wording when all possible answers remain displayed.
+
+The underlying answer universe must be larger than the displayed menu so every
+view has enough known-false fillers. Direction already has eight direction
+values. Selection therefore requires at least G+4 query candidates, while a
+Count query over N candidates requires N at least G+3 because its answer
+universe is 0 through N. This changes neither the five-option menu nor the
+meaning of G; it only makes hiding zero or more possible answers feasible.
+
+Evaluate the untuned model, Natural SINGLE-SFT, and Natural MULTI-SFT on these
+paired views. Existing SINGLE answer-only checkpoints may be retained as a
+secondary transfer reference, but no VISIBLE-specific adapter is trained.
+Report exact-set accuracy by query, G, visibility level V, and benchmark
+partition, plus the paired consistency between each model's ALL control
+prediction intersected with the visible menu and its VISIBLE prediction.
+Resampling and error analysis must group all views of one base together. The
+current zero-visible special-response generator is only an engineering smoke
+test and must not be double-counted once this paired suite is produced.
 
 Inconsistent strict cycles are not mislabeled as no-answer spatial questions.
 A separate binary diagnostic constructs 280 clean/dirty pairs over cycle

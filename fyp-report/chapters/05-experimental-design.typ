@@ -109,6 +109,13 @@ one held-out ordered transition while retaining training L/X ranges. A
 predeclared exponential maximum-entropy tilt favours the upper end without
 using model accuracy to select items.
 
+A held-out ordered transition requires two consecutive sampled prefix steps.
+Direction, Selection, and SINGLE Count therefore permit COMPOSITION-OOD from
+L2. ALL-POSSIBLE Count first spends G certificate steps establishing its
+answer-set backbone, so its feasible composition minima are G2/L4, G3/L5, and
+G4/L6. The allocation excludes lower cells rather than repeatedly sampling an
+impossible transition requirement.
+
 Complete Count certificates impose a feasibility boundary: G2/G3/G4 have
 audited minimum lengths L2/L3/L4 under the current replay obligations. Quotas
 are redistributed over each query/gold group's feasible L values rather than
@@ -117,9 +124,30 @@ within each gold size's feasible interval; imposing one global L marginal would
 force a misleading U-shaped G1 allocation. The headline candidate contains 900 SINGLE and
 2,700 ALL-POSSIBLE bases and follows a 2,400-example capability calibration.
 
-VISIBLE-POSSIBLE is supported as a paired menu view but excluded from the first
-v2 SFT experiment. Direct L0, ambiguous SINGLE, true no-match, and zero-visible
-cases form a separate diagnostic. A binary diagnostic evaluates 280
+VISIBLE-POSSIBLE is excluded from SFT and retained as a third, non-headline
+evaluation contract. After the headline candidate is frozen, a separate,
+structurally disjoint pool contributes five bases from each
+query-by-G-by-partition stratum, giving 180 diagnostic bases. Each G2--G4 base
+produces one ALL-POSSIBLE control and every VISIBLE level V0 through VG. This
+gives 720 VISIBLE views plus 180 paired ALL controls, or 900 prompts in total.
+V0 requires `None of the Options`, intermediate levels test partial visibility,
+and VG isolates the change in instruction wording when all possible answers
+remain displayed. All views retain the same problem, semantic analysis,
+certificate, and five-option A--E menu.
+
+This pairing requires a larger underlying answer universe than the displayed
+menu: Selection uses at least G+4 query candidates, and Count uses at least G+3
+candidate entities because its answer universe spans zero through the candidate
+count. Direction already has eight possible direction values. Evaluation covers
+the untuned model, Natural SINGLE-SFT, and Natural MULTI-SFT; existing SINGLE
+answer-only checkpoints are secondary transfer references rather than another
+training arm. Exact-set accuracy is reported by query, G, visibility V, and
+benchmark partition. A paired consistency metric compares the VISIBLE result
+with its diagnostic ALL control restricted to the displayed menu, and
+resampling keeps all views of one base together.
+
+Direct L0, ambiguous SINGLE, and true Selection no-match cases remain a
+separate special-response diagnostic. A binary diagnostic evaluates 280
 clean/dirty strict-cycle pairs; inconsistent premises are never mapped to
 Cannot be determined or None of the Options.
 

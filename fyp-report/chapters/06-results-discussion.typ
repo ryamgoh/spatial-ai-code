@@ -405,6 +405,49 @@ p95 1,080, and maximum 1,465, and complete-message counts of median 1,004 and
 maximum 1,746. These values are lexical diagnostics rather than exact counts
 from the pinned Qwen tokenizer.
 
+=== Corrected randomized-v2 calibration
+
+The replacement calibration passed the complete row-level audit. All 2,400
+rows realised their requested G, L, and X; all used five-option menus, passed
+prompt round trips and process checks, carried replayable certificates, and
+contained no sampled CSR or branch steps. Each of the twelve query-by-G groups
+contained 200 rows, every L quota matched the manifest, and X0--X8 was
+near-uniform within each group. The 28 wrong-G rows from the rejected run fell
+to zero.
+
+All 23 constructively supported transitions succeeded in 20/20 attempts for
+Direction, Selection, and Count. `TRC→DJE` and `TRC→DN` remained the only typed
+exclusions at 0/20. The 17 training-seen and six composition-held-out edges
+were disjoint and covered every eligible transition. With 128 workers, the
+recorded row-generation phase took 162.4 seconds. The generator accepted 2,400
+rows from 4,843 candidate trials, giving 49.56% aggregate acceptance; the
+median rejection count was zero, p95 was five, and the maximum was twenty.
+
+The corrected pool contained 2,395 unique canonical structures and five
+surplus duplicate Count rows, which remain permissible only in disposable
+calibration. Natural targets had median 749, p95 1,042, and maximum 1,400
+whitespace-delimited tokens; complete messages had median 982 and maximum
+1,684. These are lexical proxies rather than pinned-tokenizer counts. The
+corrected run therefore passes its row-level structural calibration. Its
+initially embedded benchmark allocation was subsequently superseded by the
+feasibility correction below.
+
+=== Rejected first headline-generation attempt
+
+The first headline-candidate job reached 3,500 of 3,600 scheduled rows before
+failing on Count G2 COMPOSITION-OOD at L2/X0. This was deterministic rather
+than a sampling failure. A Count G2 possibility certificate already consumes
+L2, leaving a zero-step random prefix, while the requested held-out transition
+requires two consecutive prefix steps. The same allocation defect made Count
+G3 composition below L5 and Count G4 composition below L6 unrealizable.
+
+The corrected quota reserves two prefix steps beyond the Count backbone:
+G2 starts at L4, G3 at L5, and G4 at L6. A direct Count G2/L4/X0 smoke test
+then produced exact G2 and L4 with one held-out transition. The 2,400
+calibration rows remain valid structural evidence, but their embedded benchmark
+allocation is superseded; a fresh calibration receipt is required before the
+headline candidate is regenerated.
+
 === Lessons and next actions
 
 The two pilots show that a larger answer space is not sufficient by itself:
@@ -437,12 +480,16 @@ answer-only result was strongly seed-sensitive. MULTI-v2 uses Natural
 supervision only and is compared with the prompt-matched untuned model and
 Natural SINGLE-SFT transfer baseline.
 
-VISIBLE-POSSIBLE is implemented as a paired menu view of an ALL-POSSIBLE base
-but is deferred from the first v2 SFT study. Special L0, ambiguous, no-match,
-and zero-visible cases form a separate diagnostic. Inconsistent strict cycles
-are never mislabeled as no-answer spatial questions: a separate paired
-consistency diagnostic adds one closing edge to a satisfiable chain and requires
-deletion-minimal contradiction evidence.
+VISIBLE-POSSIBLE is not added as a third SFT arm. It is predeclared as a paired
+transfer diagnostic built from 180 fresh bases that are structurally disjoint
+from training and the headline benchmark. Each base produces an ALL-POSSIBLE
+control and VISIBLE views V0 through VG while retaining the same semantics and
+a five-option menu. The planned suite therefore contains 720 VISIBLE views and
+180 ALL controls; all views from one base remain grouped during analysis.
+Special L0, ambiguous, and no-match cases remain separate. Inconsistent strict
+cycles are never mislabeled as no-answer spatial questions: a separate paired
+consistency diagnostic adds one closing edge to a satisfiable chain and
+requires deletion-minimal contradiction evidence.
 
 Randomized v2 also separates semantic depth from proof branching. Case split
 is measured in realised certificates but is not sampled as a linear
