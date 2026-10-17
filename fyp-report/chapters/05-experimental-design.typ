@@ -98,6 +98,15 @@ The replayed certificate measures semantic dependency length $L$, while $X$ coun
 atomic distractor premises whose joint removal leaves the complete answer
 unchanged. Support size and proof size remain continuous diagnostics.
 
+Each training allocation uses an 80/20 marginal between CS0 (no split) and CS1
+(one split layer). The benchmark preserves that overall ratio by keeping
+LENGTH-OOD branch-free and assigning 25% CS1 to each other partition. SINGLE
+CS1 samples two to four cases whose
+branch-local linear paths converge on one result. ALL-POSSIBLE sets case count
+equal to G; Direction and Selection branches establish a necessary exclusion, while
+Count branches encode distinct complete assignments. Nested case splits are
+excluded.
+
 Training is restricted to L1--L5, X0--X5, and training-seen ordered
 transitions. Each query/gold evaluation group has 120 fresh matched examples
 and three disjoint sixty-example OOD partitions. LENGTH-OOD changes only L to

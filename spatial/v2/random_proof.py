@@ -40,6 +40,7 @@ class RandomProofPolicy:
     require_heldout_transition: bool = False
     transition_partition: TransitionPartition | None = None
     forbidden_final_rules: tuple[SemanticRule, ...] = ()
+    case_count: int = 0
 
     def __post_init__(self) -> None:
         if not 0 <= self.semantic_length <= 8:
@@ -60,6 +61,10 @@ class RandomProofPolicy:
         if len(forbidden) != len(set(forbidden)):
             raise ValueError("forbidden_final_rules must be unique")
         object.__setattr__(self, "forbidden_final_rules", forbidden)
+        if self.case_count not in {0, 2, 3, 4}:
+            raise ValueError("case_count must be zero or between two and four")
+        if self.case_count and self.semantic_length < 2:
+            raise ValueError("case-split generation requires semantic_length >= 2")
 
     def resolved_partition(self) -> TransitionPartition:
         if self.transition_partition is not None:

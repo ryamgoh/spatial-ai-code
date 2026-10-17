@@ -161,6 +161,11 @@ contribute to realised certificate depth, but it is not an interchangeable
 linear transition token. Visible `NOT` syntax and the legacy `NEG` label do not
 by themselves establish a `DN` inference.
 
+Randomized v2 distinguishes CS0 (no case split) from CS1 (exactly one split
+layer). Case count is a separate arity: SINGLE samples two to four cases, while
+ALL-POSSIBLE uses `case_count = G`. Each branch contains its own ordered path
+over the five linear transformations. Nested CS2 is outside the first study.
+
 Thus `CNT-CSR-JCR-UNI` means a Count query, a case-split proof motif, a
 joint-Count evidence obligation, and a unique outcome; it does not mean the
 ordered sequence `CNT→CSR→JCR→UNI`.

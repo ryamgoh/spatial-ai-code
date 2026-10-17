@@ -58,6 +58,8 @@ class ProofGraphMeasurement:
     full_depth: int
     semantic_size: int
     branch_steps: int
+    case_split_depth: int
+    max_case_arity: int
     merge_steps: int
     support_premise_indices: tuple[int, ...]
     operator_counts: dict[str, int]
@@ -78,6 +80,8 @@ class ProofComplexityProfile:
     full_certificate_depth: int
     semantic_proof_size: int
     branch_steps: int
+    case_split_depth: int
+    max_case_arity: int
     merge_steps: int
     proof_obligations: int
     support_premise_indices: tuple[int, ...]
@@ -191,6 +195,7 @@ def measure_proof_graph(
         for step_id in reachable
         if by_id[step_id].rule in SEMANTIC_RULES
     ]
+    case_steps = [step for step in semantic_steps if step.rule is ProofRule.CASE_SPLIT]
     operator_counts = Counter(step.rule.value for step in semantic_steps)
     critical = tuple(sorted(signatures[root]))
     transitions = tuple(
@@ -217,6 +222,11 @@ def measure_proof_graph(
         full_depth=full_depth[root],
         semantic_size=len(semantic_steps),
         branch_steps=sum(step.rule is ProofRule.CASE_SPLIT for step in semantic_steps),
+        case_split_depth=max(
+            (signature.count(ProofRule.CASE_SPLIT.value) for signature in critical),
+            default=0,
+        ),
+        max_case_arity=max((len(step.inputs) - 1 for step in case_steps), default=0),
         merge_steps=sum(len(step.inputs) > 1 for step in semantic_steps),
         support_premise_indices=support,
         operator_counts=dict(sorted(operator_counts.items())),
@@ -315,6 +325,12 @@ def measure_certificate_complexity(
             measurement.semantic_size for measurement in measurements
         ),
         branch_steps=sum(measurement.branch_steps for measurement in measurements),
+        case_split_depth=max(
+            (measurement.case_split_depth for measurement in measurements), default=0
+        ),
+        max_case_arity=max(
+            (measurement.max_case_arity for measurement in measurements), default=0
+        ),
         merge_steps=sum(measurement.merge_steps for measurement in measurements),
         proof_obligations=len(measurements),
         support_premise_indices=tuple(sorted(support)),

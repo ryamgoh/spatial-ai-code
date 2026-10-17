@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import combinations
 
 from spatial.v2.certificate_generation import AnswerCertificate, build_answer_certificate
@@ -52,6 +52,13 @@ class RandomProofCandidate:
 class LiftedProofProblem:
     problem: SpatialProblem
     requested_path: tuple[SemanticRule, ...]
+
+
+@dataclass(frozen=True)
+class CaseSplitProblem:
+    problem: SpatialProblem
+    branch_paths: tuple[tuple[SemanticRule, ...], ...]
+    case_count: int
 
 
 def possibility_backbone_length(
@@ -308,6 +315,157 @@ def lift_problem_with_random_path(
     premise = And(tuple(top_level))
     return LiftedProofProblem(
         _pruned_problem(problem.objects, premise, problem.query), path
+    )
+
+
+def construct_case_split_problem(
+    *,
+    query_kind: str,
+    objects: tuple[str, ...],
+    gold_size: int,
+    policy: RandomProofPolicy,
+    seed: int,
+) -> CaseSplitProblem:
+    """Construct one non-nested case split with randomized branch-local paths."""
+    if not policy.case_count:
+        raise ValueError("case-split construction requires case_count")
+    rng = random.Random(seed)
+    shuffled = list(objects)
+    rng.shuffle(shuffled)
+    case_first, case_second = shuffled[:2]
+    cursor = 2
+    cases = tuple(
+        direction_constraint(case_first, case_second, direction)
+        for direction in rng.sample(list(Direction), policy.case_count)
+    )
+    branch_goals: tuple[SpatialFormula, ...]
+    exclusions: list[SpatialFormula]
+    if query_kind == "direction":
+        target, reference = shuffled[cursor : cursor + 2]
+        cursor += 2
+        alternatives = tuple(rng.sample(list(Direction), gold_size))
+        query = DirectionQuery(target, reference)
+        if gold_size == 1:
+            goal = direction_constraint(target, reference, alternatives[0])
+            branch_goals = (goal,) * policy.case_count
+            exclusions = []
+        else:
+            non_gold = [direction for direction in Direction if direction not in alternatives]
+            goal = Not(direction_constraint(target, reference, non_gold[0]))
+            branch_goals = (goal,) * policy.case_count
+            exclusions = [
+                Not(direction_constraint(target, reference, direction))
+                for direction in non_gold[1:]
+            ]
+    elif query_kind == "which":
+        reference = shuffled[cursor]
+        candidates = tuple(shuffled[cursor + 1 : cursor + 6])
+        cursor += 6
+        direction = rng.choice(
+            (
+                Direction.NORTHEAST,
+                Direction.SOUTHEAST,
+                Direction.SOUTHWEST,
+                Direction.NORTHWEST,
+            )
+        )
+        query = WhichQuery(frozenset({direction}), reference, candidates)
+        members = [direction_constraint(candidate, reference, direction) for candidate in candidates]
+        if gold_size == 1:
+            branch_goals = (members[0],) * policy.case_count
+            exclusions = [Not(member) for member in members[1:]]
+        else:
+            branch_goals = (Not(members[gold_size]),) * policy.case_count
+            exclusions = [Not(member) for member in members[gold_size + 1 :]]
+    elif query_kind == "count":
+        reference = shuffled[cursor]
+        candidates = tuple(shuffled[cursor + 1 : cursor + 6])
+        direction = rng.choice(
+            (
+                Direction.NORTHEAST,
+                Direction.SOUTHEAST,
+                Direction.SOUTHWEST,
+                Direction.NORTHWEST,
+            )
+        )
+        signs = direction_signs(direction)
+        opposite = next(
+            candidate
+            for candidate in Direction
+            if direction_signs(candidate) == (-signs[0], -signs[1])
+        )
+        query = CountQuery(frozenset({direction}), reference, candidates)
+        counts = (
+            (rng.randrange(0, len(candidates) + 1),) * policy.case_count
+            if gold_size == 1
+            else tuple(rng.sample(range(len(candidates) + 1), gold_size))
+        )
+        goals = []
+        for count in counts:
+            included = set(rng.sample(candidates, count))
+            goals.append(
+                And(
+                    tuple(
+                        direction_constraint(
+                            candidate,
+                            reference,
+                            direction if candidate in included else opposite,
+                        )
+                        for candidate in candidates
+                    )
+                )
+            )
+        branch_goals = tuple(goals)
+        exclusions = []
+    else:
+        raise ValueError(f"unknown query kind: {query_kind}")
+
+    mentioned = {case_first, case_second}
+    if isinstance(query, DirectionQuery):
+        mentioned.update((query.target, query.reference))
+    else:
+        mentioned.add(query.reference)
+        mentioned.update(query.candidates)
+    atom_objects, proof_core = _proof_and_distractor_objects(
+        objects, mentioned, policy.distractor_count, rng
+    )
+    leaves = tuple(obj for obj in objects if obj not in atom_objects)
+    atoms = _AtomFactory(atom_objects, rng, preferred_objects=proof_core)
+    branch_length = policy.semantic_length - 2
+    branch_policy = replace(
+        policy,
+        semantic_length=branch_length,
+        case_count=0,
+        forbidden_final_rules=(
+            (*policy.forbidden_final_rules, SemanticRule.TRC)
+            if query_kind == "count"
+            and SemanticRule.TRC not in policy.forbidden_final_rules
+            else policy.forbidden_final_rules
+        ),
+    )
+    premises: list[SpatialFormula] = [Or(cases), *exclusions]
+    paths = []
+    for case, goal in zip(cases, branch_goals, strict=True):
+        path = sample_policy_path(rng, branch_policy)
+        current = goal
+        side_premises: list[SpatialFormula] = []
+        for rule in reversed(path):
+            current = _backward_step(
+                rule,
+                current,
+                atoms,
+                atom_objects,
+                rng,
+                side_premises,
+                proof_core,
+            )
+        premises.extend((Implies(case, current), *side_premises))
+        paths.append(path)
+    premises.extend(_attached_leaf_distractors(leaves, mentioned, rng))
+    rng.shuffle(premises)
+    premise = And(tuple(premises))
+    return CaseSplitProblem(
+        _pruned_problem(objects, premise, query), tuple(paths), policy.case_count
     )
 
 
