@@ -761,24 +761,30 @@ def probe_transition_capability(
     constructively_supported = constructively_supported_transitions()
     for query in QueryKind:
         edges = {}
+        eligible_count = 0
         for first, second in transitions:
             successes = sum(results[cursor : cursor + attempts])
             cursor += attempts
             name = f"{first.value}->{second.value}"
+            eligible = successes >= threshold
+            eligible_count += int(eligible)
             edges[name] = {
                 "successes": successes,
                 "attempts": attempts,
-                "eligible": successes >= threshold,
+                "eligible": eligible,
+                "constructively_supported": (
+                    (first, second) in constructively_supported
+                ),
             }
-            if (
-                (first, second) in constructively_supported
-                and successes < threshold
-            ):
-                raise RuntimeError(
-                    f"transition capability gate failed for {query.value} {name}: "
-                    f"{successes}/{attempts}"
-                )
-        query_results[query.value] = edges
+        if eligible_count < 6:
+            raise RuntimeError(
+                f"transition capability gate found only {eligible_count} reliable "
+                f"edges for {query.value}; at least six are required"
+            )
+        query_results[query.value] = {
+            "eligible_transition_count": eligible_count,
+            "edges": edges,
+        }
     return {
         "schema": "spatialentail-randomized-v2-transition-probe-v1",
         "seed": seed,

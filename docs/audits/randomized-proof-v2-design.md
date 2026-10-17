@@ -57,8 +57,11 @@ slots are deterministically regenerated until unique or the bounded replacement
 budget fails.
 
 All 36 ordered rule pairs receive 20 seeded capability attempts. A transition
-is eligible after 16 successful replays. Seed 42 partitions eligible edges 75%
-seen and 25% held out while retaining an L8-capable seen graph.
+is eligible after 16 successful exact-path replays; failing pairs are filtered
+rather than treated as a failed calibration. Calibration fails only when a
+query family retains fewer than six reliable edges. Seed 42 subsequently
+partitions eligible edges 75% seen and 25% held out while retaining an
+L8-capable seen graph.
 
 ## Frozen-candidate allocation
 

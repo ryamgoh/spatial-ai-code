@@ -87,6 +87,13 @@ def test_calibration_duplicate_detection_reports_rows_without_rejecting_pool() -
     assert _duplicate_structure_indices(rows) == [2, 3]
 
 
+def test_transition_probe_threshold_scales_with_attempt_count() -> None:
+    from spatial.v2.study.randomized_v2 import _capability_success_threshold
+
+    assert _capability_success_threshold(20) == 16
+    assert _capability_success_threshold(10) == 8
+
+
 def test_marginal_pairing_preserves_both_exact_distributions() -> None:
     pairs = pair_marginal_quotas({1: 2, 2: 3}, {0: 1, 1: 4}, seed=42)
 
