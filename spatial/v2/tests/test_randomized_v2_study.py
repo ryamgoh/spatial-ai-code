@@ -10,6 +10,7 @@ from spatial.v2.study.randomized_v2 import (
     prepare_calibration,
     study_manifest,
     training_assignments,
+    write_or_verify_manifest,
     write_consistency_diagnostic,
     write_special_response_diagnostic,
 )
@@ -52,6 +53,21 @@ def test_study_manifest_has_expected_contract_totals() -> None:
         sum(quotas.values()) == 2000
         for quotas in manifest["training"]["multi_length_by_gold"].values()
     )
+
+
+def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
+    tmp_path,
+) -> None:
+    path = tmp_path / "study-manifest.json"
+    manifest = study_manifest()
+
+    assert write_or_verify_manifest(path, manifest) == "written"
+    assert write_or_verify_manifest(path, manifest) == "reused"
+    with pytest.raises(FileExistsError, match="different study design"):
+        write_or_verify_manifest(
+            path,
+            study_manifest(RandomizedStudyDesign(train_max_l=6)),
+        )
     assert sum(manifest["training"]["single_distractors"].values()) == 8000
     assert all(
         sum(quotas.values()) == 2000

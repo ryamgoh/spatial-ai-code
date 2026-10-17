@@ -345,6 +345,20 @@ def study_manifest(
     }
 
 
+def write_or_verify_manifest(path: Path, manifest: dict[str, Any]) -> str:
+    """Write a manifest once, or reuse an identical manifest after cancellation."""
+    content = json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    if path.exists():
+        if path.read_text() != content:
+            raise FileExistsError(
+                f"manifest exists with a different study design: {path}"
+            )
+        return "reused"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content)
+    return "written"
+
+
 def write_consistency_diagnostic(
     output: Path, *, seed: int = 42, pairs_per_cycle_axis: int = 20
 ) -> dict[str, Any]:
@@ -1019,12 +1033,7 @@ def main() -> None:
     )
     manifest = study_manifest(design)
     if args.manifest_out is not None:
-        if args.manifest_out.exists():
-            raise FileExistsError(f"manifest already exists: {args.manifest_out}")
-        args.manifest_out.parent.mkdir(parents=True, exist_ok=True)
-        args.manifest_out.write_text(
-            json.dumps(manifest, indent=2, sort_keys=True) + "\n"
-        )
+        write_or_verify_manifest(args.manifest_out, manifest)
     if args.consistency_out is not None:
         write_consistency_diagnostic(args.consistency_out, seed=args.seed)
     if args.special_out is not None:
