@@ -86,6 +86,8 @@ class RandomizedStudyDesign:
 
 
 DEFAULT_DESIGN = RandomizedStudyDesign()
+_CONSTRUCTION_OBJECT_COUNT = 24
+_POSSIBILITY_CANDIDATE_COUNT = 5
 
 
 def minimum_semantic_length(query_kind: QueryKind, gold_size: int) -> int:
@@ -558,8 +560,8 @@ def _randomized_policy(query: QueryKind, gold: int) -> GenerationPolicy:
             query_kind=query,
             answer_mode=AnswerMode.SINGLE,
             semantic_shape=SemanticShape.UNIQUE,
-            num_entities=24,
-            num_premises=23,
+            num_entities=_CONSTRUCTION_OBJECT_COUNT,
+            num_premises=_CONSTRUCTION_OBJECT_COUNT - 1,
             menu_option_count=5,
         )
     skeleton = "dje" if query is QueryKind.COUNT else "exclude"
@@ -569,9 +571,9 @@ def _randomized_policy(query: QueryKind, gold: int) -> GenerationPolicy:
         semantic_shape=SemanticShape.AMBIGUOUS,
         possibility_skeleton=skeleton,
         possibility_gold_size=gold,
-        possibility_candidate_count=5,
-        num_entities=24,
-        num_premises=23,
+        possibility_candidate_count=_POSSIBILITY_CANDIDATE_COUNT,
+        num_entities=_CONSTRUCTION_OBJECT_COUNT,
+        num_premises=_CONSTRUCTION_OBJECT_COUNT - 1,
         ordinary_option_target=5,
         menu_option_count=5,
     )

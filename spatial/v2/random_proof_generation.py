@@ -9,6 +9,7 @@ from itertools import combinations
 from spatial.v2.certificate_generation import AnswerCertificate, build_answer_certificate
 from spatial.v2.proof_complexity import ProofComplexityProfile, measure_certificate_complexity
 from spatial.v2.random_proof import (
+    PROOF_RULE_LABELS,
     RandomProofPolicy,
     SemanticRule,
     sample_policy_path,
@@ -76,16 +77,6 @@ def possibility_backbone_length(
     raise ValueError(f"unknown query kind: {query_kind}")
 
 
-_RULE_LABEL = {
-    SemanticRule.MP: "modus-ponens",
-    SemanticRule.IFF: "iff-elimination",
-    SemanticRule.DJE: "disjunctive-syllogism",
-    SemanticRule.CSR: "case-split",
-    SemanticRule.DN: "double-negation",
-    SemanticRule.TRC: "axis-transitivity",
-}
-
-
 class _AtomFactory:
     def __init__(
         self,
@@ -113,14 +104,14 @@ class _AtomFactory:
         ]
         self._cursor = 0
 
-    def next(self, *, exclude: set[RelationConstraint] | None = None) -> RelationConstraint:
-        excluded = exclude or set()
-        while self._cursor < len(self._atoms):
-            atom = self._atoms[self._cursor]
-            self._cursor += 1
-            if atom not in excluded:
-                return atom
-        raise RandomProofConstructionError("not enough distinct atoms for proof graph")
+    def next(self) -> RelationConstraint:
+        if self._cursor >= len(self._atoms):
+            raise RandomProofConstructionError(
+                "not enough distinct atoms for proof graph"
+            )
+        atom = self._atoms[self._cursor]
+        self._cursor += 1
+        return atom
 
 
 def _single_direction(atom: RelationConstraint) -> Direction:
@@ -154,7 +145,7 @@ def _backward_step(
         return Not(Not(output))
     if rule is SemanticRule.CSR:
         first = atoms.next()
-        second = atoms.next(exclude={first})
+        second = atoms.next()
         side_premises.extend((Implies(first, output), Implies(second, output)))
         return Or((first, second))
     if rule is SemanticRule.TRC:
@@ -406,7 +397,7 @@ def construct_random_proof_candidate(
     except ValueError as exc:
         raise RandomProofConstructionError(str(exc)) from exc
     complexity = measure_certificate_complexity(problem, certificate)
-    requested = tuple(_RULE_LABEL[rule] for rule in path)
+    requested = tuple(PROOF_RULE_LABELS[rule] for rule in path)
     if policy.semantic_length and requested not in complexity.critical_signatures:
         raise RandomProofConstructionError(
             "replayed certificate does not contain the requested critical path"

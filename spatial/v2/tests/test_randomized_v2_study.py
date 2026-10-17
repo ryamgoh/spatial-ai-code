@@ -1,6 +1,9 @@
+import pytest
+
 from spatial.v2.generation import QueryKind
 from spatial.v2.study.randomized_v2 import (
     RandomizedStudyDesign,
+    _calibration_row,
     benchmark_partition_quotas,
     calibration_length_quotas,
     pair_marginal_quotas,
@@ -112,9 +115,30 @@ def test_randomized_policy_uses_bounded_object_domains() -> None:
     single = randomized_v2._randomized_policy(QueryKind.DIRECTION, 1)
     possible = randomized_v2._randomized_policy(QueryKind.COUNT, 4)
 
-    assert single.num_entities == 24
-    assert possible.num_entities == 24
+    assert single.num_entities == possible.num_entities
+    assert single.num_entities < 30
     assert possible.possibility_candidate_count == 5
+
+
+@pytest.mark.parametrize(
+    ("query", "gold", "seed"),
+    (
+        ("direction", 1, 801),
+        ("direction", 4, 802),
+        ("which", 4, 803),
+        ("count", 4, 804),
+    ),
+)
+def test_l8_x8_stress_cases_replay_exact_requested_complexity(
+    query: str, gold: int, seed: int
+) -> None:
+    row = _calibration_row(query, gold, 8, 8, seed)
+    metadata = row["metadata"]
+
+    assert metadata["difficulty"]["proof_complexity"]["semantic_length"] == 8
+    assert metadata["difficulty"]["num_distractor_premises"] == 8
+    assert metadata["menu_option_count"] == 5
+    assert metadata["difficulty"]["requested_rule_path"].count("CSR") <= 1
 
 
 def test_consistency_diagnostic_writes_all_clean_dirty_pairs(tmp_path) -> None:

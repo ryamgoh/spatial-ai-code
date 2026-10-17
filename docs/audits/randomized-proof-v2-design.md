@@ -39,6 +39,10 @@ Representative local L6/X6 timings fell from 4.62s to 0.84s for SINGLE
 Direction, 14.12s to 1.42s for ALL Direction G4, 69.24s to 6.66s for ALL
 Selection G4, and 5.28s to 3.37s for ALL Count G4.
 
+A separate L8/X8 regression covers SINGLE Direction G1 plus ALL Direction,
+Selection, and Count G4. Representative local times were 2.72s, 7.49s, 9.84s,
+and 9.29s respectively; every case replayed at exact L8/X8.
+
 ## Calibration and feasibility correction
 
 The structural pool targets 2,400 examples over three query families, four gold
