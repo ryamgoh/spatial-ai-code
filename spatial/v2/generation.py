@@ -843,6 +843,13 @@ class SpatialGeneratorV2:
                     raise RandomProofConstructionError(
                         "random proof candidate has the wrong semantic shape"
                     )
+                if (
+                    policy.ambiguity_size is not None
+                    and len(_answer_values(analysis)) != policy.ambiguity_size
+                ):
+                    raise RandomProofConstructionError(
+                        "random proof candidate has the wrong answer-set size"
+                    )
                 requested_labels = tuple(
                     PROOF_RULE_LABELS[rule] for rule in requested_path
                 )

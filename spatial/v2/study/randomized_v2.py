@@ -644,6 +644,7 @@ def _randomized_policy(query: QueryKind, gold: int) -> GenerationPolicy:
         query_kind=query,
         answer_mode=AnswerMode.ALL_POSSIBLE,
         semantic_shape=SemanticShape.AMBIGUOUS,
+        ambiguity_size=gold,
         possibility_skeleton=skeleton,
         possibility_gold_size=gold,
         possibility_candidate_count=_POSSIBILITY_CANDIDATE_COUNT,

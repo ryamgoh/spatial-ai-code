@@ -82,19 +82,8 @@ class _AtomFactory:
         self,
         objects: tuple[str, ...],
         rng: random.Random,
-        *,
-        preferred_objects: tuple[str, ...] = (),
     ) -> None:
-        preferred_pairs = list(combinations(preferred_objects, 2))
-        preferred_keys = {frozenset(pair) for pair in preferred_pairs}
-        pairs = [
-            *preferred_pairs,
-            *(
-                pair
-                for pair in combinations(objects, 2)
-                if frozenset(pair) not in preferred_keys
-            ),
-        ]
+        pairs = list(combinations(objects, 2))
         rng.shuffle(pairs)
         directions = list(Direction)
         rng.shuffle(directions)
@@ -289,7 +278,7 @@ def lift_problem_with_random_path(
         problem.objects, mentioned, policy.distractor_count, rng
     )
     leaves = tuple(obj for obj in problem.objects if obj not in atom_objects)
-    atoms = _AtomFactory(atom_objects, rng, preferred_objects=proof_core)
+    atoms = _AtomFactory(proof_core, rng)
     side_premises: list[SpatialFormula] = []
     current: SpatialFormula = target
     for rule in reversed(path):
@@ -297,7 +286,7 @@ def lift_problem_with_random_path(
             rule,
             current,
             atoms,
-            atom_objects,
+            proof_core,
             rng,
             side_premises,
             proof_core,
@@ -364,7 +353,7 @@ def construct_random_proof_candidate(
         objects, mentioned, policy.distractor_count, rng
     )
     leaves = tuple(obj for obj in objects if obj not in atom_objects)
-    atom_factory = _AtomFactory(atom_objects, rng, preferred_objects=proof_core)
+    atom_factory = _AtomFactory(proof_core, rng)
     side_premises: list[SpatialFormula] = []
     current: SpatialFormula = final
     for rule in reversed(path):
@@ -372,7 +361,7 @@ def construct_random_proof_candidate(
             rule,
             current,
             atom_factory,
-            atom_objects,
+            proof_core,
             rng,
             side_premises,
             proof_core,

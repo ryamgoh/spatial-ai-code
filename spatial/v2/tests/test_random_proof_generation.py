@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from spatial.v2.generation import (
@@ -8,16 +10,20 @@ from spatial.v2.generation import (
     SpatialGeneratorV2,
 )
 from spatial.v2.grading import AnswerMode
+from spatial.v2.possibility import construct_possibility
 from spatial.v2.random_proof import (
     RandomProofPolicy,
     SemanticRule,
     TransitionPartition,
+    constructively_supported_transitions,
 )
 from spatial.v2.random_proof_generation import (
     RandomProofConstructionError,
     construct_random_proof_candidate,
+    lift_problem_with_random_path,
     possibility_backbone_length,
 )
+from spatial.v2.solver import SpatialSolverV2
 
 
 @pytest.mark.parametrize("query_kind", ("direction", "which", "count"))
@@ -136,3 +142,70 @@ def test_possibility_skeleton_can_be_lifted_to_longer_randomized_proof() -> None
     assert len(sample.options) == 5
     assert len(sample.analysis.possible_directions) == 3
     assert sample.difficulty["proof_complexity"]["semantic_length"] == 6
+
+
+def test_randomized_lift_preserves_requested_selection_gold_size() -> None:
+    sample = SpatialGeneratorV2(17209467846799471187).generate_randomized(
+        GenerationPolicy(
+            query_kind=QueryKind.WHICH,
+            answer_mode=AnswerMode.ALL_POSSIBLE,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            ambiguity_size=2,
+            possibility_skeleton="exclude",
+            possibility_gold_size=2,
+            possibility_candidate_count=5,
+            num_entities=24,
+            num_premises=23,
+            ordinary_option_target=5,
+            menu_option_count=5,
+        ),
+        RandomProofPolicy(
+            2,
+            0,
+            forbidden_final_rules=(SemanticRule.TRC,),
+            transition_partition=TransitionPartition(
+                constructively_supported_transitions(), frozenset()
+            ),
+        ),
+        max_attempts=2_000,
+    )
+
+    assert len(sample.analysis.possible_entities) == 2
+    assert len(sample.menu_answer.letters) == 2
+
+
+def test_proof_prefix_does_not_change_base_possibility_set() -> None:
+    seed = 17209467846799471187
+    rng = random.Random(seed)
+    policy = GenerationPolicy(
+        query_kind=QueryKind.WHICH,
+        answer_mode=AnswerMode.ALL_POSSIBLE,
+        semantic_shape=SemanticShape.AMBIGUOUS,
+        ambiguity_size=2,
+        possibility_skeleton="exclude",
+        possibility_gold_size=2,
+        possibility_candidate_count=5,
+        num_entities=24,
+        num_premises=23,
+        ordinary_option_target=5,
+        menu_option_count=5,
+    )
+    objects = tuple(sorted(rng.sample(ENTITY_NAMES, policy.num_entities)))
+    base = construct_possibility(policy, objects, rng)
+    lifted = lift_problem_with_random_path(
+        base,
+        RandomProofPolicy(
+            2,
+            0,
+            forbidden_final_rules=(SemanticRule.TRC,),
+            transition_partition=TransitionPartition(
+                constructively_supported_transitions(), frozenset()
+            ),
+        ),
+        seed=seed * 1_000_003,
+    )
+    solver = SpatialSolverV2()
+
+    assert solver.analyze(lifted.problem).possible_entities == (
+        solver.analyze(base).possible_entities
+    )
