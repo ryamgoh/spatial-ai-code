@@ -146,20 +146,24 @@ Three capability lenses organize the supported reasoning structures:
   caption: [Capability lenses. They are not chronological stages or universal hardness tiers.],
 ) <capability-lenses>
 
-The experimental source of truth is not one flat task list. A cell is the
-predeclared combination
+The experimental source of truth is not one flat task list. Labels belong to
+different axes and must not be read as one chronological sequence. `DIR`,
+`SEL`, and `CNT` are query families. `UNI`, `ALT`, `MUL`, and `NOM` are semantic
+outcomes. `JCR` is a model-theoretic evidence obligation. `ARC` describes direct
+input access and `AXC` describes an axis-composition motif.
 
-$ "query contract" times "support/rule structure" times "semantic status" times "evidence burden". $
+Randomized v2 samples ordered paths over five linear transformations: transitive
+composition (`TRC`), modus ponens (`MP`), equivalence elimination (`IFF`),
+double-negation elimination (`DN`), and disjunctive elimination (`DJE`).
+Case-split reasoning (`CSR`) is instead a branching motif: it opens cases,
+performs branch-local reasoning, and merges their conclusions. CSR may
+contribute to realised certificate depth, but it is not an interchangeable
+linear transition token. Visible `NOT` syntax and the legacy `NEG` label do not
+by themselves establish a `DN` inference.
 
-Compact structure codes include atomic access (`ARC`), transitive composition
-(`TRC`), independent-axis composition (`AXC`), modus ponens (`MP`), equivalence
-elimination (`IFF`), negation (`NEG`), disjunctive elimination (`DJE`), and
-case-split reasoning (`CSR`). Semantic/evidence codes include unique or
-invariant resolution (`UNI`), alternative answers (`ALT`), multiple certain
-selections (`MUL`), no match (`NOM`), candidate exclusion (`EXC`), and joint
-Count reasoning (`JCR`). For example, `DIR-TRC-UNI` and `CNT-CSR-JCR-UNI`
-identify interpretable cells without claiming that all code combinations are
-valid.
+Thus `CNT-CSR-JCR-UNI` means a Count query, a case-split proof motif, a
+joint-Count evidence obligation, and a unique outcome; it does not mean the
+ordered sequence `CNT→CSR→JCR→UNI`.
 
 Depth, formula nesting, branch count, candidate and possibility-domain sizes,
 independent-axis support, distractors, token length, and rejection rate remain
