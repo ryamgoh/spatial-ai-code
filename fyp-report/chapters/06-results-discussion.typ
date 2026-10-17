@@ -341,12 +341,30 @@ fully solved at 100%; combined accuracy is 94%. The three G3 errors reflect one
 incorrect independence assumption, one incorrect merger of the latent groups,
 and one repetitive over-inclusive response. This provides modest Count
 headroom, but also confirms that Count is intrinsically easier for this base
-model under the current ontology. The final allocation therefore retains G3 as
-a SHIFT discriminator while retaining G4 as a transparent saturated anchor.
-The final matrix is selected structurally rather than only from cells where
-Qwen fails: Direction, Selection, and Count each include G2/G3/G4 set-size
-anchors and consecutive D5--D9 depth curves. This permits literal per-query
-gold-size and depth plots rather than interpolating across skipped values.
+model under the current ontology. The fixed 30-cell freeze candidate is
+therefore retained only as engineering history. Its `D` control plants a longer
+relational chain, but simultaneously increases premises, entities, removable
+noise, and prompt length; it cannot by itself identify general proof depth as
+the cause of the D9 drop.
+
+The replacement v2 design samples ordered proof graphs and admits them by their
+replayed certificates. Semantic length $L$ is the longest dependency path of
+MP, IFF elimination, disjunctive elimination, case split, double-negation
+elimination, and transitive relational composition; proof bookkeeping does not
+increase $L$. Verified distractor count $X$ is kept separate. Training covers
+L1--L5, X0--X5, and training-seen ordered transitions. Four disjoint evaluation
+partitions then compare fresh matched structures against one-factor length
+(L6--L8), noise (X6--X8), or ordered-transition OOD cases. Complete feasible
+rule paths are sampled with dynamic-programming completion counts rather than
+selected after observing model failures.
+
+Executable capability probes also expose a necessary non-factorial boundary:
+complete G2, G3, and G4 Count certificates currently have minimum semantic
+lengths L2, L3, and L4 because excluded counts require assignment refutations.
+The allocation preserves each query/gold total by redistributing examples over
+its feasible L range instead of fabricating impossible cells. Support size,
+proof size, branching, and token length remain continuous diagnostics rather
+than new task labels or a composite difficulty score.
 
 === Lessons and next actions
 
@@ -369,17 +387,21 @@ audit artifacts; full Natural source rows and answer-only evaluation views are
 stored separately.
 
 This remains an engineering pool, not the final benchmark. Three of its 350
-rows repeat another canonical structure within one Selection COMP cell, even
-though their surface names and option mappings differ. Before freezing, the
-pipeline will enforce canonical uniqueness, fix per-cell allocations, and audit
-structural disjointness from all training and development splits. Canonical
-uniqueness and the Count extension are now implemented; the remaining step is
-to generate the fresh selected pool and run the disjointness audit. The resulting
-`SpatialEntail-ALL-POSSIBLE-Bench` can then be sealed. Only after that boundary
-is fixed will the study generate `SpatialEntail-MULTI-SFT`, train the Natural
-multi-contract model, and compare untuned, SINGLE-to-MULTI transfer, and
-MULTI-SFT on the frozen benchmark. The answer-only ablation remains confined to
-the completed SINGLE study.
+rows repeat another canonical structure within one Selection composition cell,
+even though their surface names and option mappings differ. Randomized v2 must
+first pass its 2,400-example structural calibration and transition capability
+gates. It then prepares 900 fresh SINGLE and 2,700 fresh ALL-POSSIBLE headline
+examples, audits canonical uniqueness and structural disjointness, and freezes
+their hashes before generating SFT data. The Natural-versus-answer-only
+ablation is repeated for both SINGLE-v2 and MULTI-v2 at seeds 42 and 43 because
+the v1 answer-only result was strongly seed-sensitive.
+
+VISIBLE-POSSIBLE is implemented as a paired menu view of an ALL-POSSIBLE base
+but is deferred from the first v2 SFT study. Special L0, ambiguous, no-match,
+and zero-visible cases form a separate diagnostic. Inconsistent strict cycles
+are never mislabeled as no-answer spatial questions: a separate paired
+consistency diagnostic adds one closing edge to a satisfiable chain and requires
+deletion-minimal contradiction evidence.
 
 == Discussion and Threats
 

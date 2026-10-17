@@ -387,7 +387,13 @@ def _membership_skeleton(
     gold_size = policy.possibility_gold_size
     if len(rest) < gold_size:
         raise PossibilityConstructionError("not enough membership candidates")
-    planted, others = rest[:gold_size], rest[gold_size:]
+    candidate_count = policy.possibility_candidate_count or len(rest)
+    if not gold_size < candidate_count <= len(rest):
+        raise PossibilityConstructionError(
+            "possibility candidate count must exceed gold size and fit the pool"
+        )
+    candidate_pool = rest[:candidate_count]
+    planted, others = candidate_pool[:gold_size], candidate_pool[gold_size:]
     trigger = direction_constraint(first, second, rng.choice(tuple(Direction)))
     any_planted = Or(tuple(member(candidate) for candidate in planted))
     if name == "mp":

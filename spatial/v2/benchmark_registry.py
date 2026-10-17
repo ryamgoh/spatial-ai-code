@@ -143,7 +143,10 @@ _GENERATION_KEYS = {
     "possibility_skeleton",
     "possibility_depth",
     "possibility_gold_size",
+    "possibility_candidate_count",
     "ordinary_option_target",
+    "visible_gold_size",
+    "menu_option_count",
 }
 _QUERY_CODE = {
     QueryKind.DIRECTION: "DIR",

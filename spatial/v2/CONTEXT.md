@@ -18,3 +18,16 @@
   generalisation beyond matched composition.
 - **MULTI-SFT**: training data containing SINGLE and set-valued answer contracts.
   It is generated only after frozen benchmark structures are excluded.
+- **Semantic length (L)**: the longest dependency path of semantic proof rules
+  in the complete replay certificate. Premise loading, assumptions, and proof
+  bookkeeping do not increase L. L is not the old relational-chain depth.
+- **Distractor count (X)**: the exact number of top-level atomic premises that
+  are individually and jointly removable without changing the complete answer.
+- **MATCHED**: fresh, structurally disjoint evaluation examples inside the SFT
+  ranges L1--L5, X0--X5, and training-seen ordered transitions.
+- **One-factor OOD**: evaluation that changes exactly one factor: LENGTH-OOD
+  uses L6--L8, NOISE-OOD uses X6--X8, and COMPOSITION-OOD uses exactly one
+  held-out ordered transition.
+- **VISIBLE-POSSIBLE**: select only possible values displayed in the fixed
+  five-option menu. It shares complete semantics and certificates with an
+  ALL-POSSIBLE base but may hide semantic possibilities.

@@ -85,6 +85,8 @@ class AnswerVariant:
     name: str
     mode: AnswerMode
     menu_coverage: MenuCoverage
+    visible_gold_size: int | None = None
+    menu_option_count: int | None = None
 
 
 @dataclass(frozen=True)
@@ -188,7 +190,13 @@ def _answer_variants(raw: dict[str, Any]) -> tuple[AnswerVariant, ...]:
     variants = []
     for item in items:
         item = _mapping(item, "answer variant")
-        unknown = set(item) - {"name", "mode", "menu_coverage"}
+        unknown = set(item) - {
+            "name",
+            "mode",
+            "menu_coverage",
+            "visible_gold_size",
+            "menu_option_count",
+        }
         if unknown:
             raise ValueError(
                 "unknown answer variant keys: " + ", ".join(sorted(unknown))
@@ -201,12 +209,34 @@ def _answer_variants(raw: dict[str, Any]) -> tuple[AnswerVariant, ...]:
             item.get("name") or f"{mode.value}-{coverage.value}",
             "answer variant name",
         )
-        variants.append(AnswerVariant(name, mode, coverage))
+        visible_gold_size = item.get("visible_gold_size")
+        menu_option_count = item.get("menu_option_count")
+        if visible_gold_size is not None and type(visible_gold_size) is not int:
+            raise ValueError("visible_gold_size must be an integer")
+        if menu_option_count is not None and type(menu_option_count) is not int:
+            raise ValueError("menu_option_count must be an integer")
+        variants.append(
+            AnswerVariant(
+                name,
+                mode,
+                coverage,
+                visible_gold_size,
+                menu_option_count,
+            )
+        )
     if len({variant.name for variant in variants}) != len(variants):
         raise ValueError("duplicate answer variant names")
-    if len({(variant.mode, variant.menu_coverage) for variant in variants}) != len(
-        variants
-    ):
+    if len(
+        {
+            (
+                variant.mode,
+                variant.menu_coverage,
+                variant.visible_gold_size,
+                variant.menu_option_count,
+            )
+            for variant in variants
+        }
+    ) != len(variants):
         raise ValueError("duplicate answer variants")
     return tuple(variants)
 
@@ -403,6 +433,8 @@ def _policy(
         semantic_shape=cell.semantic_shape,
         boolean_shape=cell.boolean_shape,
         menu_coverage=answer.menu_coverage,
+        visible_gold_size=answer.visible_gold_size,
+        menu_option_count=answer.menu_option_count,
         trace_format=trace.trace_format,
         num_entities=cell.num_entities,
         num_premises=cell.num_premises,
@@ -529,7 +561,11 @@ def generate_matrix(
                 rows = []
                 answer_samples = {
                     answer.name: generator.with_answer_mode(
-                        base, answer.mode, answer.menu_coverage
+                        base,
+                        answer.mode,
+                        answer.menu_coverage,
+                        visible_gold_size=answer.visible_gold_size,
+                        menu_option_count=answer.menu_option_count,
                     )
                     for answer in answers
                 }

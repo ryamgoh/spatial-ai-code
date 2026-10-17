@@ -1,5 +1,11 @@
 # SpatialEntail-ALL-POSSIBLE-Bench: draft cell registry and feasibility pilot
 
+> **Superseded design note.** The calibration findings in this document remain
+> valid evidence, but the fixed 30-cell freeze candidate is no longer the final
+> design. Randomized proof-graph v2 replaces it with certificate-measured L,
+> verified X, and matched/one-factor-OOD partitions. See
+> `docs/audits/randomized-proof-v2-design.md`.
+
 Status: hardening, updated 2026-10-15. Not frozen or sealed. The first
 calibration registry is `spatial/v2/all-possible-cells.yaml`; the separate
 hardening registry is `spatial/v2/all-possible-hardening-cells.yaml`. The

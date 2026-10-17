@@ -779,6 +779,63 @@ def test_answer_mode_variants_share_one_solved_problem() -> None:
     assert 0 < len(visible.menu_answer.letters) < len(complete.menu_answer.letters)
 
 
+def test_visible_variant_controls_visible_gold_size_on_fixed_five_option_menu() -> None:
+    generator = SpatialGeneratorV2(seed=1746)
+    base = generator.generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=AnswerMode.ALL_POSSIBLE,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            ambiguity_size=3,
+            num_entities=6,
+            num_premises=5,
+            ordinary_option_target=5,
+            menu_option_count=5,
+        )
+    )
+
+    visible = generator.with_answer_mode(
+        base,
+        AnswerMode.VISIBLE_POSSIBLE,
+        MenuCoverage.PARTIAL,
+        visible_gold_size=2,
+        menu_option_count=5,
+    )
+
+    row = visible.as_sft_row()
+    assert len(visible.options) == 5
+    assert len(visible.menu_answer.letters) == 2
+    assert row["metadata"]["visible_gold_size"] == 2
+    assert len(row["metadata"]["visible_possible_values"]) == 2
+    assert len(row["metadata"]["hidden_possible_values"]) == 1
+
+
+def test_zero_visible_variant_reserves_one_of_five_slots_for_none() -> None:
+    generator = SpatialGeneratorV2(seed=1747)
+    base = generator.generate(
+        GenerationPolicy(
+            query_kind=QueryKind.DIRECTION,
+            answer_mode=AnswerMode.ALL_POSSIBLE,
+            semantic_shape=SemanticShape.AMBIGUOUS,
+            ambiguity_size=2,
+            num_entities=6,
+            num_premises=5,
+        )
+    )
+
+    visible = generator.with_answer_mode(
+        base,
+        AnswerMode.VISIBLE_POSSIBLE,
+        MenuCoverage.ZERO,
+        visible_gold_size=0,
+        menu_option_count=5,
+    )
+
+    assert len(visible.options) == 5
+    assert list(visible.options.values()).count("None of the Options") == 1
+    assert visible.menu_answer.status == "none-of-options"
+
+
 @pytest.mark.parametrize("trace_format", tuple(TraceFormat))
 def test_training_rows_never_contain_coordinate_witnesses(
     trace_format: TraceFormat,

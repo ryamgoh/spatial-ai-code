@@ -60,6 +60,8 @@ does not alter stored schemas or source SpatialMap labels.
 | `answer_mode` | `single`, `all-possible`, `visible-possible` | Defines whether the answer is one invariant result, the complete semantic possibility set, or only visible possible menu values. | `visible-possible` is diagnostic rather than headline exact semantics. |
 | `menu_coverage` | `full`, `partial`, `zero` | Controls whether all, some, or none of the semantic answers occur as ordinary menu options. | `partial` is undefined for `single`. |
 | `ordinary_option_target` | 1–25 | Sets the requested number of ordinary menu entries before any special answer. | Exposed by `GenerationPolicy`; the strict matrix currently uses its policy default. |
+| `menu_option_count` | positive integer or unset | Fixes the total menu size after reserving any special option. | Randomized v2 sets five, so V0 uses four ordinary distractors plus `None of the Options`. |
+| `visible_gold_size` | 0 through G or unset | Controls how many semantic possibilities remain displayed under `VISIBLE_POSSIBLE`. | Zero requires zero coverage; a positive proper subset requires partial coverage. |
 
 All ordinary and special options participate in one seeded final shuffle.
 `Cannot be determined` and `None of the Options` therefore have no fixed letter.
@@ -104,6 +106,11 @@ is not an implemented `GenerationMode`.
 | `require_independent_axes` | Boolean | Requires X and Y conclusions to depend on disjoint supporting premises. | Requires the relevant minimum depth to be at least two. |
 | `distractor_premises` | non-negative integer | Requires this many jointly removable premises after preserving answer and membership semantics. | Supported for Direction and controlled-depth Selection; Count remains unsupported. No greater than `num_premises`. Support is sufficient and order-dependent, not globally minimum. Incomplete semantic checks retain premises and set `support_checks_complete: false`. |
 | `require_joint_count_dependency` | Boolean | Requires possible Count values to be stricter than the interval implied by independent candidate-membership marginals. | Count-only; currently constructed as a unique case-split/XOR obligation. |
+| `possibility_candidate_count` | positive integer or unset | Limits the declared Selection/Count candidate domain while leaving spare objects for proof structure and noise. | Must exceed the requested gold size for generic possibility skeletons. |
+
+Randomized proof-graph v2 additionally measures certificate-derived semantic
+length `L` and exact verified distractor count `X`. These are not aliases for
+the older axis/membership depths. See `docs/audits/randomized-proof-v2-design.md`.
 
 Difficulty is measured on accepted problems. Generator intent alone does not
 establish the reported depth, independence, or distractor count.

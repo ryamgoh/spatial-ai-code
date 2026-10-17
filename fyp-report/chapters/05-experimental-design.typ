@@ -18,9 +18,11 @@ token-efficiency extension rather than a central formal-reasoning claim.
   caption: [Predeclared supervision contrasts.],
 ) <experimental-contrasts>
 
-Verified Natural versus answer-only is the central `SpatialEntail-SINGLE-SFT`
-comparison on the primary 4B model. Prompt-matched untuned evaluation provides
-context rather than another SFT arm. Compact Symbolic is optional and proceeds only after its
+Verified Natural versus answer-only is the completed
+`SpatialEntail-SINGLE-SFT` comparison on the primary 4B model. Randomized v2
+repeats this contrast for both SINGLE and MULTI contracts at seeds 42 and 43.
+Prompt-matched untuned evaluation provides context rather than another SFT
+arm. Compact Symbolic is optional and proceeds only after its
 notation and corpus-wide token reduction are demonstrated. Replayable NDJSON
 answer certificates are not an SFT arm.
 
@@ -85,6 +87,38 @@ equivalence or rotation invariance. Held-out results apply to the three frozen
 skeleton families, not arbitrary unseen compositions. Engineering checkpoints and
 previously inspected pilots are excluded from final evaluation and initialization.
 
+== Randomized Proof-Graph v2 Extension
+
+The fixed v1 registry remains the evidence source for its reported
+CORE/COMP/SHIFT results; v2 does not reuse those labels. It samples ordered
+proof graphs over MP, IFF elimination, disjunctive elimination, case split,
+double-negation elimination, and transitive relational composition. The
+replayed certificate measures semantic dependency length $L$, while $X$ counts
+atomic distractor premises whose joint removal leaves the complete answer
+unchanged. Support size and proof size remain continuous diagnostics.
+
+Training is restricted to L1--L5, X0--X5, and training-seen ordered
+transitions. Each query/gold evaluation group has 120 fresh matched examples
+and three disjoint sixty-example OOD partitions. LENGTH-OOD changes only L to
+L6--L8; NOISE-OOD changes only X to X6--X8; COMPOSITION-OOD introduces exactly
+one held-out ordered transition while retaining training L/X ranges. A
+predeclared exponential maximum-entropy tilt favours the upper end without
+using model accuracy to select items.
+
+Complete Count certificates impose a feasibility boundary: G2/G3/G4 have
+audited minimum lengths L2/L3/L4 under the current replay obligations. Quotas
+are redistributed over each query/gold group's feasible L values rather than
+creating unrealizable cells. MULTI training normalizes its exponential L tilt
+within each gold size's feasible interval; imposing one global L marginal would
+force a misleading U-shaped G1 allocation. The headline candidate contains 900 SINGLE and
+2,700 ALL-POSSIBLE bases and follows a 2,400-example capability calibration.
+
+VISIBLE-POSSIBLE is supported as a paired menu view but excluded from the first
+v2 SFT experiment. Direct L0, ambiguous SINGLE, true no-match, and zero-visible
+cases form a separate diagnostic. A binary diagnostic evaluates 280
+clean/dirty strict-cycle pairs; inconsistent premises are never mapped to
+Cannot be determined or None of the Options.
+
 == External Transfer
 
 External datasets are evaluation-only and retain native contracts. Results are
@@ -110,9 +144,10 @@ comparator until a semantics-preserving public adapter can be frozen.
 
 == Metrics and Statistical Reporting
 
-Primary outcomes are separately reported accuracy on CORE, COMP, SHIFT, and
-SpatialMap-TQA-Corr. Each internal section reports a cumulative score and its
-cell-level breakdown; depth curves remain diagnostic. Secondary metrics include per-capability/query
+Primary v1 outcomes are separately reported accuracy on CORE, COMP, SHIFT, and
+SpatialMap-TQA-Corr. Randomized v2 instead reports MATCHED, LENGTH-OOD,
+NOISE-OOD, and COMPOSITION-OOD, together with macro-L and macro-X curves.
+Secondary metrics include per-capability/query
 results, ambiguity precision/recall, option-position consistency, generated
 tokens, runtime, and memory. If compact Symbolic runs, its token reduction and
 answer accuracy are reported together.
@@ -172,10 +207,10 @@ when at least 98% pass. Its unequal final volumes range from roughly 1.5K to
 16K grid-control sets. The 98% threshold is a quality gate, not a difficulty
 weight.
 
-SpatialEntail instead uses a predeclared factorial cell allocation, complete
-formal checking, and a smaller source-blinded readability sample. This makes
-coverage across queries, reasoning structures, semantic statuses, and evidence
-obligations an explicit experimental choice.
+SpatialEntail v1 instead uses a predeclared factorial cell allocation, complete
+formal checking, and a smaller source-blinded readability sample. Randomized v2
+retains predeclared marginal quotas but samples complete feasible proof paths
+uniformly within them. Both designs fix selection rules before model evaluation.
 
 == GRPO Gate
 

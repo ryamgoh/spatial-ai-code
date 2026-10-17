@@ -92,6 +92,15 @@ def _resolve_worker_count(requested: int | None, *, work_item_count: int) -> int
     return min(workers, work_item_count)
 
 
+def _process_pool_supported() -> bool:
+    """Return false only for runtimes that deny Python's semaphore check."""
+    try:
+        os.sysconf("SC_SEM_NSEMS_MAX")
+    except (NotImplementedError, PermissionError, ValueError):
+        return False
+    return True
+
+
 def _sample_seed(
     base_seed: int, cell_id: str, sample_index: int, uniqueness_retry: int = 0
 ) -> int:
@@ -167,13 +176,15 @@ def _replace_duplicate_structures(
                     _sample_seed(seed, cell.id, sample_index, retry),
                 )
             )
-        if workers == 1:
+        if workers == 1 or not _process_pool_supported():
             for cell, sample_index, retry, sample_seed in work:
                 generated[cell.id][sample_index] = _generate_one_row(
                     cell, seed=sample_seed, uniqueness_retry=retry
                 )
         else:
-            with ProcessPoolExecutor(max_workers=min(workers, len(work))) as executor:
+            with ProcessPoolExecutor(
+                max_workers=min(workers, len(work))
+            ) as executor:
                 futures = {
                     executor.submit(
                         _generate_one_row,
@@ -402,7 +413,8 @@ def _generate_ready_cells(
         flush=True,
     )
 
-    if workers == 1:
+    use_pool = workers > 1 and _process_pool_supported()
+    if not use_pool:
         for completed, (cell, sample_index, sample_seed) in enumerate(
             work_items, start=1
         ):
@@ -413,7 +425,8 @@ def _generate_ready_cells(
             )
             print(
                 f"[{completed}/{len(work_items)}] generated {cell.id} "
-                f"sample {sample_index + 1}/{samples_per_cell}",
+                f"sample {sample_index + 1}/{samples_per_cell}"
+                f"{' (serial fallback)' if workers > 1 else ''}",
                 file=sys.stderr,
                 flush=True,
             )

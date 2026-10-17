@@ -1,5 +1,8 @@
-# SpatialEntail-ALL-POSSIBLE-Bench freeze-candidate registry.
-# Uniform allocation: 100 fresh examples per cell, 3,000 total.
+# SUPERSEDED PROTOTYPE — do not generate or freeze as the final benchmark.
+#
+# This 30-cell marginal grid remains as engineering history. The approved v2
+# design uses randomized certificate-measured proof paths, one-factor OOD
+# partitions, and the manifest in spatial.v2.study.randomized_v2.
 version: 1
 cells:
 - id: DIR-COMP-CSR-ALT-G2

@@ -1,0 +1,305 @@
+"""Construct solver-labelled spatial problems from randomized proof backbones."""
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+from itertools import combinations
+
+from spatial.v2.certificate_generation import AnswerCertificate, build_answer_certificate
+from spatial.v2.proof_complexity import ProofComplexityProfile, measure_certificate_complexity
+from spatial.v2.random_proof import (
+    RandomProofPolicy,
+    SemanticRule,
+    sample_rule_path,
+)
+from spatial.v2.solver import (
+    And,
+    CountQuery,
+    Direction,
+    DirectionQuery,
+    Iff,
+    Implies,
+    Not,
+    Or,
+    QueryAnalysis,
+    RelationConstraint,
+    SpatialFormula,
+    SpatialProblem,
+    SpatialSolverV2,
+    WhichQuery,
+    direction_constraint,
+    direction_signs,
+)
+
+
+class RandomProofConstructionError(ValueError):
+    """The sampled backbone cannot be instantiated in the supported fragment."""
+
+
+@dataclass(frozen=True)
+class RandomProofCandidate:
+    problem: SpatialProblem
+    analysis: QueryAnalysis
+    certificate: AnswerCertificate
+    requested_path: tuple[SemanticRule, ...]
+    complexity: ProofComplexityProfile
+
+
+@dataclass(frozen=True)
+class LiftedProofProblem:
+    problem: SpatialProblem
+    requested_path: tuple[SemanticRule, ...]
+
+
+_RULE_LABEL = {
+    SemanticRule.MP: "modus-ponens",
+    SemanticRule.IFF: "iff-elimination",
+    SemanticRule.DJE: "disjunctive-syllogism",
+    SemanticRule.CSR: "case-split",
+    SemanticRule.DN: "double-negation",
+    SemanticRule.TRC: "axis-transitivity",
+}
+
+
+class _AtomFactory:
+    def __init__(self, objects: tuple[str, ...], rng: random.Random) -> None:
+        pairs = list(combinations(objects, 2))
+        rng.shuffle(pairs)
+        directions = list(Direction)
+        rng.shuffle(directions)
+        self._atoms = [
+            direction_constraint(first, second, directions[index % len(directions)])
+            for index, (first, second) in enumerate(pairs)
+        ]
+        self._cursor = 0
+
+    def next(self, *, exclude: set[RelationConstraint] | None = None) -> RelationConstraint:
+        excluded = exclude or set()
+        while self._cursor < len(self._atoms):
+            atom = self._atoms[self._cursor]
+            self._cursor += 1
+            if atom not in excluded:
+                return atom
+        raise RandomProofConstructionError("not enough distinct atoms for proof graph")
+
+
+def _single_direction(atom: RelationConstraint) -> Direction:
+    if len(atom.allowed) != 1:
+        raise RandomProofConstructionError("TRC requires an exact spatial atom")
+    return next(iter(atom.allowed))
+
+
+def _backward_step(
+    rule: SemanticRule,
+    output: SpatialFormula,
+    atoms: _AtomFactory,
+    objects: tuple[str, ...],
+    rng: random.Random,
+    side_premises: list[SpatialFormula],
+) -> SpatialFormula:
+    if rule is SemanticRule.MP:
+        source = atoms.next()
+        side_premises.append(Implies(source, output))
+        return source
+    if rule is SemanticRule.IFF:
+        source = atoms.next()
+        side_premises.append(Iff(source, output))
+        return source
+    if rule is SemanticRule.DJE:
+        eliminated = atoms.next()
+        side_premises.append(Or((eliminated, output)))
+        return Not(eliminated)
+    if rule is SemanticRule.DN:
+        return Not(Not(output))
+    if rule is SemanticRule.CSR:
+        first = atoms.next()
+        second = atoms.next(exclude={first})
+        side_premises.extend((Implies(first, output), Implies(second, output)))
+        return Or((first, second))
+    if rule is SemanticRule.TRC:
+        if not isinstance(output, RelationConstraint):
+            raise RandomProofConstructionError(
+                "TRC cannot produce a compound Boolean formula"
+            )
+        direction = _single_direction(output)
+        candidates = [
+            obj for obj in objects if obj not in {output.subject, output.reference}
+        ]
+        rng.shuffle(candidates)
+        if not candidates:
+            raise RandomProofConstructionError("TRC needs an intermediate object")
+        intermediate = candidates[0]
+        source = direction_constraint(output.subject, intermediate, direction)
+        side_premises.append(
+            direction_constraint(intermediate, output.reference, direction)
+        )
+        return source
+    raise AssertionError(f"unsupported semantic rule: {rule}")
+
+
+def _is_padding_tautology(formula: SpatialFormula) -> bool:
+    if not isinstance(formula, Or) or len(formula.operands) != 2:
+        return False
+    first, second = formula.operands
+    return (isinstance(second, Not) and second.operand == first) or (
+        isinstance(first, Not) and first.operand == second
+    )
+
+
+def lift_problem_with_random_path(
+    problem: SpatialProblem,
+    policy: RandomProofPolicy,
+    *,
+    seed: int,
+) -> LiftedProofProblem:
+    """Replace one required atomic premise with a sampled derivation backbone."""
+    rng = random.Random(seed)
+    path = sample_rule_path(
+        rng,
+        policy.semantic_length,
+        policy.allowed_rules,
+        policy.resolved_partition(),
+        require_exactly_one_heldout=policy.require_heldout_transition,
+    )
+    top_level = list(
+        problem.premise.operands
+        if isinstance(problem.premise, And)
+        else (problem.premise,)
+    )
+    top_level = [item for item in top_level if not _is_padding_tautology(item)]
+    target_indices = (
+        [
+            index
+            for index, premise in enumerate(top_level)
+            if isinstance(premise, RelationConstraint) and len(premise.allowed) == 1
+        ]
+        if path and path[-1] is SemanticRule.TRC
+        else list(range(len(top_level)))
+    )
+    if not target_indices:
+        raise RandomProofConstructionError(
+            "possibility skeleton has no compatible premise to lift"
+        )
+    target_index = rng.choice(target_indices)
+    target = top_level.pop(target_index)
+    atoms = _AtomFactory(problem.objects, rng)
+    side_premises: list[SpatialFormula] = []
+    current: SpatialFormula = target
+    for rule in reversed(path):
+        current = _backward_step(
+            rule,
+            current,
+            atoms,
+            problem.objects,
+            rng,
+            side_premises,
+        )
+    top_level.extend((current, *side_premises))
+    for _ in range(policy.distractor_count):
+        top_level.append(atoms.next())
+    rng.shuffle(top_level)
+    return LiftedProofProblem(
+        SpatialProblem(problem.objects, And(tuple(top_level)), problem.query),
+        path,
+    )
+
+
+def _query_problem(
+    query_kind: str,
+    objects: tuple[str, ...],
+    rng: random.Random,
+) -> tuple[RelationConstraint, DirectionQuery | WhichQuery | CountQuery, list[SpatialFormula]]:
+    if len(objects) < 8:
+        raise RandomProofConstructionError("random proof graphs require eight objects")
+    target, reference, *rest = objects
+    direction = rng.choice(tuple(Direction))
+    final = direction_constraint(target, reference, direction)
+    if query_kind == "direction":
+        return final, DirectionQuery(target, reference), []
+    candidates = (target, *rest[:4])
+    signs = direction_signs(direction)
+    opposite = next(
+        candidate
+        for candidate in Direction
+        if direction_signs(candidate) == (-signs[0], -signs[1])
+    )
+    exclusions = [
+        direction_constraint(candidate, reference, opposite)
+        for candidate in candidates
+        if candidate != target
+    ]
+    if query_kind == "which":
+        return final, WhichQuery(frozenset({direction}), reference, candidates), exclusions
+    if query_kind == "count":
+        return final, CountQuery(frozenset({direction}), reference, candidates), exclusions
+    raise ValueError(f"unknown query kind: {query_kind}")
+
+
+def construct_random_proof_candidate(
+    *,
+    query_kind: str,
+    objects: tuple[str, ...],
+    policy: RandomProofPolicy,
+    seed: int,
+    solver: SpatialSolverV2 | None = None,
+) -> RandomProofCandidate:
+    """Construct and certify one unique-answer candidate with an exact backbone."""
+    rng = random.Random(seed)
+    solver = solver or SpatialSolverV2()
+    final, query, exclusions = _query_problem(query_kind, objects, rng)
+    path = sample_rule_path(
+        rng,
+        policy.semantic_length,
+        policy.allowed_rules,
+        policy.resolved_partition(),
+        require_exactly_one_heldout=policy.require_heldout_transition,
+    )
+    atom_factory = _AtomFactory(objects, rng)
+    side_premises: list[SpatialFormula] = []
+    current: SpatialFormula = final
+    for rule in reversed(path):
+        current = _backward_step(
+            rule, current, atom_factory, objects, rng, side_premises
+        )
+    premises: list[SpatialFormula] = [current, *side_premises, *exclusions]
+
+    used_atoms = {final}
+    for _ in range(policy.distractor_count):
+        distractor = atom_factory.next(exclude=used_atoms)
+        used_atoms.add(distractor)
+        premises.append(distractor)
+    rng.shuffle(premises)
+    problem = SpatialProblem(objects, And(tuple(premises)), query)
+    analysis = solver.analyze(problem)
+    if analysis.error or not analysis.consistent:
+        raise RandomProofConstructionError(
+            analysis.error or "constructed proof graph is inconsistent"
+        )
+    try:
+        certificate = build_answer_certificate(problem, analysis, solver)
+    except ValueError as exc:
+        raise RandomProofConstructionError(str(exc)) from exc
+    complexity = measure_certificate_complexity(problem, certificate)
+    requested = tuple(_RULE_LABEL[rule] for rule in path)
+    if policy.semantic_length and requested not in complexity.critical_signatures:
+        raise RandomProofConstructionError(
+            "replayed certificate does not contain the requested critical path"
+        )
+    if complexity.semantic_length != policy.semantic_length:
+        raise RandomProofConstructionError(
+            f"requested L{policy.semantic_length} but realised "
+            f"L{complexity.semantic_length}"
+        )
+    if complexity.removable_premises != policy.distractor_count:
+        raise RandomProofConstructionError(
+            f"requested X{policy.distractor_count} but realised "
+            f"X{complexity.removable_premises}"
+        )
+    return RandomProofCandidate(
+        problem,
+        analysis,
+        certificate,
+        path,
+        complexity,
+    )

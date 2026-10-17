@@ -37,6 +37,13 @@ from spatial.v2.grading import (
     resolve_answer,
 )
 from spatial.v2.proofs import ProofConstructionError
+from spatial.v2.proof_complexity import measure_certificate_complexity
+from spatial.v2.random_proof import PROOF_RULE_LABELS, RandomProofPolicy
+from spatial.v2.random_proof_generation import (
+    RandomProofConstructionError,
+    construct_random_proof_candidate,
+    lift_problem_with_random_path,
+)
 from spatial.v2.solver import (
     And,
     CountQuery,
@@ -184,6 +191,9 @@ class GenerationPolicy:
     possibility_skeleton: str | None = None
     possibility_depth: int = 2
     possibility_gold_size: int = 2
+    possibility_candidate_count: int | None = None
+    visible_gold_size: int | None = None
+    menu_option_count: int | None = None
     generation_mode: GenerationMode = GenerationMode.AUTO
 
     def __post_init__(self) -> None:
@@ -219,6 +229,15 @@ class GenerationPolicy:
             )
         if not 1 <= self.ordinary_option_target <= len(ascii_uppercase) - 1:
             raise ValueError("ordinary_option_target must be between 1 and 25")
+        if self.menu_option_count is not None and not 1 <= self.menu_option_count <= 26:
+            raise ValueError("menu_option_count must be between 1 and 26")
+        if (
+            self.possibility_candidate_count is not None
+            and not 1 <= self.possibility_candidate_count < self.num_entities
+        ):
+            raise ValueError(
+                "possibility_candidate_count must fit inside the object domain"
+            )
 
     def _validate_answer_contract(self) -> None:
         if self.oracle_only and self.trace_format is not TraceFormat.NATURAL:
@@ -253,6 +272,19 @@ class GenerationPolicy:
             and self.menu_coverage is MenuCoverage.PARTIAL
         ):
             raise ValueError("partial menu coverage is undefined for SINGLE questions")
+        if self.visible_gold_size is not None:
+            if self.answer_mode is not AnswerMode.VISIBLE_POSSIBLE:
+                raise ValueError(
+                    "visible_gold_size applies only to VISIBLE_POSSIBLE questions"
+                )
+            if self.visible_gold_size < 0:
+                raise ValueError("visible_gold_size must be non-negative")
+            if self.visible_gold_size == 0 and self.menu_coverage is not MenuCoverage.ZERO:
+                raise ValueError("visible_gold_size zero requires zero menu coverage")
+            if self.visible_gold_size > 0 and self.menu_coverage is not MenuCoverage.PARTIAL:
+                raise ValueError(
+                    "positive visible_gold_size requires partial menu coverage"
+                )
         if self.semantic_shape is SemanticShape.NO_MATCH and self.query_kind in {
             QueryKind.DIRECTION,
             QueryKind.COUNT,
@@ -554,12 +586,24 @@ class GeneratedSpatialSample:
                 "answer_mode": self.policy.answer_mode.value,
                 "semantic_shape": self.policy.semantic_shape.value,
                 "menu_coverage": self.policy.menu_coverage.value,
+                "visible_gold_size": self.policy.visible_gold_size,
+                "menu_option_count": len(self.options),
                 "trace_format": self.policy.trace_format.value,
                 "boolean_shape": self.policy.boolean_shape.value,
                 "num_entities": len(self.problem.objects),
                 "num_premises": len(self.problem.premise.operands),
                 "possible_values": [
                     _render_value(value) for value in _answer_values(self.analysis)
+                ],
+                "visible_possible_values": [
+                    _render_value(value)
+                    for value in _answer_values(self.analysis)
+                    if _render_value(value) in self.options.values()
+                ],
+                "hidden_possible_values": [
+                    _render_value(value)
+                    for value in _answer_values(self.analysis)
+                    if _render_value(value) not in self.options.values()
                 ],
                 "resolution_status": self.resolution.status.value,
                 "menu_status": self.menu_answer.status,
@@ -711,17 +755,190 @@ class SpatialGeneratorV2:
             f"rejections: {summary}"
         )
 
+    def generate_randomized(
+        self,
+        policy: GenerationPolicy,
+        proof_policy: RandomProofPolicy,
+        *,
+        max_attempts: int = 500,
+    ) -> GeneratedSpatialSample:
+        """Generate a row whose realised certificate matches a random proof policy."""
+        if max_attempts <= 0:
+            raise ValueError("max_attempts must be positive")
+        rejections: Counter[str] = Counter()
+        for attempt in range(max_attempts):
+            try:
+                objects = tuple(
+                    sorted(self._random.sample(ENTITY_NAMES, policy.num_entities))
+                )
+                if policy.possibility_skeleton is None:
+                    candidate = construct_random_proof_candidate(
+                        query_kind=policy.query_kind.value,
+                        objects=objects,
+                        policy=proof_policy,
+                        seed=self.seed * 1_000_003 + self._emitted * 10_007 + attempt,
+                        solver=self._solver,
+                    )
+                    problem = candidate.problem
+                    analysis = candidate.analysis
+                    certificate = candidate.certificate
+                    profile = candidate.complexity
+                    requested_path = candidate.requested_path
+                    requested_is_prefix = False
+                else:
+                    from spatial.v2.possibility import construct_possibility
+
+                    base = construct_possibility(policy, objects, self._random)
+                    base_analysis = self._solver.analyze(base)
+                    if base_analysis.error or not base_analysis.consistent:
+                        raise RandomProofConstructionError(
+                            base_analysis.error or "base possibility problem is inconsistent"
+                        )
+                    base_certificate = build_answer_certificate(
+                        base, base_analysis, self._solver
+                    )
+                    base_length = measure_certificate_complexity(
+                        base, base_certificate
+                    ).semantic_length
+                    prefix_length = proof_policy.semantic_length - base_length
+                    if prefix_length < 0:
+                        raise RandomProofConstructionError(
+                            f"base possibility skeleton already has L{base_length}"
+                        )
+                    prefix_policy = replace(
+                        proof_policy,
+                        semantic_length=prefix_length,
+                        require_heldout_transition=(
+                            proof_policy.require_heldout_transition
+                            and prefix_length >= 2
+                        ),
+                    )
+                    lifted = lift_problem_with_random_path(
+                        base,
+                        prefix_policy,
+                        seed=self.seed * 1_000_003 + self._emitted * 10_007 + attempt,
+                    )
+                    problem = lifted.problem
+                    requested_path = lifted.requested_path
+                    analysis = self._solver.analyze(problem)
+                    if analysis.error or not analysis.consistent:
+                        raise RandomProofConstructionError(
+                            analysis.error or "lifted possibility problem is inconsistent"
+                        )
+                    certificate = build_answer_certificate(
+                        problem, analysis, self._solver
+                    )
+                    profile = measure_certificate_complexity(problem, certificate)
+                    requested_is_prefix = True
+
+                if not self._shape_matches(analysis, policy.semantic_shape):
+                    raise RandomProofConstructionError(
+                        "random proof candidate has the wrong semantic shape"
+                    )
+                requested_labels = tuple(
+                    PROOF_RULE_LABELS[rule] for rule in requested_path
+                )
+                path_found = requested_labels in profile.critical_signatures or (
+                    requested_is_prefix
+                    and any(
+                        signature[: len(requested_labels)] == requested_labels
+                        for signature in profile.critical_signatures
+                    )
+                )
+                if requested_labels and not path_found:
+                    raise RandomProofConstructionError(
+                        "certificate bypassed the requested proof backbone"
+                    )
+                if profile.semantic_length != proof_policy.semantic_length:
+                    raise RandomProofConstructionError(
+                        f"requested L{proof_policy.semantic_length} but realised "
+                        f"L{profile.semantic_length}"
+                    )
+                difficulty = measure_difficulty(
+                    problem, analysis, self._solver, analyze_support=True
+                )
+                if difficulty["num_distractor_premises"] != proof_policy.distractor_count:
+                    raise RandomProofConstructionError(
+                        f"requested X{proof_policy.distractor_count} but realised "
+                        f"X{difficulty['num_distractor_premises']}"
+                    )
+                difficulty["proof_complexity"] = measure_certificate_complexity(
+                    problem,
+                    certificate,
+                    removable_premises=difficulty["num_distractor_premises"],
+                ).to_dict()
+                difficulty["requested_rule_path"] = [
+                    rule.value for rule in requested_path
+                ]
+                difficulty["requested_semantic_length"] = proof_policy.semantic_length
+                difficulty["requested_distractor_count"] = proof_policy.distractor_count
+
+                resolution = resolve_answer(analysis, policy.answer_mode)
+                options = self._menu(policy, analysis, resolution)
+                menu_answer = encode_menu_answer(resolution, options)
+                if not menu_answer.is_resolved:
+                    raise RandomProofConstructionError(
+                        menu_answer.error or "randomized menu was unresolved"
+                    )
+                prompt = self._prompt(problem, options, policy.answer_mode)
+                self._verify_round_trip(
+                    problem, options, prompt, policy, menu_answer
+                )
+                trace = _render_trace(
+                    certificate, resolution, menu_answer, policy
+                )
+                if isinstance(analysis, DirectionAnalysis):
+                    coordinates = analysis.coordinates or next(
+                        iter(analysis.witnesses.values()), {}
+                    )
+                else:
+                    coordinates = next(iter(analysis.witnesses.values()), {})
+                sample = GeneratedSpatialSample(
+                    problem,
+                    options,
+                    analysis,
+                    resolution,
+                    menu_answer,
+                    certificate,
+                    prompt,
+                    trace,
+                    policy,
+                    GenerationProvenance.PROOF_TEMPLATE_FIRST,
+                    self.seed,
+                    self._emitted,
+                    attempt,
+                    coordinates,
+                    difficulty,
+                    dict(sorted(rejections.items())),
+                )
+                self._emitted += 1
+                return sample
+            except (RandomProofConstructionError, ProofConstructionError, _RetryGeneration) as exc:
+                rejections[str(exc)] += 1
+        summary = ", ".join(
+            f"{reason}={count}" for reason, count in sorted(rejections.items())
+        )
+        raise RuntimeError(
+            f"could not satisfy random proof policy after {max_attempts} attempts; "
+            f"rejections: {summary}"
+        )
+
     def with_answer_mode(
         self,
         sample: GeneratedSpatialSample,
         answer_mode: AnswerMode | str,
         menu_coverage: MenuCoverage | str,
+        *,
+        visible_gold_size: int | None = None,
+        menu_option_count: int | None = None,
     ) -> GeneratedSpatialSample:
         """Render another answer contract for an already solved base problem."""
         policy = replace(
             sample.policy,
             answer_mode=AnswerMode(answer_mode),
             menu_coverage=MenuCoverage(menu_coverage),
+            visible_gold_size=visible_gold_size,
+            menu_option_count=menu_option_count,
         )
         resolution = resolve_answer(sample.analysis, policy.answer_mode)
         options = self._menu(policy, sample.analysis, resolution)
@@ -893,6 +1110,12 @@ class SpatialGeneratorV2:
                 raise _RetryGeneration(
                     f"certificate construction failed: {exc}"
                 ) from exc
+        if certificate is not None:
+            difficulty["proof_complexity"] = measure_certificate_complexity(
+                problem,
+                certificate,
+                removable_premises=difficulty["num_distractor_premises"],
+            ).to_dict()
 
         resolution = resolve_answer(analysis, policy.answer_mode)
         options = self._menu(policy, analysis, resolution)
@@ -1709,22 +1932,39 @@ class SpatialGeneratorV2:
                 raise _RetryGeneration(
                     "partial coverage needs at least two possibilities"
                 )
-            count = self._random.randint(1, len(possible) - 1)
+            count = (
+                policy.visible_gold_size
+                if policy.visible_gold_size is not None
+                else self._random.randint(1, len(possible) - 1)
+            )
+            if not 1 <= count < len(possible):
+                raise _RetryGeneration(
+                    "visible_gold_size must expose at least one but not all possibilities"
+                )
             visible = self._random.sample(possible, count)
 
         distractors = [value for value in universe if value not in possible]
         self._random.shuffle(distractors)
-        ordinary_target = max(policy.ordinary_option_target, len(visible))
-        visible.extend(distractors[: max(0, ordinary_target - len(visible))])
-        rendered = [_render_value(value) for value in visible]
-
+        special = None
         if resolution.status is ResolutionStatus.AMBIGUOUS or (
             policy.answer_mode is AnswerMode.ALL_POSSIBLE
             and policy.menu_coverage is MenuCoverage.PARTIAL
         ):
-            rendered.append("Cannot be determined")
+            special = "Cannot be determined"
         elif not possible or policy.menu_coverage is MenuCoverage.ZERO:
-            rendered.append("None of the Options")
+            special = "None of the Options"
+        if policy.menu_option_count is None:
+            ordinary_target = max(policy.ordinary_option_target, len(visible))
+        else:
+            ordinary_target = policy.menu_option_count - int(special is not None)
+            if ordinary_target < len(visible):
+                raise _RetryGeneration("fixed menu cannot represent visible answers")
+        visible.extend(distractors[: max(0, ordinary_target - len(visible))])
+        rendered = [_render_value(value) for value in visible]
+        if special is not None:
+            rendered.append(special)
+        if policy.menu_option_count is not None and len(rendered) != policy.menu_option_count:
+            raise _RetryGeneration("not enough distinct distractors to fill fixed menu")
         if len(rendered) > len(ascii_uppercase):
             raise _RetryGeneration("menu exceeds available option letters")
         self._random.shuffle(rendered)
