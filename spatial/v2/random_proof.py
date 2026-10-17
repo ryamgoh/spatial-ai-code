@@ -265,8 +265,8 @@ def stable_transition_order(
 def constructively_supported_transitions() -> frozenset[Transition]:
     """Transitions supported by the backward proof-chain constructor.
 
-    A TRC step can only produce an exact spatial atom.  DJE, CSR, and DN expose
-    compound inputs to the preceding step, so those three transitions cannot
+    A TRC step can only produce an exact spatial atom. DJE and DN expose
+    compound inputs to the preceding step, so those transitions cannot
     immediately follow TRC in the constructive grammar.
     """
     blocked_after_trc = {SemanticRule.DJE, SemanticRule.DN}

@@ -173,7 +173,7 @@ def test_l8_x8_stress_cases_replay_exact_requested_complexity(
     assert metadata["difficulty"]["proof_complexity"]["semantic_length"] == 8
     assert metadata["difficulty"]["num_distractor_premises"] == 8
     assert metadata["menu_option_count"] == 5
-    assert metadata["difficulty"]["requested_rule_path"].count("CSR") <= 1
+    assert "CSR" not in metadata["difficulty"]["requested_rule_path"]
 
 
 def test_consistency_diagnostic_writes_all_clean_dirty_pairs(tmp_path) -> None:
