@@ -56,8 +56,8 @@ class PartitionQuota:
 class RandomizedStudyDesign:
     """Frozen train/OOD boundaries and maximum-entropy tilt parameters."""
 
-    train_max_l: int = 5
-    train_max_x: int = 5
+    train_max_l: int = 6
+    train_max_x: int = 6
     eval_max_l: int = 8
     eval_max_x: int = 8
     benchmark_l_ratio: float = 1.15
@@ -299,8 +299,8 @@ def study_manifest(
         "transitions": _transition_payload(),
         "benchmark": benchmark,
         "training": {
-            "examples_per_arm": 8000,
-            "development_per_arm": 800,
+            "examples_per_contract": 8000,
+            "development_per_contract": 800,
             "single_length": exponential_quotas(
                 range(1, design.train_max_l + 1),
                 8000,
@@ -330,7 +330,10 @@ def study_manifest(
             "single_gold": {"1": 8000},
             "multi_gold": {str(gold): 2000 for gold in range(1, 5)},
             "seeds": [42, 43],
-            "supervision": ["natural", "answer-only"],
+            "supervision_by_contract": {
+                "single": ["natural", "answer-only"],
+                "multi": ["natural"],
+            },
         },
         "diagnostics": {
             "special_response_examples": 300,
@@ -1085,10 +1088,10 @@ def main() -> None:
     parser.add_argument("--workers", type=int)
     parser.add_argument("--examples-per-query-gold", type=int, default=200)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--train-max-l", type=int, default=5)
-    parser.add_argument("--train-max-x", type=int, default=5)
-    parser.add_argument("--eval-max-l", type=int, default=8)
-    parser.add_argument("--eval-max-x", type=int, default=8)
+    parser.add_argument("--train-max-l", type=int, default=DEFAULT_DESIGN.train_max_l)
+    parser.add_argument("--train-max-x", type=int, default=DEFAULT_DESIGN.train_max_x)
+    parser.add_argument("--eval-max-l", type=int, default=DEFAULT_DESIGN.eval_max_l)
+    parser.add_argument("--eval-max-x", type=int, default=DEFAULT_DESIGN.eval_max_x)
     args = parser.parse_args()
     design = RandomizedStudyDesign(
         train_max_l=args.train_max_l,

@@ -20,7 +20,10 @@ token-efficiency extension rather than a central formal-reasoning claim.
 
 Verified Natural versus answer-only is the completed
 `SpatialEntail-SINGLE-SFT` comparison on the primary 4B model. Randomized v2
-repeats this contrast for both SINGLE and MULTI contracts at seeds 42 and 43.
+retains this contrast for the SINGLE contract at seeds 42 and 43. MULTI uses
+Natural supervision only and is not treated as a second supervision-format
+ablation; its comparators are the prompt-matched untuned model and Natural
+SINGLE-SFT transfer baseline.
 Prompt-matched untuned evaluation provides context rather than another SFT
 arm. Compact Symbolic is optional and proceeds only after its
 notation and corpus-wide token reduction are demonstrated. Replayable NDJSON
@@ -98,10 +101,10 @@ The replayed certificate measures semantic dependency length $L$, while $X$ coun
 atomic distractor premises whose joint removal leaves the complete answer
 unchanged. Support size and proof size remain continuous diagnostics.
 
-Training is restricted to L1--L5, X0--X5, and training-seen ordered
+Training is restricted to L1--L6, X0--X6, and training-seen ordered
 transitions. Each query/gold evaluation group has 120 fresh matched examples
 and three disjoint sixty-example OOD partitions. LENGTH-OOD changes only L to
-L6--L8; NOISE-OOD changes only X to X6--X8; COMPOSITION-OOD introduces exactly
+L7--L8; NOISE-OOD changes only X to X7--X8; COMPOSITION-OOD introduces exactly
 one held-out ordered transition while retaining training L/X ranges. A
 predeclared exponential maximum-entropy tilt favours the upper end without
 using model accuracy to select items.
@@ -157,10 +160,12 @@ Both training seeds are reported individually, together with their mean and
 range. Two seeds do not support a strong seed-level confidence interval. Paired
 item-level bootstrap intervals are reported within each seed, and consistent directions are reported as observations from two runs. Item-level
 intervals condition on the checkpoints and do not estimate training-run variance.
-The primary held-out comparison is Natural versus answer-only. Cell-stratified
-paired resampling keeps base variants together. At one hundred examples, cell
-profiles are descriptive; a cell near fifty percent has roughly a ten-point
-confidence half-width.
+For SINGLE, the primary held-out supervision comparison is Natural versus
+answer-only. MULTI instead compares Natural MULTI-SFT against the prompt-matched
+untuned model and Natural SINGLE-SFT transfer baseline. Cell-stratified paired
+resampling keeps base variants together. At one hundred examples, cell profiles
+are descriptive; a cell near fifty percent has roughly a ten-point confidence
+half-width.
 
 == Source-Blinded Quality Review
 

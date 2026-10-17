@@ -32,7 +32,7 @@ def test_count_gold_dependent_minimum_is_reflected_without_shrinking_group() -> 
     quotas = benchmark_partition_quotas(QueryKind.COUNT, 4)
     matched = quotas[0]
 
-    assert set(matched.length) == {4, 5}
+    assert set(matched.length) == {4, 5, 6}
     assert sum(matched.length.values()) == 120
     assert calibration_length_quotas(QueryKind.COUNT, 4, total=10) == {
         4: 2,
@@ -61,6 +61,20 @@ def test_study_manifest_has_expected_contract_totals() -> None:
     )
 
 
+def test_study_manifest_scopes_answer_only_ablation_to_single() -> None:
+    training = study_manifest()["training"]
+
+    assert training["examples_per_contract"] == 8000
+    assert training["development_per_contract"] == 800
+    assert training["supervision_by_contract"] == {
+        "single": ["natural", "answer-only"],
+        "multi": ["natural"],
+    }
+    assert "examples_per_arm" not in training
+    assert "development_per_arm" not in training
+    assert "supervision" not in training
+
+
 def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
     tmp_path,
 ) -> None:
@@ -72,7 +86,7 @@ def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
     with pytest.raises(FileExistsError, match="different study design"):
         write_or_verify_manifest(
             path,
-            study_manifest(RandomizedStudyDesign(train_max_l=6)),
+            study_manifest(RandomizedStudyDesign(train_max_l=5)),
         )
 
 
@@ -114,12 +128,17 @@ def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None
         3: 2000,
         4: 2000,
     }
-    assert {length: sum(item[1] == length for item in assignments) for length in range(1, 6)} == {
-        1: 183,
-        2: 538,
-        3: 1211,
-        4: 2528,
-        5: 3540,
+    counts_by_length = {
+        length: sum(item[1] == length for item in assignments)
+        for length in range(1, 7)
+    }
+    assert counts_by_length == {
+        1: 122,
+        2: 355,
+        3: 778,
+        4: 1547,
+        5: 2166,
+        6: 3032,
     }
     assert all(length >= gold for gold, length, _ in assignments)
     for gold in range(1, 5):
@@ -127,12 +146,15 @@ def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None
             distractor: sum(
                 item[0] == gold and item[2] == distractor for item in assignments
             )
-            for distractor in range(0, 6)
-        } == {0: 178, 1: 222, 2: 277, 3: 347, 4: 434, 5: 542}
+            for distractor in range(0, 7)
+        } == {0: 133, 1: 166, 2: 207, 3: 259, 4: 324, 5: 405, 6: 506}
 
 
-def test_train_l6_x6_boundary_is_parameterized_not_a_code_branch() -> None:
-    design = RandomizedStudyDesign(train_max_l=6, train_max_x=6)
+def test_default_train_l6_x6_boundary_drives_assignments_and_benchmark() -> None:
+    design = RandomizedStudyDesign()
+    assert (design.train_max_l, design.train_max_x) == (6, 6)
+    assert (design.eval_max_l, design.eval_max_x) == (8, 8)
+
     assignments = training_assignments(
         "multi", total=8000, seed=42, design=design
     )

@@ -16,8 +16,8 @@ cd "$SLURM_SUBMIT_DIR"
 
 calibration_out=${CALIBRATION_OUT:-experiments/spatialentail-randomized-v2/prepared-calibration}
 study_manifest=${STUDY_MANIFEST:-experiments/spatialentail-randomized-v2/study-manifest.json}
-train_max_l=${TRAIN_MAX_L:-5}
-train_max_x=${TRAIN_MAX_X:-5}
+train_max_l=${TRAIN_MAX_L:-6}
+train_max_x=${TRAIN_MAX_X:-6}
 eval_max_l=${EVAL_MAX_L:-8}
 eval_max_x=${EVAL_MAX_X:-8}
 

@@ -353,9 +353,9 @@ transitive relational composition, then admits them by their replayed
 certificates. Case split remains a measured branching rule rather than a
 sampled path token. Semantic length $L$ is the longest semantic dependency path;
 proof bookkeeping does not increase $L$. Verified distractor count $X$ is kept separate. Training covers
-L1--L5, X0--X5, and training-seen ordered transitions. Four disjoint evaluation
+L1--L6, X0--X6, and training-seen ordered transitions. Four disjoint evaluation
 partitions then compare fresh matched structures against one-factor length
-(L6--L8), noise (X6--X8), or ordered-transition OOD cases. Complete feasible
+(L7--L8), noise (X7--X8), or ordered-transition OOD cases. Complete feasible
 rule paths are sampled with dynamic-programming completion counts rather than
 selected after observing model failures.
 
@@ -431,9 +431,11 @@ even though their surface names and option mappings differ. Randomized v2 must
 first pass its 2,400-example structural calibration and transition capability
 gates. It then prepares 900 fresh SINGLE and 2,700 fresh ALL-POSSIBLE headline
 examples, audits canonical uniqueness and structural disjointness, and freezes
-their hashes before generating SFT data. The Natural-versus-answer-only
-ablation is repeated for both SINGLE-v2 and MULTI-v2 at seeds 42 and 43 because
-the v1 answer-only result was strongly seed-sensitive.
+their hashes before generating SFT data. SINGLE-v2 retains the matched
+Natural-versus-answer-only ablation at seeds 42 and 43 because the v1
+answer-only result was strongly seed-sensitive. MULTI-v2 uses Natural
+supervision only and is compared with the prompt-matched untuned model and
+Natural SINGLE-SFT transfer baseline.
 
 VISIBLE-POSSIBLE is implemented as a paired menu view of an ALL-POSSIBLE base
 but is deferred from the first v2 SFT study. Special L0, ambiguous, no-match,

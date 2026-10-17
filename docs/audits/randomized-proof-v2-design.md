@@ -129,10 +129,10 @@ Every query/gold group contains:
 
 | Partition | N | L | X | Transitions |
 |---|---:|---|---|---|
-| MATCHED | 120 | feasible L1--L5 | X0--X5 | seen |
-| LENGTH-OOD | 60 | L6--L8 | X0--X5 | seen |
-| NOISE-OOD | 60 | feasible L1--L5 | X6--X8 | seen |
-| COMPOSITION-OOD | 60 | feasible L2--L5 | X0--X5 | exactly one held-out |
+| MATCHED | 120 | feasible L1--L6 | X0--X6 | seen |
+| LENGTH-OOD | 60 | L7--L8 | X0--X6 | seen |
+| NOISE-OOD | 60 | feasible L1--L6 | X7--X8 | seen |
+| COMPOSITION-OOD | 60 | feasible L2--L6 | X0--X6 | exactly one held-out |
 
 No headline item combines OOD factors. Within each allowed interval, quotas use
 the predeclared maximum-entropy tilt `P(k) proportional to r^k`: benchmark
@@ -160,15 +160,18 @@ prompts and remains outside the headline score and SFT data.
 ## SFT and ablation
 
 SINGLE-v2 and MULTI-v2 each use 8,000 train and 800 development bases. Training
-contains only L1--L5, X0--X5, and seen transitions. MULTI is balanced at 2,000
+contains only L1--L6, X0--X6, and seen transitions. MULTI is balanced at 2,000
 examples for each G1--G4. Its exponential L tilt is normalized separately over
-each gold size's feasible interval (G1: L1--L5, G2: L2--L5, G3: L3--L5, G4:
-L4--L5). X0--X5 is likewise normalized within each gold size, where all X
+each gold size's feasible interval (G1: L1--L6, G2: L2--L6, G3: L3--L6, G4:
+L4--L6). X0--X6 is likewise normalized within each gold size, where all X
 values are feasible, giving identical conditional noise distributions. This
 avoids a misleading U-shaped conditional L distribution that would
 be forced by combining equal gold-size rows, structural zeros, and one global L
-marginal. The same base rows yield Natural and answer-only
-targets, trained at seeds 42 and 43, giving eight adapters in total.
+marginal. SINGLE-v2 retains matched Natural and answer-only targets as the
+supervision ablation. MULTI-v2 uses Natural targets only and is not treated as
+a second supervision-format ablation; its comparators are the prompt-matched
+untuned model and Natural SINGLE-SFT transfer baseline. Both contracts are
+trained at seeds 42 and 43, giving six adapters in total.
 
 Certificates remain offline audit artifacts and are never SFT targets. Natural
 rows are never silently culled: use 24,576 context tokens when all fit, otherwise

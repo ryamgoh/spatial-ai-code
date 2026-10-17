@@ -13,9 +13,8 @@ sbatch --partition=normal --cpus-per-task=128 --mem=128G \
   experiments/spatialentail-randomized-v2/slurm/prepare-calibration.sh
 ```
 
-The default boundary is train L1--L5/X0--X5 and evaluate through L8/X8. To
-train through L6/X6 without changing code, freeze those values in the
-calibration manifest:
+The frozen default boundary is train L1--L6/X0--X6 and evaluate through
+L8/X8. The values can also be supplied explicitly when submitting the job:
 
 ```sh
 sbatch --partition=normal --cpus-per-task=128 --mem=128G \
