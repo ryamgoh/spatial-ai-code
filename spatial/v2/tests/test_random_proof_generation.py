@@ -16,6 +16,7 @@ from spatial.v2.random_proof import (
 from spatial.v2.random_proof_generation import (
     RandomProofConstructionError,
     construct_random_proof_candidate,
+    possibility_backbone_length,
 )
 
 
@@ -89,6 +90,13 @@ def test_infeasible_transition_is_rejected() -> None:
             policy=policy,
             seed=3,
         )
+
+
+def test_dje_backbone_length_avoids_recertifying_every_base_retry() -> None:
+    assert possibility_backbone_length("direction", "dje", 4) == 1
+    assert possibility_backbone_length("which", "dje", 4) == 0
+    assert possibility_backbone_length("count", "dje", 4) == 4
+    assert possibility_backbone_length("count", "csr", 4) is None
 
 
 def test_standard_generator_renders_fixed_menu_randomized_single() -> None:

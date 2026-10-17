@@ -10,6 +10,7 @@ from spatial.v2.study.randomized_v2 import (
     write_consistency_diagnostic,
     write_special_response_diagnostic,
 )
+from spatial.v2.study import randomized_v2
 
 
 def test_every_query_gold_group_keeps_three_hundred_headline_examples() -> None:
@@ -105,6 +106,15 @@ def test_train_l6_x6_boundary_is_parameterized_not_a_code_branch() -> None:
     assert set(quotas[0].length) == {4, 5, 6}
     assert set(quotas[1].length) == {7, 8}
     assert set(quotas[2].distractors) == {7, 8}
+
+
+def test_randomized_policy_uses_bounded_object_domains() -> None:
+    single = randomized_v2._randomized_policy(QueryKind.DIRECTION, 1)
+    possible = randomized_v2._randomized_policy(QueryKind.COUNT, 4)
+
+    assert single.num_entities == 24
+    assert possible.num_entities == 24
+    assert possible.possibility_candidate_count == 5
 
 
 def test_consistency_diagnostic_writes_all_clean_dirty_pairs(tmp_path) -> None:

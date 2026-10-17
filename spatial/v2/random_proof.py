@@ -41,6 +41,8 @@ class RandomProofPolicy:
     allowed_rules: tuple[SemanticRule, ...] = tuple(SemanticRule)
     require_heldout_transition: bool = False
     transition_partition: TransitionPartition | None = None
+    max_case_splits: int | None = None
+    forbidden_final_rules: tuple[SemanticRule, ...] = ()
 
     def __post_init__(self) -> None:
         if not 0 <= self.semantic_length <= 8:
@@ -55,6 +57,14 @@ class RandomProofPolicy:
         object.__setattr__(self, "allowed_rules", normalized)
         if self.require_heldout_transition and self.semantic_length < 2:
             raise ValueError("a held-out transition requires semantic_length >= 2")
+        if self.max_case_splits is not None and self.max_case_splits < 0:
+            raise ValueError("max_case_splits must be non-negative")
+        forbidden = tuple(
+            SemanticRule(rule) for rule in self.forbidden_final_rules
+        )
+        if len(forbidden) != len(set(forbidden)):
+            raise ValueError("forbidden_final_rules must be unique")
+        object.__setattr__(self, "forbidden_final_rules", forbidden)
 
     def resolved_partition(self) -> TransitionPartition:
         if self.transition_partition is not None:
@@ -193,6 +203,29 @@ def sample_rule_path(
         path.append(following)
         current = following
     return tuple(path)
+
+
+def sample_policy_path(
+    rng: random.Random,
+    policy: RandomProofPolicy,
+    *,
+    max_samples: int = 1_000,
+) -> tuple[SemanticRule, ...]:
+    """Uniformly sample a feasible path conditional on policy-level bounds."""
+    for _ in range(max_samples):
+        path = sample_rule_path(
+            rng,
+            policy.semantic_length,
+            policy.allowed_rules,
+            policy.resolved_partition(),
+            require_exactly_one_heldout=policy.require_heldout_transition,
+        )
+        if (
+            policy.max_case_splits is None
+            or path.count(SemanticRule.CSR) <= policy.max_case_splits
+        ) and (not path or path[-1] not in policy.forbidden_final_rules):
+            return path
+    raise ValueError("no rule path satisfied max_case_splits")
 
 
 def exponential_quotas(

@@ -23,6 +23,22 @@ Complete feasible rule paths are sampled uniformly using dynamic-programming
 completion counts. Prompt premise order is shuffled independently from proof
 order. The certificate, not generator intent, determines realised L.
 
+Generation separates sequential depth from branching: a randomized prefix may
+contain at most one case-split step, while branch count and proof size remain
+reported diagnostics. Without this bound, repeated case splits create an
+accidental exponential branch tree rather than a controlled L curve. Direction
+and Selection use exclusion-first ALL-POSSIBLE skeletons: gold values remain
+open-world possible and the proof derives necessary non-gold exclusions. Count
+retains correlated assignment evidence with a five-candidate cap.
+
+The construction pool reserves fresh leaf objects for X distractors and a small
+proof-atom core, then removes unused names before solving. The known
+possibility-skeleton offset avoids rebuilding a base certificate on every
+rejected lift; the final complete certificate still decides admission.
+Representative local L6/X6 timings fell from 4.62s to 0.84s for SINGLE
+Direction, 14.12s to 1.42s for ALL Direction G4, 69.24s to 6.66s for ALL
+Selection G4, and 5.28s to 3.37s for ALL Count G4.
+
 ## Calibration and feasibility correction
 
 The structural pool targets 2,400 examples over three query families, four gold

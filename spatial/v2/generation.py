@@ -43,6 +43,7 @@ from spatial.v2.random_proof_generation import (
     RandomProofConstructionError,
     construct_random_proof_candidate,
     lift_problem_with_random_path,
+    possibility_backbone_length,
 )
 from spatial.v2.solver import (
     And,
@@ -789,17 +790,24 @@ class SpatialGeneratorV2:
                     from spatial.v2.possibility import construct_possibility
 
                     base = construct_possibility(policy, objects, self._random)
-                    base_analysis = self._solver.analyze(base)
-                    if base_analysis.error or not base_analysis.consistent:
-                        raise RandomProofConstructionError(
-                            base_analysis.error or "base possibility problem is inconsistent"
-                        )
-                    base_certificate = build_answer_certificate(
-                        base, base_analysis, self._solver
+                    base_length = possibility_backbone_length(
+                        policy.query_kind.value,
+                        policy.possibility_skeleton,
+                        policy.possibility_gold_size,
                     )
-                    base_length = measure_certificate_complexity(
-                        base, base_certificate
-                    ).semantic_length
+                    if base_length is None:
+                        base_analysis = self._solver.analyze(base)
+                        if base_analysis.error or not base_analysis.consistent:
+                            raise RandomProofConstructionError(
+                                base_analysis.error
+                                or "base possibility problem is inconsistent"
+                            )
+                        base_certificate = build_answer_certificate(
+                            base, base_analysis, self._solver
+                        )
+                        base_length = measure_certificate_complexity(
+                            base, base_certificate
+                        ).semantic_length
                     prefix_length = proof_policy.semantic_length - base_length
                     if prefix_length < 0:
                         raise RandomProofConstructionError(

@@ -49,6 +49,7 @@ POSSIBILITY_SKELETONS = {
     "case-chain": (frozenset({"which"}), 13),
     "case-count": (frozenset({"count"}), 8),
     "factor-count": (frozenset({"count"}), 10),
+    "exclude": (frozenset({"direction", "which"}), 6),
 }
 
 
@@ -64,6 +65,7 @@ POSSIBILITY_STRUCTURES = {
     "case-chain": ("CSR", "TRC"),
     "case-count": ("CSR",),
     "factor-count": ("IFF",),
+    "exclude": ("NEG",),
 }
 
 
@@ -103,6 +105,7 @@ def validate_possibility_policy(policy: Any) -> None:
         "case-chain",
         "case-count",
         "factor-count",
+        "exclude",
     }:
         if not 2 <= gold_size <= 4:
             raise ValueError("possibility_gold_size must be between 2 and 4")
@@ -116,6 +119,11 @@ def validate_possibility_policy(policy: Any) -> None:
                     f"{policy.possibility_skeleton} with gold size {gold_size} "
                     f"requires at least {needed} objects"
                 )
+        if (
+            policy.possibility_skeleton == "exclude"
+            and policy.query_kind.value == "count"
+        ):
+            raise ValueError("exclude does not define correlated Count possibilities")
         if policy.possibility_skeleton == "case-chain":
             needed = 8 + 5 * (policy.possibility_depth - 1)
             if policy.num_entities < needed:
@@ -200,6 +208,14 @@ def _direction_skeleton(
 ) -> tuple[list[SpatialFormula], DirectionQuery, set[str]]:
     target, reference, first, second, *extras = nodes
     query = DirectionQuery(target, reference)
+    if name == "exclude":
+        alternatives = tuple(rng.sample(list(Direction), policy.possibility_gold_size))
+        premises = [
+            Not(direction_constraint(target, reference, value))
+            for value in Direction
+            if value not in alternatives
+        ]
+        return premises, query, {target, reference}
     if name in {"depth", "noise"}:
         chain = [reference, *extras[: policy.possibility_depth - 1], target]
         if len(chain) != policy.possibility_depth + 1:
@@ -253,6 +269,22 @@ def _membership_skeleton(
     reference, *pool = nodes
     direction = policy.query_direction or rng.choice(_DIAGONALS)
     member = lambda candidate: direction_constraint(candidate, reference, direction)
+    if name == "exclude":
+        candidate_count = policy.possibility_candidate_count or 5
+        if not policy.possibility_gold_size < candidate_count <= len(pool):
+            raise PossibilityConstructionError(
+                "exclude candidate count must exceed gold size and fit the pool"
+            )
+        candidates = pool[:candidate_count]
+        planted = candidates[: policy.possibility_gold_size]
+        others = candidates[policy.possibility_gold_size :]
+        premises = [Not(member(candidate)) for candidate in others]
+        rng.shuffle(candidates)
+        return (
+            premises,
+            WhichQuery(frozenset({direction}), reference, tuple(candidates)),
+            {reference, *planted, *others},
+        )
     if name == "case-chain":
         first, second, *rest = pool
         candidates, intermediate_pool = rest[:5], rest[5:]

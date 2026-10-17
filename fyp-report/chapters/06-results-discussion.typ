@@ -403,6 +403,18 @@ are never mislabeled as no-answer spatial questions: a separate paired
 consistency diagnostic adds one closing edge to a satisfiable chain and requires
 deletion-minimal contradiction evidence.
 
+Randomized v2 also separates semantic depth from proof branching. A sampled
+prefix contains at most one case split; repeated case splits would create an
+accidental exponential branch tree rather than a controlled L curve. Direction
+and Selection construct ALL-POSSIBLE answers through necessary non-gold
+exclusions, while Count retains complete correlated-assignment evidence with
+five declared candidates. Fresh leaf objects make X distractors constructively
+removable, unused construction names are pruned before solving, and the known
+base-skeleton offset avoids recertifying the base on every retry. On
+representative local L6/X6 cases, these changes reduced generation from 4.62s
+to 0.84s for SINGLE Direction, 14.12s to 1.42s for ALL Direction G4, 69.24s to
+6.66s for ALL Selection G4, and 5.28s to 3.37s for ALL Count G4.
+
 == Discussion and Threats
 
 The semantic audit already establishes that a latent-world answer can remain

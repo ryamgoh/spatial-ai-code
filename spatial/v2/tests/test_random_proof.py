@@ -10,7 +10,9 @@ from spatial.v2.random_proof import (
     count_rule_paths,
     deterministic_transition_partition,
     exponential_quotas,
+    sample_policy_path,
     sample_rule_path,
+    constructively_supported_transitions,
 )
 
 
@@ -91,6 +93,41 @@ def test_random_proof_policy_validates_requested_bounds() -> None:
         RandomProofPolicy(9, 0)
     with pytest.raises(ValueError, match="held-out"):
         RandomProofPolicy(1, 0, require_heldout_transition=True)
+
+
+def test_policy_sampler_caps_case_split_branching_without_reducing_l() -> None:
+    partition = TransitionPartition(
+        constructively_supported_transitions(), frozenset()
+    )
+    path = sample_policy_path(
+        random.Random(42),
+        RandomProofPolicy(
+            8,
+            0,
+            transition_partition=partition,
+            max_case_splits=1,
+        ),
+    )
+
+    assert len(path) == 8
+    assert path.count(SemanticRule.CSR) <= 1
+
+
+def test_policy_sampler_can_forbid_incompatible_terminal_rules() -> None:
+    partition = TransitionPartition(
+        constructively_supported_transitions(), frozenset()
+    )
+    path = sample_policy_path(
+        random.Random(43),
+        RandomProofPolicy(
+            8,
+            0,
+            transition_partition=partition,
+            forbidden_final_rules=(SemanticRule.TRC,),
+        ),
+    )
+
+    assert path[-1] is not SemanticRule.TRC
 
 
 def test_deterministic_partition_retains_seen_l8_and_heldout_edges() -> None:

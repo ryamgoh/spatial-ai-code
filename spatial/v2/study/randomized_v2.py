@@ -64,6 +64,7 @@ class RandomizedStudyDesign:
     benchmark_x_ratio: float = 1.10
     training_l_ratio: float = 1.40
     training_x_ratio: float = 1.25
+    max_case_splits: int = 1
 
     def __post_init__(self) -> None:
         if not 4 <= self.train_max_l < self.eval_max_l <= 8:
@@ -80,6 +81,8 @@ class RandomizedStudyDesign:
             )
         ):
             raise ValueError("all exponential ratios must be positive")
+        if not 0 <= self.max_case_splits <= self.eval_max_l:
+            raise ValueError("max_case_splits must be between zero and eval_max_l")
 
 
 DEFAULT_DESIGN = RandomizedStudyDesign()
@@ -555,19 +558,20 @@ def _randomized_policy(query: QueryKind, gold: int) -> GenerationPolicy:
             query_kind=query,
             answer_mode=AnswerMode.SINGLE,
             semantic_shape=SemanticShape.UNIQUE,
-            num_entities=30,
-            num_premises=29,
+            num_entities=24,
+            num_premises=23,
             menu_option_count=5,
         )
+    skeleton = "dje" if query is QueryKind.COUNT else "exclude"
     return GenerationPolicy(
         query_kind=query,
         answer_mode=AnswerMode.ALL_POSSIBLE,
         semantic_shape=SemanticShape.AMBIGUOUS,
-        possibility_skeleton="dje",
+        possibility_skeleton=skeleton,
         possibility_gold_size=gold,
         possibility_candidate_count=5,
-        num_entities=20,
-        num_premises=19,
+        num_entities=24,
+        num_premises=23,
         ordinary_option_target=5,
         menu_option_count=5,
     )
@@ -579,6 +583,7 @@ def _calibration_row(
     length: int,
     distractors: int,
     seed: int,
+    max_case_splits: int = 1,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     generator = SpatialGeneratorV2(seed)
@@ -589,6 +594,8 @@ def _calibration_row(
         RandomProofPolicy(
             length,
             distractors,
+            max_case_splits=max_case_splits,
+            forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
             transition_partition=TransitionPartition(transitions, frozenset()),
         ),
         max_attempts=2_000,
@@ -617,14 +624,15 @@ def _transition_probe_attempt(
                 query_kind=QueryKind(query_value),
                 answer_mode=AnswerMode.SINGLE,
                 semantic_shape=SemanticShape.UNIQUE,
-                num_entities=20,
-                num_premises=19,
+                num_entities=16,
+                num_premises=15,
                 menu_option_count=5,
             ),
             RandomProofPolicy(
                 2,
                 0,
                 allowed_rules=tuple(dict.fromkeys(edge)),
+                max_case_splits=1,
                 transition_partition=TransitionPartition(frozenset({edge}), frozenset()),
             ),
             max_attempts=20,
@@ -639,7 +647,10 @@ def _capability_success_threshold(attempts: int) -> int:
 
 
 def probe_transition_capability(
-    *, seed: int = 42, attempts: int = 20, workers: int = 1
+    *,
+    seed: int = 42,
+    attempts: int = 20,
+    workers: int = 1,
 ) -> dict[str, Any]:
     """Probe every ordered pair per query before model-dependent work begins."""
     if attempts <= 0 or workers <= 0:
@@ -718,6 +729,7 @@ def _headline_row(
     length: int,
     distractors: int,
     seed: int,
+    max_case_splits: int = 1,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     benchmark_partition = BenchmarkPartition(partition_value)
@@ -741,6 +753,8 @@ def _headline_row(
                     distractors,
                     require_heldout_transition=require_heldout,
                     transition_partition=proof_partition,
+                    max_case_splits=max_case_splits,
+                    forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
                 ),
                 max_attempts=2_000,
             )
@@ -804,6 +818,7 @@ def prepare_calibration(
                             length,
                             cursor % (design.eval_max_x + 1),
                             _calibration_seed(seed, query, gold, length, local_index),
+                            design.max_case_splits,
                         )
                     )
                     cursor += 1
@@ -922,6 +937,7 @@ def prepare_headline_benchmark(
                                 length * 100 + distractors,
                                 sample_index,
                             ),
+                            design.max_case_splits,
                         )
                     )
     requested_workers = workers or int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))

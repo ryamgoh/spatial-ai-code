@@ -52,6 +52,27 @@ def test_boolean_skeletons_plant_exactly_gold_size_answers(
     assert set(sample.menu_answer.letters) <= set(sample.options)
 
 
+@pytest.mark.parametrize("query_kind", ["direction", "which"])
+@pytest.mark.parametrize("gold_size", [2, 4])
+def test_exclusion_skeleton_defines_open_world_gold_without_enumerating_it(
+    query_kind, gold_size
+) -> None:
+    sample = SpatialGeneratorV2(seed=9250).generate(
+        _policy(
+            query_kind=query_kind,
+            possibility_skeleton="exclude",
+            possibility_gold_size=gold_size,
+            possibility_candidate_count=5,
+            num_entities=10,
+            num_premises=9,
+        )
+    )
+
+    assert len(sample.menu_answer.letters) == gold_size
+    assert len(sample.options) == 5
+    assert all(isinstance(premise, (Not, Or)) for premise in sample.problem.premise.operands)
+
+
 @pytest.mark.parametrize("query_kind", ["direction", "which", "count"])
 @pytest.mark.parametrize("depth", [3, 5])
 def test_depth_skeletons_leave_multiple_answers_open(query_kind, depth) -> None:
