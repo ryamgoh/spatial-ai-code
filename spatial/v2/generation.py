@@ -36,12 +36,11 @@ from spatial.v2.grading import (
     render_symbolic_answer_decision,
     resolve_answer,
 )
-from spatial.v2.proofs import ProofConstructionError, ProofRule
+from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.proof_complexity import measure_certificate_complexity
-from spatial.v2.random_proof import PROOF_RULE_LABELS, RandomProofPolicy, SemanticRule
+from spatial.v2.random_proof import PROOF_RULE_LABELS, RandomProofPolicy
 from spatial.v2.random_proof_generation import (
     RandomProofConstructionError,
-    construct_case_split_problem,
     construct_random_proof_candidate,
     lift_problem_with_random_path,
     possibility_backbone_length,
@@ -773,40 +772,7 @@ class SpatialGeneratorV2:
                 objects = tuple(
                     sorted(self._random.sample(ENTITY_NAMES, policy.num_entities))
                 )
-                requested_branch_signatures: tuple[tuple[str, ...], ...] = ()
-                if proof_policy.case_count:
-                    branching = construct_case_split_problem(
-                        query_kind=policy.query_kind.value,
-                        objects=objects,
-                        gold_size=(
-                            1
-                            if policy.answer_mode is AnswerMode.SINGLE
-                            else policy.possibility_gold_size
-                        ),
-                        policy=proof_policy,
-                        seed=self.seed * 1_000_003 + self._emitted * 10_007 + attempt,
-                    )
-                    problem = branching.problem
-                    requested_path = ()
-                    requested_branch_signatures = tuple(
-                        (
-                            PROOF_RULE_LABELS[SemanticRule.MP],
-                            *(PROOF_RULE_LABELS[rule] for rule in path),
-                            ProofRule.CASE_SPLIT.value,
-                        )
-                        for path in branching.branch_paths
-                    )
-                    analysis = self._solver.analyze(problem)
-                    if analysis.error or not analysis.consistent:
-                        raise RandomProofConstructionError(
-                            analysis.error or "case-split problem is inconsistent"
-                        )
-                    certificate = build_answer_certificate(
-                        problem, analysis, self._solver
-                    )
-                    profile = measure_certificate_complexity(problem, certificate)
-                    requested_is_prefix = False
-                elif policy.possibility_skeleton is None:
+                if policy.possibility_skeleton is None:
                     candidate = construct_random_proof_candidate(
                         query_kind=policy.query_kind.value,
                         objects=objects,
@@ -891,20 +857,6 @@ class SpatialGeneratorV2:
                     raise RandomProofConstructionError(
                         "certificate bypassed the requested proof backbone"
                     )
-                if requested_branch_signatures and not all(
-                    signature in profile.critical_signatures
-                    for signature in requested_branch_signatures
-                ):
-                    raise RandomProofConstructionError(
-                        "certificate bypassed a requested case-split branch"
-                    )
-                if proof_policy.case_count and (
-                    profile.case_split_depth != 1
-                    or profile.max_case_arity != proof_policy.case_count
-                ):
-                    raise RandomProofConstructionError(
-                        "certificate did not realise the requested single case split"
-                    )
                 if profile.semantic_length != proof_policy.semantic_length:
                     raise RandomProofConstructionError(
                         f"requested L{proof_policy.semantic_length} but realised "
@@ -926,11 +878,6 @@ class SpatialGeneratorV2:
                 difficulty["requested_rule_path"] = [
                     rule.value for rule in requested_path
                 ]
-                difficulty["requested_branch_paths"] = [
-                    [rule for rule in signature]
-                    for signature in requested_branch_signatures
-                ]
-                difficulty["requested_case_count"] = proof_policy.case_count
                 difficulty["requested_semantic_length"] = proof_policy.semantic_length
                 difficulty["requested_distractor_count"] = proof_policy.distractor_count
 

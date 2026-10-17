@@ -64,8 +64,6 @@ class RandomizedStudyDesign:
     benchmark_x_ratio: float = 1.10
     training_l_ratio: float = 1.40
     training_x_ratio: float = 1.25
-    case_split_fraction: float = 0.20
-    case_split_max_l: int = 4
 
     def __post_init__(self) -> None:
         if not 4 <= self.train_max_l < self.eval_max_l <= 8:
@@ -82,10 +80,6 @@ class RandomizedStudyDesign:
             )
         ):
             raise ValueError("all exponential ratios must be positive")
-        if not 0 <= self.case_split_fraction <= 1:
-            raise ValueError("case_split_fraction must be between zero and one")
-        if not 2 <= self.case_split_max_l <= self.train_max_l:
-            raise ValueError("case_split_max_l must be between two and train_max_l")
 
 
 DEFAULT_DESIGN = RandomizedStudyDesign()
@@ -179,19 +173,6 @@ def benchmark_partition_quotas(
     )
 
 
-def benchmark_case_split_fraction(
-    partition: BenchmarkPartition, design: RandomizedStudyDesign
-) -> float:
-    if partition is BenchmarkPartition.LENGTH_OOD:
-        return 0.0
-    # LENGTH-OOD is 60/300 of each query/gold group. Redistribute the overall
-    # CS1 target across the remaining 240 rows without changing total size.
-    fraction = design.case_split_fraction / 0.8
-    if fraction > 1:
-        raise ValueError("case_split_fraction is too large for CS0 LENGTH-OOD")
-    return fraction
-
-
 def pair_marginal_quotas(
     first: dict[int, int], second: dict[int, int], *, seed: int
 ) -> tuple[tuple[int, int], ...]:
@@ -204,34 +185,6 @@ def pair_marginal_quotas(
     return tuple(zip(left, right, strict=True))
 
 
-def assign_case_counts(
-    lengths: list[int],
-    *,
-    gold_size: int,
-    fraction: float,
-    seed: int,
-    max_length: int = 4,
-) -> list[int]:
-    """Assign one non-nested split to a deterministic fraction of eligible rows."""
-    target = round(len(lengths) * fraction)
-    eligible = [
-        index for index, length in enumerate(lengths) if 2 <= length <= max_length
-    ]
-    if target > len(eligible):
-        raise ValueError("case-split quota exceeds rows with L >= 2")
-    random.Random(seed).shuffle(eligible)
-    selected = set(eligible[:target])
-    counts = [0] * len(lengths)
-    single_arities = (2, 3, 4)
-    for ordinal, index in enumerate(sorted(selected)):
-        counts[index] = (
-            single_arities[ordinal % len(single_arities)]
-            if gold_size == 1
-            else gold_size
-        )
-    return counts
-
-
 def training_assignments(
     contract: str,
     *,
@@ -239,7 +192,7 @@ def training_assignments(
     seed: int,
     development: bool = False,
     design: RandomizedStudyDesign = DEFAULT_DESIGN,
-) -> tuple[tuple[int, int, int, int], ...]:
+) -> tuple[tuple[int, int, int], ...]:
     """Assign a monotone exponential L distribution within every gold size."""
     if contract not in {"single", "multi"}:
         raise ValueError("contract must be single or multi")
@@ -274,18 +227,9 @@ def training_assignments(
         ]
         rng.shuffle(lengths)
         rng.shuffle(distractors)
-        case_counts = assign_case_counts(
-            lengths,
-            gold_size=gold,
-            fraction=design.case_split_fraction,
-            seed=seed + gold * 1_000_003,
-            max_length=design.case_split_max_l,
-        )
         assignments.extend(
-            (gold, length, distractor, case_count)
-            for length, distractor, case_count in zip(
-                lengths, distractors, case_counts, strict=True
-            )
+            (gold, length, distractor)
+            for length, distractor in zip(lengths, distractors, strict=True)
         )
     rng.shuffle(assignments)
     return tuple(assignments)
@@ -318,17 +262,6 @@ def study_manifest(
                     "distractors": {
                         str(k): v for k, v in quota.distractors.items()
                     },
-                    "case_split": {
-                        "CS0": quota.count
-                        - round(
-                            quota.count
-                            * benchmark_case_split_fraction(quota.partition, design)
-                        ),
-                        "CS1": round(
-                            quota.count
-                            * benchmark_case_split_fraction(quota.partition, design)
-                        ),
-                    },
                 }
                 for quota in benchmark_partition_quotas(query, gold, design)
             ]
@@ -355,10 +288,6 @@ def study_manifest(
             "distractors": list(range(0, design.eval_max_x + 1)),
             "acceptance_floor": 0.05,
             "median_generation_seconds_ceiling": 60,
-            "case_split": {
-                "CS0": 1 - design.case_split_fraction,
-                "CS1": design.case_split_fraction,
-            },
             "query_gold_length_quotas": {
                 f"{query.value}-g{gold}": calibration_length_quotas(
                     query, gold, design=design
@@ -402,13 +331,6 @@ def study_manifest(
             "multi_gold": {str(gold): 2000 for gold in range(1, 5)},
             "seeds": [42, 43],
             "supervision": ["natural", "answer-only"],
-            "case_split": {
-                "depth": [0, 1],
-                "fraction": design.case_split_fraction,
-                "single_case_counts": [2, 3, 4],
-                "all_possible_case_count": "G",
-                        "maximum_semantic_length": design.case_split_max_l,
-            },
         },
         "diagnostics": {
             "special_response_examples": 300,
@@ -664,7 +586,7 @@ def _replacement_seed(original: int, retry: int) -> int:
 
 def _replace_headline_duplicates(
     rows: list[dict[str, Any]],
-    work: list[tuple[str, int, str, int, int, int, int]],
+    work: list[tuple[str, int, str, int, int, int]],
     *,
     workers: int,
     max_rounds: int = 50,
@@ -684,11 +606,7 @@ def _replace_headline_duplicates(
             replacement_work.append(
                 (
                     index,
-                    (
-                        *original[:-2],
-                        _replacement_seed(original[-2], retries[index]),
-                        original[-1],
-                    ),
+                    (*original[:-1], _replacement_seed(original[-1], retries[index])),
                 )
             )
         if workers == 1:
@@ -742,7 +660,6 @@ def _calibration_row(
     length: int,
     distractors: int,
     seed: int,
-    case_count: int = 0,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     generator = SpatialGeneratorV2(seed)
@@ -753,7 +670,6 @@ def _calibration_row(
         RandomProofPolicy(
             length,
             distractors,
-            case_count=case_count,
             forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
             transition_partition=TransitionPartition(transitions, frozenset()),
         ),
@@ -765,8 +681,6 @@ def _calibration_row(
         calibration_gold_size=gold,
         calibration_length=length,
         calibration_distractors=distractors,
-        case_split_depth=int(bool(case_count)),
-        case_count=case_count,
         headline=False,
     )
     return row
@@ -895,7 +809,6 @@ def _headline_row(
     length: int,
     distractors: int,
     seed: int,
-    case_count: int = 0,
 ) -> dict[str, Any]:
     query = QueryKind(query_value)
     benchmark_partition = BenchmarkPartition(partition_value)
@@ -920,7 +833,6 @@ def _headline_row(
                     require_heldout_transition=require_heldout,
                     transition_partition=proof_partition,
                     forbidden_final_rules=(SemanticRule.TRC,) if gold > 1 else (),
-                    case_count=case_count,
                 ),
                 max_attempts=2_000,
             )
@@ -940,8 +852,6 @@ def _headline_row(
             benchmark_partition=benchmark_partition.value,
             gold_size=gold,
             headline=True,
-            case_split_depth=int(bool(case_count)),
-            case_count=case_count,
             heldout_transitions=["->".join(edge) for edge in sorted(actual_heldout)],
         )
         return row
@@ -977,10 +887,9 @@ def prepare_calibration(
                 design=design,
             )
             cursor = 0
-            group_work = []
             for length, count in quotas.items():
                 for local_index in range(count):
-                    group_work.append(
+                    work.append(
                         (
                             query.value,
                             gold,
@@ -990,17 +899,6 @@ def prepare_calibration(
                         )
                     )
                     cursor += 1
-            case_counts = assign_case_counts(
-                [item[2] for item in group_work],
-                gold_size=gold,
-                fraction=design.case_split_fraction,
-                seed=seed + list(QueryKind).index(query) * 10_000 + gold,
-                max_length=design.case_split_max_l,
-            )
-            work.extend(
-                (*item, case_count)
-                for item, case_count in zip(group_work, case_counts, strict=True)
-            )
     requested_workers = workers or int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
     if requested_workers <= 0:
         raise ValueError("workers must be positive")
@@ -1101,24 +999,7 @@ def prepare_headline_benchmark(
                     quota.distractors,
                     seed=_calibration_seed(seed, query, gold, quota.count, 0),
                 )
-                branch_fraction = benchmark_case_split_fraction(
-                    quota.partition, design
-                )
-                case_counts = assign_case_counts(
-                    [length for length, _ in pairs],
-                    gold_size=gold,
-                    fraction=branch_fraction,
-                    seed=(
-                        seed
-                        + list(QueryKind).index(query) * 10_000
-                        + gold * 100
-                        + list(BenchmarkPartition).index(quota.partition)
-                    ),
-                    max_length=design.case_split_max_l,
-                )
-                for sample_index, ((length, distractors), case_count) in enumerate(
-                    zip(pairs, case_counts, strict=True)
-                ):
+                for sample_index, (length, distractors) in enumerate(pairs):
                     work.append(
                         (
                             query.value,
@@ -1133,7 +1014,6 @@ def prepare_headline_benchmark(
                                 length * 100 + distractors,
                                 sample_index,
                             ),
-                            case_count,
                         )
                     )
     requested_workers = workers or int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))

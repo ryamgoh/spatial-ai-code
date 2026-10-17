@@ -27,14 +27,10 @@ determines realised L.
 Generation separates sequential transformations from branching. Case split
 remains a semantic certificate rule and contributes to realised L, proof size,
 and branch diagnostics, but it is not sampled as an interchangeable linear
-token: its branches already contain implication steps. CS0 has no split and CS1
-has exactly one split layer; each overall query/gold allocation is 80% CS0 and
-20% CS1.
-Every CS1 branch receives an independently sampled linear path. SINGLE branches
-converge on one answer. ALL-POSSIBLE Direction/Selection branches converge on a
-necessary non-gold exclusion, while Count branches encode distinct complete
-assignments. SINGLE samples two to four cases, ALL-POSSIBLE uses case count G,
-and nested CS2 is excluded.
+token: its branches already contain implication steps. Direction and Selection
+use exclusion-first ALL-POSSIBLE skeletons, where gold values remain open-world
+possible and the proof derives necessary non-gold exclusions. Count retains
+correlated assignment evidence with a five-candidate cap.
 
 The construction pool reserves fresh leaf objects for X distractors and a small
 proof-atom core, then removes unused names before solving. The known
@@ -55,7 +51,6 @@ sizes, and L1--L8. Infeasible low-L Count cells are not fabricated: complete
 G2/G3/G4 Count certificates currently have audited minima L2/L3/L4 because
 excluded counts require assignment refutations. Each query/gold group retains
 200 calibration examples by reallocating uniformly over its feasible L range.
-Each query/gold group also preserves the 80/20 CS0/CS1 marginal.
 Calibration is disposable engineering evidence, so repeated canonical
 structures are counted in its receipt rather than causing the completed pool to
 be discarded. The fresh headline benchmark remains strictly unique: duplicate
@@ -85,9 +80,6 @@ No headline item combines OOD factors. Within each allowed interval, quotas use
 the predeclared maximum-entropy tilt `P(k) proportional to r^k`: benchmark
 `r_L=1.15`, benchmark `r_X=1.10`, training `r_L=1.40`, and training `r_X=1.25`.
 Largest-remainder rounding makes integer marginals deterministic.
-LENGTH-OOD remains CS0 because CS1 is bounded to L2--L4. MATCHED, NOISE-OOD,
-and COMPOSITION-OOD each use 25% CS1, preserving 20% CS1 over the complete
-300-example query/gold group without increasing the 3,600-example total.
 
 ## Contracts and diagnostics
 
@@ -119,7 +111,6 @@ avoids a misleading U-shaped conditional L distribution that would
 be forced by combining equal gold-size rows, structural zeros, and one global L
 marginal. The same base rows yield Natural and answer-only
 targets, trained at seeds 42 and 43, giving eight adapters in total.
-Each training arm contains 6,400 CS0 and 1,600 CS1 bases.
 
 Certificates remain offline audit artifacts and are never SFT targets. Natural
 rows are never silently culled: use 24,576 context tokens when all fit, otherwise

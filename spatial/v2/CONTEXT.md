@@ -44,11 +44,6 @@
   more cases, proves a result within each branch, and merges the branch results.
   CSR is measured in replayed certificates but is not a member of the linear
   transformation alphabet.
-- **Case-split depth**: the maximum number of nested case-split layers. The
-  first randomized v2 study uses only CS0 (none) and CS1 (one layer).
-- **Case count**: the number of alternatives opened by one CS1 node. SINGLE
-  samples two through four cases; ALL-POSSIBLE uses its gold-set size. Case
-  count is not case-split depth.
 - **Atomic relation comprehension (`ARC`)**: direct use of a visible relation;
   this is an input structure rather than a derived transformation.
 - **Axis composition (`AXC`)**: a spatial proof motif that combines axis-level

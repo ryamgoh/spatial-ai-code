@@ -5,7 +5,6 @@ from spatial.v2.study.randomized_v2 import (
     RandomizedStudyDesign,
     _calibration_row,
     _duplicate_structure_indices,
-    assign_case_counts,
     benchmark_partition_quotas,
     calibration_length_quotas,
     pair_marginal_quotas,
@@ -60,12 +59,6 @@ def test_study_manifest_has_expected_contract_totals() -> None:
         sum(quotas.values()) == 2000
         for quotas in manifest["training"]["multi_distractors_by_gold"].values()
     )
-    for partitions in manifest["benchmark"].values():
-        assert sum(item["case_split"]["CS1"] for item in partitions) == 60
-        length_ood = next(
-            item for item in partitions if item["partition"] == "length-ood"
-        )
-        assert length_ood["case_split"] == {"CS0": 60, "CS1": 0}
 
 
 def test_identical_cancelled_run_manifest_is_reused_but_drift_is_rejected(
@@ -111,19 +104,6 @@ def test_marginal_pairing_preserves_both_exact_distributions() -> None:
     assert [item[1] for item in pairs].count(1) == 4
 
 
-def test_case_split_assignment_is_bounded_and_contract_aware() -> None:
-    lengths = [1] * 20 + [2] * 40 + [3] * 40
-
-    single = assign_case_counts(lengths, gold_size=1, fraction=0.2, seed=42)
-    possible = assign_case_counts(lengths, gold_size=3, fraction=0.2, seed=42)
-
-    assert sum(value > 0 for value in single) == 20
-    assert set(value for value in single if value) == {2, 3, 4}
-    assert sum(value > 0 for value in possible) == 20
-    assert set(value for value in possible if value) == {3}
-    assert all(not case_count for length, case_count in zip(lengths, single) if length < 2)
-
-
 def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None:
     assignments = training_assignments("multi", total=8000, seed=42)
 
@@ -141,7 +121,7 @@ def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None
         4: 2528,
         5: 3540,
     }
-    assert all(length >= gold for gold, length, _, _ in assignments)
+    assert all(length >= gold for gold, length, _ in assignments)
     for gold in range(1, 5):
         assert {
             distractor: sum(
@@ -149,13 +129,6 @@ def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None
             )
             for distractor in range(0, 6)
         } == {0: 178, 1: 222, 2: 277, 3: 347, 4: 434, 5: 542}
-        assert sum(item[0] == gold and item[3] > 0 for item in assignments) == 400
-    assert all(
-        case_count == 0
-        or case_count == gold
-        or gold == 1 and case_count in {2, 3, 4}
-        for gold, _, _, case_count in assignments
-    )
 
 
 def test_train_l6_x6_boundary_is_parameterized_not_a_code_branch() -> None:
@@ -164,9 +137,9 @@ def test_train_l6_x6_boundary_is_parameterized_not_a_code_branch() -> None:
         "multi", total=8000, seed=42, design=design
     )
 
-    assert max(length for _, length, _, _ in assignments) == 6
-    assert max(distractor for _, _, distractor, _ in assignments) == 6
-    assert all(length >= gold for gold, length, _, _ in assignments)
+    assert max(length for _, length, _ in assignments) == 6
+    assert max(distractor for _, _, distractor in assignments) == 6
+    assert all(length >= gold for gold, length, _ in assignments)
     quotas = benchmark_partition_quotas(QueryKind.COUNT, 4, design)
     assert set(quotas[0].length) == {4, 5, 6}
     assert set(quotas[1].length) == {7, 8}

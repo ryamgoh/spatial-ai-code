@@ -407,13 +407,10 @@ deletion-minimal contradiction evidence.
 Randomized v2 also separates semantic depth from proof branching. Case split
 is measured in realised certificates but is not sampled as a linear
 transformation; treating it as interchangeable would create accidental branch
-expansion rather than a controlled L curve. The frozen design instead assigns
-80% of each overall query/gold allocation to CS0 and 20% to CS1, with one split
-layer and ordered linear paths inside every branch. LENGTH-OOD remains CS0;
-the other partitions use 25% CS1. SINGLE branches converge on one result;
-ALL-POSSIBLE Direction and Selection branches establish a necessary exclusion;
-Count branches encode complete correlated assignments. Nested CS2 is excluded.
-Fresh leaf objects make X distractors constructively
+expansion rather than a controlled L curve. Direction
+and Selection construct ALL-POSSIBLE answers through necessary non-gold
+exclusions, while Count retains complete correlated-assignment evidence with
+five declared candidates. Fresh leaf objects make X distractors constructively
 removable, unused construction names are pruned before solving, and the known
 base-skeleton offset avoids recertifying the base on every retry. On
 representative local L6/X6 cases, these changes reduced generation from 4.62s
