@@ -9,6 +9,7 @@ import os
 import random
 import sys
 import time
+from collections import Counter
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from enum import Enum
@@ -51,6 +52,7 @@ class PartitionQuota:
     length: dict[int, int]
     distractors: dict[int, int]
     transition_contract: str
+    pair_caps: tuple[tuple[int, int, int], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -148,6 +150,11 @@ def benchmark_partition_quotas(
                 design.benchmark_x_ratio,
             ),
             "seen-only",
+            (
+                ((minimum, 0, 4),)
+                if query_kind is QueryKind.COUNT and gold_size > 1
+                else ()
+            ),
         ),
         PartitionQuota(
             BenchmarkPartition.LENGTH_OOD,
@@ -192,15 +199,28 @@ def benchmark_partition_quotas(
 
 
 def pair_marginal_quotas(
-    first: dict[int, int], second: dict[int, int], *, seed: int
+    first: dict[int, int],
+    second: dict[int, int],
+    *,
+    seed: int,
+    pair_caps: dict[tuple[int, int], int] | None = None,
 ) -> tuple[tuple[int, int], ...]:
     """Pair two exact marginals without declaring a full Cartesian matrix."""
     if sum(first.values()) != sum(second.values()):
         raise ValueError("marginal totals must match")
+    caps = pair_caps or {}
+    if any(cap < 0 for cap in caps.values()):
+        raise ValueError("pair capacities must be non-negative")
     left = [value for value, count in sorted(first.items()) for _ in range(count)]
     right = [value for value, count in sorted(second.items()) for _ in range(count)]
-    random.Random(seed).shuffle(right)
-    return tuple(zip(left, right, strict=True))
+    for retry in range(1_000):
+        shuffled = list(right)
+        random.Random(seed + retry * 1_000_003).shuffle(shuffled)
+        pairs = tuple(zip(left, shuffled, strict=True))
+        counts = Counter(pairs)
+        if all(counts[pair] <= cap for pair, cap in caps.items()):
+            return pairs
+    raise ValueError("could not pair marginals within declared capacities")
 
 
 def training_assignments(
@@ -1031,6 +1051,10 @@ def prepare_headline_benchmark(
                     quota.length,
                     quota.distractors,
                     seed=_calibration_seed(seed, query, gold, quota.count, 0),
+                    pair_caps={
+                        (length, distractors): cap
+                        for length, distractors, cap in quota.pair_caps
+                    },
                 )
                 for sample_index, (length, distractors) in enumerate(pairs):
                     work.append(

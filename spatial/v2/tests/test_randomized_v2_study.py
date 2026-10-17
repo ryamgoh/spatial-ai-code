@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 
 import pytest
 
@@ -162,6 +163,27 @@ def test_marginal_pairing_preserves_both_exact_distributions() -> None:
     assert [item[0] for item in pairs].count(2) == 3
     assert [item[1] for item in pairs].count(0) == 1
     assert [item[1] for item in pairs].count(1) == 4
+
+
+def test_marginal_pairing_respects_predeclared_joint_capacity() -> None:
+    lengths = {4: 34, 5: 40, 6: 46}
+    distractors = {0: 13, 1: 14, 2: 15, 3: 17, 4: 19, 5: 20, 6: 22}
+    pairs = pair_marginal_quotas(
+        lengths,
+        distractors,
+        seed=42,
+        pair_caps={(4, 0): 4},
+    )
+
+    assert Counter(length for length, _ in pairs) == lengths
+    assert Counter(distractor for _, distractor in pairs) == distractors
+    assert pairs.count((4, 0)) <= 4
+
+
+def test_minimum_count_cell_declares_canonical_capacity() -> None:
+    matched = benchmark_partition_quotas(QueryKind.COUNT, 4)[0]
+
+    assert matched.pair_caps == ((4, 0, 4),)
 
 
 def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None:

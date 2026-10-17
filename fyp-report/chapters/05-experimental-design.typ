@@ -116,6 +116,12 @@ answer-set backbone, so its feasible composition minima are G2/L4, G3/L5, and
 G4/L6. The allocation excludes lower cells rather than repeatedly sampling an
 impossible transition requirement.
 
+The minimum-length, X0 ALL-POSSIBLE Count construction has four canonical
+structures under the frozen direction-sensitive isomorphism key. The design
+therefore caps each such exact L/X pairing at four rows while preserving the
+predeclared L and X marginals. Deterministic pairing retries only their joint
+association; it does not drop rows or weaken final-benchmark uniqueness.
+
 Complete Count certificates impose a feasibility boundary: G2/G3/G4 have
 audited minimum lengths L2/L3/L4 under the current replay obligations. Quotas
 are redistributed over each query/gold group's feasible L values rather than

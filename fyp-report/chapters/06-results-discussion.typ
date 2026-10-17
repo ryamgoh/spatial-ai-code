@@ -448,6 +448,22 @@ calibration rows remain valid structural evidence, but their embedded benchmark
 allocation is superseded; a fresh calibration receipt is required before the
 headline candidate is regenerated.
 
+=== Rejected second headline-generation attempt
+
+The next job generated all 3,600 rows, then the uniqueness repair stopped after
+50 replacement rounds with one duplicate remaining. A five-row local harness
+reproduced the failure in Count G4 MATCHED at L4/X0. A wider 100-seed sweep
+found exactly four canonical structures with near-uniform frequency, while the
+deterministic L/X pairing had assigned five rows to that exact cell. Increasing
+the replacement budget could therefore never satisfy the quota.
+
+The correction preserves the original L and X marginals but caps every
+minimum-length, X0 ALL-POSSIBLE Count pairing at four rows. For the reproduced
+G4 cell, the corrected pairing assigned four slots; initial generation produced
+three unique structures and deterministic replacement found the fourth after
+ten candidates. The final benchmark still requires 3,600 unique structures;
+no duplicate is retained and no row is removed.
+
 === Lessons and next actions
 
 The two pilots show that a larger answer space is not sufficient by itself:
