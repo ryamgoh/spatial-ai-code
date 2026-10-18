@@ -68,6 +68,18 @@ This verifies every candidate file hash and measures the complete rendered
 Qwen chat sequence, evaluation prompt, and assistant target. The receipt
 selects the smallest tested common training envelope that fits every row.
 
+After tokenizer admission passes, export lean message-only JSONL and prepare
+the six Axolotl jobs:
+
+```sh
+sbatch --partition=normal --cpus-per-task=2 --mem=16G \
+  experiments/spatialentail-randomized-v2/slurm/prepare-sft-jobs.sh
+```
+
+The prepared jobs contain SINGLE Natural, SINGLE answer-only, and MULTI Natural
+at seeds 42 and 43. They use QLoRA, the known-fit Qwen3.5 target modules, and
+the measured common `sequence_len: 4096` on one H100-47 GPU.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 
