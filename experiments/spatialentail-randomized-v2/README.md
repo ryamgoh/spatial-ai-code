@@ -116,8 +116,16 @@ print(receipt["total_bases"], len(receipt["tasks"]), len(receipt["jobs"]))
 PY
 ```
 
-The expected values are `3600 48 6`. Submit all six to the one-H200 allocation
-as an `afterok` chain:
+The expected values are `3600 48 6`. First submit the six-condition smoke
+chain. Each job evaluates one example from every task, or 48 examples total:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-general-eval/submit-h200-smoke-chain.sh
+```
+
+Confirm that all six directories under `results/smoke/` contain `COMPLETED`
+and `results.json`. Then submit all six full evaluations to the one-H200
+allocation as an `afterok` chain:
 
 ```sh
 bash experiments/spatialentail-randomized-v2/prepared-general-eval/submit-h200-chain.sh

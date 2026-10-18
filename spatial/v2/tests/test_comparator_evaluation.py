@@ -54,6 +54,12 @@ def test_prepare_general_instruction_evaluation_uses_model_neutral_chat(tmp_path
 
     gemma3 = yaml.safe_load((output / "configs/gemma-3-4b-it.yaml").read_text())
     assert gemma3["model_args"]["system_message_policy"] == "prepend_user"
+    smoke = yaml.safe_load(
+        (output / "configs/smoke/gemma-3-4b-it.yaml").read_text()
+    )
+    assert smoke["limit"] == 1
     submit = (output / "submit-h200-chain.sh").read_text()
     assert submit.count("/slurm/") == 6
     assert 'dependency=(--dependency="afterok:$job_id")' in submit
+    smoke_submit = (output / "submit-h200-smoke-chain.sh").read_text()
+    assert smoke_submit.count("/slurm/smoke/") == 6

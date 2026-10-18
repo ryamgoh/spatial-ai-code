@@ -120,7 +120,13 @@ metadata:
 """
 
 
-def _config(spec: ComparatorSpec, *, tasks: list[str], include_path: str) -> str:
+def _config(
+    spec: ComparatorSpec,
+    *,
+    tasks: list[str],
+    include_path: str,
+    limit: int | None = None,
+) -> str:
     config = {
         "model": "vllm_staged_chat_pass",
         "model_args": {
@@ -148,12 +154,22 @@ def _config(spec: ComparatorSpec, *, tasks: list[str], include_path: str) -> str
         "device": "cuda:0",
         "log_samples": True,
     }
+    if limit is not None:
+        config["limit"] = limit
     return yaml.safe_dump(config, sort_keys=False)
 
 
-def _wrapper(output_relative: Path, spec: ComparatorSpec, config_relative: Path) -> str:
+def _wrapper(
+    output_relative: Path,
+    spec: ComparatorSpec,
+    config_relative: Path,
+    *,
+    smoke: bool = False,
+) -> str:
+    run_name = f"smoke-{spec.name}" if smoke else spec.name
+    result_relative = f"results/smoke/{spec.name}" if smoke else f"results/{spec.name}"
     return f"""#!/bin/bash
-#SBATCH --job-name=spatialentail-{spec.name}
+#SBATCH --job-name=spatialentail-{run_name}
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -168,17 +184,23 @@ def _wrapper(output_relative: Path, spec: ComparatorSpec, config_relative: Path)
 set -euo pipefail
 : "${{SLURM_SUBMIT_DIR:?Submit this script from the repository root}}"
 cd "$SLURM_SUBMIT_DIR"
-export EVAL_NAME={spec.name}
+export EVAL_NAME={run_name}
 export EVAL_CONFIG="$SLURM_SUBMIT_DIR/{config_relative}"
 export EVAL_PREPARED_DIR="$SLURM_SUBMIT_DIR/{output_relative}"
-export RESULT_DIR="$SLURM_SUBMIT_DIR/{output_relative}/results/{spec.name}"
+export RESULT_DIR="$SLURM_SUBMIT_DIR/{output_relative}/{result_relative}"
 bash experiments/spatialentail-randomized-v2/jobs/eval-comparator.sh
 """
 
 
-def _submit_script(output_relative: Path, specs: tuple[ComparatorSpec, ...]) -> str:
+def _submit_script(
+    output_relative: Path,
+    specs: tuple[ComparatorSpec, ...],
+    *,
+    smoke: bool = False,
+) -> str:
+    directory = "slurm/smoke" if smoke else "slurm"
     scripts = "\n".join(
-        f'  "$ROOT/{output_relative}/slurm/{spec.name}.sh"' for spec in specs
+        f'  "$ROOT/{output_relative}/{directory}/{spec.name}.sh"' for spec in specs
     )
     return f"""#!/bin/bash
 set -euo pipefail
@@ -299,21 +321,38 @@ def process_docs_comparator(dataset):
     for model in GENERAL_INSTRUCTION_MODELS:
         config_relative = (output / "configs" / f"{model.name}.yaml").relative_to(root)
         script_relative = (output / "slurm" / f"{model.name}.sh").relative_to(root)
+        smoke_config_relative = (
+            output / "configs" / "smoke" / f"{model.name}.yaml"
+        ).relative_to(root)
+        smoke_script_relative = (
+            output / "slurm" / "smoke" / f"{model.name}.sh"
+        ).relative_to(root)
         files[f"configs/{model.name}.yaml"] = _config(
             model, tasks=task_names, include_path=include_path
         )
+        files[f"configs/smoke/{model.name}.yaml"] = _config(
+            model, tasks=task_names, include_path=include_path, limit=1
+        )
         files[f"slurm/{model.name}.sh"] = _wrapper(
             output.relative_to(root), model, config_relative
+        )
+        files[f"slurm/smoke/{model.name}.sh"] = _wrapper(
+            output.relative_to(root), model, smoke_config_relative, smoke=True
         )
         jobs.append(
             {
                 **asdict(model),
                 "config": str(config_relative),
                 "script": str(script_relative),
+                "smoke_config": str(smoke_config_relative),
+                "smoke_script": str(smoke_script_relative),
             }
         )
     files["submit-h200-chain.sh"] = _submit_script(
         output.relative_to(root), GENERAL_INSTRUCTION_MODELS
+    )
+    files["submit-h200-smoke-chain.sh"] = _submit_script(
+        output.relative_to(root), GENERAL_INSTRUCTION_MODELS, smoke=True
     )
 
     output.mkdir(parents=True)
@@ -321,7 +360,7 @@ def process_docs_comparator(dataset):
         path = output / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content)
-        if relative.startswith("slurm/") or relative == "submit-h200-chain.sh":
+        if relative.startswith("slurm/") or relative.startswith("submit-h200-"):
             path.chmod(0o755)
     (output / "logs").mkdir()
     (output / "results").mkdir()
