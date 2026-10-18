@@ -12,6 +12,12 @@ Status markers:
 - `[-]` optional if time remains
 - `[>]` deferred future work
 
+Priority levels:
+
+- **P0:** required to complete the FYP; may run in parallel when dependencies permit
+- **P1:** valuable extension only after the P0 path is secure
+- **P2:** deferred future work; must not delay submission
+
 ## Completion definition
 
 The randomized-v2 study is complete when:
@@ -24,7 +30,7 @@ The randomized-v2 study is complete when:
 5. at least the frozen SpatialMap-TQA-Corr external-transfer evaluation is
    reported for the central Natural models.
 
-## A. Frozen data and benchmark
+## A. P0 — Frozen data and benchmark — complete
 
 - [x] Five-rule randomized structural calibration completed.
 - [x] Wrong-G lift defect fixed and regression-tested.
@@ -46,7 +52,7 @@ Evidence:
 - `prepared-training-candidate/token-audit.json`
 - `prepared-sft/jobs.json`
 
-## B. Six central SFT jobs
+## B. P0 — Six central SFT jobs — running
 
 All jobs start independently from pinned `Qwen/Qwen3.5-4B` revision
 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`.
@@ -69,7 +75,7 @@ For each completed job, record:
 - whether the job resumed from a checkpoint; and
 - confirmation that the `COMPLETED` marker and adapter files exist.
 
-## C. Required frozen-benchmark evaluation
+## C. P0 — Frozen-benchmark evaluation
 
 Models:
 
@@ -102,7 +108,7 @@ Primary comparisons:
 - [ ] MULTI Natural versus SINGLE Natural transfer on ALL-POSSIBLE.
 - [ ] SINGLE retention after MULTI training.
 
-## D. Required external transfer
+## D. P0 — SpatialMap-TQA-Corr external transfer
 
 - [ ] Prepare prompt-matched evaluation configs for the central Natural models.
 - [ ] Evaluate untuned, SINGLE Natural 42/43, and MULTI Natural 42/43 on the
@@ -111,7 +117,7 @@ Primary comparisons:
 - [ ] Record whether MULTI training improves, preserves, or degrades external
   SINGLE-style spatial reasoning.
 
-## E. Required report closure
+## E. P0 — Report closure
 
 - [ ] Record six training-job receipts and hashes.
 - [ ] Add randomized-v2 headline result tables.
@@ -127,7 +133,7 @@ Primary comparisons:
   propositional-logic limitation.
 - [ ] Compile and visually review the final PDF.
 
-## F. Optional if time remains
+## F. P1 — Optional extensions if time remains
 
 - [-] Paired VISIBLE-POSSIBLE transfer diagnostic: 180 bases, 720 VISIBLE views,
   and 180 ALL controls.
@@ -137,7 +143,7 @@ Primary comparisons:
 - [-] Additional external datasets: StepGame, Text2Space, SpartQA-Human, ReSQ.
 - [-] Detailed option-position and paired-contract consistency analysis.
 
-## G. Deferred future work
+## G. P2 — Deferred future work
 
 - [>] General capacitated Z3 allocation and capacity-provenance system.
 - [>] Chunked resumable generation and atomic publication pipeline.
@@ -149,5 +155,8 @@ Primary comparisons:
 
 ## Scope rule
 
-Complete sections B--E before starting an item in F. Section G is explicitly
-outside the current FYP execution path.
+P0 work may overlap when dependencies permit: evaluation preparation and the
+untuned benchmark run can proceed while SFT jobs train. Do not begin P1 until
+the six adapters, frozen-benchmark evaluation path, Corr transfer path, and
+report templates are secure. P2 is explicitly outside the current FYP
+execution path.
