@@ -453,9 +453,11 @@ headline candidate is regenerated.
 The next job generated all 3,600 rows, then the uniqueness repair stopped after
 50 replacement rounds with one duplicate remaining. A five-row local harness
 reproduced the failure in Count G4 MATCHED at L4/X0. A wider 100-seed sweep
-found exactly four canonical structures with near-uniform frequency, while the
-deterministic L/X pairing had assigned five rows to that exact cell. Increasing
-the replacement budget could therefore never satisfy the quota.
+observed four canonical structures with near-uniform frequency and no fifth,
+while the deterministic L/X pairing had assigned five rows to that exact cell.
+This bounded sweep does not prove that the mathematical capacity is four, so
+the correction is recorded as a conservative empirical-operational cap rather
+than an impossibility theorem.
 
 The correction preserves the original L and X marginals but caps every
 minimum-length, X0 ALL-POSSIBLE Count pairing at four rows. For the reproduced

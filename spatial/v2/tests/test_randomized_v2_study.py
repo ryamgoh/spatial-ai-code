@@ -180,10 +180,11 @@ def test_marginal_pairing_respects_predeclared_joint_capacity() -> None:
     assert pairs.count((4, 0)) <= 4
 
 
-def test_minimum_count_cell_declares_canonical_capacity() -> None:
+def test_minimum_count_cell_declares_empirical_operational_cap() -> None:
     matched = benchmark_partition_quotas(QueryKind.COUNT, 4)[0]
 
     assert matched.pair_caps == ((4, 0, 4),)
+    assert matched.pair_cap_basis == "empirical-operational"
 
 
 def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None:

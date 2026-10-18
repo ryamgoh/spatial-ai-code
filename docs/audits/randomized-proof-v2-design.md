@@ -148,11 +148,12 @@ evidence.
 The next job generated all 3,600 rows but ended after 50 uniqueness-replacement
 rounds with one duplicate. A five-slot harness reproduced the failure in Count
 G4 MATCHED L4/X0, and 100 additional seeds yielded exactly four canonical
-structures. The quota had paired five rows into a cell with capacity four, so
-more replacement retries could not succeed. The corrected deterministic pairing
-caps minimum-length, X0 ALL-POSSIBLE Count cells at four while preserving both
-the L and X marginals. In the same harness, the new four-slot allocation reached
-four unique structures after ten replacement candidates.
+structures in that bounded sweep. This does not prove that a rare fifth
+structure is mathematically impossible. The quota had paired five rows into a
+cell whose observed generator support was four, so the corrected deterministic
+pairing adopts a conservative empirical-operational cap of four while
+preserving both L and X marginals. In the same harness, the new four-slot
+allocation reached four unique structures after ten replacement candidates.
 
 SpatialEntail uses a bounded propositional fragment whose basic propositions
 are concrete pairwise spatial relations. It supplements the Boolean rules with
@@ -197,12 +198,14 @@ possibility backbone, so L2 is sufficient. ALL-POSSIBLE Count already uses G
 certificate steps before the sampled prefix; its feasible composition minima
 are therefore G2/L4, G3/L5, and G4/L6.
 
-Minimum-length ALL-POSSIBLE Count with X0 has exactly four canonical structures
-under the frozen direction-sensitive isomorphism key. L and X marginals remain
-unchanged, but deterministic marginal pairing caps each `(minimum L, X0)` Count
-cell at four rows. Pairing retries only the L/X association, not generation,
-until the cap holds. This prevents an impossible uniqueness request without
-silently shrinking a partition or relaxing the canonical definition.
+A 100-seed sweep of minimum-length ALL-POSSIBLE Count with X0 observed four
+canonical structures under the frozen direction-sensitive isomorphism key. The
+design records four as an empirical-operational cap, not a proved upper bound.
+L and X marginals remain unchanged, but deterministic marginal pairing caps
+each `(minimum L, X0)` Count cell at four rows. Pairing retries only the L/X
+association, not generation, until the cap holds. This conservatively avoids
+the observed uniqueness saturation without silently shrinking a partition or
+relaxing the canonical definition.
 
 ## Contracts and diagnostics
 

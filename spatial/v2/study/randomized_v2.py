@@ -53,6 +53,7 @@ class PartitionQuota:
     distractors: dict[int, int]
     transition_contract: str
     pair_caps: tuple[tuple[int, int, int], ...] = ()
+    pair_cap_basis: str | None = None
 
 
 @dataclass(frozen=True)
@@ -154,6 +155,11 @@ def benchmark_partition_quotas(
                 ((minimum, 0, 4),)
                 if query_kind is QueryKind.COUNT and gold_size > 1
                 else ()
+            ),
+            (
+                "empirical-operational"
+                if query_kind is QueryKind.COUNT and gold_size > 1
+                else None
             ),
         ),
         PartitionQuota(
