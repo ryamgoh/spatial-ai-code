@@ -11,8 +11,9 @@ optional comparator ladder is five open checkpoints:
 1. `Qwen/Qwen3.5-4B`, in both non-thinking and thinking modes;
 2. `Qwen/Qwen3.5-9B`, with the same two modes, as the clean family-scale
    control;
-3. `mistralai/Ministral-3-8B-Instruct-2512`, as an independent current
-   instruction baseline;
+3. `google/gemma-4-E4B-it`, as the newest verified independent same-compute
+   instruction baseline; smoke-test canonical BF16, or use Google's explicitly
+   labelled vLLM/SGLang QAT variant;
 4. `openai/gpt-oss-20b`, as a cheap reasoning-specialist control; and
 5. `Qwen/Qwen3-30B-A3B-Thinking-2507`, as the stronger open reasoning model
    already used on SpatialMap by recent verifier research.
@@ -66,13 +67,43 @@ governs memory unless the server can omit the vision tower.
 | [`mistralai/Ministral-3-3B-Instruct-2512`][ministral-3-i] | 3.4B LM + about 0.4B vision, 3.849B checkpoint / dense | 262,144 | Apache-2.0; ungated | Official FP8 checkpoint; vLLM >=0.12 and Transformers documented | Official card says 8 GB VRAM in FP8; easy on 1x47 |
 | [`microsoft/Phi-4-mini-instruct`][phi-mini] | 3.836B / dense | 131,072 | MIT; ungated | Transformers >=4.49 and vLLM >=0.7.3 documented | About 7.7 GB BF16 weights; easy on 1x47 |
 | [`mistralai/Ministral-3-8B-Instruct-2512`][ministral-8-i] | 8.4B LM + about 0.4B vision, 8.918B checkpoint / dense | 262,144 | Apache-2.0; ungated | Official FP8 checkpoint; vLLM >=0.12 and Transformers documented | Official card says 12 GB VRAM in FP8; easy on 1x47 |
+| [`google/gemma-4-E2B-it`][gemma4-e2] | 2.3B effective; 5.1B with embeddings, 5.123B checkpoint / dense | 131,072 | Apache-2.0; ungated | Official card documents current Transformers; Google also publishes a separate vLLM/SGLang QAT checkpoint | Google estimate: 11.4 GB BF16 including 20% load overhead; easy on 1x47 |
+| [`google/gemma-4-E4B-it`][gemma4-e4] | 4.5B effective; 8.0B with embeddings, 7.996B checkpoint / dense | 131,072 | Apache-2.0; ungated | Official card documents current Transformers; Google also publishes a separate vLLM/SGLang QAT checkpoint | Google estimate: 17.9 GB BF16 including 20% load overhead; easy on 1x47 |
 
-Two familiar alternatives remain useful only as literature anchors:
-`google/gemma-3-4b-it` is a 4.300B, 128K checkpoint under the gated Gemma
-license, while `meta-llama/Llama-3.1-8B-Instruct` is an 8.030B, 128K checkpoint
-under the gated Llama 3.1 community license ([official Gemma card][gemma3-4],
-[official Llama card][llama31-8]). Both fit one 47 GB device, but neither adds as
-much experimental information as the ungated, newer controls above.
+Gemma 4 materially changes the choice here: E2B and E4B are both below 9B in
+stored parameters, ungated, and Apache-2.0. `google/gemma-3-4b-it` should now be
+kept only for literature continuity. `meta-llama/Llama-3.1-8B-Instruct` remains
+a gated historical anchor rather than the newest Meta option.
+
+### Verified Gemma 4 release family
+
+Google has officially released Gemma 4. The owning `google` Hugging Face
+organization, the common Google DeepMind model card, and the Gemma 4 technical
+report [agree on five instruction-tuned sizes][gemma4-report]. These are real releases, not
+search-result or community pages.
+
+| Exact official ID | Model/checkpoint parameters | Context | License/access | Fit at 8K |
+|---|---:|---:|---|---|
+| [`google/gemma-4-E2B-it`][gemma4-e2] | 2.3B effective; 5.1B including PLE embeddings; 5.123B HF tensors | 128K | Apache-2.0; ungated | Google estimate 11.4 GB BF16; 1x47 |
+| [`google/gemma-4-E4B-it`][gemma4-e4] | 4.5B effective; 8.0B including PLE embeddings; 7.996B HF tensors | 128K | Apache-2.0; ungated | Google estimate 17.9 GB BF16; 1x47 |
+| [`google/gemma-4-12B-it`][gemma4-12] | 11.95B model; 11.960B HF tensors | 256K | Apache-2.0; ungated | Google estimate 26.7 GB BF16; 1x47 at the frozen 8K cap |
+| [`google/gemma-4-26B-A4B-it`][gemma4-26] | 25.2B model / 3.8B active MoE; 25.806B HF tensors including the vision encoder | 256K | Apache-2.0; ungated | Google estimate 57.7 GB BF16; not 1x47, but 1x96, 1x141, or 2x47 |
+| [`google/gemma-4-31B-it`][gemma4-31] | 30.7B model; 31.273B HF tensors including the vision encoder / dense | 256K | Apache-2.0; ungated | Google estimate 69.9 GB BF16; not 1x47, but 1x96, 1x141, or 2x47 |
+
+All five canonical cards document Hugging Face Transformers. Google additionally
+publishes `google/gemma-4-E2B-it-qat-w4a16-ct`,
+`google/gemma-4-E4B-it-qat-w4a16-ct`,
+`google/gemma-4-12B-it-qat-w4a16-ct`, and
+`google/gemma-4-31B-it-qat-w4a16-ct` explicitly for vLLM/SGLang; no equivalent
+26B A4B variant is listed. Canonical BF16 should still pass the repository's
+staged-pass smoke test before entering the frozen matrix, and any QAT result
+must be labelled as a different precision checkpoint. Google's memory numbers
+include 20% load overhead but exclude runtime software and KV cache.
+
+Community models whose names contain “Gemma 4” are not evidence of release;
+only exact `google/gemma-4-*` IDs are treated as official. In particular,
+`google/gemma-4-4b-it` and `google/gemma-4-27b-it` do not exist; the official
+names are E4B, 12B, 26B-A4B, and 31B.
 
 ## Stronger open models, 9B–32B
 
@@ -89,6 +120,26 @@ much experimental information as the ungated, newer controls above.
 family, release, prompt template, and thinking switch nearly constant.
 `Qwen3.5-27B` is the next scale point but belongs in P1 because the 9B result
 should determine whether another dense family point is worth its cost.
+
+### Verified Meta release boundary
+
+Meta [officially released Llama 4 Scout and Maverick][meta-llama4], but neither is a native-
+precision fit for this study's hardware. The newest small, pure-text Meta
+checkpoint that fits without ad-hoc quantization is Llama 3.2 3B.
+
+| Exact official ID | Parameters/context | License/access and serving | Hardware conclusion |
+|---|---|---|---|
+| [`meta-llama/Llama-4-Scout-17B-16E-Instruct`][llama4-scout] | 108.642B stored / 17B active MoE; 10M context | Llama 4 Community License; manual gate; official HF page documents Transformers >=4.51 and vLLM | BF16 is about 217 GB and fits none of 1x47/1x96/1x141/2x47. Meta says Scout fits one H100 only with INT4; that is a separate quantized experiment, not the official BF16 baseline. |
+| [`meta-llama/Llama-4-Maverick-17B-128E-Instruct`][llama4-maverick] | 401.584B stored / 17B active MoE; 1M context | Llama 4 Community License; manual gate; official HF page documents Transformers >=4.51 and vLLM | Far outside scope. Meta says one H100 **host**, not one GPU; it does not fit any listed profile. |
+| [`meta-llama/Llama-3.3-70B-Instruct`][llama33-70] | 70.554B dense; 128K context | Llama 3.3 Community License; manual gate; official Transformers checkpoint | Newest Meta text-only family, but about 141 GB of BF16 weights leaves no runtime/KV headroom even on 1x141; exclude without separately labelled quantization. |
+| [`meta-llama/Llama-3.2-3B-Instruct`][llama32-3] | 3.213B dense; 128K context | Llama 3.2 Community License; manual gate; official Transformers checkpoint | Easy on 1x47 BF16; newest officially released Meta checkpoint below 9B suitable for native-weight pure-text evaluation. |
+| [`meta-llama/Llama-3.1-8B-Instruct`][llama31-8] | 8.030B dense; 128K context | Llama 3.1 Community License; manual gate; mature HF/vLLM | Easy on 1x47 BF16; better literature anchor, but older than Llama 3.2. |
+
+No later general-purpose Llama weight release appears in Meta's official HF
+organization as of the cutoff. Llama 4 Behemoth was described by Meta as still
+training, not released. Any `Llama-5`, post-Llama-4 community namespace, or
+download page not traceable to Meta AI or `meta-llama/*` is unverified and must
+not enter the evaluation plan.
 
 ## Open reasoning-specialized models
 
@@ -174,7 +225,7 @@ Five checkpoints, seven modes:
 | `Qwen/Qwen3.5-4B`, thinking off | Untuned instruction baseline and SFT starting-point control | 1xH100-47 |
 | `Qwen/Qwen3.5-4B`, thinking on | Isolate test-time reasoning without changing weights | 1xH100-47 |
 | `Qwen/Qwen3.5-9B`, thinking off and on | Clean within-family scale test in both response regimes | 1xH100-47 |
-| `mistralai/Ministral-3-8B-Instruct-2512` | Independent modern same-scale instruction baseline | 1xH100-47 |
+| `google/gemma-4-E4B-it` | Newest verified independent same-compute baseline; smoke-test BF16, or label Google's official W4A16 serving variant explicitly | 1xH100-47 |
 | `openai/gpt-oss-20b`, reasoning high | Efficient reasoning-specialist control with full local weights | 1xH100-47 |
 | `Qwen/Qwen3-30B-A3B-Thinking-2507` | Stronger open reasoning ceiling with direct recent SpatialMap precedent | 1xH100-96, 1xH200-141, or 2xH100-47 |
 
@@ -188,6 +239,8 @@ Run these only after the corresponding P1 comparison is informative:
 - `Qwen/Qwen3.5-27B`, thinking off and on, if 4B→9B shows a scale trend;
 - `mistralai/Ministral-3-8B-Reasoning-2512`, paired with the P1 Ministral
   Instruct checkpoint to isolate reasoning post-training;
+- `mistralai/Ministral-3-8B-Instruct-2512`, if the paired Ministral
+  reasoning/instruction ablation is run;
 - `microsoft/Phi-4-mini-instruct`, as a compact independent 4B-scale control;
 - `microsoft/Phi-4-reasoning-plus`, because recent SpatialMap work evaluates
   the closely named `microsoft/phi-4-reasoning`; and
@@ -198,6 +251,9 @@ Run these only after the corresponding P1 comparison is informative:
 
 - one conventional historical anchor, preferably the ungated
   `Qwen/Qwen2.5-7B-Instruct`; add Llama/Gemma only for direct paper matching;
+- if a current Meta-family anchor is specifically required, use
+  `meta-llama/Llama-3.2-3B-Instruct`; exclude Llama 4 from this hardware matrix
+  unless a separately labelled INT4 Scout experiment is approved;
 - one spatial specialist only after its gated official card and exact runtime
   context can be captured in the run manifest; the current paper-level evidence
   alone is not enough to put one in the frozen model matrix;
@@ -254,7 +310,19 @@ from the original papers or official proceedings pages.
 [mistral-small]: https://huggingface.co/mistralai/Mistral-Small-3.2-24B-Instruct-2506
 [gemma3-4]: https://huggingface.co/google/gemma-3-4b-it
 [gemma3-27]: https://huggingface.co/google/gemma-3-27b-it
+[gemma4-e2]: https://huggingface.co/google/gemma-4-E2B-it
+[gemma4-e4]: https://huggingface.co/google/gemma-4-E4B-it
+[gemma4-e4-qat]: https://huggingface.co/google/gemma-4-E4B-it-qat-w4a16-ct
+[gemma4-12]: https://huggingface.co/google/gemma-4-12B-it
+[gemma4-26]: https://huggingface.co/google/gemma-4-26B-A4B-it
+[gemma4-31]: https://huggingface.co/google/gemma-4-31B-it
+[gemma4-report]: https://arxiv.org/abs/2607.02770
 [llama31-8]: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+[llama32-3]: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+[llama33-70]: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct
+[llama4-scout]: https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct
+[llama4-maverick]: https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct
+[meta-llama4]: https://ai.meta.com/blog/llama-4-multimodal-intelligence/
 [q25-7]: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
 [q25-32]: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct
 [mistral7]: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
