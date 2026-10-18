@@ -10,6 +10,7 @@ from spatial.v2.study.randomized_v2 import (
     _duplicate_structure_indices,
     benchmark_partition_quotas,
     calibration_length_quotas,
+    nested_training_assignments,
     pair_marginal_quotas,
     prepare_calibration,
     prepare_headline_benchmark,
@@ -217,6 +218,44 @@ def test_multi_training_assignment_preserves_marginals_and_gold_minima() -> None
             )
             for distractor in range(0, 7)
         } == {0: 133, 1: 166, 2: 207, 3: 259, 4: 324, 5: 405, 6: 506}
+
+
+def test_nested_training_assignments_share_multi_g1_with_single() -> None:
+    allocation = nested_training_assignments(total_per_contract=8000, seed=42)
+    shared = allocation["shared_g1"]
+    single = (*shared, *allocation["single_only"])
+    multi = (*shared, *allocation["multi_only"])
+
+    assert len(shared) == 2000
+    assert len(single) == 8000
+    assert len(multi) == 8000
+    assert Counter(gold for gold, _, _ in single) == {1: 8000}
+    assert Counter(gold for gold, _, _ in multi) == {
+        1: 2000,
+        2: 2000,
+        3: 2000,
+        4: 2000,
+    }
+    manifest = study_manifest()["training"]
+    assert Counter(length for _, length, _ in single) == {
+        int(length): count for length, count in manifest["single_length"].items()
+    }
+    assert Counter(noise for _, _, noise in single) == {
+        int(noise): count for noise, count in manifest["single_distractors"].items()
+    }
+    for gold in range(1, 5):
+        assert Counter(
+            length for item_gold, length, _ in multi if item_gold == gold
+        ) == {
+            int(length): count
+            for length, count in manifest["multi_length_by_gold"][str(gold)].items()
+        }
+        assert Counter(
+            noise for item_gold, _, noise in multi if item_gold == gold
+        ) == {
+            int(noise): count
+            for noise, count in manifest["multi_distractors_by_gold"][str(gold)].items()
+        }
 
 
 def test_default_train_l6_x6_boundary_drives_assignments_and_benchmark() -> None:

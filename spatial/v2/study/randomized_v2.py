@@ -279,6 +279,70 @@ def training_assignments(
     return tuple(assignments)
 
 
+def nested_training_assignments(
+    *,
+    total_per_contract: int,
+    seed: int,
+    development: bool = False,
+    design: RandomizedStudyDesign = DEFAULT_DESIGN,
+) -> dict[str, tuple[tuple[int, int, int], ...]]:
+    """Allocate a shared G1 core plus contract-specific training bases."""
+    if total_per_contract <= 0 or total_per_contract % 4:
+        raise ValueError("total_per_contract must be positive and divisible by four")
+    shared_count = total_per_contract // 4
+    length_ratio = 1.0 if development else design.training_l_ratio
+    noise_ratio = 1.0 if development else design.training_x_ratio
+
+    def marginals(gold: int, count: int) -> tuple[dict[int, int], dict[int, int]]:
+        return (
+            exponential_quotas(
+                range(gold, design.train_max_l + 1), count, length_ratio
+            ),
+            exponential_quotas(
+                range(0, design.train_max_x + 1), count, noise_ratio
+            ),
+        )
+
+    def rows(
+        gold: int,
+        lengths: dict[int, int],
+        distractors: dict[int, int],
+        salt: int,
+    ) -> tuple[tuple[int, int, int], ...]:
+        paired = pair_marginal_quotas(
+            lengths,
+            distractors,
+            seed=seed + salt * 1_000_003,
+        )
+        allocated = [(gold, length, noise) for length, noise in paired]
+        random.Random(seed + salt * 10_007).shuffle(allocated)
+        return tuple(allocated)
+
+    shared_lengths, shared_noise = marginals(1, shared_count)
+    single_lengths, single_noise = marginals(1, total_per_contract)
+    single_only_lengths = {
+        length: count - shared_lengths.get(length, 0)
+        for length, count in single_lengths.items()
+    }
+    single_only_noise = {
+        noise: count - shared_noise.get(noise, 0)
+        for noise, count in single_noise.items()
+    }
+    if min((*single_only_lengths.values(), *single_only_noise.values())) < 0:
+        raise ValueError("shared G1 allocation is not nested within SINGLE marginals")
+
+    multi_only = []
+    for gold in range(2, 5):
+        lengths, distractors = marginals(gold, shared_count)
+        multi_only.extend(rows(gold, lengths, distractors, 10 + gold))
+
+    return {
+        "shared_g1": rows(1, shared_lengths, shared_noise, 1),
+        "single_only": rows(1, single_only_lengths, single_only_noise, 2),
+        "multi_only": tuple(multi_only),
+    }
+
+
 def _transition_payload() -> dict[str, Any]:
     partition = deterministic_transition_partition(42)
     render = lambda transition: f"{transition[0].value}->{transition[1].value}"
