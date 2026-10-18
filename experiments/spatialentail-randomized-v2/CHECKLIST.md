@@ -141,6 +141,9 @@ Primary comparisons:
   Gemma-4-E4B-it (or explicitly labelled W4A16 QAT), Gemma-3-4B-IT
   instruction-only, Ministral-3-8B-Instruct, DeepSeek-R1-Distill-Qwen-7B,
   Ministral-3-8B-Reasoning, and Phi-4-mini-instruct.
+- [x] Reasoning batch generator prepared: fresh Qwen3.5-4B/9B thinking-on,
+  Ministral-3-8B-Reasoning, and DeepSeek-R1-Distill-Qwen-7B, with H200
+  smoke/full chains and recorded fixed-seed sampling.
 - [-] Fixed five-model spatial-specialist panel: SpatialASM-Qwen3.5-9B,
   SenseNova-SI-1.2-InternVL3-8B, SpaceQwen3-VL-2B-Thinking,
   RoboBrain2.5-8B-NV, and Cosmos-Reason2-8B. Require a text-only preflight

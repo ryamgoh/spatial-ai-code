@@ -138,6 +138,31 @@ chain. Gemma 3 folds the frozen system instruction into the user message
 because its native template lacks the same system-role contract; the semantic
 instruction is retained and the receipt records this policy.
 
+After the general package exists, prepare the four-condition reasoning batch:
+
+```sh
+sbatch -p normal -t 00:30:00 \
+  experiments/spatialentail-randomized-v2/slurm/prepare-reasoning-evaluation.sh
+```
+
+The package reuses the general package's exact 3,600 model-neutral rows; it
+does not regenerate or copy benchmark data. It contains fresh thinking-on runs
+for Qwen3.5-4B and Qwen3.5-9B plus Ministral 3 8B Reasoning and
+DeepSeek-R1-Distill-Qwen-7B. Stage 1 uses each model card's supported sampling
+subset with seed 42; Stage 2 remains deterministic and constrained.
+
+Run the reasoning smoke chain:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-reasoning-eval/submit-h200-smoke-chain.sh
+```
+
+After all four `results/smoke/*/COMPLETED` markers exist, launch the full chain:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-reasoning-eval/submit-h200-chain.sh
+```
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 
