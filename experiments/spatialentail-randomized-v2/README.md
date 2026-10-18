@@ -163,6 +163,42 @@ After all four `results/smoke/*/COMPLETED` markers exist, launch the full chain:
 bash experiments/spatialentail-randomized-v2/prepared-reasoning-eval/submit-h200-chain.sh
 ```
 
+Prepare the fixed five-model spatial-specialist batch from the same general
+package:
+
+```sh
+sbatch -p normal -t 00:30:00 \
+  experiments/spatialentail-randomized-v2/slurm/prepare-spatial-evaluation.sh
+```
+
+The spatial package contains no images, image placeholders, or visual tokens.
+All five models receive the same text-only system/user messages. Stage 1 and
+Stage 2 are deterministic for this category so the comparison isolates spatial
+post-training rather than model-specific sampling presets.
+
+Run the one-question-per-model load and text-only preflight first:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-spatial-eval/submit-h200-preflight-chain.sh
+```
+
+Only after all five `results/preflight/*/COMPLETED` markers exist, run the
+48-cell smoke chain:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-spatial-eval/submit-h200-smoke-chain.sh
+```
+
+After all five smoke jobs complete, launch the full chain:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-spatial-eval/submit-h200-chain.sh
+```
+
+RoboBrain and Cosmos require accepted Hugging Face gates. A checkpoint that
+cannot complete a genuine no-image preflight is recorded as interface-
+incompatible; do not add a dummy image or alter the frozen prompt.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 

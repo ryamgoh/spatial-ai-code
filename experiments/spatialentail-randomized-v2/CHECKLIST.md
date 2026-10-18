@@ -148,6 +148,9 @@ Primary comparisons:
   SenseNova-SI-1.2-InternVL3-8B, SpaceQwen3-VL-2B-Thinking,
   RoboBrain2.5-8B-NV, and Cosmos-Reason2-8B. Require a text-only preflight
   before each full run; do not introduce dummy images.
+- [x] Spatial-specialist batch generator prepared with separate one-question
+  preflight, 48-cell smoke, and full H200 chains. All prompts are text-only;
+  SenseNova uses the sole remote-code loader while the other four use vLLM.
 - [-] Paired VISIBLE-POSSIBLE transfer diagnostic: 180 bases, 720 VISIBLE views,
   and 180 ALL controls.
 - [-] Special-response diagnostic: direct L0, ambiguous SINGLE, and Selection
