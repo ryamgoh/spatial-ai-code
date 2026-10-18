@@ -1,4 +1,8 @@
-"""Cross-family two-stage evaluation with native model chat templates."""
+"""Cross-family two-stage evaluation with native model chat templates.
+
+This stays separate from ``eval_new.py`` because prepared P0 receipts pin that
+file's hash while the six adapter evaluations are still pending.
+"""
 
 from __future__ import annotations
 
@@ -35,13 +39,10 @@ class VLLMStagedChatPass(LM):
         dtype: str = "bfloat16",
         gpu_memory_utilization: float = 0.85,
         max_model_len: int = 8192,
-        batch_size: int | None = None,
-        chat_template_kwargs: dict | None = None,
+        chat_template_kwargs: dict[str, object] | None = None,
         system_message_policy: str = "native",
-        trust_remote_code: bool = False,
         **_: object,
     ) -> None:
-        del batch_size
         super().__init__()
         if stages not in (1, 2):
             raise ValueError(f"stages must be 1 or 2, got {stages}")
@@ -66,7 +67,6 @@ class VLLMStagedChatPass(LM):
         self.tokenizer = AutoTokenizer.from_pretrained(
             pretrained,
             revision=tokenizer_revision or revision,
-            trust_remote_code=trust_remote_code,
         )
         self.llm = LLM(
             model=pretrained,
@@ -76,7 +76,6 @@ class VLLMStagedChatPass(LM):
             gpu_memory_utilization=gpu_memory_utilization,
             max_model_len=max_model_len,
             enforce_eager=True,
-            trust_remote_code=trust_remote_code,
         )
         self.SamplingParams = SamplingParams
         self.StructuredOutputsParams = StructuredOutputsParams

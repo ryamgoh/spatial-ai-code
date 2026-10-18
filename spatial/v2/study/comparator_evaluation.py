@@ -12,8 +12,6 @@ from typing import Any
 
 import yaml
 
-from spatial.v2.evaluation_chat import encode_chat_input
-
 
 @dataclass(frozen=True)
 class ComparatorSpec:
@@ -23,7 +21,6 @@ class ComparatorSpec:
     response_regime: str
     chat_template_kwargs: dict[str, Any]
     system_message_policy: str = "native"
-    trust_remote_code: bool = False
 
 
 GENERAL_INSTRUCTION_MODELS = (
@@ -143,7 +140,6 @@ def _config(
             "record_stage1": True,
             "chat_template_kwargs": spec.chat_template_kwargs,
             "system_message_policy": spec.system_message_policy,
-            "trust_remote_code": spec.trust_remote_code,
         },
         "include_path": include_path,
         "tasks": tasks,
@@ -251,7 +247,6 @@ def prepare_general_instruction_evaluation(
             )
             prepared = dict(row)
             prepared["messages"] = messages[:2]
-            prepared["model_input"] = encode_chat_input(prepared["messages"])
             groups.setdefault(key, []).append(prepared)
     if not groups:
         raise ValueError("benchmark contains no rows")
@@ -260,6 +255,7 @@ def prepare_general_instruction_evaluation(
     files["tasks/spatialentail_utils.py"] = """\
 import importlib.util
 from pathlib import Path
+from spatial.v2.evaluation_chat import encode_chat_input
 
 source = Path(__file__).resolve().parents[4] / "experiments/tasks/utils.py"
 spec = importlib.util.spec_from_file_location("spatialentail_task_utils", source)
@@ -277,7 +273,7 @@ def process_docs_comparator(dataset):
             raise ValueError("comparator row has invalid oracle letters")
         return {
             "text": next(str(message.get("content") or "") for message in doc["messages"] if message.get("role") == "user"),
-            "model_input": str(doc["model_input"]),
+            "model_input": encode_chat_input(doc["messages"]),
             "oracle_option": ",".join(letters),
             "trace_format": str(metadata.get("trace_format") or "natural"),
             "supervision_arm": "answer-only",

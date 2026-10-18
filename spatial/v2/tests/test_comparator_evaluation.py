@@ -38,9 +38,11 @@ def test_prepare_general_instruction_evaluation_uses_model_neutral_chat(tmp_path
     assert len(receipt["tasks"]) == 1
     assert len(receipt["jobs"]) == 6
     data = json.loads(next((output / "data").glob("*.jsonl")).read_text())
-    assert data["model_input"].startswith(CHAT_INPUT_PREFIX)
-    assert "<|im_start|>" not in data["model_input"]
+    assert "model_input" not in data
     assert [message["role"] for message in data["messages"]] == ["system", "user"]
+    utility = (output / "tasks/spatialentail_utils.py").read_text()
+    assert "encode_chat_input(doc[\"messages\"])" in utility
+    assert CHAT_INPUT_PREFIX not in next((output / "data").glob("*.jsonl")).read_text()
 
     qwen = yaml.safe_load(
         (output / "configs/qwen3-5-9b-thinking-off.yaml").read_text()
