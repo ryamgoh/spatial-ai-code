@@ -11,6 +11,7 @@ import sys
 import time
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from copy import deepcopy
 from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
@@ -36,6 +37,7 @@ from spatial.v2.random_proof import (
     exponential_quotas,
 )
 from spatial.v2.random_proof_generation import possibility_backbone_length
+from spatial.v2.supervision_controls import apply_supervision_arm
 
 
 class BenchmarkPartition(str, Enum):
@@ -341,6 +343,65 @@ def nested_training_assignments(
         "single_only": rows(1, single_only_lengths, single_only_noise, 2),
         "multi_only": tuple(multi_only),
     }
+
+
+def assign_training_queries(
+    assignments: tuple[tuple[int, int, int], ...],
+    *,
+    seed: int,
+) -> tuple[tuple[str, int, int, int], ...]:
+    """Balance query families while avoiding the saturated Count corner."""
+    if not assignments:
+        return ()
+    queries = tuple(QueryKind)
+    base, remainder = divmod(len(assignments), len(queries))
+    remaining = {
+        query: base + int(index < remainder)
+        for index, query in enumerate(queries)
+    }
+    rng = random.Random(seed)
+    result: list[tuple[str, int, int, int] | None] = [None] * len(assignments)
+
+    def choose(allowed: tuple[QueryKind, ...]) -> QueryKind:
+        capacity = max(remaining[query] for query in allowed)
+        candidates = [query for query in allowed if remaining[query] == capacity]
+        return rng.choice(candidates)
+
+    critical = [
+        index
+        for index, (gold, length, noise) in enumerate(assignments)
+        if gold > 1 and length == gold and noise == 0
+    ]
+    critical_set = set(critical)
+    non_count_capacity = remaining[QueryKind.DIRECTION] + remaining[QueryKind.WHICH]
+    deficit = max(0, len(critical) - non_count_capacity)
+    for _ in range(deficit):
+        if remaining[QueryKind.COUNT] <= 0:
+            raise ValueError("critical training rows cannot be assigned without Count")
+        recipient = min(
+            (QueryKind.DIRECTION, QueryKind.WHICH),
+            key=lambda query: remaining[query],
+        )
+        remaining[QueryKind.COUNT] -= 1
+        remaining[recipient] += 1
+    ordinary = [index for index in range(len(assignments)) if index not in critical_set]
+    for index in (*critical, *ordinary):
+        gold, length, noise = assignments[index]
+        allowed = (
+            tuple(
+                query
+                for query in (QueryKind.DIRECTION, QueryKind.WHICH)
+                if remaining[query] > 0
+            )
+            if index in critical_set
+            else tuple(query for query in queries if remaining[query] > 0)
+        )
+        query = choose(allowed)
+        remaining[query] -= 1
+        result[index] = (query.value, gold, length, noise)
+    if any(item is None for item in result) or any(remaining.values()):
+        raise RuntimeError("query assignment did not consume its exact quotas")
+    return tuple(item for item in result if item is not None)
 
 
 def _transition_payload() -> dict[str, Any]:
@@ -676,8 +737,11 @@ def _calibration_seed(
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
 
 
-def _duplicate_structure_indices(rows: list[dict[str, Any]]) -> list[int]:
-    seen: set[str] = set()
+def _duplicate_structure_indices(
+    rows: list[dict[str, Any]],
+    excluded_signatures: set[str] | None = None,
+) -> list[int]:
+    seen = set(excluded_signatures or ())
     duplicates = []
     for index, row in enumerate(rows):
         signature = row.get("metadata", {}).get("structure_signature")
@@ -701,12 +765,13 @@ def _replace_headline_duplicates(
     *,
     workers: int,
     max_rounds: int = 50,
+    excluded_signatures: set[str] | None = None,
 ) -> int:
     """Regenerate only repeated final-benchmark structures."""
     replacement_count = 0
     retries: dict[int, int] = {}
     for _ in range(max_rounds):
-        duplicates = _duplicate_structure_indices(rows)
+        duplicates = _duplicate_structure_indices(rows, excluded_signatures)
         if not duplicates:
             return replacement_count
         replacement_count += len(duplicates)
@@ -733,7 +798,7 @@ def _replace_headline_duplicates(
                 }
                 for future in as_completed(futures):
                     rows[futures[future]] = future.result()
-    remaining = len(_duplicate_structure_indices(rows))
+    remaining = len(_duplicate_structure_indices(rows, excluded_signatures))
     raise RuntimeError(
         f"could not obtain a unique benchmark after {max_rounds} replacement "
         f"rounds; {remaining} duplicate rows remain"
@@ -1200,6 +1265,210 @@ def prepare_headline_benchmark(
     return receipt
 
 
+def _load_structure_signatures(path: Path) -> set[str]:
+    signatures = set()
+    with path.open() as source:
+        for line_number, line in enumerate(source, start=1):
+            row = json.loads(line)
+            signature = row.get("metadata", {}).get("structure_signature")
+            if not isinstance(signature, str) or not signature:
+                raise ValueError(f"benchmark row {line_number} lacks structure signature")
+            signatures.add(signature)
+    return signatures
+
+
+def _training_work(
+    assignments: tuple[tuple[int, int, int], ...],
+    *,
+    seed: int,
+    salt: int,
+) -> list[tuple[str, int, str, int, int, int]]:
+    assigned = assign_training_queries(assignments, seed=seed + salt)
+    return [
+        (
+            query,
+            gold,
+            BenchmarkPartition.MATCHED.value,
+            length,
+            noise,
+            _calibration_seed(
+                seed + salt * 1_000_003,
+                QueryKind(query),
+                gold,
+                length * 100 + noise,
+                index,
+            ),
+        )
+        for index, (query, gold, length, noise) in enumerate(assigned)
+    ]
+
+
+def prepare_training_candidate(
+    output: Path,
+    *,
+    benchmark_jsonl: Path,
+    train_per_contract: int = 8_000,
+    development_per_contract: int = 800,
+    seed: int = 42,
+    workers: int | None = None,
+    design: RandomizedStudyDesign = DEFAULT_DESIGN,
+) -> dict[str, Any]:
+    """Prepare nested SINGLE/MULTI natural rows and SINGLE answer-only controls."""
+    if output.exists():
+        raise FileExistsError(f"training candidate output already exists: {output}")
+    if not benchmark_jsonl.is_file():
+        raise FileNotFoundError(f"benchmark JSONL does not exist: {benchmark_jsonl}")
+    excluded = _load_structure_signatures(benchmark_jsonl)
+    train = nested_training_assignments(
+        total_per_contract=train_per_contract,
+        seed=seed,
+        design=design,
+    )
+    development = nested_training_assignments(
+        total_per_contract=development_per_contract,
+        seed=seed + 1,
+        development=True,
+        design=design,
+    )
+    pools = {
+        "train-shared": train["shared_g1"],
+        "train-single-only": train["single_only"],
+        "train-multi-only": train["multi_only"],
+        "development-shared": development["shared_g1"],
+        "development-single-only": development["single_only"],
+        "development-multi-only": development["multi_only"],
+    }
+    pool_order = tuple(pools)
+    work_by_pool = {
+        name: _training_work(assignments, seed=seed, salt=index + 1)
+        for index, (name, assignments) in enumerate(pools.items())
+    }
+    work = [item for name in pool_order for item in work_by_pool[name]]
+    ranges = {}
+    cursor = 0
+    for name in pool_order:
+        stop = cursor + len(work_by_pool[name])
+        ranges[name] = (cursor, stop)
+        cursor = stop
+
+    requested_workers = workers or int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))
+    worker_count = min(requested_workers, len(work))
+    if worker_count <= 0:
+        raise ValueError("workers must be positive")
+    rows: list[dict[str, Any] | None] = [None] * len(work)
+    started = time.perf_counter()
+    if worker_count == 1:
+        for index, item in enumerate(work):
+            rows[index] = _headline_row(*item)
+    else:
+        with ProcessPoolExecutor(max_workers=worker_count) as executor:
+            futures = {
+                executor.submit(_headline_row, *item): index
+                for index, item in enumerate(work)
+            }
+            for completed, future in enumerate(as_completed(futures), start=1):
+                rows[futures[future]] = future.result()
+                if completed % 100 == 0 or completed == len(futures):
+                    print(
+                        f"[{completed}/{len(futures)}] randomized SFT bases",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+    admitted = [row for row in rows if row is not None]
+    if len(admitted) != len(work):
+        raise RuntimeError("training generation left empty work slots")
+    replacement_count = _replace_headline_duplicates(
+        admitted,
+        work,
+        workers=worker_count,
+        excluded_signatures=excluded,
+    )
+
+    tagged = {}
+    for name, (start, stop) in ranges.items():
+        split, _, _ = name.partition("-")
+        contracts = (
+            ["single", "multi"]
+            if name.endswith("shared")
+            else ["single"]
+            if "single-only" in name
+            else ["multi"]
+        )
+        tagged_rows = []
+        for source in admitted[start:stop]:
+            row = deepcopy(source)
+            metadata = row["metadata"]
+            metadata.pop("benchmark_partition", None)
+            metadata.pop("heldout_transitions", None)
+            metadata.update(
+                dataset_role=split,
+                headline=False,
+                training_contracts=contracts,
+                training_pool=name,
+            )
+            tagged_rows.append(row)
+        tagged[name] = tagged_rows
+
+    single_train = [*tagged["train-shared"], *tagged["train-single-only"]]
+    multi_train = [*tagged["train-shared"], *tagged["train-multi-only"]]
+    single_dev = [
+        *tagged["development-shared"],
+        *tagged["development-single-only"],
+    ]
+    multi_dev = [
+        *tagged["development-shared"],
+        *tagged["development-multi-only"],
+    ]
+    files = {
+        "single/train-natural.jsonl": single_train,
+        "single/train-answer-only.jsonl": [
+            apply_supervision_arm(row, "answer-only") for row in single_train
+        ],
+        "single/development-natural.jsonl": single_dev,
+        "single/development-answer-only.jsonl": [
+            apply_supervision_arm(row, "answer-only") for row in single_dev
+        ],
+        "multi/train-natural.jsonl": multi_train,
+        "multi/development-natural.jsonl": multi_dev,
+    }
+    output.mkdir(parents=True)
+    file_receipts = {}
+    for relative, file_rows in files.items():
+        content = "".join(
+            json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n"
+            for row in file_rows
+        )
+        path = output / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+        file_receipts[relative] = {
+            "bytes": len(content.encode()),
+            "rows": len(file_rows),
+            "sha256": hashlib.sha256(content.encode()).hexdigest(),
+        }
+    receipt = {
+        "schema": "spatialentail-randomized-v2-training-candidate-v1",
+        "seed": seed,
+        "unique_bases": len(admitted),
+        "canonical_replacements": replacement_count,
+        "workers": worker_count,
+        "elapsed_seconds": time.perf_counter() - started,
+        "benchmark_excluded_structures": len(excluded),
+        "benchmark_jsonl_sha256": hashlib.sha256(
+            benchmark_jsonl.read_bytes()
+        ).hexdigest(),
+        "shared_train_bases": len(tagged["train-shared"]),
+        "shared_development_bases": len(tagged["development-shared"]),
+        "tokenizer_admission": "pending",
+        "files": file_receipts,
+        "study": study_manifest(design),
+    }
+    (output / "manifest.json").write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    )
+    return receipt
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest-out", type=Path)
@@ -1208,6 +1477,10 @@ def main() -> None:
     parser.add_argument("--calibration-out", type=Path)
     parser.add_argument("--benchmark-out", type=Path)
     parser.add_argument("--calibration-manifest", type=Path)
+    parser.add_argument("--training-out", type=Path)
+    parser.add_argument("--benchmark-jsonl", type=Path)
+    parser.add_argument("--train-per-contract", type=int, default=8_000)
+    parser.add_argument("--development-per-contract", type=int, default=800)
     parser.add_argument("--workers", type=int)
     parser.add_argument("--examples-per-query-gold", type=int, default=200)
     parser.add_argument("--seed", type=int, default=42)
@@ -1246,12 +1519,25 @@ def main() -> None:
             seed=args.seed,
             workers=args.workers,
         )
+    if args.training_out is not None:
+        if args.benchmark_jsonl is None:
+            parser.error("--training-out requires --benchmark-jsonl")
+        prepare_training_candidate(
+            args.training_out,
+            benchmark_jsonl=args.benchmark_jsonl,
+            train_per_contract=args.train_per_contract,
+            development_per_contract=args.development_per_contract,
+            seed=args.seed,
+            workers=args.workers,
+            design=design,
+        )
     if (
         args.manifest_out is None
         and args.consistency_out is None
         and args.special_out is None
         and args.calibration_out is None
         and args.benchmark_out is None
+        and args.training_out is None
     ):
         print(json.dumps(manifest, indent=2, sort_keys=True))
 

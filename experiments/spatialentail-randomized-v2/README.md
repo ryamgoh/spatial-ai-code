@@ -44,6 +44,19 @@ The benchmark command refuses incomplete calibration receipts and still calls
 the result a candidate until its quotas, certificates, uniqueness, hashes, and
 disjointness checks are reviewed.
 
+After the benchmark candidate passes its audit, prepare the nested SINGLE and
+MULTI training/development candidate. Benchmark canonical structures are hard
+exclusions; MULTI shares its G1 core with SINGLE, and only SINGLE receives an
+answer-only supervision view:
+
+```sh
+sbatch --partition=normal --cpus-per-task=128 --mem=128G \
+  experiments/spatialentail-randomized-v2/slurm/prepare-training.sh
+```
+
+The output remains a training candidate until the pinned Qwen tokenizer admits
+every complete training sequence and the persisted files pass their audit.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 

@@ -8,12 +8,14 @@ from spatial.v2.study.randomized_v2 import (
     RandomizedStudyDesign,
     _calibration_row,
     _duplicate_structure_indices,
+    assign_training_queries,
     benchmark_partition_quotas,
     calibration_length_quotas,
     nested_training_assignments,
     pair_marginal_quotas,
     prepare_calibration,
     prepare_headline_benchmark,
+    prepare_training_candidate,
     study_manifest,
     training_assignments,
     write_or_verify_manifest,
@@ -258,6 +260,18 @@ def test_nested_training_assignments_share_multi_g1_with_single() -> None:
         }
 
 
+def test_training_query_assignment_is_balanced_and_avoids_saturated_count_cell() -> None:
+    allocation = nested_training_assignments(total_per_contract=8000, seed=42)
+    assigned = assign_training_queries(allocation["multi_only"], seed=42)
+    counts = Counter(query for query, _, _, _ in assigned)
+
+    assert max(counts.values()) - min(counts.values()) <= 1
+    assert all(
+        not (query == "count" and gold > 1 and length == gold and noise == 0)
+        for query, gold, length, noise in assigned
+    )
+
+
 def test_default_train_l6_x6_boundary_drives_assignments_and_benchmark() -> None:
     design = RandomizedStudyDesign()
     assert (design.train_max_l, design.train_max_x) == (6, 6)
@@ -353,3 +367,48 @@ def test_calibration_smoke_uses_standard_generation_pipeline(tmp_path) -> None:
     assert len(
         (tmp_path / "calibration/source-natural.jsonl").read_text().splitlines()
     ) == 1
+
+
+def test_training_candidate_smoke_nests_g1_and_writes_answer_only(tmp_path) -> None:
+    benchmark = tmp_path / "benchmark.jsonl"
+    benchmark.write_text(
+        json.dumps({"metadata": {"structure_signature": "excluded"}}) + "\n"
+    )
+    output = tmp_path / "training"
+
+    receipt = prepare_training_candidate(
+        output,
+        benchmark_jsonl=benchmark,
+        train_per_contract=8,
+        development_per_contract=4,
+        workers=1,
+    )
+
+    def load(relative: str) -> list[dict]:
+        return [
+            json.loads(line)
+            for line in (output / relative).read_text().splitlines()
+        ]
+
+    single = load("single/train-natural.jsonl")
+    multi = load("multi/train-natural.jsonl")
+    answer_only = load("single/train-answer-only.jsonl")
+    single_ids = {row["metadata"]["base_id"] for row in single}
+    multi_ids = {row["metadata"]["base_id"] for row in multi}
+    base_signatures = {
+        row["metadata"]["structure_signature"]
+        for relative in (
+            "single/train-natural.jsonl",
+            "multi/train-natural.jsonl",
+            "single/development-natural.jsonl",
+            "multi/development-natural.jsonl",
+        )
+        for row in load(relative)
+    }
+
+    assert receipt["unique_bases"] == 21
+    assert len(single) == len(multi) == len(answer_only) == 8
+    assert len(single_ids & multi_ids) == 2
+    assert len(base_signatures) == 21
+    assert "excluded" not in base_signatures
+    assert all("<think>" not in row["messages"][-1]["content"] for row in answer_only)

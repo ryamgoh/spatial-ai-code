@@ -297,6 +297,16 @@ a second supervision-format ablation; its comparators are the prompt-matched
 untuned model and Natural SINGLE-SFT transfer baseline. Both contracts are
 trained at seeds 42 and 43, giving six adapters in total.
 
+The two contracts are nested rather than independently regenerated. MULTI's
+2,000 G1 training bases and 200 G1 development bases are shared verbatim with
+SINGLE. SINGLE adds 6,000/600 G1-only bases, while MULTI adds 2,000/200 bases
+for each of G2, G3, and G4. This produces 15,400 unique generated bases before
+rendering the shared contract views. Query families are balanced within each
+pool, all training/development bases use seen transitions, and every benchmark
+canonical signature is excluded before admission. The known minimum-length,
+X0 ALL-POSSIBLE Count corner is assigned to Direction or Selection rather than
+requesting unavailable Count diversity.
+
 Certificates remain offline audit artifacts and are never SFT targets. Natural
 rows are never silently culled: use 24,576 context tokens when all fit, otherwise
 32,768, and fail preparation above that bound.

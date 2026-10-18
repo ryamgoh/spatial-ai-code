@@ -132,6 +132,15 @@ within each gold size's feasible interval; imposing one global L marginal would
 force a misleading U-shaped G1 allocation. The headline candidate contains 900 SINGLE and
 2,700 ALL-POSSIBLE bases and follows a 2,400-example capability calibration.
 
+SINGLE and MULTI share the latter's 2,000 G1 training bases and 200 G1
+development bases verbatim. SINGLE adds 6,000/600 G1-only bases, while MULTI
+adds 2,000/200 bases for each of G2, G3, and G4. Thus preparation generates
+15,400 unique bases before rendering shared contract views. Query families are
+balanced within each pool, every training and development row uses seen
+transitions, and benchmark canonical signatures are excluded before admission.
+The narrow minimum-length, X0 ALL-POSSIBLE Count corner is assigned to Direction
+or Selection instead of requesting unavailable Count diversity.
+
 VISIBLE-POSSIBLE is excluded from SFT and retained as a third, non-headline
 evaluation contract. After the headline candidate is frozen, a separate,
 structurally disjoint pool contributes five bases from each
