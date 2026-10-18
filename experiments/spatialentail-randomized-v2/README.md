@@ -57,6 +57,17 @@ sbatch --partition=normal --cpus-per-task=128 --mem=128G \
 The output remains a training candidate until the pinned Qwen tokenizer admits
 every complete training sequence and the persisted files pass their audit.
 
+Run exact tokenizer admission after the structural candidate is audited:
+
+```sh
+sbatch --partition=normal --cpus-per-task=8 --mem=32G \
+  experiments/spatialentail-randomized-v2/slurm/audit-training-tokens.sh
+```
+
+This verifies every candidate file hash and measures the complete rendered
+Qwen chat sequence, evaluation prompt, and assistant target. The receipt
+selects the smallest tested common training envelope that fits every row.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 
