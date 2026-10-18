@@ -93,6 +93,43 @@ The package contains the untuned model plus all six adapter paths. Its Slurm
 scripts default to one H200, but `sbatch -p/-t/--gres` may override the resource
 profile. Only the untuned job is runnable before adapters finish.
 
+Prepare the separate six-condition general-instruction comparator batch:
+
+```sh
+sbatch -p normal -t 01:00:00 \
+  experiments/spatialentail-randomized-v2/slurm/prepare-general-evaluation.sh
+```
+
+This package renders the frozen system/user messages with each checkpoint's
+own pinned tokenizer and chat template. It does not reuse the Qwen-rendered P0
+prompt. After preparation, verify the receipt:
+
+```sh
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+receipt = json.loads(Path(
+    "experiments/spatialentail-randomized-v2/prepared-general-eval/jobs.json"
+).read_text())
+print(receipt["total_bases"], len(receipt["tasks"]), len(receipt["jobs"]))
+PY
+```
+
+The expected values are `3600 48 6`. Submit all six to the one-H200 allocation
+as an `afterok` chain:
+
+```sh
+bash experiments/spatialentail-randomized-v2/prepared-general-eval/submit-h200-chain.sh
+```
+
+The scheduler runs one model at a time. If a job fails, later jobs remain
+blocked instead of silently producing an incomplete comparison. Inspect the
+failed log, then resubmit the failed model or rebuild the remaining dependency
+chain. Gemma 3 folds the frozen system instruction into the user message
+because its native template lacks the same system-role contract; the semantic
+instruction is retained and the receipt records this policy.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 

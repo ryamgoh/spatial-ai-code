@@ -79,7 +79,7 @@ For each completed job, record:
 
 Models:
 
-- [ ] Untuned Qwen3.5-4B.
+- [x] Untuned Qwen3.5-4B, native-thinking and two-stage.
 - [ ] SINGLE Natural seed 42.
 - [ ] SINGLE Natural seed 43.
 - [ ] SINGLE answer-only seed 42.
@@ -135,9 +135,16 @@ Primary comparisons:
 
 ## F. P1 — Optional extensions if time remains
 
-- [-] Open-model comparator panel after P0: Qwen3.5-9B thinking/non-thinking,
-  Ministral-3-8B-Instruct, and gpt-oss-20b; add Qwen3-30B-A3B-Thinking only if
-  the stronger open ceiling is worth the larger GPU allocation.
+- [-] Close the Qwen3.5-4B response-regime control: the completed untuned run
+  is native-thinking and two-stage; run and label thinking-off separately.
+- [-] Recommended <=9B comparator panel after P0: Qwen3.5-9B thinking off/on,
+  Gemma-4-E4B-it (or explicitly labelled W4A16 QAT), Gemma-3-4B-IT
+  instruction-only, Ministral-3-8B-Instruct, DeepSeek-R1-Distill-Qwen-7B,
+  Ministral-3-8B-Reasoning, and Phi-4-mini-instruct.
+- [-] Fixed five-model spatial-specialist panel: SpatialASM-Qwen3.5-9B,
+  SenseNova-SI-1.2-InternVL3-8B, SpaceQwen3-VL-2B-Thinking,
+  RoboBrain2.5-8B-NV, and Cosmos-Reason2-8B. Require a text-only preflight
+  before each full run; do not introduce dummy images.
 - [-] Paired VISIBLE-POSSIBLE transfer diagnostic: 180 bases, 720 VISIBLE views,
   and 180 ALL controls.
 - [-] Special-response diagnostic: direct L0, ambiguous SINGLE, and Selection
@@ -148,7 +155,8 @@ Primary comparisons:
 
 ## G. P2 — Deferred future work
 
-- [>] Broader model sweep, historical anchors, and proprietary frontier APIs.
+- [>] Models above the agreed approximately 9B class are outside the FYP
+  experiment scope; do not prepare or run a larger-model sweep.
 - [>] General capacitated Z3 allocation and capacity-provenance system.
 - [>] Chunked resumable generation and atomic publication pipeline.
 - [>] Exhaustive proof of minimum-Count canonical capacity.
