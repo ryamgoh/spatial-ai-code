@@ -135,6 +135,9 @@ Primary comparisons:
 
 ## F. P1 — Optional extensions if time remains
 
+- [-] Open-model comparator panel after P0: Qwen3.5-9B thinking/non-thinking,
+  Ministral-3-8B-Instruct, and gpt-oss-20b; add Qwen3-30B-A3B-Thinking only if
+  the stronger open ceiling is worth the larger GPU allocation.
 - [-] Paired VISIBLE-POSSIBLE transfer diagnostic: 180 bases, 720 VISIBLE views,
   and 180 ALL controls.
 - [-] Special-response diagnostic: direct L0, ambiguous SINGLE, and Selection
@@ -145,6 +148,7 @@ Primary comparisons:
 
 ## G. P2 — Deferred future work
 
+- [>] Broader model sweep, historical anchors, and proprietary frontier APIs.
 - [>] General capacitated Z3 allocation and capacity-provenance system.
 - [>] Chunked resumable generation and atomic publication pipeline.
 - [>] Exhaustive proof of minimum-Count canonical capacity.

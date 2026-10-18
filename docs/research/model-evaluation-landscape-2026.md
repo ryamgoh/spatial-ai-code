@@ -1,0 +1,277 @@
+# Model evaluation landscape for SpatialEntail
+
+*Primary-source review, checked 18 October 2026.*
+
+## Decision
+
+Keep **`Qwen/Qwen3.5-4B` as the only SFT base**. Use every other checkpoint
+below only as an untuned evaluation comparator. The smallest defensible
+optional comparator ladder is five open checkpoints:
+
+1. `Qwen/Qwen3.5-4B`, in both non-thinking and thinking modes;
+2. `Qwen/Qwen3.5-9B`, with the same two modes, as the clean family-scale
+   control;
+3. `mistralai/Ministral-3-8B-Instruct-2512`, as an independent current
+   instruction baseline;
+4. `openai/gpt-oss-20b`, as a cheap reasoning-specialist control; and
+5. `Qwen/Qwen3-30B-A3B-Thinking-2507`, as the stronger open reasoning model
+   already used on SpatialMap by recent verifier research.
+
+This comparator set separates three questions that a single leaderboard would confound:
+whether SFT beats its own untuned 4B starting point, whether ordinary scale
+from 4B to 9B explains the gain, and whether test-time reasoning explains it.
+It also stays within the available one- or two-GPU profiles at the repository's
+8,192-token frozen evaluation cap. Closed APIs should be reported only as a
+separate ceiling because they cannot reproduce the local two-pass vLLM decoder
+exactly.
+
+## Scope and interpretation
+
+This review covers text-capable checkpoints whose total weights are practical
+on one H100-96, one H200-141, or two H100-47 devices. A few smaller models are
+included because they are the correct same-scale controls. Models larger than
+32B total are excluded even when their active MoE parameter count is small.
+The exception is no model: `Qwen3-30B-A3B` is 30.5B total, so it remains within
+scope.
+
+“Fit” below means **single-sequence inference at `max_model_len=8,192`**, not
+serving the model's advertised maximum context. It assumes the official
+checkpoint precision, batch size one where necessary, and a recent compatible
+vLLM. The estimate is intentionally conservative:
+
+- BF16 weights require about two bytes per stored parameter before runtime,
+  activations, kernels, and KV cache;
+- FP8 weights require roughly one byte per stored parameter, subject to
+  unquantized modules and runtime overhead;
+- every MoE expert must reside in memory even though only a subset is active per
+  token; and
+- `2x47` means tensor parallelism across two 47 GB devices, not a fictitious
+  contiguous 94 GB device.
+
+The frozen randomized-v2 protocol uses an 8,192-token evaluation budget with up
+to 4,096 new tokens. Its pinned tokenizer audit found a 2,513-token maximum
+complete training sequence. Thus all shortlisted contexts are sufficient;
+advertised 128K–1M context is not a reason to prefer one model here.
+
+## Current open instruction baselines, 3B–8B
+
+These are the most useful same-scale untuned controls. Parameters are
+**total/active**. For multimodal-native checkpoints, both the language-model
+size and the complete checkpoint tensor count are shown because the latter
+governs memory unless the server can omit the vision tower.
+
+| Exact model ID | Parameters | Declared context | License and access | HF/vLLM status | Hardware fit at 8K |
+|---|---:|---:|---|---|---|
+| [`Qwen/Qwen3.5-4B`][q35-4] | 4B LM, 4.660B checkpoint / dense | 262,144 native; 1,010,000 extended | Apache-2.0; ungated | Official Transformers, SGLang, and vLLM support; the card currently asks for vLLM main/nightly and documents `--language-model-only` | Easy on 1x47 BF16; also the **only SFT base** |
+| [`mistralai/Ministral-3-3B-Instruct-2512`][ministral-3-i] | 3.4B LM + about 0.4B vision, 3.849B checkpoint / dense | 262,144 | Apache-2.0; ungated | Official FP8 checkpoint; vLLM >=0.12 and Transformers documented | Official card says 8 GB VRAM in FP8; easy on 1x47 |
+| [`microsoft/Phi-4-mini-instruct`][phi-mini] | 3.836B / dense | 131,072 | MIT; ungated | Transformers >=4.49 and vLLM >=0.7.3 documented | About 7.7 GB BF16 weights; easy on 1x47 |
+| [`mistralai/Ministral-3-8B-Instruct-2512`][ministral-8-i] | 8.4B LM + about 0.4B vision, 8.918B checkpoint / dense | 262,144 | Apache-2.0; ungated | Official FP8 checkpoint; vLLM >=0.12 and Transformers documented | Official card says 12 GB VRAM in FP8; easy on 1x47 |
+
+Two familiar alternatives remain useful only as literature anchors:
+`google/gemma-3-4b-it` is a 4.300B, 128K checkpoint under the gated Gemma
+license, while `meta-llama/Llama-3.1-8B-Instruct` is an 8.030B, 128K checkpoint
+under the gated Llama 3.1 community license ([official Gemma card][gemma3-4],
+[official Llama card][llama31-8]). Both fit one 47 GB device, but neither adds as
+much experimental information as the ungated, newer controls above.
+
+## Stronger open models, 9B–32B
+
+| Exact model ID | Parameters | Declared context | License and access | HF/vLLM status | Hardware fit at 8K |
+|---|---:|---:|---|---|---|
+| [`Qwen/Qwen3.5-9B`][q35-9] | 9B LM, 9.653B checkpoint / dense | 262,144 native; 1,010,000 extended | Apache-2.0; ungated | Same current Qwen3.5 Transformers/vLLM-nightly path as 4B; text-only loading documented | About 19.3 GB BF16 weights; easy on 1x47 |
+| [`mistralai/Ministral-3-14B-Instruct-2512`][ministral-14-i] | 13.5B LM + about 0.4B vision, 13.945B checkpoint / dense | 262,144 | Apache-2.0; ungated | Official FP8 checkpoint; vLLM >=0.12 and Transformers documented | Official card says 24 GB VRAM in FP8; easy on 1x47 |
+| [`mistralai/Mistral-Small-3.2-24B-Instruct-2506`][mistral-small] | 24.011B / dense | 131,072 | Apache-2.0; ungated | vLLM >=0.9.1 recommended; Transformers supported | Card states about 55 GB in BF16: no on 1x47, yes on 1x96, 1x141, or 2x47 |
+| [`Qwen/Qwen3.5-27B`][q35-27] | 27B LM, 27.781B checkpoint / dense | 262,144 native; 1,010,000 extended | Apache-2.0; ungated | Transformers and current vLLM-nightly supported; official full-context example uses TP=8, but 16K does not require that | About 55.6 GB BF16 weights: no on 1x47; yes on 1x96, 1x141, or 2x47 at 16K |
+| [`google/gemma-3-27b-it`][gemma3-27] | 27.432B / dense | 131,072 | Gemma license; manual HF access gate | Transformers and vLLM support exist after accepting terms | About 54.9 GB BF16 weights: no on 1x47; yes on 1x96, 1x141, or 2x47 at 16K |
+| [`Qwen/Qwen2.5-32B-Instruct`][q25-32] | 32.764B / dense | 32,768 configured; 131,072 with the card's YaRN recipe | Apache-2.0; ungated | Mature Transformers and vLLM path | About 65.5 GB BF16 weights: no on 1x47; yes on 1x96, 1x141, or 2x47 at 16K |
+
+`Qwen3.5-9B` is the highest-value row: it changes scale while holding model
+family, release, prompt template, and thinking switch nearly constant.
+`Qwen3.5-27B` is the next scale point but belongs in P1 because the 9B result
+should determine whether another dense family point is worth its cost.
+
+## Open reasoning-specialized models
+
+| Exact model ID | Parameters | Declared context | License and access | HF/vLLM status | Hardware fit at 8K |
+|---|---:|---:|---|---|---|
+| [`nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16`][nemotron-4] | 3.973B / dense hybrid Mamba–Transformer | 262,144 | NVIDIA Nemotron Open Model License; ungated | Transformers and vLLM >=0.15.1; custom official reasoning parser required | About 8.0 GB BF16 weights; easy on 1x47 |
+| [`mistralai/Ministral-3-8B-Reasoning-2512`][ministral-8-r] | 8.4B LM + about 0.4B vision, 8.918B checkpoint / dense | 262,144 | Apache-2.0; ungated | vLLM >=0.12 with `reasoning-parser=mistral`; Transformers documented | Official card says BF16 fits 24 GB; easy on 1x47 |
+| [`deepseek-ai/DeepSeek-R1-Distill-Qwen-7B`][ds-r1-7] | 7.616B / dense | 131,072 configured | MIT final weights; Qwen-derived base was Apache-2.0; ungated | Official DeepSeek card gives vLLM/SGLang serving; modern Transformers also loads the Qwen2 architecture | About 15.2 GB BF16 weights; easy on 1x47 |
+| [`openai/gpt-oss-20b`][gpt-oss] | 21B total / 3.6B active MoE | 131,072 | Apache-2.0; ungated | Official Transformers and vLLM paths; must preserve Harmony formatting | Official MXFP4 checkpoint runs within 16 GB; easy on 1x47 |
+| [`microsoft/Phi-4-reasoning-plus`][phi-reasoning] | 14.660B / dense | 32,768 | MIT; ungated | Official Transformers and vLLM `deepseek_r1` reasoning-parser command | About 29.3 GB BF16 weights; fits 1x47 at 16K/batch 1; all larger profiles are comfortable |
+| [`Qwen/Qwen3-30B-A3B-Thinking-2507`][q3-thinking] | 30.5B total / 3.3B active MoE | 262,144 native | Apache-2.0; ungated | Transformers, vLLM >=0.8.5, and SGLang officially supported | About 61.1 GB BF16 weights: no on 1x47; yes on 1x96, 1x141, or 2x47 at 16K |
+| [`deepseek-ai/DeepSeek-R1-Distill-Qwen-32B`][ds-r1-32] | 32.764B / dense | 131,072 configured | MIT final weights; Qwen-derived base was Apache-2.0; ungated | Official card demonstrates vLLM TP=2 with a 32,768 cap | About 65.5 GB BF16 weights: no on 1x47; yes on 1x96, 1x141, or 2x47 at 16K |
+
+Two distinctions matter. First, Qwen3.5 itself is hybrid-mode: thinking is on by
+default and `enable_thinking=False` gives an instruction-style response. That
+makes paired thinking/non-thinking runs on one checkpoint more informative than
+calling it only an “instruction model.” Second, active parameters describe MoE
+compute, not weight residency. `gpt-oss-20b` fits a 47 GB GPU because its
+official checkpoint is MXFP4, whereas the 30.5B Qwen MoE does not fit there in
+BF16 merely because 3.3B parameters activate per token.
+
+## What recent spatial and reasoning papers actually evaluate
+
+The model choices above are not based only on general benchmark rankings.
+Recent primary spatial sources reveal a stable set of comparison roles.
+
+| Source | Models used | Implication for SpatialEntail |
+|---|---|---|
+| [MentalMap, 2026][mentalmap] | Closed: GPT-4o, Gemini-2.5-Flash, DeepSeek-V4-Flash, Qwen3.5-Flash. Open 7–10B: `meta-llama/Llama-3.1-8B-Instruct`, `Qwen/Qwen2.5-7B-Instruct`, `mistralai/Mistral-7B-Instruct-v0.3`, `google/gemma-2-9b-it`, `tiiuae/Falcon3-10B-Instruct`. Scale controls: `Qwen/Qwen2.5-32B-Instruct`, `google/gemma-3-27b-it`. | Confirms the conventional 7–10B instruction panel and the value of a separate 27–32B scale control. It also reports that chain-of-thought can hurt strict structured output, supporting separate direct and reasoning tracks rather than one mixed ranking. |
+| [SiT-Bench, 2026][sitbench] | General backbones include Qwen2.5/3 and Llama 3.1; specialist baselines include Space-Qwen, SpaceThinker, RoboBrain2.0, SpaceR, and Cosmos-Reason2; proprietary/large models include GPT-4o, Gemini-3-Flash, and DeepSeek-V3.2. | Supports keeping one specialist spatial model only as a P2 diagnostic. It does not justify replacing modern general reasoning controls with a large panel of multimodal specialists. |
+| [`interwhen`, 2026][interwhen] | Exact open reasoning models: `Qwen/Qwen3-30B-A3B-Thinking-2507`, `Qwen/QwQ-32B`, and `microsoft/phi-4-reasoning`; all served with vLLM. SpatialMap is one of its main 1,500-example tasks. | Directly motivates Qwen3-30B-A3B-Thinking and Phi-4-reasoning-plus as optional comparators. These have stronger task-family relevance than a generic math leaderboard. |
+| [SODA/SPOD-Bench, ACL 2026][soda] | Builds a pure-text spatial benchmark and trains with SFT followed by GRPO. | Confirms that training and evaluation checkpoints must be separated in reporting. It does not make its training base an automatic comparator for SpatialEntail's static entailment semantics. |
+
+For reproducibility, the recurring historical IDs have the following verified
+deployment envelope:
+
+| Exact ID | Parameters; context | License/access; vLLM | Fit at 8K |
+|---|---|---|---|
+| [`meta-llama/Llama-3.1-8B-Instruct`][llama31-8] | 8.030B dense; 128K | Llama 3.1 community license, manual gate; mature HF/vLLM | 1x47 BF16 |
+| [`Qwen/Qwen2.5-7B-Instruct`][q25-7] | 7.616B dense; 32K configured, 131K with YaRN | Apache-2.0, ungated; mature HF/vLLM | 1x47 BF16 |
+| [`mistralai/Mistral-7B-Instruct-v0.3`][mistral7] | 7.248B dense; 32K | Apache-2.0, ungated; official vLLM card | 1x47 BF16 |
+| [`google/gemma-2-9b-it`][gemma2-9] | 9.242B dense; 8K | Gemma license, manual gate; HF/vLLM after access | 1x47 BF16 |
+| [`tiiuae/Falcon3-10B-Instruct`][falcon3] | 10.306B dense; 32K | Falcon license, ungated; HF/vLLM | 1x47 BF16 |
+| [`Qwen/QwQ-32B`][qwq] | 32.764B dense; 40,960 configured, 131K with YaRN | Apache-2.0, ungated; official HF/vLLM | 1x96, 1x141, or 2x47; not 1x47 BF16 |
+
+The older five-model MentalMap panel is useful if direct comparability to that
+paper is a goal. It is not the best main 2026 panel: Qwen3.5, Ministral 3,
+Nemotron 3, and gpt-oss are newer, ungated where noted, and better aligned with
+the hardware and reasoning questions here.
+
+## Optional closed-API ceilings
+
+These are reference ceilings, not substitutes for the open-model study.
+Providers do not disclose total or active parameters, weights are unavailable,
+and neither HF nor vLLM applies.
+
+| Exact API model | Parameters | Context/output | Access and reproducibility |
+|---|---:|---:|---|
+| [`gpt-5.4-2026-03-05`][gpt54] | Undisclosed | 1,050,000 context; 128,000 output | Proprietary OpenAI API. Prefer the dated snapshot over alias `gpt-5.4`; supports reasoning effort from `none` to `xhigh`. |
+| [`claude-opus-5-5`][claude55] | Undisclosed | 1M context; 128K standard max output | Proprietary Anthropic API; official catalog marks it active and released 22 September 2026. No dated snapshot is listed, so record response metadata. |
+| [`gemini-4-argon`][gemini4] | Undisclosed | Unified 1,048,576 limit; 65,536 synchronous output, up to 1,048,576 with long decode | Proprietary Gemini API; official page labels the ID stable. Record the returned model version because the stable alias may move. |
+
+Use at most one of these for P2, on a fixed stratified subset. Add all three only
+in P2 if a cross-provider ceiling is worth the API cost. Since provider APIs do
+not expose the repository's local constrained-decoding pass, report native
+answer accuracy and format validity separately; do not merge their number with
+the local stage-2 accuracy column.
+
+## Recommended FYP priority
+
+### P0 — current controlled study
+
+P0 remains the untuned Qwen3.5-4B checkpoint and the six SpatialEntail
+adapters. These seven models answer the thesis-critical supervision and
+transfer questions. No additional base model may delay this evaluation.
+
+### P1 — optional open-model comparators
+
+Five checkpoints, seven modes:
+
+| Checkpoint/mode | Why now | Preferred hardware |
+|---|---|---|
+| `Qwen/Qwen3.5-4B`, thinking off | Untuned instruction baseline and SFT starting-point control | 1xH100-47 |
+| `Qwen/Qwen3.5-4B`, thinking on | Isolate test-time reasoning without changing weights | 1xH100-47 |
+| `Qwen/Qwen3.5-9B`, thinking off and on | Clean within-family scale test in both response regimes | 1xH100-47 |
+| `mistralai/Ministral-3-8B-Instruct-2512` | Independent modern same-scale instruction baseline | 1xH100-47 |
+| `openai/gpt-oss-20b`, reasoning high | Efficient reasoning-specialist control with full local weights | 1xH100-47 |
+| `Qwen/Qwen3-30B-A3B-Thinking-2507` | Stronger open reasoning ceiling with direct recent SpatialMap precedent | 1xH100-96, 1xH200-141, or 2xH100-47 |
+
+If API budget permits after the open comparisons, add `gpt-5.4-2026-03-05` only
+on a preregistered P2 subset; keep it outside the main local leaderboard.
+
+### P2 — diagnose the comparator result
+
+Run these only after the corresponding P1 comparison is informative:
+
+- `Qwen/Qwen3.5-27B`, thinking off and on, if 4B→9B shows a scale trend;
+- `mistralai/Ministral-3-8B-Reasoning-2512`, paired with the P1 Ministral
+  Instruct checkpoint to isolate reasoning post-training;
+- `microsoft/Phi-4-mini-instruct`, as a compact independent 4B-scale control;
+- `microsoft/Phi-4-reasoning-plus`, because recent SpatialMap work evaluates
+  the closely named `microsoft/phi-4-reasoning`; and
+- `deepseek-ai/DeepSeek-R1-Distill-Qwen-32B`, if a dense 32B reasoning ceiling
+  is needed against the 30.5B MoE model.
+
+### Additional P2 literature continuity and optional ceilings
+
+- one conventional historical anchor, preferably the ungated
+  `Qwen/Qwen2.5-7B-Instruct`; add Llama/Gemma only for direct paper matching;
+- one spatial specialist only after its gated official card and exact runtime
+  context can be captured in the run manifest; the current paper-level evidence
+  alone is not enough to put one in the frozen model matrix;
+- `nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16` as another small reasoning regime;
+- `Qwen/QwQ-32B` only for direct `interwhen` continuity, not because it is the
+  strongest current 32B option; and
+- `claude-opus-5-5` and `gemini-4-argon` on the same fixed API subset if a
+  three-provider frontier comparison is required.
+
+No P0, P1, or P2 model other than `Qwen/Qwen3.5-4B` should receive SpatialEntail
+SFT. Otherwise the study changes from “does the proposed supervision improve a
+fixed small base?” to a multi-base training sweep and loses its clean causal
+comparison.
+
+## Evaluation controls required for a credible comparison
+
+1. **Freeze exact revisions.** Record HF commit SHA, tokenizer revision,
+   vLLM version, dtype/quantization, reasoning parser, and chat-template hash.
+   Record provider-returned model version for moving API aliases.
+2. **Separate direct and reasoning tracks.** Use the model's documented
+   thinking switch and recommended sampling. Do not silently force all
+   reasoning models to temperature zero: Qwen3-30B recommends sampling around
+   0.6, while Phi-4-reasoning-plus specifies 0.8. Report token use and latency
+   with accuracy.
+3. **Keep the answer contract identical.** Score native stage-1 answer,
+   stage-1 format validity, and local stage-2 constrained answer separately.
+   For APIs without equivalent constrained decoding, report stage 1 only or a
+   clearly labelled extraction/repair result.
+4. **Hold context and output budgets fixed.** Start with the frozen 8,192 /
+   4,096 total/new-token limits. A model-card maximum context is not an excuse
+   to grant one model more problem-solving budget. If a reasoning model reaches
+   the cap, report truncation and run a separately labelled budget sensitivity.
+5. **Report by SpatialEntail structure.** Preserve CORE/COMP/SHIFT, query
+   family, and proof-depth slices. The prior hardened calibration showed that
+   Direction D9, not aggregate Count accuracy, carried much of the remaining
+   headroom; an overall number alone would hide the mechanism.
+6. **Do not collapse precision regimes.** An official FP8 or MXFP4 checkpoint
+   is a valid deployed-model result, but label it. Do not compare it as if it
+   were the BF16 checkpoint, and never infer fit from active MoE parameters.
+
+## Sources
+
+Model facts above come from the owning organizations' model cards/configs and
+official API catalogs, not leaderboard aggregators. Literature claims come
+from the original papers or official proceedings pages.
+
+[q35-4]: https://huggingface.co/Qwen/Qwen3.5-4B
+[q35-9]: https://huggingface.co/Qwen/Qwen3.5-9B
+[q35-27]: https://huggingface.co/Qwen/Qwen3.5-27B
+[ministral-3-i]: https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512
+[ministral-8-i]: https://huggingface.co/mistralai/Ministral-3-8B-Instruct-2512
+[ministral-14-i]: https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512
+[phi-mini]: https://huggingface.co/microsoft/Phi-4-mini-instruct
+[mistral-small]: https://huggingface.co/mistralai/Mistral-Small-3.2-24B-Instruct-2506
+[gemma3-4]: https://huggingface.co/google/gemma-3-4b-it
+[gemma3-27]: https://huggingface.co/google/gemma-3-27b-it
+[llama31-8]: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+[q25-7]: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+[q25-32]: https://huggingface.co/Qwen/Qwen2.5-32B-Instruct
+[mistral7]: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
+[gemma2-9]: https://huggingface.co/google/gemma-2-9b-it
+[falcon3]: https://huggingface.co/tiiuae/Falcon3-10B-Instruct
+[nemotron-4]: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16
+[ministral-8-r]: https://huggingface.co/mistralai/Ministral-3-8B-Reasoning-2512
+[ds-r1-7]: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B
+[ds-r1-32]: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+[gpt-oss]: https://huggingface.co/openai/gpt-oss-20b
+[phi-reasoning]: https://huggingface.co/microsoft/Phi-4-reasoning-plus
+[q3-thinking]: https://huggingface.co/Qwen/Qwen3-30B-A3B-Thinking-2507
+[qwq]: https://huggingface.co/Qwen/QwQ-32B
+[mentalmap]: https://arxiv.org/abs/2605.28277
+[sitbench]: https://arxiv.org/abs/2601.03590
+[interwhen]: https://arxiv.org/abs/2602.11202
+[soda]: https://aclanthology.org/2026.acl-long.1382/
+[gpt54]: https://developers.openai.com/api/docs/models/gpt-5.4
+[claude55]: https://docs.anthropic.com/en/docs/about-claude/models/overview
+[gemini4]: https://ai.google.dev/gemini-api/docs/models/gemini-4-argon
