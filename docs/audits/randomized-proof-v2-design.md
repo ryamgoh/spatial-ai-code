@@ -307,9 +307,13 @@ canonical signature is excluded before admission. The known minimum-length,
 X0 ALL-POSSIBLE Count corner is assigned to Direction or Selection rather than
 requesting unavailable Count diversity.
 
-Certificates remain offline audit artifacts and are never SFT targets. Natural
-rows are never silently culled: use 24,576 context tokens when all fit, otherwise
-32,768, and fail preparation above that bound.
+Certificates remain offline audit artifacts and are never SFT targets. The
+persisted candidate contains 15,400 unique bases, has no benchmark or
+train/development structural overlap, and required eighteen canonical
+replacements. Exact admission with Qwen3.5-4B revision
+`851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` found a maximum complete training
+sequence of 2,513 tokens and zero rows above 4,096. All central SFT jobs
+therefore use one common `sequence_len: 4096`; no row is culled or truncated.
 
 ## Commands
 

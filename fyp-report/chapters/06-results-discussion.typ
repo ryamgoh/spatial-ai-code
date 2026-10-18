@@ -487,6 +487,27 @@ model leakage; the narrow-support overlap is retained and disclosed. The
 candidate itself is strictly unique. Its source JSONL is frozen at SHA-256
 `523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d`.
 
+=== Randomized-v2 SFT candidate and tokenizer admission
+
+Training preparation generated 15,400 unique bases in 743.2 seconds and used
+eighteen canonical replacements. MULTI shares 2,000 training and 200
+development G1 bases verbatim with SINGLE; the remaining bases produce 8,000
+training and 800 development rows per contract. All declared G/L/X marginals
+match, query-family counts differ by at most one, train and development are
+structurally disjoint, and none of the 3,600 benchmark signatures appears in
+the training candidate. SINGLE Natural and answer-only views match by base ID,
+structure, and prompt.
+
+Exact admission used the pinned Qwen3.5-4B tokenizer revision
+`851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`. The largest complete training
+sequence contains 2,513 tokens for MULTI Natural, followed by 2,328 for SINGLE
+Natural and 422 for SINGLE answer-only. No row exceeds 4,096 tokens. The six
+central adapters therefore use `sequence_len: 4096`, replacing the earlier
+prospective 24,576-token envelope without truncation or row removal. The
+training manifest and tokenizer-audit SHA-256 values are respectively
+`a3d6ff1449acf1f5cefaa6962cdcba841639c4e1cb2a8061be69bc4c884e03ef` and
+`9f83a87f92a2752223ff8ea6caac14723cb0f818b03a4f23379bb0c19300797e`.
+
 === Lessons and next actions
 
 The two pilots show that a larger answer space is not sufficient by itself:

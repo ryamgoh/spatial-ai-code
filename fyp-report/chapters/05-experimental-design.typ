@@ -141,6 +141,11 @@ transitions, and benchmark canonical signatures are excluded before admission.
 The narrow minimum-length, X0 ALL-POSSIBLE Count corner is assigned to Direction
 or Selection instead of requesting unavailable Count diversity.
 
+All six adapters use a common sequence length of 4,096. This value follows
+exact admission with the pinned Qwen3.5-4B tokenizer: the largest complete
+training sequence is 2,513 tokens and no candidate exceeds 4,096. No training
+row is truncated or removed by the context policy.
+
 VISIBLE-POSSIBLE is excluded from SFT and retained as a third, non-headline
 evaluation contract. After the headline candidate is frozen, a separate,
 structurally disjoint pool contributes five bases from each

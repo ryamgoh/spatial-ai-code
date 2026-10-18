@@ -1,0 +1,69 @@
+{
+  "schema": "spatialentail-randomized-v2-training-audit-v1",
+  "audit_date": "2026-10-18",
+  "status": "tokenizer-audit-passed",
+  "artifact": {
+    "archive_sha256": "bc01c54ab11292c772255d132e10575b414f294b81bce699dc12c007d8e04362",
+    "manifest_sha256": "a3d6ff1449acf1f5cefaa6962cdcba841639c4e1cb2a8061be69bc4c884e03ef",
+    "token_audit_sha256": "9f83a87f92a2752223ff8ea6caac14723cb0f818b03a4f23379bb0c19300797e"
+  },
+  "structure": {
+    "benchmark_overlap": 0,
+    "canonical_replacements": 18,
+    "shared_development_bases": 200,
+    "shared_train_bases": 2000,
+    "train_development_overlap": 0,
+    "unique_base_ids": 15400,
+    "unique_structures": 15400,
+    "validation_failures": 0
+  },
+  "tokenizer": {
+    "name": "Qwen/Qwen3.5-4B",
+    "recommended_train_max_tokens": 4096,
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "packages": {
+    "multi-development-natural": {
+      "rows": 800,
+      "target_max": 2017,
+      "training_max": 2349,
+      "training_median": 1387,
+      "training_p95": 1807
+    },
+    "multi-train-natural": {
+      "rows": 8000,
+      "target_max": 2161,
+      "training_max": 2513,
+      "training_median": 1451,
+      "training_p95": 1843
+    },
+    "single-development-answer-only": {
+      "rows": 800,
+      "target_max": 3,
+      "training_max": 414,
+      "training_median": 280,
+      "training_p95": 354
+    },
+    "single-development-natural": {
+      "rows": 800,
+      "target_max": 1719,
+      "training_max": 2072,
+      "training_median": 1363,
+      "training_p95": 1750
+    },
+    "single-train-answer-only": {
+      "rows": 8000,
+      "target_max": 3,
+      "training_max": 422,
+      "training_median": 303,
+      "training_p95": 369
+    },
+    "single-train-natural": {
+      "rows": 8000,
+      "target_max": 2030,
+      "training_max": 2328,
+      "training_median": 1434,
+      "training_p95": 1831
+    }
+  }
+}
