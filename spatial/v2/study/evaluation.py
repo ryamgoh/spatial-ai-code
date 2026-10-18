@@ -163,6 +163,7 @@ set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
 export EVAL_NAME={model_name}
 export EVAL_CONFIG="$SLURM_SUBMIT_DIR/{config_relative}"
+export EVAL_PREPARED_DIR="$SLURM_SUBMIT_DIR/{output_relative}"
 export MODEL_DIR="{model_dir}"
 export RESULT_DIR="$SLURM_SUBMIT_DIR/{output_relative}/results/{model_name}"
 export UNTUNED={1 if lora is None else 0}

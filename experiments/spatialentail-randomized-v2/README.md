@@ -82,6 +82,17 @@ The prepared jobs contain SINGLE Natural, SINGLE answer-only, and MULTI Natural
 at seeds 42 and 43. They use QLoRA, the known-fit Qwen3.5 target modules, and
 the measured common `sequence_len: 4096` on one H100-47 GPU.
 
+Prepare the frozen 48-task evaluation package while training runs:
+
+```sh
+sbatch --partition=normal --cpus-per-task=8 --mem=32G \
+  experiments/spatialentail-randomized-v2/slurm/prepare-evaluation.sh
+```
+
+The package contains the untuned model plus all six adapter paths. Its Slurm
+scripts default to one H200, but `sbatch -p/-t/--gres` may override the resource
+profile. Only the untuned job is runnable before adapters finish.
+
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 

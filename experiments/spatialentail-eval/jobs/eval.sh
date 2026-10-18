@@ -22,7 +22,8 @@ if [[ -f "$RESULT_DIR/COMPLETED" && -f "$RESULT_DIR/results.json" ]]; then
   exit 0
 fi
 
-python3 - "$SLURM_SUBMIT_DIR/experiments/spatialentail-eval/prepared-final/jobs.json" "$SLURM_SUBMIT_DIR/experiments/spatialentail-eval/prepared-final" "$SLURM_SUBMIT_DIR" <<'CHECK'
+prepared_dir=${EVAL_PREPARED_DIR:-$SLURM_SUBMIT_DIR/experiments/spatialentail-eval/prepared-final}
+python3 - "$prepared_dir/jobs.json" "$prepared_dir" "$SLURM_SUBMIT_DIR" <<'CHECK'
 import hashlib, json, pathlib, sys
 receipt = json.loads(pathlib.Path(sys.argv[1]).read_text())
 base = pathlib.Path(sys.argv[2])
