@@ -466,6 +466,27 @@ three unique structures and deterministic replacement found the fourth after
 ten candidates. The final benchmark still requires 3,600 unique structures;
 no duplicate is retained and no row is removed.
 
+=== Successful randomized-v2 headline candidate
+
+The corrected job produced all 3,600 candidate rows in 230.0 seconds and used
+eleven canonical replacements. The persisted artifact contains 3,600 unique
+IDs and 3,600 unique canonical structures. It contains 1,200 examples for each
+query family and 900 for each G1--G4, with 1,440 MATCHED and 720 examples in
+each one-factor OOD partition. All requested and realised G, L, and X values
+agree; every prompt round-trips; every row carries an answer certificate; and
+no sampled CSR or branch step occurs. Every COMPOSITION-OOD row contains
+exactly one held-out transition, while the other partitions contain none.
+
+Natural targets have median 760, p95 1,027, and maximum 1,429
+whitespace-delimited units; complete messages have median 995 and maximum
+1,657. These remain lexical proxies pending pinned-tokenizer admission. Six
+minimum-length matched Count rows share a canonical structure with the
+disposable structural-calibration pool. Calibration was never used for model
+training, checkpoint selection, or scored model evaluation, so this is not
+model leakage; the narrow-support overlap is retained and disclosed. The
+candidate itself is strictly unique. Its source JSONL is frozen at SHA-256
+`523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d`.
+
 === Lessons and next actions
 
 The two pilots show that a larger answer space is not sufficient by itself:

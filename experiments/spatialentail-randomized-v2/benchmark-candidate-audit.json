@@ -1,0 +1,78 @@
+{
+  "schema": "spatialentail-randomized-v2-benchmark-audit-v1",
+  "audit_date": "2026-10-18",
+  "status": "candidate-audit-passed",
+  "artifact": {
+    "archive_sha256": "02bc2a41e9601a5a7a955ae73c9fba13c52fa69c4a31a04c7b8629b1cd56fb78",
+    "manifest_sha256": "3f21098c24d391b4907b9953983b2fc69055e59ff2b71b9028d36b6c1df4a8bc",
+    "source_natural_bytes": 145090119,
+    "source_natural_sha256": "523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d"
+  },
+  "summary": {
+    "rows": 3600,
+    "unique_ids": 3600,
+    "unique_structures": 3600,
+    "canonical_replacements": 11,
+    "query_rows": {
+      "count": 1200,
+      "direction": 1200,
+      "which": 1200
+    },
+    "gold_rows": {
+      "1": 900,
+      "2": 900,
+      "3": 900,
+      "4": 900
+    },
+    "partition_rows": {
+      "composition-ood": 720,
+      "length-ood": 720,
+      "matched": 1440,
+      "noise-ood": 720
+    }
+  },
+  "validation_failures": {
+    "answer_mode": 0,
+    "branch_steps": 0,
+    "certificate": 0,
+    "composition_heldout_count": 0,
+    "csr_path": 0,
+    "duplicate_structure": 0,
+    "gold_size": 0,
+    "headline_flag": 0,
+    "menu_size": 0,
+    "noncomposition_heldout": 0,
+    "oracle_gold_size": 0,
+    "process_validity": 0,
+    "quota": 0,
+    "requested_length": 0,
+    "requested_noise": 0,
+    "round_trip": 0
+  },
+  "operational_cap_cells": [
+    {"gold": 2, "length": 2, "noise": 0, "rows": 1},
+    {"gold": 3, "length": 3, "noise": 0, "rows": 2},
+    {"gold": 4, "length": 4, "noise": 0, "rows": 4}
+  ],
+  "length_proxy": {
+    "all_message_whitespace_max": 1657,
+    "all_message_whitespace_median": 995,
+    "natural_target_whitespace_max": 1429,
+    "natural_target_whitespace_median": 760,
+    "natural_target_whitespace_p95": 1027.05,
+    "natural_target_whitespace_p99": 1151.06,
+    "unit": "whitespace-delimited; not pinned-tokenizer counts"
+  },
+  "calibration_overlap": {
+    "canonical_structures": 6,
+    "interpretation": "disposable engineering calibration only; no model training, checkpoint selection, or scored evaluation exposure",
+    "rows": [
+      {"gold": 3, "length": 3, "noise": 0, "partition": "matched", "query": "count"},
+      {"gold": 4, "length": 4, "noise": 0, "partition": "matched", "query": "count"},
+      {"gold": 4, "length": 4, "noise": 0, "partition": "matched", "query": "count"},
+      {"gold": 4, "length": 4, "noise": 1, "partition": "matched", "query": "count"},
+      {"gold": 4, "length": 4, "noise": 1, "partition": "matched", "query": "count"},
+      {"gold": 4, "length": 4, "noise": 0, "partition": "matched", "query": "count"}
+    ]
+  }
+}

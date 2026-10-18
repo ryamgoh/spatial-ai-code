@@ -155,6 +155,32 @@ pairing adopts a conservative empirical-operational cap of four while
 preserving both L and X marginals. In the same harness, the new four-slot
 allocation reached four unique structures after ten replacement candidates.
 
+### Successful headline candidate
+
+The corrected job produced all 3,600 rows in 230.0 seconds and used eleven
+canonical replacements. The persisted artifact contains 3,600 unique IDs and
+3,600 unique canonical structures. Every query-by-G group has 120 MATCHED and
+sixty examples in each one-factor OOD partition, giving 1,440 MATCHED and 720
+each LENGTH-OOD, NOISE-OOD, and COMPOSITION-OOD. All requested and realised G,
+L, and X values agree; all menus contain five options; all prompts round-trip;
+all answer certificates are present; and no sampled CSR or branch step occurs.
+Every COMPOSITION-OOD row contains exactly one held-out transition, and no
+other partition contains one.
+
+The candidate required one, two, and four rows respectively in the operational
+Count G2/L2/X0, G3/L3/X0, and G4/L4/X0 cells, all within their conservative cap.
+Natural targets have median 760 and maximum 1,429 whitespace-delimited units;
+complete messages have median 995 and maximum 1,657. Exact tokenizer admission
+remains a release-preparation check rather than a claim about these proxies.
+
+Six benchmark rows share a canonical structure with the disposable calibration
+pool, all in minimum-length matched Count cells. Calibration was not used for
+model training, checkpoint selection, or scored evaluation, so this is not
+model leakage. The overlap is retained and disclosed because these cells have
+deliberately narrow structural support. The candidate itself remains strictly
+unique. The frozen source JSONL SHA-256 is
+`523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d`.
+
 SpatialEntail uses a bounded propositional fragment whose basic propositions
 are concrete pairwise spatial relations. It supplements the Boolean rules with
 checked operations for decomposing, inverting, composing, and recombining
