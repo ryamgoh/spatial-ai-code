@@ -1,5 +1,7 @@
 # SpatialEntail randomized proof-graph v2
 
+Track remaining required, optional, and deferred work in [CHECKLIST.md](CHECKLIST.md).
+
 This experiment implements the structural calibration and non-headline
 diagnostics for the randomized v2 study. The calibration must pass before a
 fresh benchmark or SFT release is frozen.
