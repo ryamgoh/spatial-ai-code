@@ -36,11 +36,11 @@ For the main FYP report, the less jargon-heavy equivalent is:
 
 The formula AST has a domain-specific atom, `RelationConstraint(subject,
 reference, allowed)`, and recursively supports `Not`, n-ary nonempty `And` and
-`Or`, `Implies`, and `Iff` ([`solver.py`, lines 104–141](../../spatial/v2/solver.py#L104-L141),
-[`solver.py`, lines 256–295](../../spatial/v2/solver.py#L256-L295)). Both the
+`Or`, `Implies`, and `Iff` ([`solver.py`, lines 104–141](../../../spatial/v2/solver.py#L104-L141),
+[`solver.py`, lines 256–295](../../../spatial/v2/solver.py#L256-L295)). Both the
 reference evaluator and Z3 translation give these connectives their ordinary
-classical truth-functional meanings ([`solver.py`, lines 610–641](../../spatial/v2/solver.py#L610-L641),
-[`solver.py`, lines 859–896](../../spatial/v2/solver.py#L859-L896)). This closely
+classical truth-functional meanings ([`solver.py`, lines 610–641](../../../spatial/v2/solver.py#L610-L641),
+[`solver.py`, lines 859–896](../../../spatial/v2/solver.py#L859-L896)). This closely
 matches the inductive TFL syntax in *forall x: Calgary*: sentence letters are
 closed under negation, conjunction, disjunction, conditional, and
 biconditional.[^syntax]
@@ -49,7 +49,7 @@ There are nevertheless important boundaries. SpatialEntail's atoms are ground
 claims about finitely named objects, not freely interpreted propositional
 letters; their models must also satisfy the spatial coordinate/order theory.
 There are no quantifiers. `Contradiction` is a proof-object conclusion rather
-than a `SpatialFormula`/falsum constant ([`proofs.py`, lines 92–97](../../spatial/v2/proofs.py#L92-L97)).
+than a `SpatialFormula`/falsum constant ([`proofs.py`, lines 92–97](../../../spatial/v2/proofs.py#L92-L97)).
 Thus “full Boolean syntax over the available atoms” does **not** imply a full
 propositional proof calculus.
 
@@ -73,12 +73,12 @@ negation introduction, and indirect proof.[^basic]
 | Other shortcuts/conversions | None as general rules | No primitive LEM, modus tollens, contraposition, De Morgan conversion, Boolean normalization, or double-negation introduction |
 
 The checker definitions and their side conditions are explicit in
-[`proofs.py`, lines 304–528](../../spatial/v2/proofs.py#L304-L528). In particular,
+[`proofs.py`, lines 304–528](../../../spatial/v2/proofs.py#L304-L528). In particular,
 case split requires every disjunct to have a distinct scoped branch proving the
 same result; explosion requires a branch; and assumptions cannot leak across
 branches. A formula refutation is also a separate typed certificate: the root
 claim assumption must lead to a dependent contradiction
-([`proofs.py`, lines 684–743](../../spatial/v2/proofs.py#L684-L743)). It is not a
+([`proofs.py`, lines 684–743](../../../spatial/v2/proofs.py#L684-L743)). It is not a
 general proof step that exports `NOT claim` for later reuse.
 
 The distinction between *core* and *derived* rules matters. *forall x* presents
@@ -92,7 +92,7 @@ natural-deduction calculus obtained by stopping after the “basic rules” chap
 
 Finally, `DIRECTION_DECOMPOSITION`, axis inversion/transitivity/contradiction,
 and direction/atom recomposition are **domain rules**, not propositional rules
-([`proofs.py`, lines 530–637](../../spatial/v2/proofs.py#L530-L637)). They make
+([`proofs.py`, lines 530–637](../../../spatial/v2/proofs.py#L530-L637)). They make
 the overall certificate system richer in spatial reasoning without filling the
 missing Boolean rule schemas.
 
@@ -101,13 +101,13 @@ missing Boolean rule schemas.
 The deterministic constructor is narrower than the checker interface. It
 saturates selected eliminations and shortcuts, introduces conjunctions only
 when demanded, and performs goal-directed finite case splits
-([`proofs.py`, lines 996–1116](../../spatial/v2/proofs.py#L996-L1116),
-[`proofs.py`, lines 1368–1458](../../spatial/v2/proofs.py#L1368-L1458)). The
+([`proofs.py`, lines 996–1116](../../../spatial/v2/proofs.py#L996-L1116),
+[`proofs.py`, lines 1368–1458](../../../spatial/v2/proofs.py#L1368-L1458)). The
 repository's acceptance contract correspondingly says that semantically
 decidable formulas can remain outside automatic proof-search coverage and
 explicitly disclaims unrestricted proof-search completeness
-([`certificates.md`, lines 3–8](../spatialentail/certificates.md#L3-L8),
-[`certificates.md`, lines 52–72](../spatialentail/certificates.md#L52-L72)).
+([`certificates.md`, lines 3–8](../../spatialentail/certificates.md#L3-L8),
+[`certificates.md`, lines 52–72](../../spatialentail/certificates.md#L52-L72)).
 
 ## Soundness and completeness: what the evidence supports
 

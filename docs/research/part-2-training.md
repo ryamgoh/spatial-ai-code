@@ -89,7 +89,7 @@ verified derivation, but they should include only query-relevant reasoning.
 
 ## Authoritative execution scope
 
-The reviewed [corpus and benchmark protocol](size-freeze-protocol.md) controls
+The reviewed [corpus and benchmark protocol](../archive/research/size-freeze-protocol.md) controls
 all sizes, roles, composition reservations, and central contrasts. Its sealed
 allocations supersede the former 17K and 5.8K-test programme. The primary study
 is one 4B model, answer-only and Natural packages, and separately reported
@@ -214,7 +214,7 @@ exploration, not a central claim about formal verification or hidden reasoning.
 
 ## Composition, allocation, and depth
 
-See [size-freeze-protocol.md](size-freeze-protocol.md) for the executable twelve
+See [size-freeze-protocol.md](../archive/research/size-freeze-protocol.md) for the executable twelve
 seen composition cells and nine held-out cells, paired semantic interventions,
 775-base Dev set, and 4,300-base benchmark. These are sealed artifact counts,
 not provisional allocation targets.
@@ -343,8 +343,8 @@ arm or the central SFT design.
 That bounded configuration did not exercise the final Selection, Count,
 Boolean, transfer, depth, or quality-review protocols. The later sealed
 production release does. SFT and model evaluation have not been run. See the
-[preparation audit](../audits/sft-job-preparation.md) for final verification
-evidence and the [remediation audit](../audits/critique-remediation.md) for the
+[preparation audit](../archive/audits/sft-job-preparation.md) for final verification
+evidence and the [remediation audit](../archive/audits/critique-remediation.md) for the
 earlier pilot.
 
 The separate `matrix-premise-holdout.yaml` reserves premise-first IFF development
@@ -369,7 +369,7 @@ multiple-certain Selection admission, correlation-sensitive Count admission,
 and removable Selection distractors. A deterministic five-per-cell packet was
 screened sequentially by `DeepSeek-V4-Pro` and `GPT-5.5`; both approved all 65
 items, so the human appeal queue was empty. Exact hashes and local artifact paths
-are summarized in the tracked [v3 audit](../audits/capability-pilot-v3.md).
+are summarized in the tracked [v3 audit](../archive/audits/capability-pilot-v3.md).
 This historical pilot validated the representative registry and automated
 quality workflow. The later production release froze the final allocation and
 completed its review; neither artifact establishes learning results.

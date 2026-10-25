@@ -1,8 +1,8 @@
 # Capability-framework literature review
 
 **Checked 2026-10-10.** Primary-source critique of the
-[task taxonomy](task-taxonomy.md), using the
-[SODA naming note](soda-task-taxonomy.md), [source ledger](annotated-sources.md),
+[task taxonomy](../../research/task-taxonomy.md), using the
+[SODA naming note](soda-task-taxonomy.md), [source ledger](../../research/annotated-sources.md),
 and existing report bibliography as leads, not substitutes for papers.
 Recommendations only: no implemented algorithm, executed transfer result,
 allocation change, or novelty claim. Proceedings locators below give printed
@@ -220,8 +220,8 @@ That does not give the tested LLM a solver. A model-plus-Z3 test-time oracle is 
 separately labelled tool-assisted system. Likewise, verified source reasoning
 does not make arbitrary model prose verified. Replay applies to the offline
 answer certificate, whereas arbitrary Natural output lacks a process checker. See the local
-[semantic contract](../spatialentail/semantics.md) and
-[certificate limits](../spatialentail/certificates.md).
+[semantic contract](../../spatialentail/semantics.md) and
+[certificate limits](../../spatialentail/certificates.md).
 
 Test teachability centrally with matched answer-only and Natural targets,
 candidate coverage, primitive retention, and held-out logical-spatial compounds,

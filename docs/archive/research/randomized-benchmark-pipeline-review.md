@@ -323,7 +323,7 @@ The following corrections are needed before the active proposal and
 implementation agree:
 
 1. **Downgrade the capacity claim.**
-   `docs/audits/randomized-proof-v2-design.md` currently says the 100-seed sweep
+   `docs/archive/audits/randomized-proof-v2-design.md` currently says the 100-seed sweep
    found a cell “with capacity four” and later says it has “exactly four
    canonical structures.” Replace both with an empirical-operational cap unless
    exhaustive enumeration proves the upper bound.

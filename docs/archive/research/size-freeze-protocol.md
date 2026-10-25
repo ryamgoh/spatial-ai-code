@@ -278,7 +278,7 @@ structural yield and exact token admission. `study/seal.py` checks all roles,
 paired targets, overlap, hashes, and release-linked judge receipts before
 sealing. `study/jobs.py` refuses engineering/unsealed data and writes paired
 Train/Dev package views, pinned Axolotl configs, and repository-relative Slurm
-scripts for seeds 42/43. See the [execution guide](../../spatial/v2/study/README.md).
+scripts for seeds 42/43. See the [execution guide](../../../spatial/v2/study/README.md).
 
 Production ambiguity and no-match Selection policies now use larger independent
 object trees/star exclusions. Boolean and hybrid budget fillers vary object

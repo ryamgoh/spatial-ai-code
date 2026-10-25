@@ -192,12 +192,12 @@ python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe
 ```
 
 Primary supporting analysis:
-[capability and framework synthesis](capability-validation-and-framework.md),
-[SODA taxonomy check](soda-task-taxonomy.md),
-[framework literature review](capability-framework-literature-review.md),
-[relational external review](external-relational-capability-review.md), and
-[human external review](external-human-capability-review.md).
+[capability and framework synthesis](../archive/research/capability-validation-and-framework.md),
+[SODA taxonomy check](../archive/research/soda-task-taxonomy.md),
+[framework literature review](../archive/research/capability-framework-literature-review.md),
+[relational external review](../archive/research/external-relational-capability-review.md), and
+[human external review](../archive/research/external-human-capability-review.md).
 
 The reviewed executable scope and all allocation decisions are governed by
-[size-freeze-protocol.md](size-freeze-protocol.md); earlier larger experiment
+[size-freeze-protocol.md](../archive/research/size-freeze-protocol.md); earlier larger experiment
 counts and seven-composition proposals are withdrawn.

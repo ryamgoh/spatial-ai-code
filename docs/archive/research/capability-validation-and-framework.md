@@ -36,7 +36,7 @@ need especially careful cell definitions. Prefer merged families or secondary
 tags over duplicate task identities if a controlled contrast cannot isolate
 the proposed distinction.
 
-The canonical [task taxonomy](task-taxonomy.md) retains compact structure and
+The canonical [task taxonomy](../../research/task-taxonomy.md) retains compact structure and
 obligation codes without treating them as one flat list of peer task types.
 MTR means reasoning across satisfying models, not neural-model parameters.
 SODA already uses MR for Mental Rotation, so Model-Based Reasoning/MR is rejected
@@ -87,9 +87,9 @@ The implemented certificate stack supplies much of the assurance pipeline.
 It does not establish that an LLM has learned an inference policy, that every
 semantic consequence has an automatically constructible proof, or that the
 external Natural trace reveals internal cognition. Sources:
-[certificate contract](../spatialentail/certificates.md), especially supported
+[certificate contract](../../spatialentail/certificates.md), especially supported
 language, automatic construction fragment, and assurance limits;
-[trace formats](../spatialentail/trace-formats.md).
+[trace formats](../../spatialentail/trace-formats.md).
 
 ## 3. Candidate teachable procedure
 
@@ -181,8 +181,8 @@ status `ambiguous`, and ALL_POSSIBLE status `possibilities` for this example.
 Do not conflate inconsistent premises, a refuted candidate, and an uncertain
 answer. The current generated training pool rejects inconsistent premises;
 adding an inconsistency task would require a new explicit output contract.
-Sources: [semantics](../spatialentail/semantics.md),
-[answer/menu controls](../spatialentail/generation-and-knobs.md).
+Sources: [semantics](../../spatialentail/semantics.md),
+[answer/menu controls](../../spatialentail/generation-and-knobs.md).
 
 ### A checked mixed logical-spatial derivation
 

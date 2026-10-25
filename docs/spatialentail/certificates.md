@@ -89,7 +89,7 @@ limits separately.
   must pass for the exact configuration being proposed for training.
 
 The current verification record is maintained in
-[the remediation audit](../audits/critique-remediation.md).
+[the remediation audit](../archive/audits/critique-remediation.md).
 Meeting these requirements validates the tested implementation boundaries.
 Premise-first proposals are now a distinct generation route, not a synonym for
 certificate-first construction. Training, structural generalisation, readability,

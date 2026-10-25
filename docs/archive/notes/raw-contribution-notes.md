@@ -4,7 +4,7 @@ Status: deliberately raw working notes, not contribution claims ready for the
 report or abstract.
 
 Primary-source annotations:
-[`What each source supports and does not support`](../research/annotated-sources.md)
+[`What each source supports and does not support`](../../research/annotated-sources.md)
 
 ## The central discomfort
 

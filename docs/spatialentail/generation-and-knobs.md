@@ -6,6 +6,12 @@ defined by [Semantics](semantics.md); certificates are defined by
 [Certificate system](certificates.md); rendered outputs are defined by
 [Trace formats](trace-formats.md).
 
+This guide includes the generation algorithm, rule substitution, sampling
+contract, rejection policy, and configuration catalogue. The compact
+[generation PDF](generation-overview.pdf) and
+[rule-substitution PDF](rule-substitution.pdf) are presentation views of this
+guide, not separate implementation contracts.
+
 The controls below do not belong to the solver. They select, filter, render,
 split, or admit problems after the solver has established their semantics.
 
@@ -18,6 +24,95 @@ validates declarations and can probe one checked example per ready cell. The
 registry contains no quotas; the study assembler adds role and cell metadata.
 Existing `boolean_shape` and depth fields must not be relabelled as verified
 capabilities without the taxonomy's admission checks.
+
+## Generation algorithm
+
+The randomized proof-backbone route starts from a target or a possibility
+skeleton, constructs premises backward, and then checks the visible problem.
+This is distinct from the older world-first and premise-first routes below.
+
+```text
+GENERATE(query, gold_set_size G, rule_length L, distractors X, policy):
+    repeat within the candidate-attempt budget:
+        choose distinct object names
+        initialise a unique target or a G-answer possibility skeleton
+        choose a target premise to expand and account for skeleton length
+        sample a policy-feasible forward rule sequence
+        traverse the sequence backward:
+            match the rule conclusion to the current goal
+            instantiate its inputs with compatible objects or formulas
+            retain supporting inputs as premises
+            make the chain input the next goal
+        add the final goal and X distractors; shuffle and remove unused names
+        solve all candidate answers; reject inconsistent or undecided problems
+        build checked evidence; verify G, L, X and the required rule path
+        construct options; render and reparse; reject semantic drift
+        return the checked problem, answer, trace, and audit metadata
+    report attempt exhaustion; never emit an unverified problem
+```
+
+Known candidate rejections are retried; configuration and unexpected errors are
+not silently converted into retries. Study-level admission also checks
+transitions, structural deduplication, split exclusions, and context budgets.
+Timeout means unverified, not unsatisfiable. Contradictory cycles are excluded
+from main training; detecting inconsistency is a separate diagnostic.
+
+### Object selection and targets
+
+The current randomized study samples 24 distinct names from a pool of 30,
+then removes unused names. This is not the final entity count. The unique
+route assigns target/reference roles from the sorted names and samples an
+exact compass direction. Name subsets are uniform; object roles are not
+independently uniform. Selection/Count use additional query candidates with
+exclusion premises. Possibility skeletons shuffle roles and are checked to
+preserve exactly G possible answers, not G simultaneously qualifying objects.
+
+For multi-answer lifts, known skeleton offsets are 0 for Direction/Selection
+and G for the study's Count skeleton. The randomized prefix has length
+`L - offset`; the final certificate must still confirm total length L.
+
+### Rule substitution and chaining
+
+Here S is the current goal and P is an auxiliary exact spatial atom:
+
+| Rule | Supporting premise | Next backward goal |
+|---|---|---|
+| MP | `P -> S` | `P` |
+| IFF elimination | `P <-> S` | `P` |
+| Disjunctive syllogism (DJE) | `P OR S` | `NOT P` |
+| Double-negation elimination (DN) | none | `NOT NOT S` |
+| Transitivity (TRC), for `S = D(A,B)` | `D(M,B)` | `D(A,M)` |
+
+Bindings must match the goal and satisfy object/formula constraints.
+TRC inherits the exact direction D and requires a distinct intermediate M.
+All generated spatial atoms use the eight exact compass directions, not
+explicit northward/eastward predicates. The constructor implements five
+specific templates, not a general-purpose unifier.
+
+Example: to establish `NE(A,B)` using the forward path `MP -> TRC`, backward
+construction emits `P`, `P -> NE(A,M)`, and `NE(M,B)`. MP derives `NE(A,M)`;
+TRC derives `NE(A,B)`. This is intended L2 with three premises, subject to
+the certificate's realised-length check.
+
+The constructor supports 23 ordered rule pairs. The two excluded pairs are
+`TRC -> DJE` and `TRC -> DN`: TRC supplies a positive exact atom, not their
+required negated/double-negated input. Training and query policies restrict
+this set further; multi-answer lifts forbid a final TRC. Pair compatibility
+alone does not guarantee an accepted full chain.
+
+### Uniformity and admission
+
+The sampler counts feasible suffixes and weights each next rule by its number
+of valid completions. This makes complete proposed paths uniform conditional
+on length, allowed transitions, and policy restrictions. It does not make
+individual rule frequencies, object roles, or accepted problems uniform:
+instantiation, consistency, certificate search, and deduplication can reject
+different paths at different rates.
+
+The implementation-level details are maintained in the source:
+[`random_proof.py`](../../spatial/v2/random_proof.py),
+[`random_proof_generation.py`](../../spatial/v2/random_proof_generation.py),
+and [`generation.py`](../../spatial/v2/generation.py).
 
 ## Knob classes
 
@@ -110,7 +205,7 @@ is not an implemented `GenerationMode`.
 
 Randomized proof-graph v2 additionally measures certificate-derived semantic
 length `L` and exact verified distractor count `X`. These are not aliases for
-the older axis/membership depths. See `docs/audits/randomized-proof-v2-design.md`.
+the older axis/membership depths. See `docs/archive/audits/randomized-proof-v2-design.md`.
 
 Difficulty is measured on accepted problems. Generator intent alone does not
 establish the reported depth, independence, or distractor count.
@@ -315,4 +410,4 @@ families across all query contracts. MP→TRC→MP, MP→DJE→TRC, and
 TRC→MP→TRC are separately reserved. Admission requires
 replay-valid ordered dependencies and individual logical-premise removal to
 change query semantics. These are bounded interventions, not global shortest
-proof claims. See [study protocol](../research/size-freeze-protocol.md).
+proof claims. See [study protocol](../archive/research/size-freeze-protocol.md).

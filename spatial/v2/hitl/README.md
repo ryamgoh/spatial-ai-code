@@ -11,6 +11,6 @@ certificate stack, benchmark registry, and size-calibration protocol.
 
 The public interface is exported from `spatial.v2.hitl`. The execution and
 reporting contract is documented in
-[`docs/research/human-review-workflow.md`](../../../docs/research/human-review-workflow.md).
+[`docs/archive/research/human-review-workflow.md`](../../../docs/archive/research/human-review-workflow.md).
 The frozen model-judge instructions are
 [`quality-judge-v1.md`](quality-judge-v1.md).

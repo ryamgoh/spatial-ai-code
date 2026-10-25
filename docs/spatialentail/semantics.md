@@ -139,6 +139,23 @@ Axis equality is transitive. Strict comparisons are transitive after equality
 classes are merged. A strict cycle, a strict comparison inside an equality
 class, or equality on both axes makes the premise set inconsistent.
 
+### Training assumption: consistent premises
+
+The main generated training set assumes that all premises can hold together
+in at least one allowed spatial world. The generator rejects and resamples
+inconsistent proposals, including strict cycles such as `East(A, B)` together
+with `East(B, A)`, before accepting a training example.
+
+Cycle detection and inconsistency classification are not main training
+objectives. The solver's consistency check is a data-validity gate, not a
+supervised task in that training set. Deliberately inconsistent examples belong
+only to the separate, labelled consistency diagnostic and are not mixed into
+the main training data.
+
+This assumption does not require a unique answer: consistent premises can
+still permit multiple answers. Inconsistency is also distinct from a consistent
+problem whose offered menu contains no possible answer.
+
 ## Premises
 
 `RelationConstraint` is the atomic spatial proposition. `Not`, `And`, `Or`,
@@ -205,13 +222,20 @@ Callers generating large datasets should request `backend="z3"` explicitly so
 a missing dependency fails closed instead of silently selecting slower search.
 The reference backend exists for small cases and differential correctness tests.
 
-The core V2 interface supports pairwise direction queries only. Invalid
+The core V2 interface supports Direction, Which, and Count queries. Invalid
 structured problems and Z3 timeouts fail closed. Unsupported question families,
 unknown query objects, and unparsed premises are rejected by the text adapter.
 The reference engine remains exponential in unresolved negated or coarse
 premises; the Z3 backend is the supported path for larger workloads.
 
 ### What a unique answer means
+
+The invariance argument below requires the queried candidate directions to
+cover every direction possible under the premises. With the default all-eight
+domain this holds automatically. A singleton projection onto a restricted
+candidate set need not establish entailment; restricting tested candidates does
+not itself assert that the intended world belongs to that set. See the
+[correctness argument](correctness.md#5-theorem-possibility-and-entailment-decisions).
 
 Let `P` denote all rendered premises and let `D` be one of the eight exact
 directions. V2 includes `D` in the query result exactly when this formula has a
@@ -414,6 +438,12 @@ solver and certificate modules.
 
 ## Completeness boundary
 
+The [solver correctness argument](correctness.md) proves truth preservation,
+the finite-rank model property, sound preprocessing, and the entailment
+reduction under the declared semantics. It also records independent bounded
+tests, rule-soundness arguments, and the remaining implementation trust base.
+It is not a proof-assistant verification of Python or Z3.
+
 Within its supported language, V2 does not depend on a hand-written collection
 of forward-chaining rules. Exact directions, coarse half-planes, their
 negations, arbitrary finite Boolean combinations, equality, transitive
@@ -474,7 +504,11 @@ menu_answer = encode_menu_answer(resolution, parsed.options)
 - `VISIBLE_POSSIBLE` returns every possible value present in the menu and
   deliberately ignores possibilities that were not offered.
 
-Original SpatialEval uses `SINGLE` for Direction, singular Which, and Count.
+Our SpatialEval adapter defaults to `SINGLE` for Direction, singular Which,
+and Count. This is our full-domain audit contract, not a formally specified
+SpatialEval author semantics. The released benchmark has one gold per item;
+a menu-conditioned contract can differ from full-domain invariance. See
+[SpatialMap contract alignment](../archive/research/spatialmap-contract-alignment.md).
 `Cannot be determined` is a semantic result of ambiguous `SINGLE` resolution and
 an explicit menu-coverage result for partially represented `ALL_POSSIBLE`
 answers; it is not used for `VISIBLE_POSSIBLE`.
