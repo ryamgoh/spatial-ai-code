@@ -52,10 +52,15 @@ Evidence:
 - `prepared-training-candidate/token-audit.json`
 - `prepared-sft/jobs.json`
 
-## B. P0 — Six central SFT jobs — running
+## B. P0 — Six central SFT jobs — awaiting training receipts
 
 All jobs start independently from pinned `Qwen/Qwen3.5-4B` revision
 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`.
+
+All six adapter evaluation outputs were imported and validated on 2026-10-25.
+The evaluation archives do not contain the training completion markers,
+adapter hashes, W&B receipts, or training logs, so the training evidence below
+remains awaiting artifacts rather than being marked complete.
 
 | Adapter | Seed | Status | Slurm ID | Completion evidence |
 |---|---:|---|---|---|
@@ -80,42 +85,82 @@ For each completed job, record:
 Models:
 
 - [x] Untuned Qwen3.5-4B, native-thinking and two-stage.
-- [ ] SINGLE Natural seed 42.
-- [ ] SINGLE Natural seed 43.
-- [ ] SINGLE answer-only seed 42.
-- [ ] SINGLE answer-only seed 43.
-- [ ] MULTI Natural seed 42.
-- [ ] MULTI Natural seed 43.
+- [x] SINGLE Natural seed 42.
+- [x] SINGLE Natural seed 43.
+- [x] SINGLE answer-only seed 42.
+- [x] SINGLE answer-only seed 43.
+- [x] MULTI Natural seed 42.
+- [x] MULTI Natural seed 43.
+
+Evidence imported on 2026-10-25:
+
+- `prepared-eval/jobs.json` and `prepared-eval/results/<model>/COMPLETED`.
+- Seven full runs, each with 48 tasks and 3,600 unique labeled examples.
+- [Evaluation summary](evaluation-summary/SUMMARY.md) and
+  [machine-readable breakdowns](evaluation-summary/summary.json).
+- Saved per-example metrics agree with `results.json`; all three imported
+  batches share the frozen benchmark hash and the same labeled examples.
+- This validates the evaluation artifacts, not training provenance or an
+  independent regeneration of the benchmark.
 
 Evaluation checks:
 
-- [ ] Native stage-1 extraction recorded.
-- [ ] Stage-2 constrained-choice score recorded as the primary metric.
-- [ ] Exact-set scoring supports one through four selected options.
-- [ ] Overall and macro partition scores: MATCHED, LENGTH-OOD, NOISE-OOD,
+- [x] Native stage-1 extraction recorded.
+- [x] Stage-2 constrained-choice score recorded as the primary metric.
+- [x] Exact-set scoring supports one through four selected options.
+- [x] Overall and macro partition scores: MATCHED, LENGTH-OOD, NOISE-OOD,
   COMPOSITION-OOD.
-- [ ] Direction, Selection, and Count breakdown.
-- [ ] G1--G4 breakdown.
-- [ ] L and X curves.
-- [ ] Held-out transition breakdown.
-- [ ] Seed 42/43 results reported separately plus mean and range.
-- [ ] Sample outputs and failure categories retained.
+- [x] Direction, Selection, and Count breakdown.
+- [x] G1--G4 breakdown.
+- [x] L and X curves (tabulated and plotted by contract and training seed).
+- [x] Held-out transition breakdown.
+- [x] Seed 42/43 results reported separately plus mean and range.
+- [x] Sample outputs and diagnostic stage-outcome categories retained.
+  Causal reasoning-error classification has not been performed.
 
 Primary comparisons:
 
-- [ ] SINGLE Natural versus SINGLE answer-only.
-- [ ] MULTI Natural versus untuned.
-- [ ] MULTI Natural versus SINGLE Natural transfer on ALL-POSSIBLE.
-- [ ] SINGLE retention after MULTI training.
+- [x] SINGLE Natural versus SINGLE answer-only.
+- [x] MULTI Natural versus untuned.
+- [x] MULTI Natural versus SINGLE Natural transfer on ALL-POSSIBLE.
+- [x] SINGLE retention after MULTI training.
+
+These comparisons are summarized locally; dissertation integration remains
+open in section E. SINGLE is the 900-row G1 subset, not the full mixed-contract
+benchmark. MULTI Natural averages 99.08% overall and 98.85% on ALL-POSSIBLE
+across the two seeds. SINGLE Natural averages 99.89% on SINGLE but 0.30% on
+ALL-POSSIBLE; its approximately 25% overall score must not be described as
+failure on its trained contract.
+
+Research follow-up on 2026-10-25:
+
+- [x] Replay all 61,200 saved responses through the original scorer.
+- [x] Compare every saved prompt payload with hash-bound benchmark messages.
+- [x] Audit candidate train/development overlap and held-out proof transitions.
+- [x] Analyze answer cardinality, missing/extra options, and paired checkpoint
+  differences with fixed-cell, checkpoint-conditional bootstrap intervals.
+- [x] Export four research figures as PNG and PDF.
+- [x] Document extraction sensitivity, token-budget proxies, and stage-2
+  regressions without modifying the primary scores.
+- [Research findings and limitations](research-analysis/REPORT.md).
+  Candidate/preparation provenance is checked; actual cluster training
+  consumption, finish reasons, and final checkpoint hashes remain unverified.
 
 ## D. P0 — SpatialMap-TQA-Corr external transfer
 
-- [ ] Prepare prompt-matched evaluation configs for the central Natural models.
+- [x] Prepare prompt-matched evaluation configs for the central Natural models,
+  both answer-only seeds, and untuned baseline.
 - [ ] Evaluate untuned, SINGLE Natural 42/43, and MULTI Natural 42/43 on the
   frozen SpatialMap-TQA-Corr release.
 - [ ] Report native contract metrics; do not merge them with SpatialEntail.
 - [ ] Record whether MULTI training improves, preserves, or degrades external
   SINGLE-style spatial reasoning.
+
+`prepared-corr-eval/` contains seven hash-bound jobs, not submitted. It uses
+the current 1,500-row SINGLE correction (667 determinate, 833 underdetermined),
+not the legacy 1,329-row task. The corrected data were regenerated and checked
+against the documented counts; GPU runtime remains untested.
+See the [cluster handoff](research-analysis/RUNBOOK.md).
 
 ## E. P0 — Report closure
 
@@ -135,12 +180,18 @@ Primary comparisons:
 
 ## F. P1 — Optional extensions if time remains
 
-- [-] Close the Qwen3.5-4B response-regime control: the completed untuned run
-  is native-thinking and two-stage; run and label thinking-off separately.
-- [-] Recommended <=9B comparator panel after P0: Qwen3.5-9B thinking off/on,
+- [x] Qwen3.5-4B thinking-off and fresh thinking-on runs imported and
+  summarized separately from the P0 untuned run.
+- [x] Recommended <=9B comparator panel evaluated: Qwen3.5-9B thinking off/on,
   Gemma-4-E4B-it (or explicitly labelled W4A16 QAT), Gemma-3-4B-IT
   instruction-only, Ministral-3-8B-Instruct, DeepSeek-R1-Distill-Qwen-7B,
   Ministral-3-8B-Reasoning, and Phi-4-mini-instruct.
+- General and reasoning evidence: `prepared-general-eval/jobs.json`,
+  `prepared-reasoning-eval/jobs.json`, and their full-run `results/`
+  directories. All ten runs pass the 48-task/3,600-example summary checks.
+  The reasoning runs' low native stage-1 extraction accuracy (1.28%--4.19%)
+  requires response-budget/extraction inspection before attributing differences
+  to model reasoning ability. P0 and fresh reasoning settings are not identical.
 - [x] Reasoning batch generator prepared: fresh Qwen3.5-4B/9B thinking-on,
   Ministral-3-8B-Reasoning, and DeepSeek-R1-Distill-Qwen-7B, with H200
   smoke/full chains and recorded fixed-seed sampling.
@@ -148,6 +199,7 @@ Primary comparisons:
   SenseNova-SI-1.2-InternVL3-8B, SpaceQwen3-VL-2B-Thinking,
   RoboBrain2.5-8B-NV, and Cosmos-Reason2-8B. Require a text-only preflight
   before each full run; do not introduce dummy images.
+  No spatial-specialist result archive was supplied in this import.
 - [x] Spatial-specialist batch generator prepared with separate one-question
   preflight, 48-cell smoke, and full H200 chains. All prompts are text-only;
   SenseNova uses the sole remote-code loader while the other four use vLLM.

@@ -2,6 +2,20 @@
 
 Track remaining required, optional, and deferred work in [CHECKLIST.md](CHECKLIST.md).
 
+## Research analysis
+
+The [research report](research-analysis/REPORT.md) audits all 61,200 saved
+responses, checks hash-bound candidate-data separation, analyzes contract
+transfer and stage-2 regressions, and includes four figures with separate
+training seeds. Primary evaluation scores remain unchanged.
+
+The [reproduction and cluster runbook](research-analysis/RUNBOOK.md) documents
+the prepared seven-job external-transfer package. It uses the current
+1,500-row SINGLE Corr correction, not the legacy 1,329-row dataset. External
+GPU evaluation and final training-consumption provenance remain pending.
+
+## Study scope
+
 This experiment implements the structural calibration and non-headline
 diagnostics for the randomized v2 study. The calibration must pass before a
 fresh benchmark or SFT release is frozen.
@@ -202,9 +216,55 @@ incompatible; do not add a dummy image or alter the frozen prompt.
 Outputs and logs are written below this experiment directory. Preparation
 fails rather than overwriting an existing output.
 
+## Summarize downloaded results
+
+The 2026-10-25 import includes six general runs, four reasoning runs, and the
+untuned baseline plus six SFT adapters. See
+[the validated summary](evaluation-summary/SUMMARY.md) and
+[machine-readable results](evaluation-summary/summary.json).
+No spatial-specialist results were supplied.
+
+Each downloaded package needs its original `jobs.json` and
+`results/<model>/{COMPLETED,results.json,responses_*.jsonl}`. Extract each archive
+into its own prepared directory; all three archives use the same top-level
+names. These result-only imports are not complete runnable evaluation packages:
+their generated configs, task definitions, and data shards are absent.
+
+From the repository root, summarize locally or on a CPU cluster node:
+
+```sh
+uv run --python 3.12 --no-project python -m spatial.v2.study.summarize_randomized \
+  experiments/spatialentail-randomized-v2/prepared-general-eval \
+  experiments/spatialentail-randomized-v2/prepared-reasoning-eval \
+  experiments/spatialentail-randomized-v2/prepared-eval \
+  --general-prepared experiments/spatialentail-randomized-v2/prepared-general-eval \
+  --output-dir experiments/spatialentail-randomized-v2/evaluation-summary
+```
+
+This uses only the Python standard library (Python 3.11+); it does not load
+models or install the GPU training environment. The reasoning receipt refers
+to a hash-bound general receipt, which supplies its task counts. The command
+validates all inputs before writing `SUMMARY.md` and `summary.json`, replacing
+previous reports in the output directory. It leaves raw results untouched and
+never reads smoke/preflight runs as full evaluations.
+
+Per-example metadata supports contract, partition, query, G, measured L/X,
+and held-out-transition breakdowns without another benchmark download. Missing
+completion markers are reported as incomplete; inconsistent task coverage,
+sample counts, duplicate base IDs, or sample/aggregate metrics stop reporting.
+The reports retain input hashes and runtime configurations, but do not verify
+training provenance, adapter contents, or the original cluster environment.
+
+SINGLE is the 900-row G1 subset. Do not use the full mixed-contract score alone
+to assess SINGLE training. The low stage-1 extraction scores of the reasoning
+panel need inspection before making model-capability claims; the P0 untuned
+baseline and fresh thinking-on comparator runs have different configurations.
+
 ## Local smoke
 
 ```sh
 uv run python -m spatial.v2.study.randomized_v2
 uv run pytest -q spatial/v2/tests/test_randomized_v2_study.py
+uv run --python 3.12 --no-project python -m unittest \
+  spatial.v2.tests.test_summarize_randomized
 ```

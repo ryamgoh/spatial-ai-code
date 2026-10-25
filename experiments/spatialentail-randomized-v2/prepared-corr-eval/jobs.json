@@ -1,0 +1,104 @@
+{
+  "schema": "spatialentail-randomized-v2-corr-transfer-v1",
+  "source_sft_evaluation_receipt_sha256": "16227b8f962be97c8d5495313baae5e12b94606623befef03ff19e1945c359ac",
+  "corrected_sha256": "fc4e56d8921ef416a9d61dfe0d05e8f4dba25e8c9f8ad40a1ccb477f49e8a232",
+  "tokenizer_sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+  "total_bases": 1500,
+  "max_prompt_tokens": 348,
+  "context_budget": {
+    "eval_max_tokens": 8192,
+    "max_new_tokens": 4096,
+    "tokenizer_name": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "gold_counts": {
+    "A": 167,
+    "C": 176,
+    "B": 159,
+    "E": 833,
+    "D": 165
+  },
+  "protocol": "Current 1500-row SINGLE Corr; not legacy 1329-row all-possible Corr.",
+  "tasks": [
+    {
+      "task": "spatialentail_randomized_v2_corr_single",
+      "count": 1500
+    }
+  ],
+  "jobs": [
+    {
+      "name": "untuned",
+      "lora_path": null,
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/untuned.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/untuned.sh"
+    },
+    {
+      "name": "single-natural-seed-42",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-natural-seed-42",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/single-natural-seed-42.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/single-natural-seed-42.sh"
+    },
+    {
+      "name": "single-natural-seed-43",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-natural-seed-43",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/single-natural-seed-43.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/single-natural-seed-43.sh"
+    },
+    {
+      "name": "single-answer-only-seed-42",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-answer-only-seed-42",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/single-answer-only-seed-42.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/single-answer-only-seed-42.sh"
+    },
+    {
+      "name": "single-answer-only-seed-43",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-answer-only-seed-43",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/single-answer-only-seed-43.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/single-answer-only-seed-43.sh"
+    },
+    {
+      "name": "multi-natural-seed-42",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/multi-natural-seed-42",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/multi-natural-seed-42.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/multi-natural-seed-42.sh"
+    },
+    {
+      "name": "multi-natural-seed-43",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/multi-natural-seed-43",
+      "config": "experiments/spatialentail-randomized-v2/prepared-corr-eval/configs/multi-natural-seed-43.yaml",
+      "script": "experiments/spatialentail-randomized-v2/prepared-corr-eval/slurm/multi-natural-seed-43.sh"
+    }
+  ],
+  "submitted": false,
+  "file_sha256": {
+    "configs/multi-natural-seed-42.yaml": "a60d8e187ad6f794083f56573c654b036ee45bdba354c87118a8252926ab348b",
+    "configs/multi-natural-seed-43.yaml": "e01836aa663d95ed0f084338b14595d1a6f955ab1c7407e63a7a7c21cf34c102",
+    "configs/single-answer-only-seed-42.yaml": "4b0c9f303da5ebc78248e22612d8b1217e69a3e0ace856198f1df765f2d65669",
+    "configs/single-answer-only-seed-43.yaml": "82be88f48f1715b466e35a4be591a7434952c8d6fead80d26f7f199583ad0465",
+    "configs/single-natural-seed-42.yaml": "732836fd63cf736df061111153c1920ff789e55a2551a6e62a1dcf99a681e048",
+    "configs/single-natural-seed-43.yaml": "93ab9ce3f52695cd1c8c6f2980261dd6c30a57cf9c57de9296936c031c0f4e6f",
+    "configs/untuned.yaml": "1f16b2400bdfad5decda7ab91d8982c7d0f5e09fe592cabab00e74b6fe38f4f8",
+    "correction-summary.json": "a899d39913d887ca46c252eec1785317393808015d4781e9efc4f7069f7be819",
+    "data/corr.jsonl": "1e331a8e93c65cddd65fcc393b8183efe80285ec1a874433001cef2ac360c05e",
+    "slurm/multi-natural-seed-42.sh": "6df722feb67512b0c1bf96f7d7b8a96ded1de8722cb17f5f76aa17b5a6005f79",
+    "slurm/multi-natural-seed-43.sh": "ec60fc76534b15f2d8bb85d2b59c1647b6ec7a6a48c1c3d7a7186794e6a6097e",
+    "slurm/single-answer-only-seed-42.sh": "9f41b85818448806107a98d7e64b7fb6d868268f9505b7a902c16dbc27d35b34",
+    "slurm/single-answer-only-seed-43.sh": "8f9c3a00b73d0e3e6ea9322be9a155d11e2979717e5664f44596154373f03038",
+    "slurm/single-natural-seed-42.sh": "b4b4004f05a40d93d13f8908cd0138bd1d3113e71a6abc410d1b4929a3ff64d5",
+    "slurm/single-natural-seed-43.sh": "6bd9380951f8795f1b8c040ed4f2a464c65cd5c59cba07084ebdafd20aaaa1ef",
+    "slurm/untuned.sh": "c478038b434714b5b3a3974c6b8d8a560571cb566772da3122eab96bd2fdc2b1",
+    "tasks/spatialentail_randomized_v2_corr_single.yaml": "d75dd83450156a747dd6a7505bdbebe76b6df85aaf517b387d9df50e18880eed",
+    "tasks/spatialentail_utils.py": "20ec6dc67fc55a8b12e7cd15cad116fb1bc8adc892c7cdc12b3e1eb22a85b020"
+  },
+  "environment_sha256": {
+    "eval/eval_new.py": "218c7732cabc38d4b07f25828d4b5aef7980d2d8b8b01f3009aa4eb60450d720",
+    "eval/generation_contract.py": "bf375ecf842bab4aab2c6c452cc948a21d9e87396041d233fe93d128cbf30c91",
+    "experiments/spatialentail-eval/jobs/eval.sh": "5ba0a028209775b39012a3cf3d6eabc5193fdbeef59ae41e619794d01994ed00",
+    "experiments/tasks/utils.py": "7de09cabbd590a4acf3bbcd64a25125006f955c2f60d31552ce976621fd01fa9",
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "spatial/v2/study/evaluation.py": "75de966fb7b0d3f550db383297695283c51e53797bf66142dce8f77be948a412",
+    "spatial/v2/study/randomized_evaluation.py": "e2f6860159581964fba40018580454c0455f9b07954572cd568243daa5a6a512",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e",
+    "spatial/v2/study/prepare_randomized_corr.py": "10f891ff0e1b33f36519d245e9349476eb89396840ad5b766006893fde27c85c"
+  }
+}

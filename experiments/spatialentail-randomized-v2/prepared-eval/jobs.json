@@ -1,0 +1,517 @@
+{
+  "benchmark_sha256": "523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d",
+  "context_budget": {
+    "eval_max_tokens": 8192,
+    "max_new_tokens": 4096,
+    "tokenizer_name": "Qwen/Qwen3.5-4B",
+    "tokenizer_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "environment_sha256": {
+    "eval/eval_new.py": "218c7732cabc38d4b07f25828d4b5aef7980d2d8b8b01f3009aa4eb60450d720",
+    "eval/generation_contract.py": "bf375ecf842bab4aab2c6c452cc948a21d9e87396041d233fe93d128cbf30c91",
+    "experiments/spatialentail-eval/jobs/eval.sh": "5ba0a028209775b39012a3cf3d6eabc5193fdbeef59ae41e619794d01994ed00",
+    "experiments/tasks/utils.py": "7de09cabbd590a4acf3bbcd64a25125006f955c2f60d31552ce976621fd01fa9",
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "spatial/v2/study/evaluation.py": "75de966fb7b0d3f550db383297695283c51e53797bf66142dce8f77be948a412",
+    "spatial/v2/study/randomized_evaluation.py": "e2f6860159581964fba40018580454c0455f9b07954572cd568243daa5a6a512",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e"
+  },
+  "file_sha256": {
+    "configs/multi-natural-seed-42.yaml": "bdea13e4507039dda366f6a70d43f3b558838b63cae68504f2daea8f33f4f98b",
+    "configs/multi-natural-seed-43.yaml": "bfbe0cad7269a1a3d63c0c632e009c93185e73bc9a3a76ae21e187797cdb9748",
+    "configs/single-answer-only-seed-42.yaml": "94a25a2a19374e172a1fcdc981c210c058dec905e3706a71895431d2dccfc65f",
+    "configs/single-answer-only-seed-43.yaml": "d43d882adeda4b4c7854b81730b2de23d45911dd9e7980ff864470a7d24d9b5d",
+    "configs/single-natural-seed-42.yaml": "5faaf2210fdf7b9709e5d9a2f99789c409b59c1f0fe9ec8cca2774544cc5b12c",
+    "configs/single-natural-seed-43.yaml": "7ba5d53398d20dfdb46488c78c1de161f5550bfc25af5f3d727204a9789903d4",
+    "configs/untuned.yaml": "797728d4653763f7ec159f6677776e2311489151646a788f9af40383c9faa146",
+    "data/count-g1-composition-ood.jsonl": "90a2b62a7e5a8e7643269cf175a92c940de430663f8bc2d1e3a8f05eb2098f1f",
+    "data/count-g1-length-ood.jsonl": "e500cd8222fa30468c005ee73ceff0258ddc6adfe28f9d9d19f81e4c0979a8e5",
+    "data/count-g1-matched.jsonl": "9af28bdfde5b02ecf0279cab1f9fcb917863afacf61ada943fcb10c70e314c78",
+    "data/count-g1-noise-ood.jsonl": "363ff4076f11cc6dd02fb758d73d31810f77b386e41ae1ec22afd4f3c12e911a",
+    "data/count-g2-composition-ood.jsonl": "04f7ea248f073682f4138075022a7f21e171b306bc0cc7c2137f2203cffdd849",
+    "data/count-g2-length-ood.jsonl": "e92737edb6bb9c78cdcc99dcad67009f1dc54276f90bb30d64d28eafd42f8c37",
+    "data/count-g2-matched.jsonl": "9d3ee539045a517566016f3712d22bd6f051abfeafa65d6203ab6d2d8c900ba8",
+    "data/count-g2-noise-ood.jsonl": "bf3f1c3978291ac534241ea1b750b554447f6999ad21128a070fe39d5d801b6a",
+    "data/count-g3-composition-ood.jsonl": "23d7aeeaea27dd1c7169dae64e3c3967a06a733b68315beec69957415c3b75a4",
+    "data/count-g3-length-ood.jsonl": "ceadf87ce62342f08b80c1ee5a031cbfca5de9ad79f5245b744d4e40b087c2d7",
+    "data/count-g3-matched.jsonl": "f7ab79a9555e55f613bc7ae411142e8bdabbc8f03e55b4f1417430e319f59587",
+    "data/count-g3-noise-ood.jsonl": "741d47588948f889cd2b2ecb857776ef59c627e9a12a72220945825308ff2a38",
+    "data/count-g4-composition-ood.jsonl": "9090339aaf20f1280f465b65c2f24a064af19b161816db82b13c4a49c5a95223",
+    "data/count-g4-length-ood.jsonl": "f5ed61d7dc463c6762996e841822c0fca1cc49452996e654088377bb89dbff37",
+    "data/count-g4-matched.jsonl": "76f24d9801f84352a2db5edcabe6b21adf8d31ba910b8ebcff9690103f491db0",
+    "data/count-g4-noise-ood.jsonl": "8c0ccd589f58cf3576b7230a77d376fbfe4490cb714b5b0ba59f6c247efdd55e",
+    "data/direction-g1-composition-ood.jsonl": "f6928df76e50f2070da3ca8613b92f2c2c1cef914ddbc674124ce802129d5e1e",
+    "data/direction-g1-length-ood.jsonl": "ebbbe2190cb88b31126b2c51a3c2315fdd3c2cf38506c46b5d385e49aab46a6c",
+    "data/direction-g1-matched.jsonl": "4f0eb30c2b7f15a8be34bbc2763f30c3081900883f2a242a61aad32861df9c32",
+    "data/direction-g1-noise-ood.jsonl": "fb8fa015a98fecfa95b460e41bb28d85fb65be82a553255841760e1c24e696e9",
+    "data/direction-g2-composition-ood.jsonl": "438c7c88530710a320e33f1d9abec766c4e797d032c7cda8995f6510e5e4895f",
+    "data/direction-g2-length-ood.jsonl": "b20c23e89176f71ab5e02f8b08e04ba7c27df900eca866959f5e1e517840ecae",
+    "data/direction-g2-matched.jsonl": "da69c919fce21695397d54b49d56ce762502eb98c8496cfa745c1a445ae9c0df",
+    "data/direction-g2-noise-ood.jsonl": "dd0a6e2c35a395e4e3a0a9408f30073eb6247f89ad33064da02f76e081cf05be",
+    "data/direction-g3-composition-ood.jsonl": "cd0fe8249e01689386c7afced2a38374765f5fffe53d2ed42a1f66a199e7992c",
+    "data/direction-g3-length-ood.jsonl": "fb3441b52f5e0f039348102331e718eb26b83be60ef5a47890bd793a8e91ece4",
+    "data/direction-g3-matched.jsonl": "28fb148b8d69e4b32eff391b023b82f73f97383705dbf6822e931da8aedfb7bd",
+    "data/direction-g3-noise-ood.jsonl": "336416abfedfd12d171e9ec9ac82c5fa95d4af81c7c4ac192ed23315b465f638",
+    "data/direction-g4-composition-ood.jsonl": "d31b304d2db03e7055e53f485380921f78f04ea18da9264f4b530584b1b28e81",
+    "data/direction-g4-length-ood.jsonl": "21b20ba5c730ab083c6c5543d2bebdd6d5a8d60ac8630a8bec9ac2b76ccc69ff",
+    "data/direction-g4-matched.jsonl": "010484a38fe5ab3685fe31dfb16c57939d138d92b716944f55a178e74bbe6796",
+    "data/direction-g4-noise-ood.jsonl": "680bdc2df414d774f7f21628c921c1ac5e3dfe7023aa8050bcd3c5250cbfe5aa",
+    "data/which-g1-composition-ood.jsonl": "659a2739c5e7325e9be175352b78ea1df87a100fb1fa5b95cbd12c0606092739",
+    "data/which-g1-length-ood.jsonl": "f324dad9b97bf3776aef9769354cc5fbd0f22d8a113e2b19d38b88415d1e08fd",
+    "data/which-g1-matched.jsonl": "77be338dfb842d867dfc0ac8241ec294846f07f0ab413d09dfd9667909b7becd",
+    "data/which-g1-noise-ood.jsonl": "5925b00fd8d6f55e0ff29e0823290d929303cf946f1de49f9fa6340668b62ab7",
+    "data/which-g2-composition-ood.jsonl": "b65b29e6f0e3c89e0d233d4c42c501fe068b1602f6d6c4c5c3d1b0eee7beb5f0",
+    "data/which-g2-length-ood.jsonl": "ef725068d374f18e8e93a97e4a7704c16e1b0281a63c85e31dd68c190a5c8191",
+    "data/which-g2-matched.jsonl": "6f58986d920e821429f52cf0ddb02e338598c69ae761077f980bf7deb6931980",
+    "data/which-g2-noise-ood.jsonl": "c22cfe80a39ea30d0aae866ff4b7c9c56ac6a79230dd9c177a1ed6618dbfa512",
+    "data/which-g3-composition-ood.jsonl": "76b1455842a0942175fd92dd9a6da5fc79d67ee1e631af16f89ef9a072ea8f2e",
+    "data/which-g3-length-ood.jsonl": "6dbce3e136334cd39127032c30845f2e353d50d687d3064dc42956198f21ebac",
+    "data/which-g3-matched.jsonl": "044a7e7e995d382268d8e8ea805890c386235b81a9b8d4a17d6165e21dd98ae6",
+    "data/which-g3-noise-ood.jsonl": "669d0834156c7eecbed77ce36eff7712683a1d19c1744345d1b6ff1090fad637",
+    "data/which-g4-composition-ood.jsonl": "9ad4b617bdff785bfe5efd3c563a9553fe4023cc2b736c421cc5458e56db659b",
+    "data/which-g4-length-ood.jsonl": "e38b3a97fb3681431f8803224de60d070576d3500e7f3c223292b8dab3ce42ce",
+    "data/which-g4-matched.jsonl": "cc4bfc379295924377ac4794b9db71bfcb50941c3eae49d82731fcf28a3d9803",
+    "data/which-g4-noise-ood.jsonl": "6598bacbb675203a9fa7d63f71825433334e46928fd3853e546f6035f4f35cf5",
+    "slurm/multi-natural-seed-42.sh": "006008af6ed94cdb6b93336de911e2c94a4b3dc296bb4d5f92f6abe253d4f333",
+    "slurm/multi-natural-seed-43.sh": "27a42cf4214f34e4b898395693e9745fab6b5f29c6ba18606926a11203335981",
+    "slurm/single-answer-only-seed-42.sh": "c8b3a101ebbe2b5e2593a9fe67d8d6f3e2ba2aa01beb5553cc61d0a915a50301",
+    "slurm/single-answer-only-seed-43.sh": "645c826902129335737510def937dbcd46181d0d02ae745dde28e93a14a941f8",
+    "slurm/single-natural-seed-42.sh": "bb0a574aef15f733238096e8f9729223ccceeb75a45b0114d5e0d2f99694c963",
+    "slurm/single-natural-seed-43.sh": "6b55abbe941d067fa83046622fbf055a1eb16bd4e94c2cea4954057fc918f0ae",
+    "slurm/untuned.sh": "70faec15bfca1aeaa02171ee49c87c52b7274fc53be5b94b7f087385fe46f41b",
+    "tasks/spatialentail_random_v2_count_g1_composition_ood.yaml": "9728280e250eebcc91b32aecc5c08187acaa49c62120a9e1227f0ce4b8593c7e",
+    "tasks/spatialentail_random_v2_count_g1_length_ood.yaml": "cc78d8a2d441e10b904f62293db3bd10da3b4a88aa1a7c46d382c31a31a423a1",
+    "tasks/spatialentail_random_v2_count_g1_matched.yaml": "8d92d36157e24b20fb318540af91632399d80fb02b86b321f56e572355810e42",
+    "tasks/spatialentail_random_v2_count_g1_noise_ood.yaml": "0d77ad92813364ed42de35e16642461ec75485a9892bbbbab80ffa022a372947",
+    "tasks/spatialentail_random_v2_count_g2_composition_ood.yaml": "4141b967442fc5673f687a851821c834cdc865c78177928763d4dc3a5b85aba6",
+    "tasks/spatialentail_random_v2_count_g2_length_ood.yaml": "0e6bf70e0863065cf8bc122fc731887a2210fb2840028836538a835c7d29a118",
+    "tasks/spatialentail_random_v2_count_g2_matched.yaml": "062f0f74cb947f1838433fd46402d5f03abae3fe0149373186fa0bca38ab2f75",
+    "tasks/spatialentail_random_v2_count_g2_noise_ood.yaml": "c64058b204c655d6a76d9dbe3f1683b336e4dc7b34c624e34f12f480ffe8f37a",
+    "tasks/spatialentail_random_v2_count_g3_composition_ood.yaml": "79e52ea4c72dd379b9610eabda2acd7c82c776149ee63b5316ba47f04736f896",
+    "tasks/spatialentail_random_v2_count_g3_length_ood.yaml": "c4ad3b33de717535408d5b2d0a467f062d2b799d8fc52695512982eb3ab77a33",
+    "tasks/spatialentail_random_v2_count_g3_matched.yaml": "f91dcf29e83abfe1a4d05afca4ec301c3f7d3c5effa9ca14afc7fc3f33ba1f64",
+    "tasks/spatialentail_random_v2_count_g3_noise_ood.yaml": "50ab35531a08b708b93180b698cf50632346016fefe790e9d9bdce6bcf6db111",
+    "tasks/spatialentail_random_v2_count_g4_composition_ood.yaml": "d36d66eca57a7bed578bbd07e6fcd4b47690598b521f9b9638e32f20ecccacf4",
+    "tasks/spatialentail_random_v2_count_g4_length_ood.yaml": "0d1eec095cf0638b31a03c0bc7c4945f37f4145f703e86ffc4d6ad745a678b0d",
+    "tasks/spatialentail_random_v2_count_g4_matched.yaml": "58d3394c6273014c6d8d213d14e0fab40d397eac0a603df27133286d0daffd77",
+    "tasks/spatialentail_random_v2_count_g4_noise_ood.yaml": "eb7f7dd754d9c047463b09705b8b03cf31f037bee47c7670982f6b61963f096a",
+    "tasks/spatialentail_random_v2_direction_g1_composition_ood.yaml": "72e53e7948af97e5e680af05c41f0ab95c27f357473bf989fb27bbabb8227749",
+    "tasks/spatialentail_random_v2_direction_g1_length_ood.yaml": "4de0de41232aca5bade488233674ef236ce1760770cbd3653437cf91268c5563",
+    "tasks/spatialentail_random_v2_direction_g1_matched.yaml": "3b350a5e93344a0d100c2e4908f23ea694a299cb4ebff8276813d9d231444b73",
+    "tasks/spatialentail_random_v2_direction_g1_noise_ood.yaml": "9b3bfcb2fe562a1e5c4172b503bb8f78af57ab58b773db494a3924827ff73344",
+    "tasks/spatialentail_random_v2_direction_g2_composition_ood.yaml": "d6ba8cdce8389b3ae076537da6eeb17c57ebbe09a5b04b01538f205064c9dcc0",
+    "tasks/spatialentail_random_v2_direction_g2_length_ood.yaml": "a3ea04dea627dd35754265714b6ae4fedfd2b1698061d74b4adf70d6c852ecc4",
+    "tasks/spatialentail_random_v2_direction_g2_matched.yaml": "9f7fdea0d98a87b63b5ff644b83afd6af26e0574eaa18bf63ff45a0f611af4a3",
+    "tasks/spatialentail_random_v2_direction_g2_noise_ood.yaml": "1b8e4e7e739e0da2cc7bc6bdb879120f70a959ed8bdc5dced6c3e2a8c62a69b5",
+    "tasks/spatialentail_random_v2_direction_g3_composition_ood.yaml": "9e7c7fecd73467bbccf1e31a8bd38ade8f25608c9fca6b0e6abf1d59d789de3c",
+    "tasks/spatialentail_random_v2_direction_g3_length_ood.yaml": "f633dbe1bd3de5bbdcf1eecd325b97a1f70b506f3c83f62b3793c750b299130e",
+    "tasks/spatialentail_random_v2_direction_g3_matched.yaml": "ca584fa5c84281e978aae1233ab9e8fe2daba1e5aa9bf6ec12f8376dbfcae3c3",
+    "tasks/spatialentail_random_v2_direction_g3_noise_ood.yaml": "cbed487921ec75656a7d68eb718f35de15d08aaf15ca6319e543fd5f53ac13a6",
+    "tasks/spatialentail_random_v2_direction_g4_composition_ood.yaml": "9b4d2bc34c18eb48efdfb52ccedf33922a1323d7629da53afe7fdf62bca9578c",
+    "tasks/spatialentail_random_v2_direction_g4_length_ood.yaml": "ddce8e56db8a1a0429c6919aefb2a52a48a70abc067aafdb29e1f1acb7a2e796",
+    "tasks/spatialentail_random_v2_direction_g4_matched.yaml": "9af443d2fdae62a5fce6535485dd418e1ec86ec66ba285481d175f577fad845f",
+    "tasks/spatialentail_random_v2_direction_g4_noise_ood.yaml": "0c52e15af557c4481dbd23d5c97e42e05a892747915c7d2c6341e3632d8eb751",
+    "tasks/spatialentail_random_v2_which_g1_composition_ood.yaml": "1ada52d9a647ede2578fb7dab2c304b13e26218ca3094de2fc8717bc938e3696",
+    "tasks/spatialentail_random_v2_which_g1_length_ood.yaml": "2d2cb0ee367997b291072ec04f41a85922d9c8aa87b295e078f704cf1b971179",
+    "tasks/spatialentail_random_v2_which_g1_matched.yaml": "08548e5aceb0f02752f98352585c194bd1f6c80687c37f52ca9f4f80e3b6ac55",
+    "tasks/spatialentail_random_v2_which_g1_noise_ood.yaml": "d5fb4c01b593efa9e6e0bd0489ed8f575fc97ce5e384de2408e58fd0b1a744d5",
+    "tasks/spatialentail_random_v2_which_g2_composition_ood.yaml": "632bf1bef574aa917b58cc9788cbdf9d94a6dc6eb32ca9ea2632c3f0cc4f6d09",
+    "tasks/spatialentail_random_v2_which_g2_length_ood.yaml": "582afbbb84468d94fc12c0565ae6fb18677816197d1ca5ac5f1dae830879b963",
+    "tasks/spatialentail_random_v2_which_g2_matched.yaml": "07faac9888185fc763766dcabcdaac4ce7aa1be6691bb5ee5b78179893589c80",
+    "tasks/spatialentail_random_v2_which_g2_noise_ood.yaml": "c17916c390bd6521daf87e5c00c42b12164f11b1b93c5b3fd7f86e94ba547ac1",
+    "tasks/spatialentail_random_v2_which_g3_composition_ood.yaml": "26bad3efabb3bc40e62012b611b1e331b5ebef58297ecf60ed574da3e9a4d5c5",
+    "tasks/spatialentail_random_v2_which_g3_length_ood.yaml": "f7cba4cc23461c8e958baa0c75c044385339ab5bfbfe4e7aa2b8d425badd6e42",
+    "tasks/spatialentail_random_v2_which_g3_matched.yaml": "3c6da7067ee9f0fdddf64cd3ba8a6975ee36d5680bc7718a29ca95e5335a4c98",
+    "tasks/spatialentail_random_v2_which_g3_noise_ood.yaml": "d12184bc57675fc8486e9b24c91ec5c8ac2b524f7477040217e0261adcd9fa46",
+    "tasks/spatialentail_random_v2_which_g4_composition_ood.yaml": "6ea8dc36f2badbaa48c647c11637b259d651f8a9e06da23adf1b1eb0b1f38fa0",
+    "tasks/spatialentail_random_v2_which_g4_length_ood.yaml": "7ae92bb61aeb13783a3db304b7ab0dd42a593c85fffbe3ffaa94a738c39fa0a5",
+    "tasks/spatialentail_random_v2_which_g4_matched.yaml": "f0a296ae1f88d9a257e6e8678f224771c9b399a69df076565400ea1a74873291",
+    "tasks/spatialentail_random_v2_which_g4_noise_ood.yaml": "1a9f5fe14a6744d336e654018b554278149ea36990136b4e1f98396fafceb21a",
+    "tasks/spatialentail_utils.py": "59bf3efd4dbac870301edb1333f6bc2fa900a01921c6bcc50c4a5fc428eafd01"
+  },
+  "jobs": [
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/untuned.yaml",
+      "lora_path": null,
+      "name": "untuned",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/untuned.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/single-natural-seed-42.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-natural-seed-42",
+      "name": "single-natural-seed-42",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/single-natural-seed-42.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/single-natural-seed-43.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-natural-seed-43",
+      "name": "single-natural-seed-43",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/single-natural-seed-43.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/single-answer-only-seed-42.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-answer-only-seed-42",
+      "name": "single-answer-only-seed-42",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/single-answer-only-seed-42.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/single-answer-only-seed-43.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/single-answer-only-seed-43",
+      "name": "single-answer-only-seed-43",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/single-answer-only-seed-43.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/multi-natural-seed-42.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/multi-natural-seed-42",
+      "name": "multi-natural-seed-42",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/multi-natural-seed-42.sh"
+    },
+    {
+      "config": "experiments/spatialentail-randomized-v2/prepared-eval/configs/multi-natural-seed-43.yaml",
+      "lora_path": "experiments/spatialentail-randomized-v2/prepared-sft/models/multi-natural-seed-43",
+      "name": "multi-natural-seed-43",
+      "script": "experiments/spatialentail-randomized-v2/prepared-eval/slurm/multi-natural-seed-43.sh"
+    }
+  ],
+  "schema": "spatialentail-randomized-v2-eval-jobs-v1",
+  "submitted": false,
+  "tasks": [
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_random_v2_count_g4_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_random_v2_direction_g4_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_random_v2_which_g4_noise_ood"
+    }
+  ],
+  "total_bases": 3600
+}

@@ -1,0 +1,55 @@
+{
+  "counts": {
+    "possibility_count": {
+      "1": 778,
+      "2": 463,
+      "3": 140,
+      "4": 119
+    },
+    "query_kind": {
+      "count": 500,
+      "direction": 500,
+      "which": 500
+    },
+    "status": {
+      "exact-match": 667,
+      "underdetermined-oracle-possible": 833
+    },
+    "status_by_query": {
+      "count": {
+        "exact-match": 195,
+        "underdetermined-oracle-possible": 305
+      },
+      "direction": {
+        "exact-match": 332,
+        "underdetermined-oracle-possible": 168
+      },
+      "which": {
+        "exact-match": 140,
+        "underdetermined-oracle-possible": 360
+      }
+    }
+  },
+  "input": {
+    "file": "spatialeval_org.jsonl",
+    "rows": 1500,
+    "sha256": "53f4cff9d3baef1a1495fbf028f2a5ec80b85de2afb2ed7031f721f271982766"
+  },
+  "outputs": {
+    "audit": {
+      "file": "spatialeval_audit.jsonl",
+      "rows": 1500,
+      "sha256": "4d5c7169635c7466d4306a4232954c35fb49f72af77e50f73e3531027a012647"
+    },
+    "corrected": {
+      "file": "spatialmap_tqa_corr.jsonl",
+      "rows": 1500,
+      "sha256": "fc4e56d8921ef416a9d61dfe0d05e8f4dba25e8c9f8ad40a1ccb477f49e8a232"
+    }
+  },
+  "schema": "spatialeval-v2-audit-1",
+  "solver": {
+    "answer_mode": "single",
+    "backend": "z3"
+  }
+}

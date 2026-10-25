@@ -1,0 +1,80 @@
+{
+  "benchmark_sha256": "523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d",
+  "benchmark_bases": 3600,
+  "benchmark_unique_signatures": 3600,
+  "training_receipt_sha256": "7a4404acd8fef86a2248fba61266373adfabf4f12ba66a150a888513c7c57801",
+  "files": {
+    "multi/development-natural.jsonl": {
+      "rows": 800,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "fed3ee90bacc865d10e2fda2ad16b71c1257064301ef62330284fe793184500d",
+      "unique_signatures": 800
+    },
+    "multi/train-natural.jsonl": {
+      "rows": 8000,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "b8aafd5bc3567c77bb355ed3d21850e2d1b534ce1b11736c342e81d5758413de",
+      "unique_signatures": 8000
+    },
+    "single/development-answer-only.jsonl": {
+      "rows": 800,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "16051fe919d7c6ccaed91740ac06e7f368c83a6ff32b9f3949f2738ee5988cdf",
+      "unique_signatures": 800
+    },
+    "single/development-natural.jsonl": {
+      "rows": 800,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "a66c2b116e54e32d51d328ceeef8bd62770b56083a8dc12bfe2b33a72357f8ec",
+      "unique_signatures": 800
+    },
+    "single/train-answer-only.jsonl": {
+      "rows": 8000,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "d09d56877f95fc6f054303c86348ae4946666ddf0a5ee7f0a6a62af3f113e2c0",
+      "unique_signatures": 8000
+    },
+    "single/train-natural.jsonl": {
+      "rows": 8000,
+      "benchmark_id_overlap": 0,
+      "benchmark_signature_overlap": 0,
+      "benchmark_user_text_overlap": 0,
+      "heldout_transition_rows": 0,
+      "sensitive_user_rows": 0,
+      "sha256": "f1e4cdd371352de976c651a55b9254f8516af616b8ca0c34542a987b5ef14c61",
+      "unique_signatures": 8000
+    }
+  },
+  "heldout_transitions": [
+    "disjunctive-syllogism->iff-elimination",
+    "double-negation->iff-elimination",
+    "iff-elimination->double-negation",
+    "iff-elimination->iff-elimination",
+    "iff-elimination->modus-ponens",
+    "modus-ponens->axis-transitivity"
+  ],
+  "benchmark_transition_violations": 0,
+  "train_development_signature_overlap": 0,
+  "scope": "Candidate files bound to a preparation receipt, not proof of cluster consumption. Signatures and proof profiles are generator-authored; no solver/certificate replay here.",
+  "qwen_tokenizer_sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42"
+}

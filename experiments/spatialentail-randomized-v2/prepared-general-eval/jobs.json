@@ -1,0 +1,562 @@
+{
+  "benchmark_sha256": "523341d95ccc9f7baa1198c5dc451ed4eea76d50979f4c9aa7d1336efab9a97d",
+  "context_budget": {
+    "max_model_len": 8192,
+    "max_new_tokens": 4096
+  },
+  "environment_sha256": {
+    "eval/eval_comparators.py": "9e7d2fb99c255a2e3707db7b00105ecd659635c7a15ef8f5793f485eb2053b55",
+    "eval/eval_new.py": "218c7732cabc38d4b07f25828d4b5aef7980d2d8b8b01f3009aa4eb60450d720",
+    "eval/generation_contract.py": "bf375ecf842bab4aab2c6c452cc948a21d9e87396041d233fe93d128cbf30c91",
+    "experiments/spatialentail-randomized-v2/jobs/eval-comparator.sh": "8c3e00564a23f486e4fb64f623f45d42d641409078ac6af314c2a170c34cc8d8",
+    "experiments/tasks/utils.py": "7de09cabbd590a4acf3bbcd64a25125006f955c2f60d31552ce976621fd01fa9",
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "spatial/v2/evaluation_chat.py": "ae225d6ec82d0b84e15a21f27be893fc37fa5e2264d1c8ef1a1678e183891421",
+    "spatial/v2/study/comparator_evaluation.py": "8052e0e6b75e0c9e13a4976f12ee3906b70bc48757ade7001ea5942edbae16a7",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e"
+  },
+  "file_sha256": {
+    "configs/gemma-3-4b-it.yaml": "c7b18a6a6791883dd622c22f95a2ada4468d78563f56c52da109ef818f11500e",
+    "configs/gemma-4-e4b-it.yaml": "5c3f07b1c6f933813177673b3796e1b563a0ee3e5feb5f13e20524331be4a128",
+    "configs/ministral-3-8b-instruct.yaml": "c3ef50578581303bd2206ce349acb5af8c6f1d14e00e94c9c79fe0f8800155ba",
+    "configs/phi-4-mini-instruct.yaml": "b92a26cd2041cde53b12c5ae9e848edd577cdc28ec9903bce04334f43ee950df",
+    "configs/qwen3-5-4b-thinking-off.yaml": "b182f5a7582c17915e7e4388b921196b7e112a55f4b43ffefbad0b7c4140bc8e",
+    "configs/qwen3-5-9b-thinking-off.yaml": "59227ee1a5a01cd1f799bc7d98a215a895ce5530950da41dcb5b1f9e98ae30a3",
+    "configs/smoke/gemma-3-4b-it.yaml": "ca24db87cb95f025fbf72ec3c29a652978ec9ce489c0809fff07d74b3b936bb2",
+    "configs/smoke/gemma-4-e4b-it.yaml": "508736e64efc327323bbb6424e959be8420a83bd91ffb396f3542709fb86f92f",
+    "configs/smoke/ministral-3-8b-instruct.yaml": "144f7e172e5725d649fb1917c0de16f66e743eac65237de98af5df70428cf149",
+    "configs/smoke/phi-4-mini-instruct.yaml": "02179b05d1b48fd8cf02a1664df83d0ab3a46a35210880c5b1174918cff67228",
+    "configs/smoke/qwen3-5-4b-thinking-off.yaml": "1342468aefb5423414b33c9493ee81a11f729180c5546808676f5dd74b1e6e3a",
+    "configs/smoke/qwen3-5-9b-thinking-off.yaml": "ff863f7b9bc4547bb9dac7c4898b29f16219318c3031650d25691df221e0a3b4",
+    "data/count-g1-composition-ood.jsonl": "eaba952c2a9d41e63cd74a7645a3e6f458e60fde4e8174eafb9de5462fca415b",
+    "data/count-g1-length-ood.jsonl": "836ffdea004576781c55fd4cd12b85a1c25584ee92261a907cd3aaa2c81b323b",
+    "data/count-g1-matched.jsonl": "7d2f6e199bf2f4be69089fd9f1fcf0428beddafd16f99be1ae9012543847e14e",
+    "data/count-g1-noise-ood.jsonl": "4c010e34f76e18ad02e656b7a95d15c7360deddaf9dd8b4910201cfd96508940",
+    "data/count-g2-composition-ood.jsonl": "5269f88a97132ec6bc821e8b18f3483a1dd95e031ab840dd5428c0c99834d0e4",
+    "data/count-g2-length-ood.jsonl": "07f02ff82126574f6d7f4fddbbd8fa987409caf659c4249dd2c02db981fefa28",
+    "data/count-g2-matched.jsonl": "baaa4c29d76b3721a80fc7d75a746156ff67b6f718a3eba8aae67e3a29ebed92",
+    "data/count-g2-noise-ood.jsonl": "9c9bae2d7d15b18767d294916f1a782546aebf979cf14c9750fe41385938817e",
+    "data/count-g3-composition-ood.jsonl": "5987ba768888056cfde17ff4e7b3df6898da41e180531dba6ec0951e06c14b71",
+    "data/count-g3-length-ood.jsonl": "5410a88c90d3f48ef4946a27250aaebaa66bb3be5a4ce6a6b192ced64e526ad1",
+    "data/count-g3-matched.jsonl": "7cd19196d2d7f2da4c6fcbc327fc333fc84cf1401a22964cf3cc1d6582e710de",
+    "data/count-g3-noise-ood.jsonl": "893a95dd39b21fecef7edba3ac68de254f34a622bf0a0c23ffadd5fe301e5a9c",
+    "data/count-g4-composition-ood.jsonl": "f13282cdbe16bc7c1b1d454b35c79da58f87e6a4ffd26362e9c1d6fbdadc4e3f",
+    "data/count-g4-length-ood.jsonl": "fae3e0869f5309b572c69f82603a0ae6c68aab7757ff355b90a8fa1f5d03fc67",
+    "data/count-g4-matched.jsonl": "519b720443778d7ec4dadfb3346c880180c2861846afab437a0b4bb36f55163e",
+    "data/count-g4-noise-ood.jsonl": "029caeac5fc12165c34d5984fd0de534f7d467d581a7638466703eb2cd2209f5",
+    "data/direction-g1-composition-ood.jsonl": "6163e531568f5331dc0ac8c034ff258413593fb667ac100207cbf4701bbdee8f",
+    "data/direction-g1-length-ood.jsonl": "f8a1137fa052f4e107e448f18670ad1a8cb3eee84a51279f6e6b83dd006d6114",
+    "data/direction-g1-matched.jsonl": "48ced9249479e2b3a69a0d1fd6426cc9396d835f9c5dc07ad8fc8933f384e3a7",
+    "data/direction-g1-noise-ood.jsonl": "dba7e0ba9ae8f8b06de4cc77a117041287ed78e207f3cd38874c7ea095eea0f1",
+    "data/direction-g2-composition-ood.jsonl": "2db06b07f46271690456ad7ca6e1b473b769078b6b90dfe52cd9a018023ac5da",
+    "data/direction-g2-length-ood.jsonl": "1bfdc43659b82c27c29fcbdeddf8adab54cdde5f1fd4ebef0b2aad1671fbf878",
+    "data/direction-g2-matched.jsonl": "4f0c351ae41ba0956bf335a76665c2641aa4e6e0f3a7682d94d4d22e38db70e9",
+    "data/direction-g2-noise-ood.jsonl": "98aa3c934e165a12a41995d9439a3c5f032a7591e37fa6248c0815c8b07f1d77",
+    "data/direction-g3-composition-ood.jsonl": "026085d4914dcac917e40a97dc1c2a6df30dc31170e76a9d108b4d2ed7409469",
+    "data/direction-g3-length-ood.jsonl": "b8558fed7f2b079351396720f912523ca9d6bbb18b184d26a59ccdadc8565a25",
+    "data/direction-g3-matched.jsonl": "9057964970198b6b40fbc6f41cab2ab575bb1b6f5cda6adf66a3080fa68db6f3",
+    "data/direction-g3-noise-ood.jsonl": "e185cf61e19af5f2f0955780d913c8b195624b64e76c8109ec54535d7df88b09",
+    "data/direction-g4-composition-ood.jsonl": "1519436d32019b55cb9cc90fa679ba897d0ab9bcb0f229f792e38dc6648e0d4f",
+    "data/direction-g4-length-ood.jsonl": "8b130249e34856b7a3099abf82238778038c4f979f96e0015917508608f81fb9",
+    "data/direction-g4-matched.jsonl": "7ca85bfc9f2b5098da01de1affb3b64355c94037d2f3b39254a13a34361d79ad",
+    "data/direction-g4-noise-ood.jsonl": "14179082ff032c6c04e72dffebb093bdde34f329dcbce2603a2be91e3d395d58",
+    "data/which-g1-composition-ood.jsonl": "51d8f243a03624bdb6b74426bb37d05ac7931bd7fc481afa963f15da468fb104",
+    "data/which-g1-length-ood.jsonl": "9ecb40107d655e9122455dfb3315a73ae91cacdc366c0c198365aa1a1c23116e",
+    "data/which-g1-matched.jsonl": "25ed1e9af0bee9fca267405d3adbddd78deb49635c520404126e40032cffbaac",
+    "data/which-g1-noise-ood.jsonl": "c789d22c3ba8696028581772ce391a232b05f0f9db18c3a0451c022906ff9898",
+    "data/which-g2-composition-ood.jsonl": "225a3dcce8795d4f8076adb9fc58cb165ecc95a5860967fddb178a8e611ba64f",
+    "data/which-g2-length-ood.jsonl": "f89825b8a1031ea765510c107c2cc788c9689c1074d220194dd6d056f24c3fe1",
+    "data/which-g2-matched.jsonl": "390d8cb900a2937bbacf360155e28e7d927be90ff41edae12602a3adadabf2c7",
+    "data/which-g2-noise-ood.jsonl": "bc01d6dc8589eac26656f49fb85b4f1fec22a405172e7481a88f98bdf73d4c4a",
+    "data/which-g3-composition-ood.jsonl": "aa8437117ae90353d6680ee5a2edf102a414857620516d0ed60be8605bf46b6e",
+    "data/which-g3-length-ood.jsonl": "0903baccbb884e5d2d7eec1efa5c2227a58b749e83596c9edfd8f2f9383bc00e",
+    "data/which-g3-matched.jsonl": "3a4ab42ca594c8c61dd264a70848d7424c5315d6b0cd9f57435c90fdece6735f",
+    "data/which-g3-noise-ood.jsonl": "aee9d64d1fdd597d98f42b944393c424a77591559a5ea87e753cd7188115401d",
+    "data/which-g4-composition-ood.jsonl": "910f05a1d2a639a05fa5192f54506f15ab44902a1a1046abdfeddc61b0b477cc",
+    "data/which-g4-length-ood.jsonl": "e04b1ac880068102dfebe0ad3578533234e62d0769129ca7efe89b88a7426187",
+    "data/which-g4-matched.jsonl": "5d6675ffbc8849ef866aaebe4c107b10b54da03a309ee5c41125ff0124b41bbc",
+    "data/which-g4-noise-ood.jsonl": "c9e7bbbb9fb374011e7cd50c59b7988575bf7e31f1f6b19a281747f5223b6a96",
+    "slurm/gemma-3-4b-it.sh": "fef683fb31c297ed305c98c974b737debb89723e1281e073c11361d0a7fa1d11",
+    "slurm/gemma-4-e4b-it.sh": "a4ba613dfa1f845f22b7b3c3cba5b24f637df0a7ce13e2115a523f406498207a",
+    "slurm/ministral-3-8b-instruct.sh": "f3f86ec807c6eacaa71a251c6d4437a172c69a3402fb502c645b5e5957b35fa4",
+    "slurm/phi-4-mini-instruct.sh": "74bc808ca809328dcc9b08971c99d9a1242d36a79dc8f5d602f3b3ccea755ffb",
+    "slurm/qwen3-5-4b-thinking-off.sh": "a82ffb4c34f46ba3de4c88e07e326ac9c05c4c9a9abb5102a79cef68d3137cd4",
+    "slurm/qwen3-5-9b-thinking-off.sh": "6c0caffe79fd0533ad20a118f303102d8efae5258de4903c38340f8620b9859d",
+    "slurm/smoke/gemma-3-4b-it.sh": "d5777ab48e8cde5968edde4ef54f592a70e0c0a4da5c74faa40d9a6affaf69fc",
+    "slurm/smoke/gemma-4-e4b-it.sh": "88327ddeae47e101752c2edfb3a9db2343d977234ebd55b36c7b26f53faf6394",
+    "slurm/smoke/ministral-3-8b-instruct.sh": "24510de951845d02dbe7fb3bde297d0f7f158069f846395b45c1f697f759d9a3",
+    "slurm/smoke/phi-4-mini-instruct.sh": "1be3bddf95ecfd5c7d414e44805e7830239e962995f60e4dbb2d2473f1e739a3",
+    "slurm/smoke/qwen3-5-4b-thinking-off.sh": "f114ab758d4bbc27157070922e7da3f31174c8437cbe6ab18a12805f6daa51d3",
+    "slurm/smoke/qwen3-5-9b-thinking-off.sh": "d43de25470e81f18a6c4c48d24379f29dbd9fa7b2d8130b7e3f0ede85843c306",
+    "submit-h200-chain.sh": "a8dd80cea9ecea4ba627a1629f1fede59432dc3d15214f3931ed82853f83870d",
+    "submit-h200-smoke-chain.sh": "c934df61ee5a7c7dc0074eed7986a97dcd0a2d0b84065c08769bc8fbe74713be",
+    "tasks/spatialentail_comparator_count_g1_composition_ood.yaml": "47f87904e3844f983f2d313a6d6155fad64b27f7908f605cddabcbcf0d5c42fa",
+    "tasks/spatialentail_comparator_count_g1_length_ood.yaml": "583fc5a1f3bb6a6c12549b7dc538ae4c41ff0100f8df7e6617304df4205e79b0",
+    "tasks/spatialentail_comparator_count_g1_matched.yaml": "9564d6a87e043ca8351f05291303829f9c3cd2f3f74aeefa7e8e00ea9ade2003",
+    "tasks/spatialentail_comparator_count_g1_noise_ood.yaml": "98184fdbd78b83b2ddfb4739af11adacb71c4cd59a5cdf1013bf55e3bb45f554",
+    "tasks/spatialentail_comparator_count_g2_composition_ood.yaml": "1a14cf226d6219e739c96f014faeec4b599e2791139832e7093d060f9148fdbd",
+    "tasks/spatialentail_comparator_count_g2_length_ood.yaml": "6ea87a496fb9fff624aea74cc4a2c1a4c0aa73444a301d3b167d8037394bf619",
+    "tasks/spatialentail_comparator_count_g2_matched.yaml": "2390421fe74f3bd0ad2130add471681ef9bbd9171c3156f96870b321f0ffb2a0",
+    "tasks/spatialentail_comparator_count_g2_noise_ood.yaml": "661d7bbd18d5af0d6a59f358ae08b5e28855ba8753ccf20c52d706cafefcc8b1",
+    "tasks/spatialentail_comparator_count_g3_composition_ood.yaml": "280208fc9e86b0260af9029aa71891852d5ad4ad3e3a1b3990bf5d9c012ca7cc",
+    "tasks/spatialentail_comparator_count_g3_length_ood.yaml": "1ab9ad6ab919bdd0e7bf65d7d392f3393bd176f4f05cd41a2e928e7fc4111a27",
+    "tasks/spatialentail_comparator_count_g3_matched.yaml": "596c69b301dbae7a4db1d137c3b0d979a349101c44e468f89ddbcf75fd5f6ab0",
+    "tasks/spatialentail_comparator_count_g3_noise_ood.yaml": "bff1b8197ab9402737b8efab080f18b5f960141017e9360f8674bd77e89703c6",
+    "tasks/spatialentail_comparator_count_g4_composition_ood.yaml": "c0fbc516fe14a01ae47822e2ae343778cf0b9c6cabe79fcdeee6df5c1355fa68",
+    "tasks/spatialentail_comparator_count_g4_length_ood.yaml": "1f8f621031a657fee05eef751c53a07bdc5d6c29900340e28f2491cf7ecead7d",
+    "tasks/spatialentail_comparator_count_g4_matched.yaml": "b59d06a1625faf6952279aa69eac6b0a7641b0106b17f0e0a1e5e0a0ae001f73",
+    "tasks/spatialentail_comparator_count_g4_noise_ood.yaml": "c3edc49f2bcea826170a2c739bb4e20dfca839fa391b2557b949b447122108c4",
+    "tasks/spatialentail_comparator_direction_g1_composition_ood.yaml": "90c938ed2e80f5ead99afea9866d51852942d571c858bc93717d618de581309c",
+    "tasks/spatialentail_comparator_direction_g1_length_ood.yaml": "7e047842cb84a6f2fbeb6023d06e42b5faa1ceae76c24682df8b66fb881dedd8",
+    "tasks/spatialentail_comparator_direction_g1_matched.yaml": "e99c2603aa53cab099acfd71122ac2fa3b2ebc7fbd48c1b7ee45b9f0302ab78e",
+    "tasks/spatialentail_comparator_direction_g1_noise_ood.yaml": "7c574267d6c092992413a3c311969054bdb73993e57feb179c271f97b67d6231",
+    "tasks/spatialentail_comparator_direction_g2_composition_ood.yaml": "a4646e02b3acde908f52fd1c6ef8f1f187ec33a0273dd3cbd1e6c34b8e27e9ef",
+    "tasks/spatialentail_comparator_direction_g2_length_ood.yaml": "5417c44a477d1b728bacb268173c112fc9e103e96163d1cce7e2829e94bdd7a3",
+    "tasks/spatialentail_comparator_direction_g2_matched.yaml": "d8ab6ca5c50f16106829b9b081c490c0017a0a1f31f71b1aae48074bd5b0c726",
+    "tasks/spatialentail_comparator_direction_g2_noise_ood.yaml": "f74986dd184d0c0bc484bd060198363975f7ce68a754aa77d11a37fadc567b9b",
+    "tasks/spatialentail_comparator_direction_g3_composition_ood.yaml": "34b705ca063f953400e2f3b0a01a1d8bea7cc99e57ac0351f6916f0670de3571",
+    "tasks/spatialentail_comparator_direction_g3_length_ood.yaml": "4fbf2e528de368507efaaa3ea602c0628d0117263526d8894af94882ccfcda2f",
+    "tasks/spatialentail_comparator_direction_g3_matched.yaml": "47e60d7e9bd30bab5233743552bf720eaa4322e2d235e964024d5ae85bd615c5",
+    "tasks/spatialentail_comparator_direction_g3_noise_ood.yaml": "27cdec71f608fde6a1151759722588e31075d047ebf53de61fe6209bb1e2712e",
+    "tasks/spatialentail_comparator_direction_g4_composition_ood.yaml": "7859e1aaf3686f59b57a9ececef3ca02bde84a739cf2bf0ba99aef11d592e91c",
+    "tasks/spatialentail_comparator_direction_g4_length_ood.yaml": "6c2492a4cdaba18a3e684d0ddfa46ee08eedbd30613ca97c9a7005e03eadf818",
+    "tasks/spatialentail_comparator_direction_g4_matched.yaml": "73fbced2cb16de28aafdc4db6cfc1348be96fb5c943aac8f861e9dbf6341584b",
+    "tasks/spatialentail_comparator_direction_g4_noise_ood.yaml": "f9be8a55bb8f7e10bebbdda658011d466632fa75757c00781d48099b1ca3b718",
+    "tasks/spatialentail_comparator_which_g1_composition_ood.yaml": "3eefdb565624aea26dcdb7ad9b1a551e16b89b5be957f47b972f128d7396aa8e",
+    "tasks/spatialentail_comparator_which_g1_length_ood.yaml": "7163dd310430b8d719ec4cb714004108301fb82789850502fe6478042c05c13d",
+    "tasks/spatialentail_comparator_which_g1_matched.yaml": "20d2a050307bf92f031010ccee0e005a8144ae7ff7157ed3ca1a7342d5703bfd",
+    "tasks/spatialentail_comparator_which_g1_noise_ood.yaml": "b68aca29658139e852beb346fe834a407ae158f1d1857120f0ffa0a0f21adb76",
+    "tasks/spatialentail_comparator_which_g2_composition_ood.yaml": "a26778869e470b6c2e2f0c6b5b1f43e2a5eafed8fb81175706d7dd13a642268a",
+    "tasks/spatialentail_comparator_which_g2_length_ood.yaml": "bd9ec53163d44c35aa2d9f91e782789362a997b0790ec3abe0d8331ca1fe38a4",
+    "tasks/spatialentail_comparator_which_g2_matched.yaml": "8b2170dd8b16d38fe8f248c2de93cfdd79241bfe4ef33f2122afb4d9bf9ea33d",
+    "tasks/spatialentail_comparator_which_g2_noise_ood.yaml": "b9d6a7a821dc217f8d15a3593cc35e8712475a6e40c555ad5d47d086ec0526b7",
+    "tasks/spatialentail_comparator_which_g3_composition_ood.yaml": "f293d86877e259f88870cfe2a2756c3724c4eae75d8a3a18d3a2771d48251a38",
+    "tasks/spatialentail_comparator_which_g3_length_ood.yaml": "e0bf189680765f8deaf5eb52857aaa9a6f17e051e5c67be3d3f2ffcec58a526b",
+    "tasks/spatialentail_comparator_which_g3_matched.yaml": "a42c41c3a5969760e571e18546a8921ef116e98110f0f1cc0a995d5316353fe6",
+    "tasks/spatialentail_comparator_which_g3_noise_ood.yaml": "20c46f8104f99be8689ebdf2028056ec9443a0b4faa7416f599796ecd85bf894",
+    "tasks/spatialentail_comparator_which_g4_composition_ood.yaml": "611ec3a8ece08c272f0bfbcac4f26787b81bf20fbc2cee33a51ab9744b6850bf",
+    "tasks/spatialentail_comparator_which_g4_length_ood.yaml": "ebb1fe6388510310405ae734b82459b5f04163331f521c55281991adc6dc6fb8",
+    "tasks/spatialentail_comparator_which_g4_matched.yaml": "a617c494cea2dccd466e66a0c3875270562987898abd8ba14665d9d28ebbf68a",
+    "tasks/spatialentail_comparator_which_g4_noise_ood.yaml": "96aca6edb7d05aa75275988f3f45fac5ab82c78168747c944eb7146b8f80ac3b",
+    "tasks/spatialentail_utils.py": "d834c7e410a4f3a7824e2e1fa4c38648dbf569fe1212c273359471cbe8bf665b"
+  },
+  "jobs": [
+    {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/qwen3-5-4b-thinking-off.yaml",
+      "name": "qwen3-5-4b-thinking-off",
+      "pretrained": "Qwen/Qwen3.5-4B",
+      "response_regime": "thinking-off",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/qwen3-5-4b-thinking-off.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/qwen3-5-4b-thinking-off.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/qwen3-5-4b-thinking-off.sh",
+      "system_message_policy": "native"
+    },
+    {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/qwen3-5-9b-thinking-off.yaml",
+      "name": "qwen3-5-9b-thinking-off",
+      "pretrained": "Qwen/Qwen3.5-9B",
+      "response_regime": "thinking-off",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/qwen3-5-9b-thinking-off.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/qwen3-5-9b-thinking-off.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/qwen3-5-9b-thinking-off.sh",
+      "system_message_policy": "native"
+    },
+    {
+      "chat_template_kwargs": {},
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/gemma-4-e4b-it.yaml",
+      "name": "gemma-4-e4b-it",
+      "pretrained": "google/gemma-4-E4B-it",
+      "response_regime": "instruction",
+      "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/gemma-4-e4b-it.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/gemma-4-e4b-it.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/gemma-4-e4b-it.sh",
+      "system_message_policy": "native"
+    },
+    {
+      "chat_template_kwargs": {},
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/gemma-3-4b-it.yaml",
+      "name": "gemma-3-4b-it",
+      "pretrained": "google/gemma-3-4b-it",
+      "response_regime": "instruction",
+      "revision": "093f9f388b31de276ce2de164bdc2081324b9767",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/gemma-3-4b-it.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/gemma-3-4b-it.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/gemma-3-4b-it.sh",
+      "system_message_policy": "prepend_user"
+    },
+    {
+      "chat_template_kwargs": {},
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/ministral-3-8b-instruct.yaml",
+      "name": "ministral-3-8b-instruct",
+      "pretrained": "mistralai/Ministral-3-8B-Instruct-2512",
+      "response_regime": "instruction",
+      "revision": "5b26027e7b19eeb4b7352e1fed3926375dd2cb4d",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/ministral-3-8b-instruct.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/ministral-3-8b-instruct.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/ministral-3-8b-instruct.sh",
+      "system_message_policy": "native"
+    },
+    {
+      "chat_template_kwargs": {},
+      "config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/phi-4-mini-instruct.yaml",
+      "name": "phi-4-mini-instruct",
+      "pretrained": "microsoft/Phi-4-mini-instruct",
+      "response_regime": "instruction",
+      "revision": "cfbefacb99257ffa30c83adab238a50856ac3083",
+      "script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/phi-4-mini-instruct.sh",
+      "smoke_config": "experiments/spatialentail-randomized-v2/prepared-general-eval/configs/smoke/phi-4-mini-instruct.yaml",
+      "smoke_script": "experiments/spatialentail-randomized-v2/prepared-general-eval/slurm/smoke/phi-4-mini-instruct.sh",
+      "system_message_policy": "native"
+    }
+  ],
+  "schema": "spatialentail-general-instruction-eval-v1",
+  "submitted": false,
+  "tasks": [
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "count",
+      "task": "spatialentail_comparator_count_g4_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "direction",
+      "task": "spatialentail_comparator_direction_g4_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g1_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g1_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 1,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g1_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 1,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g1_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g2_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g2_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 2,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g2_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 2,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g2_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g3_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g3_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 3,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g3_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 3,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g3_noise_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "composition-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g4_composition_ood"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "length-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g4_length_ood"
+    },
+    {
+      "count": 120,
+      "gold_size": 4,
+      "partition": "matched",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g4_matched"
+    },
+    {
+      "count": 60,
+      "gold_size": 4,
+      "partition": "noise-ood",
+      "query_kind": "which",
+      "task": "spatialentail_comparator_which_g4_noise_ood"
+    }
+  ],
+  "total_bases": 3600
+}
