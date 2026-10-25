@@ -260,6 +260,24 @@ to assess SINGLE training. The low stage-1 extraction scores of the reasoning
 panel need inspection before making model-capability claims; the P0 untuned
 baseline and fresh thinking-on comparator runs have different configurations.
 
+## Corr external-transfer results
+
+The 2026-10-26 Corr archive contains seven complete runs on the current
+1,500-row SINGLE correction. All 10,500 responses passed receipt, source,
+prompt, runtime-argument, scoring-replay, and aggregate checks. See the
+[Corr summary](corr-evaluation-summary/SUMMARY.md) and
+[research interpretation](research-analysis/REPORT.md#6-external-transfer-and-next-steps).
+
+Untuned stage-2 accuracy is 64.67%; two-seed means are 45.20% SINGLE Natural,
+41.80% SINGLE answer-only, and 32.47% MULTI Natural. These external regressions
+must be reported alongside the internal gains. Do not merge these scores with
+SpatialEntail or legacy Corr results.
+
+Use `python -m spatial.v2.study.summarize_corr` with `--archive`, `--prepared`,
+and a new `--output-dir`. It streams the original archive without extraction.
+The [runbook](research-analysis/RUNBOOK.md#summarize-downloaded-corr-results)
+provides the full CPU-only reproduction command.
+
 ## Local smoke
 
 ```sh

@@ -129,8 +129,43 @@ strict accuracy by query and determinate/underdetermined status, native stage-1
 accuracy, stage changes, `E` recall, and false abstention on determinate rows.
 An always-`E` predictor gets 55.53% overall, so aggregate accuracy alone is
 insufficient. Pair checkpoint contrasts by source ID, keep seeds separate, and
-retain the original stage-2 metric. No external scores are available yet.
+retain the original stage-2 metric. External scores were validated on 2026-10-26.
 The internal randomized summarizer does not accept the new Corr schema.
+
+## Summarize Downloaded Corr Results
+
+All seven runs in `~/Downloads/corr-eval-results.tar.gz` passed full coverage,
+source/prompt/config checks, original scorer replay, and aggregate consistency.
+The [Corr summary](../corr-evaluation-summary/SUMMARY.md) reports scores and
+paired comparisons; `summary.json` records archive/member hashes, and
+`predictions.csv` retains per-ID predictions and diagnostics.
+
+This command reads the archive directly without extracting or overwriting raw
+results. Choose a new output directory for each replay:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 uv run --offline --python 3.12 --no-project \
+  --with pyyaml python -m spatial.v2.study.summarize_corr \
+  --archive "$HOME/Downloads/corr-eval-results.tar.gz" \
+  --prepared experiments/spatialentail-randomized-v2/prepared-corr-eval \
+  --output-dir /tmp/randomized-v2-corr-summary-replay
+```
+
+Original archive SHA-256:
+`021d9cf7d84449042d947fae716a2cd3a7dff7f87df1608c535f5cc58ba70f75`.
+
+Keep the archive as the raw evidence, outside Git. The preparation receipt's
+`submitted: false` is historical preparation metadata; it is not a live job
+status. Do not alter that hash-bound receipt to record completion.
+
+## Matched Transfer Diagnostic
+
+A separate post-Corr diagnostic is prepared in `prepared-transfer-diagnostic/`:
+60 fresh bases, four policy/layout views each, and seven unsubmitted checkpoint
+jobs. It uses one fixed set-capable decoder across views. Do not substitute
+its scores for frozen Corr scores. The [diagnostic design and handoff](TRANSFER-DIAGNOSTIC.md)
+includes Git-based deployment, submission, download, and summarization commands.
+No training changes are required.
 
 ## Remaining Provenance
 
@@ -147,10 +182,13 @@ PYTHONDONTWRITEBYTECODE=1 uv run --offline --python 3.12 --no-project \
   --with pytest --with pyyaml python -m pytest \
   spatial/v2/tests/test_analyze_randomized.py \
   spatial/v2/tests/test_summarize_randomized.py \
+  spatial/v2/tests/test_summarize_corr.py \
   spatial/v2/tests/test_evaluation_chat.py \
   spatial/v2/tests/test_study_metrics.py -q -p no:cacheprovider
 ```
 
-Result: 26 passed, 5 subtests passed. Separate local package validation checked
+Result after the Corr import: 31 passed, 18 subtests passed. A second full
+archive replay exactly reproduced the saved Corr JSON and Markdown.
+Separate local package validation checked
 all input/environment hashes, all 1,500 gold-answer scoring replays, all seven
 adapter/config paths, and Bash syntax. These checks are not GPU smoke tests.

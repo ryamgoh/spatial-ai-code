@@ -13,7 +13,9 @@ not a harmless answer extractor**. It improves many baseline scores but changes
 40 correct ALL-POSSIBLE answers into wrong ones for MULTI Natural seed 43.
 
 No original evaluation results or scoring code were changed. External transfer
-has been prepared but has not run.
+was validated on 2026-10-26: all six SFT adapters score below the untuned
+baseline on current Corr overall. Strong internal generalization does not
+extend to this external SINGLE task under the frozen protocol.
 
 ## 1. Evidence and Integrity
 
@@ -174,16 +176,57 @@ continuation behavior are intertwined.
 
 Traceable cases: [examples with source file and line](examples.csv).
 
-## 6. Next Experiments
+## 6. External Transfer and Next Steps
 
-**First: current Corr transfer.** The locally prepared package evaluates the
-untuned baseline plus all six adapters on the current 1,500-row SINGLE Corr
-definition. This asks whether learning transfers to a different source and
-explicit underdetermination, not whether ALL-POSSIBLE transfer generalizes.
+**Current Corr transfer is complete.** The archive contains seven full runs on
+the same 1,500 source IDs: 667 determinate and 833 underdetermined questions.
+All 10,500 responses pass source/document/prompt checks and original scorer
+replay. Runtime model arguments agree with prepared configs.
+
+| Checkpoint | Stage 2 overall | Determinate | Underdetermined / E recall |
+|---|---:|---:|---:|
+| Untuned | 64.67% | 83.51% | 49.58% |
+| SINGLE Natural 42 | 48.33% | 76.61% | 25.69% |
+| SINGLE Natural 43 | 42.07% | 66.87% | 22.21% |
+| SINGLE answer-only 42 | 34.33% | 55.02% | 17.77% |
+| SINGLE answer-only 43 | 49.27% | 86.21% | 19.69% |
+| MULTI Natural 42 | 33.27% | 68.22% | 5.28% |
+| MULTI Natural 43 | 31.67% | 62.37% | 7.08% |
+
+Always predicting E scores 55.53% overall, exceeding every adapter here.
+This does not make E a useful universal strategy: it gets zero determinate
+questions correct. The status and query breakdowns are essential.
+
+MULTI minus untuned is -31.40/-33.00 pp overall; paired wins/losses are
+57/528 and 65/560. The largest deficit is on underdetermined questions.
+The SINGLE answer-only seed-43 model retains strong determinate accuracy
+(86.21%), so a uniform loss of all spatial ability is not supported either.
+Natural versus answer-only reverses across seeds (+14.00/-7.20 pp overall);
+do not infer a robust Natural advantage from the two-seed mean.
+
+This is evidence of negative transfer for the evaluated pipelines, not an
+isolated causal finding about forgetting or explanations. Dataset, ambiguity,
+answer-contract, and generation behavior differ from the internal task.
+MULTI-trained models must now select a single E rather than enumerate possible
+options, but these results alone cannot establish that as the cause.
+
+The baseline's native stage-1 accuracy is only 2.73%, versus 64.67% at stage 2,
+with 929 wrong-to-correct changes. The adapters' stage-1 scores range from
+30.53% to 42.93%. Thus, the ranking depends on protocol; neither stage should
+be silently substituted for the frozen headline metric. Baseline outputs
+close `</think>` only 4.80% of the time, which motivates a termination audit
+but does not establish finish reasons.
+
+See the [full Corr summary](../corr-evaluation-summary/SUMMARY.md) for
+query/status slices, false abstention, checkpoint-conditional paired
+intervals, and archive hashes. Gold labels inherit the existing qualitative
+coordinate assumptions; manual assumption sensitivity remains pending.
 The legacy 1,329-row Corr task and the old "None of these is proven" task are
 different datasets/contracts and must not be substituted.
 
-**Second: a bounded interface diagnostic, not a new leaderboard.** Use a
+**Next: report both the internal gains and external regression, and collect
+the outstanding training receipts.** A bounded interface diagnostic remains
+useful, not a new leaderboard. Use a
 frozen, disjoint diagnostic sample for tuning. Record actual token counts,
 finish reasons, and both runtime prompts. Hold the checkpoint and decoding
 settings fixed while changing one factor at a time: reasoning budget,
@@ -204,5 +247,7 @@ package passed all file/environment hashes, all 1,500 gold-answer scoring
 replays, seven config/adapter-path checks, and shell syntax checks.
 All four figures were visually inspected.
 
-No GPU inference, model re-training, or cluster submission was performed.
-The external runtime and training-completion provenance remain unverified.
+No GPU inference, model re-training, or cluster submission was performed by
+the local analysis. External cluster outputs are now validated; training
+completion, final adapter identity, and all installed runtime package
+versions remain outside the available evidence.

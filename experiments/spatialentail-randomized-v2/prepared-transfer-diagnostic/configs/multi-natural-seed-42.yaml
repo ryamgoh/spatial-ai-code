@@ -1,0 +1,32 @@
+model: vllm_staged_pass
+model_args:
+  pretrained: Qwen/Qwen3.5-4B
+  revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  tokenizer_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  lora_path: ../experiments/spatialentail-randomized-v2/prepared-sft/models/multi-natural-seed-42
+  max_lora_rank: 64
+  max_thinking_tokens: 4096
+  dtype: bfloat16
+  gpu_memory_utilization: 0.85
+  max_model_len: 8192
+  choices:
+  - A
+  - B
+  - C
+  - D
+  - E
+  allow_multiple_answers: true
+  record_stage1: true
+  add_special_tokens: false
+include_path: ../experiments/spatialentail-randomized-v2/prepared-transfer-diagnostic/tasks
+tasks:
+- spatialentail_transfer_diag_single_paragraph
+- spatialentail_transfer_diag_single_lines
+- spatialentail_transfer_diag_all_possible_paragraph
+- spatialentail_transfer_diag_all_possible_lines
+apply_chat_template: false
+bootstrap_iters: 0
+system_instruction: null
+batch_size: 4
+device: cuda:0
+log_samples: true

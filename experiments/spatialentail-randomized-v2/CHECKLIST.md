@@ -150,17 +150,32 @@ Research follow-up on 2026-10-25:
 
 - [x] Prepare prompt-matched evaluation configs for the central Natural models,
   both answer-only seeds, and untuned baseline.
-- [ ] Evaluate untuned, SINGLE Natural 42/43, and MULTI Natural 42/43 on the
+- [x] Evaluate untuned, SINGLE Natural 42/43, and MULTI Natural 42/43 on the
   frozen SpatialMap-TQA-Corr release.
-- [ ] Report native contract metrics; do not merge them with SpatialEntail.
-- [ ] Record whether MULTI training improves, preserves, or degrades external
+- [x] Report native contract metrics; do not merge them with SpatialEntail.
+- [x] Record whether MULTI training improves, preserves, or degrades external
   SINGLE-style spatial reasoning.
 
-`prepared-corr-eval/` contains seven hash-bound jobs, not submitted. It uses
+Seven complete cluster runs were validated on 2026-10-26, including both
+answer-only seeds: 1,500 unique source IDs per model, 10,500 responses.
+The archive receipt matches `prepared-corr-eval/jobs.json`; prepared hashes,
+saved documents/prompts/generation settings, runtime model arguments, original
+scorer replay, and aggregate scores all agree.
+
+Stage-2 accuracy is 64.67% untuned, 45.20% SINGLE Natural mean, 41.80% SINGLE
+answer-only mean, and 32.47% MULTI Natural mean. MULTI degrades external
+SINGLE-style performance in both seeds under this protocol; gold-E recall
+falls from 49.58% untuned to 5.28%/7.08%. This is not evidence of broad
+reasoning improvement despite the strong internal results.
+
+The prepared package uses
 the current 1,500-row SINGLE correction (667 determinate, 833 underdetermined),
 not the legacy 1,329-row task. The corrected data were regenerated and checked
-against the documented counts; GPU runtime remains untested.
-See the [cluster handoff](research-analysis/RUNBOOK.md).
+against the documented counts. Final adapter hashes and training consumption
+remain unverified; these evaluation logs do not close section B.
+See the [validated Corr summary](corr-evaluation-summary/SUMMARY.md),
+[machine-readable results](corr-evaluation-summary/summary.json), and
+[reproduction instructions](research-analysis/RUNBOOK.md).
 
 ## E. P0 — Report closure
 
@@ -210,6 +225,12 @@ See the [cluster handoff](research-analysis/RUNBOOK.md).
 - [-] Paired strict-cycle consistency diagnostic.
 - [-] Additional external datasets: StepGame, Text2Space, SpartQA-Human, ReSQ.
 - [-] Detailed option-position and paired-contract consistency analysis.
+- [x] Prepare fresh post-Corr matched policy/layout probe: 60 disjoint,
+  solver-checked bases and 240 views per checkpoint, with identical menus
+  and a fixed set-capable decoder. See
+  [diagnostic design](research-analysis/TRANSFER-DIAGNOSTIC.md).
+- [ ] Run and summarize the seven matched diagnostic jobs; no jobs submitted
+  locally. This probe does not replace the broader diagnostics above or Corr.
 
 ## G. P2 — Deferred future work
 
