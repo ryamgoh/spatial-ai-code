@@ -8,7 +8,7 @@ from itertools import combinations
 
 from spatial.v2.certificate_generation import AnswerCertificate, build_answer_certificate
 from spatial.v2.proof_complexity import ProofComplexityProfile, measure_certificate_complexity
-from spatial.v2.random_proof import (
+from spatial.v2.legacy.random_proof import (
     PROOF_RULE_LABELS,
     RandomProofPolicy,
     SemanticRule,

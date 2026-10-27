@@ -11,7 +11,8 @@ from pathlib import Path
 import yaml
 
 from experiments.tasks.utils import process_results_v2_answer
-from spatial.v2.study.prepare_transfer_diagnostic import generate
+from spatial.v2.study.analyze_randomized import archive_digest
+from spatial.v2.study.prepare_transfer_diagnostic import generate, preparation_source_hashes
 from spatial.v2.study.summarize_randomized import digest
 from spatial.v2.study.summarize_transfer_diagnostic import paired_effects, summarize
 from spatial.v2.text import SpatialTextAdapter
@@ -89,8 +90,12 @@ class TransferDiagnosticTests(unittest.TestCase):
         self.assertEqual(receipt["rows_per_model"], 240)
         for path, expected in receipt["file_sha256"].items():
             self.assertEqual(digest(prepared / path), expected)
-        for path, expected in receipt["preparation_source_sha256"].items():
-            self.assertEqual(digest(root / path), expected)
+        # Frozen preparation provenance belongs to its source snapshot, not the
+        # current working tree after the curriculum namespace migration.
+        snapshot = root / "experiments/archive/precomposition-source-2372c13.tar.gz"
+        with tarfile.open(snapshot) as archive:
+            for path, expected in receipt["preparation_source_sha256"].items():
+                self.assertEqual(archive_digest(archive, path), expected)
         members = {"jobs.json": (prepared / "jobs.json").read_bytes()}
         for job in receipt["jobs"]:
             subprocess.run(["bash", "-n", str(root / job["script"])], check=True)
@@ -161,6 +166,13 @@ class TransferDiagnosticTests(unittest.TestCase):
             write_archive()
             with self.assertRaisesRegex(ValueError, "Duplicate"):
                 summarize(path, prepared, root)
+
+    def test_new_preparation_hashes_include_legacy_dependencies(self):
+        root = Path(__file__).resolve().parents[3]
+        hashes = preparation_source_hashes(root)
+        for name in ("generation", "possibility", "benchmark_registry"):
+            path = f"spatial/v2/legacy/{name}.py"
+            self.assertEqual(hashes[path], digest(root / path))
 
 
 if __name__ == "__main__":

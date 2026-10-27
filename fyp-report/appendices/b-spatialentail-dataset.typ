@@ -1,29 +1,27 @@
 #pagebreak(weak: true)
-#heading(level: 1, numbering: none)[Appendix B — SpatialEntail Dataset Records]
+#heading(level: 1, numbering: none)[Appendix B: Dataset Records]
 
-Each accepted base problem records its query and semantic cell, source-generation
-mode, canonical structural signature, measured difficulty, and rejection history.
-Rendered variants carry distinct row identifiers while sharing the base identity.
-The workload manifest records requested variants, split membership, overlap
-validation, answer-position distributions, and context-admission metadata.
+The composition release must retain story and family identifiers, source
+premise IDs, query family, reference and target or eligible candidates,
+complete semantic answer, semantic case, and split assignment. Related story
+variants remain in the same split.
 
-The frozen dataset release should archive the exact matrix, tokenizer revision,
-chat template, generation seed, software revision, split fingerprints, rejection
-counts, and materialized arm paths. These artifacts are required to reproduce a
-pilot; this draft does not claim that a final release has been frozen.
+Each contract/menu view records the answer contract, four substantive values,
+their A-D permutation, fixed E/F labels, final letter answer, and precise
+escape reason. Possible-answer count and returned-answer count are separate.
+Natural and Symbolic renderings share the selected verified evidence and
+final answer.
 
+Audit metadata retains witnesses, counterexamples, conflicting subsets,
+checked derivations, full-domain feasibility and exclusion outcomes,
+chain lengths, verified distractor sets, and validation receipts. Raw audit
+logs are not supervised reasoning targets.
 
-#heading(level: 2, numbering: none)[Executed Renderer Example]
+The release receipt includes source revisions, content hashes, generation
+seeds, counts of unique bases and rendered examples per arm, supported
+evidence coverage, failures and exclusions, split checks, tokenizer settings,
+manual audit sample IDs, and audit outcomes.
 
-The following excerpt was produced by the verified Natural Direction target renderer
-from a direct two-object fixture: A is Northeast of B, queried from A to B,
-The fixture is deterministic and has no generation seed. It illustrates a
-query-directed worked solution rather than a sample from the planned
-depth-controlled pilot. Coordinates, rank witnesses, and replayable certificate
-records are retained only in the offline audit artifact.
-
-#quote[
-  P1: A is Northeast of B. \
-  Q-DIR: Therefore A is Northeast of B, as established by P1. \
-  Therefore the unique direction is Northeast; all other exact directions are excluded because exact directions are mutually exclusive.
-]
+This appendix specifies required records, not a finalized production schema.
+The schema and all admitted evidence categories must be frozen before bulk
+generation.

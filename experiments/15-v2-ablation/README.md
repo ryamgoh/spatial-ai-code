@@ -6,8 +6,8 @@ with answer-only targets on paired base problems, with prompt-matched untuned
 baselines. Replayable answer certificates remain offline verification and audit
 artifacts; they are not training arms.
 
-The complete generator and matrix field catalogue is
-[`docs/spatialentail/generation-and-knobs.md`](../../docs/spatialentail/generation-and-knobs.md).
+The historical generator and matrix field catalogue is
+[generation and experiment knobs](../../docs/archive/research/generation-and-knobs.md).
 
 `matrix.yaml` requests 40 unique Direction problems at depth 2 and 40 ambiguous
 Direction problems with two possibilities. Both use three entities and two
@@ -60,7 +60,7 @@ Generate and admit the pilot on CPU (downloads tokenizer files only):
 ```bash
 uv run --no-project --with typer --with pyyaml --with z3-solver \
   --with transformers --with jinja2 \
-  python -m spatial.v2.generate_matrix experiments/15-v2-ablation/matrix.yaml \
+  python -m spatial.v2.legacy.generate_matrix experiments/15-v2-ablation/matrix.yaml \
   --out /tmp/spatial-v2-pilot/pilot.jsonl
 ```
 

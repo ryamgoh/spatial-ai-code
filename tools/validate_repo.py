@@ -166,6 +166,8 @@ def check_layout(errors: list[str]) -> None:
         Path("spatial/v1/solver.py"),
         Path("spatial/v1/tests/test_laws.py"),
         Path("spatial/v2/generate_all.py"),
+        Path("spatial/v2/generation.py"),
+        Path("spatial/v2/legacy/generate_all.py"),
         Path("spatial/v2/solver.py"),
         Path("spatial/v2/tests/test_solver.py"),
     }

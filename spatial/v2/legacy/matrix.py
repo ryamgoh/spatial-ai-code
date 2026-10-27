@@ -21,7 +21,7 @@ from spatial.v2.context_budget import (
     summarize_admissions,
     write_rejection_report,
 )
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     BooleanShape,
     GenerationMode,
     GenerationPolicy,

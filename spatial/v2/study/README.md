@@ -1,5 +1,12 @@
 # SpatialEntail study release and SFT job preparation
 
+These are historical workflows, not the composition study's execution plan.
+Their curriculum dependencies now live in
+[`spatial.v2.legacy`](../legacy/README.md). The active study follows the
+[composition pivot](../../../experiments/spatialentail-composition-v1/pivot_20261026.md).
+Preserve old receipts and outputs; do not treat the old quotas, arms, or
+review protocol below as new-study requirements.
+
 Run these commands from the repository root. This workflow does not submit
 Slurm jobs or train a model locally.
 

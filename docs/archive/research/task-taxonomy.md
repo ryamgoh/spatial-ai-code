@@ -1,6 +1,11 @@
 # SpatialEntail task taxonomy
 
-Status: canonical design vocabulary, 2026-10-10. The taxonomy is fixed; the
+Archive status: superseded by the
+[composition pivot](../../../experiments/spatialentail-composition-v1/pivot_20261026.md).
+The Boolean structures, contract priorities, and external benchmark campaign
+below describe the retired study, not requirements for the active release.
+
+Historical status: canonical design vocabulary, 2026-10-10. The taxonomy is fixed; the
 cell allocation and quotas are not. It does not claim that the final corpus has
 been generated or that the capability groups form a universal difficulty scale.
 
@@ -181,23 +186,23 @@ corpora or finalized cell quotas. Before generation, freeze:
 5. group-sensitive size-calibration safeguards.
 
 The initial executable feasibility registry is
-[`spatial/v2/benchmark-cells.yaml`](../../spatial/v2/benchmark-cells.yaml). At
+[`spatial/v2/benchmark-cells.yaml`](../../../spatial/v2/benchmark-cells.yaml). At
 this revision it contains thirteen ready representative cells and no blocked
 cells. It is a coverage seed, not the final reporting registry or an
 allocation. Run its static check or one-sample-per-cell probe with:
 
 ```bash
-python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml
-python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe
+python -m spatial.v2.legacy.check_registry spatial/v2/benchmark-cells.yaml
+python -m spatial.v2.legacy.check_registry spatial/v2/benchmark-cells.yaml --probe
 ```
 
 Primary supporting analysis:
-[capability and framework synthesis](../archive/research/capability-validation-and-framework.md),
-[SODA taxonomy check](../archive/research/soda-task-taxonomy.md),
-[framework literature review](../archive/research/capability-framework-literature-review.md),
-[relational external review](../archive/research/external-relational-capability-review.md), and
-[human external review](../archive/research/external-human-capability-review.md).
+[capability and framework synthesis](capability-validation-and-framework.md),
+[SODA taxonomy check](soda-task-taxonomy.md),
+[framework literature review](capability-framework-literature-review.md),
+[relational external review](external-relational-capability-review.md), and
+[human external review](external-human-capability-review.md).
 
 The reviewed executable scope and all allocation decisions are governed by
-[size-freeze-protocol.md](../archive/research/size-freeze-protocol.md); earlier larger experiment
+[size-freeze-protocol.md](size-freeze-protocol.md); earlier larger experiment
 counts and seven-composition proposals are withdrawn.

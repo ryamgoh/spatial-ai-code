@@ -1,64 +1,44 @@
 # Spatial V2
 
-This is the active SpatialEntail implementation.
+The active research direction is
+[Composition v1](../../experiments/spatialentail-composition-v1/README.md),
+governed by its [pivot](../../experiments/spatialentail-composition-v1/pivot_20261026.md).
 
-The supported certificate acceptance contract is recorded in
-[`docs/spatialentail/certificates.md`](../../docs/spatialentail/certificates.md).
+## Active Generation
 
-- `solver.py` defines the structured Boolean spatial language and semantic
-  oracle.
-- `text.py` parses and renders the controlled `X is DIR of Y` grammar composed
-  with `NOT`, `AND`, `OR`, `IF ... THEN`, and `IFF`.
-- `proofs.py` and the certificate modules define independently replayed
-  evidence. Its deterministic constructor handles Boolean closure, finite
-  nested case splits, axis reasoning, and explicit or spatial contradictions.
-- `symbolic_trace_codec.py` defines the versioned JSON grammar used to serialize
-  and replay-check proof, answer-set, and menu certificates during verification
-  and audit.
-  The grammar contract is documented in
-  [`docs/spatialentail/trace-formats.md`](../../docs/spatialentail/trace-formats.md).
-- The answer-certificate renderers produce checked evidence for verification
-  and a readable Natural worked solution for SFT. Replayable Symbolic NDJSON is
-  an audit format, not a training target.
-- `supervision_controls.py` retains low-level regression fixtures for checked,
-  absent, and deliberately corrupted evidence. These exercise the verifier and
-  are not active study arms. Context admission uses the selected
-  tokenizer/template and rejects required variants on overflow.
-- `difficulty.py` measures proof depth and support for workload controls.
-- `benchmark_registry.py` loads the taxonomy-level benchmark-cell registry,
-  validates its semantic and generator-policy declarations, and probes one
-  checked example per ready cell. `benchmark-cells.yaml` contains no quotas:
-  ready cells are executable coverage seeds, while any future blocked cells
-  must name their exact implementation prerequisites.
-- `generation.py` emits rows only after certificate checking and text
-  round-trip validation. Each row records its actual `world-first`, `proof-template-first`, or
-  `premise-first` proposal route. The premise-first route samples visible
-  relations without coordinates and obtains witnesses only after solving.
-  `certificate-first` remains a stronger, unclaimed provenance.
-- `generate_all.py`, `generate_matrix.py`, and `audit_spatialeval.py` are module
-  entry points.
-- `tests/` contains the active semantic and generation contracts.
+`generation.py` now constructs only atomic pairwise premises. Its policy has
+no Boolean-shape, mixed-rule composition, or legacy possibility-skeleton
+controls, and the generator has no randomized-proof entry point.
+`generate_all.py` exposes the corresponding atomic-only workload CLI.
 
-Run commands from the repository root, for example:
+This is a cleanup of the existing V2 generator, not completion of the pivot.
+Six-option menus, matched predicate-and-axis supervision, story-family release
+gates, and the new evaluation protocol still require implementation.
 
-```bash
+## Shared Infrastructure
+
+Keep `solver.py`, `proofs.py`, the certificate modules, `text.py`, `grading.py`,
+and existing renderers available to shared and historical callers.
+Internal logical operations support semantic checks and evidence even when
+visible premises are atomic. Existing Symbolic NDJSON is an audit grammar,
+not automatically the new study's Symbolic supervision format.
+
+Software contracts in [docs/spatialentail](../../docs/spatialentail/) describe
+existing behavior. Version the new interface without changing frozen historical
+contracts or Corr SINGLE.
+
+## Historical Workflows
+
+The [legacy namespace](legacy/README.md) contains the retired Boolean
+curriculum, mixed-rule compositions, randomized proofs, possibility skeletons,
+and benchmark/matrix runners. Historical `study/` workflows and tests import
+that namespace. The old benchmark YAML files retain their paths.
+
+```sh
 python -m spatial.v2.generate_all --help
-python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe
-pytest spatial/v2 -q
+python -m spatial.v2.legacy.check_registry spatial/v2/benchmark-cells.yaml --probe
+python -m pytest spatial/v2 -q
 ```
 
-Do not import from `spatial.v1` here. V1 is retained only for reproducing older
-experiments.
-
-The runnable bounded Direction pilot is documented in
-[`experiments/15-v2-ablation/README.md`](../../experiments/15-v2-ablation/README.md).
-It separates train/development/test groups, supports explicit holdout cells, and
-uses the admitted evaluation prompt verbatim. Which and Count API support does
-not imply that all query families fit or are included in that pilot. No model
-training result is established by generation smoke checks.
-
-The `study/` release assembler handles explicit role quotas, paired context
-admission, contamination inputs, nested pools, and candidate manifests.
-`composition-cells.yaml` and `composition-holdout-cells.yaml` keep seen and
-reserved dependency families distinct. Production quotas fail on insufficient
-unique structure; engineering smoke permits repeat structures explicitly.
+Do not import `spatial.v1` or `spatial.v2.legacy` into the active generation path.
+Historical reproduction uses those packages explicitly.

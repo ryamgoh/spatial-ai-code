@@ -9,7 +9,7 @@ import math
 from collections import Counter
 from pathlib import Path
 
-from spatial.v2.composition import HOLDOUT_COMPOSITIONS
+from spatial.v2.legacy.composition import HOLDOUT_COMPOSITIONS
 from spatial.v2.context_budget import ContextBudget, validate_context_admission
 from spatial.v2.grading import encode_menu_answer, resolve_answer
 from spatial.v2.hitl.review import (

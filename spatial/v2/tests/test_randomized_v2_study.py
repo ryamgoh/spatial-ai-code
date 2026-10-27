@@ -3,7 +3,7 @@ from collections import Counter
 
 import pytest
 
-from spatial.v2.generation import QueryKind
+from spatial.v2.legacy.generation import QueryKind
 from spatial.v2.study.randomized_v2 import (
     RandomizedStudyDesign,
     _calibration_row,

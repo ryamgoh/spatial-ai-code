@@ -24,7 +24,7 @@ REPO_ROOT = EXPERIMENT_DIR.parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from spatial.v2.matrix import load_experiment_matrix
+from spatial.v2.legacy.matrix import load_experiment_matrix
 
 _SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 

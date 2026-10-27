@@ -1,36 +1,29 @@
 #heading(numbering: none, outlined: false)[Abstract]
 
-This project studies whether formal semantics can improve the evaluation and
-supervision of text-based spatial reasoning in large language models. It defines
-qualitative two-dimensional relations over finite named objects and evaluates
-answers across all spatial models satisfying the visible premises. A witness
-establishes possibility; entailment requires agreement across every such model.
+SpatialEntail studies atomic spatial relations and their composition under
+explicit all-valid-map semantics. Its primary contribution is a planned
+solver-verified dataset of Direction, Selection, and Count questions with three
+matched answer contracts: Unique Answer, Listed Possibilities, and Exhaustive
+Possibilities. Exact compass relations encode coordinate order, not distance
+or equal-length movement. The dataset design includes uniquely determined,
+underdetermined, and inconsistent premises, with checked derivations, witness
+maps, and conflicting premise subsets.
 
-Applied to SpatialMap-TQA, the audit classifies 667 of 1,500 released answers as
-uniquely entailed and 833 as possible but non-unique. SpatialMap-TQA-Corr
-preserves the questions and adds explicit underdetermination. Manual assumption
-checks and comparative model evaluation remain pending, so this is a
-conditional semantic audit.
+A supporting experiment will compare two matched mixed-contract adapters
+trained on Natural and Symbolic explanations rendered from the same verified
+evidence. Accuracy and generated-token cost will be reported separately for
+initial responses and constrained answer completion. SpatialMap is reserved for
+external evaluation, with its existing corrected SINGLE release preserved.
 
-The same contract supports SpatialEntail-SINGLE, a generator and
-certificate-checking pipeline for Direction, Entity Selection, and correlated
-Count queries over eight directions and finite Boolean formulas. Replayable
-certificates and constructive witnesses verify gold answers and remain offline
-audit artifacts. The predeclared central study compares answer-only with
-verified Natural targets on Qwen3.5-4B using two training seeds. A compact
-Chain-of-Symbol-like target is an optional token-efficiency extension, not a
-certificate format. The sealed SpatialEntail-SINGLE release contains 8,000
-training, 775 development, and 4,300 benchmark bases; the benchmark reports CORE
-(1,300), COMP (1,200), and SHIFT (1,800), with SHIFT slice labels retained as
-cell metadata. Its 485-item Natural quality sample was approved by both
-independent model judges. The first SpatialEntail-SINGLE benchmark run is
-complete; external transfer results remain pending.
-Certificate validity supports auditability, not a model response contract or
-claims about internal reasoning.
+This is a methodology draft. Executable semantic fixtures support the proposed
+contracts, but the composition dataset has not passed production release gates
+and the matched training comparison has not been run. No token savings,
+accuracy preservation, or external improvement is claimed. The design is
+post-hoc and informed by previously inspected SpatialMap failures.
 
 #v(1fr)
 *Subject Descriptors:* Artificial intelligence; knowledge representation and reasoning.
 
-*Keywords:* spatial reasoning, formal semantics, benchmark auditing, proof certificates.
+*Keywords:* spatial reasoning, spatial composition, answer contracts, verified datasets.
 
 #pagebreak()

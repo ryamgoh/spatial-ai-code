@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from spatial.v2.consistency import generate_consistency_pair
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     ENTITY_NAMES,
     GenerationPolicy,
     MenuCoverage,
@@ -27,7 +27,7 @@ from spatial.v2.generation import (
     SpatialGeneratorV2,
 )
 from spatial.v2.grading import AnswerMode
-from spatial.v2.random_proof import (
+from spatial.v2.legacy.random_proof import (
     PROOF_RULE_LABELS,
     RandomProofPolicy,
     SemanticRule,
@@ -36,7 +36,7 @@ from spatial.v2.random_proof import (
     deterministic_transition_partition,
     exponential_quotas,
 )
-from spatial.v2.random_proof_generation import possibility_backbone_length
+from spatial.v2.legacy.random_proof_generation import possibility_backbone_length
 from spatial.v2.supervision_controls import apply_supervision_arm
 
 

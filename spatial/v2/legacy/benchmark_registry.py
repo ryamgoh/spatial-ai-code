@@ -12,7 +12,7 @@ from typing import Any, TypeVar
 
 import yaml
 
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     BooleanShape,
     GenerationPolicy,
     QueryKind,
@@ -304,7 +304,7 @@ def _validate_cell(cell: BenchmarkCell) -> None:
     composition = cell.generation.get("composition")
     skeleton = cell.generation.get("possibility_skeleton")
     if skeleton is not None:
-        from spatial.v2.possibility import POSSIBILITY_STRUCTURES
+        from spatial.v2.legacy.possibility import POSSIBILITY_STRUCTURES
 
         if cell.semantic_status is not SemanticStatus.ALTERNATIVES:
             raise ValueError(f"cell {cell.id}: possibility skeletons require ALT")
@@ -313,7 +313,7 @@ def _validate_cell(cell: BenchmarkCell) -> None:
                 f"cell {cell.id}: possibility skeleton disagrees with structures"
             )
     elif composition is not None:
-        from spatial.v2.composition import COMPOSITIONS, composition_structures
+        from spatial.v2.legacy.composition import COMPOSITIONS, composition_structures
 
         expected = (
             tuple(

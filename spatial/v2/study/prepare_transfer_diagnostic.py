@@ -10,7 +10,7 @@ import tarfile
 from collections import Counter
 from pathlib import Path
 
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     GenerationMode,
     GenerationPolicy,
     QueryKind,
@@ -336,10 +336,7 @@ def prepare(
         },
         "environment_sha256": dict(receipt["environment_sha256"]),
     }
-    manifest["preparation_source_sha256"] = {
-        str(p.relative_to(root)): digest(p)
-        for p in sorted((root / "spatial/v2").glob("*.py"))
-    }
+    manifest["preparation_source_sha256"] = preparation_source_hashes(root)
     manifest["preparation_source_sha256"][
         str(Path(__file__).resolve().relative_to(root))
     ] = digest(Path(__file__))
@@ -352,6 +349,13 @@ def prepare(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )
     return manifest
+
+
+def preparation_source_hashes(root):
+    """Include the relocated curriculum in new historical preparation receipts."""
+    package = root / "spatial/v2"
+    paths = {*package.glob("*.py"), *(package / "legacy").glob("*.py")}
+    return {str(path.relative_to(root)): digest(path) for path in sorted(paths)}
 
 
 def main():

@@ -1,7 +1,7 @@
 # Capability-framework literature review
 
 **Checked 2026-10-10.** Primary-source critique of the
-[task taxonomy](../../research/task-taxonomy.md), using the
+[task taxonomy](task-taxonomy.md), using the
 [SODA naming note](soda-task-taxonomy.md), [source ledger](../../research/annotated-sources.md),
 and existing report bibliography as leads, not substitutes for papers.
 Recommendations only: no implemented algorithm, executed transfer result,

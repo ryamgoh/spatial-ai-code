@@ -113,7 +113,7 @@ def test_v2_staged_answer_scores_both_passes_and_format_separately() -> None:
 
 
 def _sample(trace_format="symbolic"):
-    from spatial.v2.generation import (
+    from spatial.v2.legacy.generation import (
         GenerationPolicy,
         QueryKind,
         SemanticShape,
@@ -229,7 +229,7 @@ def test_v2_loader_rejects_rows_without_context_admission() -> None:
 def test_v2_replays_all_query_envelopes_and_ambiguity() -> None:
     from utils import process_results_v2
 
-    from spatial.v2.generation import (
+    from spatial.v2.legacy.generation import (
         GenerationPolicy,
         QueryKind,
         SemanticShape,

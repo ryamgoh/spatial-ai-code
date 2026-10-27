@@ -13,8 +13,8 @@ from spatial.v2.answer_certificates import (
     DirectionEntailmentCertificate,
 )
 from spatial.v2.count_certificates import CountAnswerSetCertificate
-from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
-from spatial.v2.generation import (
+from spatial.v2.legacy.generate_all import WorkloadSpec, app, generate_workload
+from spatial.v2.legacy.generation import (
     BooleanShape,
     GenerationMode,
     GenerationPolicy,

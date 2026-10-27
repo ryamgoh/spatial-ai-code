@@ -9,9 +9,9 @@ from pathlib import Path
 
 import yaml
 
-from spatial.v2.benchmark_registry import load_benchmark_registry
+from spatial.v2.legacy.benchmark_registry import load_benchmark_registry
 from spatial.v2.context_budget import ContextBudget, admit_row_group, load_tokenizer
-from spatial.v2.generation import GenerationPolicy, SpatialGeneratorV2
+from spatial.v2.legacy.generation import GenerationPolicy, SpatialGeneratorV2
 from spatial.v2.supervision_controls import apply_supervision_arm
 
 

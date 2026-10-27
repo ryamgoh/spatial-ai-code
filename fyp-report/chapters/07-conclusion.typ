@@ -1,37 +1,25 @@
 #pagebreak(weak: true)
 = Conclusion
 
-This project begins from a simple evaluation principle: a text-only model should
-be scored against what follows from the text it receives. Under the declared
-qualitative semantics, a relation is possible when some satisfying spatial
-world supports it and entailed only when every satisfying world supports it.
-Applying that distinction to SpatialMap-TQA shows that one latent-map answer can
-remain possible without being uniquely recoverable from the released text.
+SpatialEntail focuses on a controlled dataset of atomic spatial relations and
+their composition. Its explicit valid-map semantics separates guaranteed
+answers from possible answers, while three matched contracts distinguish
+unique selection, listed possibilities, and exhaustive coverage.
 
-SpatialEntail uses the same semantics constructively. It separates dataset
-adapters, all-model solving, answer policy, local proof replay, constructive
-model checking, rendering, and audit storage. Generated problems carry explicit
-provenance and are accepted only after semantic analysis, certificate replay,
-text round trip, structural split validation, and exact context admission.
-Answer certificates verify and audit solutions; they are not presented as the
-model's hidden thought process or its default response format.
+The proposed release requires verified semantic answers and matched
+Natural/Symbolic reference explanations for every synthetic split. Derivations,
+witnesses, and conflicting subsets make different answer cases auditable.
+Story-family splitting and separately versioned external contract views protect
+the intended evaluation boundaries.
 
-The implemented generator and bounded pilot establish preparation feasibility,
-not a learning benefit. The central study compares answer-only and verified
-Natural SFT on Qwen3.5-4B, reporting CORE, COMP, and SHIFT with cumulative and
-cell-level results. SHIFT slice labels and depth curves remain diagnostic, while
-external transfer remains its own evaluation. A
-source-blinded two-model quality screen with selective human appeal measures
-readability separately from formal validity. A compact Chain-of-Symbol-like arm
-is optional and asks only whether a shorter representation can retain accuracy.
+A bounded supporting experiment will compare two matched mixed-contract
+adapters and style-matched untuned baselines. Initial-response and constrained
+completion accuracy will be reported separately alongside generated-token
+cost. Neither token savings nor accuracy improvement is presumed.
 
-The unresolved empirical question is whether a verified Natural worked solution
-teaches a more general spatial procedure than task exposure alone. Until the
-evaluations run, the report makes no claim of SFT improvement, human-preferred
-explanation, or causal faithfulness to internal model reasoning.
-
-Future work may extend the controlled language, add visual grounding, evaluate
-larger world models, and consider GRPO after supervised results demonstrate
-both remaining headroom and non-degenerate reward variance. Those extensions
-should retain the central contract: visible information defines the task, and
-every scored explanation should have an auditable relation to that task.
+The present draft specifies the method and its evidence requirements; it does
+not claim a completed composition release or learning benefit. Completing
+verified generation, auditing the dataset, and executing the fixed comparison
+are the remaining empirical work. The contribution stays centered on the
+dataset even if the representation comparison produces mixed or negative
+results.

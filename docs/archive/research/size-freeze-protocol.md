@@ -237,8 +237,8 @@ review.
 
 ## Runnable verification paths and final release state
 
-- `python -m spatial.v2.check_registry spatial/v2/composition-cells.yaml --probe`
-- `python -m spatial.v2.check_registry spatial/v2/composition-holdout-cells.yaml --probe`
+- `python -m spatial.v2.legacy.check_registry spatial/v2/composition-cells.yaml --probe`
+- `python -m spatial.v2.legacy.check_registry spatial/v2/composition-holdout-cells.yaml --probe`
 - `python -m spatial.v2.study.build spatial/v2/study/smoke.yaml --out <new-dir>`
 - P0 launcher: `experiments/15-v2-ablation/run-core-smoke.yaml`, with thirteen
   CORE cells, exact context admission, engineering dev/test, and one Natural

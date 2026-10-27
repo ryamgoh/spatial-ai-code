@@ -1,14 +1,19 @@
 # FYP research canvas
 
-Status: working research direction, not a fixed paper outline
+Archive status: superseded by the
+[composition pivot](../../../experiments/spatialentail-composition-v1/pivot_20261026.md).
+Retained for historical context only; the claims and plans below describe the
+earlier study, not the active release.
+
+Historical status: working research direction, not a fixed paper outline
 
 Last updated: 12 October 2026
 
 Raw contribution notes:
-[`What this project is trying to do`](../archive/notes/raw-contribution-notes.md)
+[`What this project is trying to do`](../notes/raw-contribution-notes.md)
 
 Annotated literature ledger:
-[`What each source supports and does not support`](annotated-sources.md)
+[`What each source supports and does not support`](../../research/annotated-sources.md)
 
 ## Working title
 
@@ -473,5 +478,5 @@ low-priority KIV extension.
 - Go/no-go criteria and compute budget for RL
 
 The reviewed executable scope and all allocation decisions are governed by
-[size-freeze-protocol.md](../archive/research/size-freeze-protocol.md); earlier larger experiment
+[size-freeze-protocol.md](size-freeze-protocol.md); earlier larger experiment
 counts and seven-composition proposals are withdrawn.

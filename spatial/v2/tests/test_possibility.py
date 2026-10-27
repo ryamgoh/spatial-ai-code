@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from spatial.v2.generation import GenerationPolicy, SpatialGeneratorV2
+from spatial.v2.legacy.generation import GenerationPolicy, SpatialGeneratorV2
 from spatial.v2.grading import AnswerMode
 from spatial.v2.solver import (
     And,

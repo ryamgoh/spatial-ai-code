@@ -272,7 +272,7 @@ def test_summary_reports_partial_arm_completion(tmp_path) -> None:
 
 
 def test_generation_views_feed_dev_selection_and_final_test(tmp_path):
-    from spatial.v2.matrix import generate_matrix
+    from spatial.v2.legacy.matrix import generate_matrix
     from spatial.v2.tests.test_matrix import FramingTokenizer
 
     spec = SUBMIT.load_run_spec(Path(__file__).with_name("run.yaml"), REPO)

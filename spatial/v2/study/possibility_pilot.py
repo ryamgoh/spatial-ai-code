@@ -24,13 +24,13 @@ from typing import Any
 
 import yaml
 
-from spatial.v2.benchmark_registry import (
+from spatial.v2.legacy.benchmark_registry import (
     BenchmarkCell,
     CellReadiness,
     load_benchmark_registry,
 )
 from spatial.v2.context_budget import ContextBudget, admit_row_group
-from spatial.v2.generation import SpatialGeneratorV2
+from spatial.v2.legacy.generation import SpatialGeneratorV2
 from spatial.v2.study.evaluation import _eval_config, _slug, _task_yaml
 from spatial.v2.supervision_controls import apply_supervision_arm
 
@@ -41,8 +41,8 @@ _REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
 _CHOICES = list("ABCDE")
 _LENGTH_THRESHOLDS = (12288, 16384, 20000, 24576, 32768)
 _GENERATION_ENVIRONMENT_FILES = (
-    "spatial/v2/generation.py",
-    "spatial/v2/possibility.py",
+    "spatial/v2/legacy/generation.py",
+    "spatial/v2/legacy/possibility.py",
     "spatial/v2/study/possibility_pilot.py",
     "spatial/v2/proofs.py",
     "spatial/v2/answer_certificates.py",
@@ -709,7 +709,7 @@ process_results_v2_answer = module.process_results_v2_answer
         "experiments/tasks/utils.py",
         "spatial/v2/study/evaluation.py",
         "spatial/v2/study/possibility_pilot.py",
-        "spatial/v2/possibility.py",
+        "spatial/v2/legacy/possibility.py",
         "spatial/v2/supervision_controls.py",
         "experiments/spatialentail-eval/jobs/eval.sh",
         "experiments/spatialentail-allpossible-pilot/scripts/summarize.py",

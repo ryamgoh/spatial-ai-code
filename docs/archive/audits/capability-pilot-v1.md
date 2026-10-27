@@ -89,7 +89,7 @@ as source files. The retained artifact hashes are:
 ## Verification commands
 
 ```bash
-python -m spatial.v2.check_registry spatial/v2/benchmark-cells.yaml --probe \
+python -m spatial.v2.legacy.check_registry spatial/v2/benchmark-cells.yaml --probe \
   --seed 1901 --max-attempts 500
 pytest spatial/v2 -q
 typst compile fyp-report/report.typ /tmp/spatialentail-report.pdf

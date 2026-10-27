@@ -1,5 +1,19 @@
 # SpatialEntail vocabulary
 
+## Current study
+
+Follow the
+[composition pivot](../../experiments/spatialentail-composition-v1/pivot_20261026.md)
+for all new research work. This package contains reusable infrastructure and
+historical workflows; package version `v2` does not select randomized-v2 as the
+active experiment.
+
+The vocabulary below is historical. In the new study, use chain length,
+verified distractor count, and semantic case, not redefined `L/X/G` or the
+MATCHED/OOD campaign. Natural and Symbolic are required matched supervision
+arms, rendered from the same verified evidence. Shared Boolean solver support
+does not imply Boolean premises belong in the new dataset.
+
 ## Dataset lifecycle
 
 - **Calibration pool**: generated, solver-checked examples used to measure cell

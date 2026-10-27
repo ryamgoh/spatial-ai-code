@@ -98,7 +98,7 @@ def audit_sources(benchmark: Path, training: Path, receipt_path: Path, expected:
         if manifest["benchmark_jsonl_sha256"] != expected:
             raise ValueError("Training manifest excludes a different benchmark")
         # Manifest uses abbreviations; the proof profile uses full rule labels.
-        from spatial.v2.random_proof import PROOF_RULE_LABELS, deterministic_transition_partition
+        from spatial.v2.legacy.random_proof import PROOF_RULE_LABELS, deterministic_transition_partition
 
         heldout = {
             f"{PROOF_RULE_LABELS[a]}->{PROOF_RULE_LABELS[b]}"

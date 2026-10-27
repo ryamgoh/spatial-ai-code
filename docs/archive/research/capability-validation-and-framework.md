@@ -36,7 +36,7 @@ need especially careful cell definitions. Prefer merged families or secondary
 tags over duplicate task identities if a controlled contrast cannot isolate
 the proposed distinction.
 
-The canonical [task taxonomy](../../research/task-taxonomy.md) retains compact structure and
+The canonical [task taxonomy](task-taxonomy.md) retains compact structure and
 obligation codes without treating them as one flat list of peer task types.
 MTR means reasoning across satisfying models, not neural-model parameters.
 SODA already uses MR for Mental Rotation, so Model-Based Reasoning/MR is rejected
@@ -182,7 +182,7 @@ Do not conflate inconsistent premises, a refuted candidate, and an uncertain
 answer. The current generated training pool rejects inconsistent premises;
 adding an inconsistency task would require a new explicit output contract.
 Sources: [semantics](../../spatialentail/semantics.md),
-[answer/menu controls](../../spatialentail/generation-and-knobs.md).
+[answer/menu controls](generation-and-knobs.md).
 
 ### A checked mixed logical-spatial derivation
 

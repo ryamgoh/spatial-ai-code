@@ -543,6 +543,6 @@ menu object to be impossible. A singleton `possible_entities` result is not an
 exact answer when that entity is absent in another valid world.
 
 Dataset construction and experimental controls do not belong to the solver
-contract. They are documented in [Generation and experiment knobs](generation-and-knobs.md).
+contract. They are documented in [Generation and experiment knobs](../archive/research/generation-and-knobs.md).
 Certificate construction and replay are documented in
 [Certificate system](certificates.md).

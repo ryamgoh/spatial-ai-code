@@ -1,6 +1,10 @@
 # Part I research plan: evaluating LLM spatial reasoning
 
-Status: living experimental plan
+Archive status: superseded by the
+[composition pivot](../../../experiments/spatialentail-composition-v1/pivot_20261026.md).
+Retained for historical context, not as the current evaluation plan.
+
+Historical status: living experimental plan
 
 This document develops the evaluation half of the project. It is subordinate to
 the main [`FYP research plan`](research-plan.md) and does not fix the

@@ -5,7 +5,7 @@ from copy import deepcopy
 
 import pytest
 
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     GenerationPolicy,
     QueryKind,
     SemanticShape,

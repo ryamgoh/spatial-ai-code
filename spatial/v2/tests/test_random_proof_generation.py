@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from spatial.v2.generation import (
+from spatial.v2.legacy.generation import (
     ENTITY_NAMES,
     GenerationPolicy,
     QueryKind,
@@ -10,14 +10,14 @@ from spatial.v2.generation import (
     SpatialGeneratorV2,
 )
 from spatial.v2.grading import AnswerMode
-from spatial.v2.possibility import construct_possibility
-from spatial.v2.random_proof import (
+from spatial.v2.legacy.possibility import construct_possibility
+from spatial.v2.legacy.random_proof import (
     RandomProofPolicy,
     SemanticRule,
     TransitionPartition,
     constructively_supported_transitions,
 )
-from spatial.v2.random_proof_generation import (
+from spatial.v2.legacy.random_proof_generation import (
     RandomProofConstructionError,
     construct_random_proof_candidate,
     lift_problem_with_random_path,

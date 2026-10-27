@@ -8,10 +8,10 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from spatial.v2.generate_matrix import app
-from spatial.v2.generation import BooleanShape, MenuCoverage, QueryKind, SemanticShape
+from spatial.v2.legacy.generate_matrix import app
+from spatial.v2.legacy.generation import BooleanShape, MenuCoverage, QueryKind, SemanticShape
 from spatial.v2.grading import AnswerMode
-from spatial.v2.matrix import generate_matrix, load_experiment_matrix
+from spatial.v2.legacy.matrix import generate_matrix, load_experiment_matrix
 from spatial.v2.solver import Direction
 from spatial.v2.trace import TraceFormat
 
@@ -425,7 +425,7 @@ def test_failed_replacement_preserves_previous_validated_workload(tmp_path):
 
 
 def test_workload_cli_path_persists_context_rejection(tmp_path, monkeypatch):
-    from spatial.v2 import generate_all
+    from spatial.v2.legacy import generate_all
     from spatial.v2.context_budget import ContextBudget
 
     monkeypatch.setattr(

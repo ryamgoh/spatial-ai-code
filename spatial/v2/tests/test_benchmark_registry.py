@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from spatial.v2.benchmark_registry import (
+from spatial.v2.legacy.benchmark_registry import (
     CapabilityLens,
     CellReadiness,
     EvidenceObligation,
@@ -17,8 +17,8 @@ from spatial.v2.benchmark_registry import (
     load_benchmark_registry,
     probe_registry,
 )
-from spatial.v2.check_registry import main
-from spatial.v2.generation import QueryKind
+from spatial.v2.legacy.check_registry import main
+from spatial.v2.legacy.generation import QueryKind
 
 
 REGISTRY_YAML = """

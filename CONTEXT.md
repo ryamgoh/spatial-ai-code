@@ -1,7 +1,29 @@
 # SpatialEntail
 
-This context defines the canonical language for SpatialEntail problems,
-questions, evidence, and experimental dimensions.
+## Current research authority
+
+The active study is
+[`spatialentail-composition-v1`](experiments/spatialentail-composition-v1/README.md).
+Read its [pivot](experiments/spatialentail-composition-v1/pivot_20261026.md)
+before planning or changing research code. It is the source of truth for the
+new study; the vocabulary below records earlier designs and does not override it.
+
+The research direction is settled: a solver-verified atomic spatial-composition
+dataset is the primary contribution, with matched Natural/Symbolic supervision
+as a supporting comparison. Do not reopen the direction or expand the study
+without explicit user approval. Surface correctness or feasibility blockers
+with evidence; do not silently weaken release requirements to meet the schedule.
+
+Reuse shared solver and training infrastructure. Preserve historical results,
+identifiers, and frozen Corr SINGLE behavior. New contracts and workflows need
+explicit versioning, not retroactive changes to old experiments.
+
+## Historical vocabulary
+
+The following terms describe earlier SpatialEntail problems, evidence, and
+experimental dimensions. Old benchmark sizes, capability lenses, and optional
+Symbolic supervision are not requirements for the composition study. Use the
+pivot's descriptors and matched explanation requirements for new work.
 
 ## Language
 

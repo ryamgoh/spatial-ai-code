@@ -2,60 +2,58 @@
 
 ## Start here
 
-1. [Problem definition](spatialentail/semantics.md): what a question means,
-   exact directions, possible answers, and training assumptions.
-2. [Generation guide](spatialentail/generation-and-knobs.md): how we build
-   problems backward, substitute rules, sample paths, reject proposals, and
-   configure experiments. Generation pseudocode is consolidated here.
-3. [Research plan](research/research-plan.md): why we are doing this and what
-   the two research streams test.
+For the active study, start with
+[SpatialEntail Composition v1](../experiments/spatialentail-composition-v1/README.md)
+and its [authoritative pivot](../experiments/spatialentail-composition-v1/pivot_20261026.md).
+The pivot supersedes earlier research plans, training arms, benchmark campaigns,
+and prompt contracts for new-study work. It is a specification, not evidence
+that those changes have already been implemented.
 
-For a short presentation narrative, use the
-[professor brief](professor-brief-research.md).
+For implementation entry points, use the
+[package map](../spatial/v2/README.md). The
+[report draft](../fyp-report/README.md) follows the same composition direction
+and explicitly identifies pending implementation and empirical results.
 
 ## Technical references
 
-There are five canonical implementation documents; the PDFs are illustrations,
-not additional contracts.
+These documents describe existing shared software. They are not specifications
+for the pending composition release; reuse applicable implementation contracts
+without importing retired research scope.
 
 | Document | Responsibility |
 |---|---|
 | [Semantics](spatialentail/semantics.md) | Language, world assumptions, queries, and solver boundary |
-| [Generation](spatialentail/generation-and-knobs.md) | Algorithm, rule chaining, sampling, admission, and controls |
 | [Correctness](spatialentail/correctness.md) | Soundness/completeness arguments and implementation trust limits |
 | [Certificates](spatialentail/certificates.md) | Checked derivations, refutations, witnesses, and answer evidence |
 | [Trace formats](spatialentail/trace-formats.md) | Natural supervision and replayable Symbolic audit grammar |
 
-Presentation assets: [generation overview](spatialentail/generation-overview.pdf)
-and [rule substitution](spatialentail/rule-substitution.pdf), with editable
-[generation](spatialentail/generation-overview.typ) and
-[substitution](spatialentail/rule-substitution.typ) Typst sources.
-
 ## Research references
 
-- [Evaluation plan](research/part-1-evaluation.md) and
-  [training plan](research/part-2-training.md): detailed study design.
 - [SpatialMap audit](research/spatialmap-answer-generation-review.md): local
   answerability evidence, menu-conditioned interpretation, and reporting limits.
-- [Task taxonomy](research/task-taxonomy.md): query/capability dimensions.
 - [Literature landscape](research/literature-landscape.md) and
   [citation ledger](research/annotated-sources.md): research context and sources.
 
 ## Supporting material
 
 The [archive index](archive/README.md) retains detailed research investigations,
-audit receipts, earlier drafts, and working notes. Archive placement means
-supporting material, not necessarily obsolete or invalid evidence. Do not use
-it to override the canonical implementation contracts.
+audit receipts, superseded research plans, old presentations, and working notes.
+The retired task taxonomy and Boolean/randomized generation guide are also
+archived for historical reproduction. Neither those plans nor the old
+presentation diagrams govern the active study.
+Other archived evidence may remain applicable under its stated assumptions.
 
 Run status and commands belong beside each experiment. Start with
-[randomized-v2](../experiments/spatialentail-randomized-v2/README.md);
-the [package map](../spatial/v2/README.md) locates executable code. The
-[submitted report](../fyp-report/README.md) has its own chapter structure.
+[composition-v1](../experiments/spatialentail-composition-v1/README.md);
+[randomized-v2](../experiments/spatialentail-randomized-v2/README.md) retains
+historical run records.
 
 ## Authority
 
-Use `spatialentail/` for software contracts, experiment artifacts for executed
-runs, the submitted report for its narrative, and archived audits for historical
-evidence. Research plans describe hypotheses and do not override implemented
-behaviour. No supporting evidence was deleted during consolidation.
+Use shared implementation references for software contracts, experiment artifacts
+for executed runs, the report draft for its narrative, and archived audits for historical
+evidence. The composition pivot governs intended new-study behavior; existing
+software contracts describe current behavior until explicitly migrated and
+tested. Preserve legacy behavior for historical callers. Research plans and
+documentation edits do not establish implementation completion.
+Pruned presentation sources are preserved in the archive, not discarded.

@@ -1,20 +1,20 @@
 #pagebreak(weak: true)
-#heading(level: 1, numbering: none)[Appendix D — Additional Results]
+#heading(level: 1, numbering: none)[Appendix D: Reporting Requirements]
 
-No V2 model results are available in this draft. After execution, this appendix
-will contain the complete per-task and per-seed tables underlying Chapter 6,
-including:
+No composition-study model results are available in this draft. The final
+report must include the following outputs from the frozen evaluation:
 
-- all frozen benchmark-cell scores and query/capability marginals;
-- depth-3–8 results for Direction, Selection, and Count;
-- premise-first formula-composition cells;
-- external adapter-specific results;
-- answer-position consistency;
-- paired fixes and regressions;
-- target-token, runtime, and memory accounting for any compact-representation extension;
-- LLM/human judge disagreements; and
-- representative model errors selected before reading arm identities.
+- Stage-1 and Stage-2 accuracy for both adapters and both style-matched
+  evaluations of the untuned checkpoint;
+- contract, query-family, semantic-case, and escape-reason breakdowns;
+- substantive-answer accuracy and E/F accuracy;
+- format compliance, truncation, rescues, regressions, and answer changes;
+- Stage-1 and total generated tokens, input tokens for both passes, and
+  actual training cost;
+- paired Natural/Symbolic comparisons with related views grouped;
+- fixed external SpatialMap results, with Corr SINGLE separate from new
+  contract variants;
+- explanation-verifier coverage, release rejections, and audit limitations.
 
-Earlier V1 experiments remain historical evidence and must not be relabelled as
-results of this protocol. GRPO appears here only if a later, predeclared go/no-go
-decision authorizes the follow-up.
+Historical results remain in their original experiment records and in the
+pre-pivot report archive. They are not results of this protocol.

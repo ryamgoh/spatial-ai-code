@@ -1,21 +1,27 @@
 # SpatialEntail generation and experiment knobs
 
-This is the authoritative catalogue of controls exposed by the active V2 data
-generator and experiment matrix. The formal meaning of accepted problems is
-defined by [Semantics](semantics.md); certificates are defined by
-[Certificate system](certificates.md); rendered outputs are defined by
-[Trace formats](trace-formats.md).
+This is the historical catalogue of controls exposed by
+[`spatial.v2.legacy`](../../../spatial/v2/legacy/README.md), not the active atomic
+generator or the composition study's release specification. Boolean curriculum
+controls and randomized-proof paths have been retired from active generation.
+Follow the [composition pivot](../../../experiments/spatialentail-composition-v1/pivot_20261026.md)
+for new work.
+
+The formal meaning of accepted historical problems is
+defined by [Semantics](../../spatialentail/semantics.md); certificates are defined by
+[Certificate system](../../spatialentail/certificates.md); rendered outputs are defined by
+[Trace formats](../../spatialentail/trace-formats.md).
 
 This guide includes the generation algorithm, rule substitution, sampling
 contract, rejection policy, and configuration catalogue. The compact
-[generation PDF](generation-overview.pdf) and
-[rule-substitution PDF](rule-substitution.pdf) are presentation views of this
+[generation PDF](../presentations/generation-overview.pdf) and
+[rule-substitution PDF](../presentations/rule-substitution.pdf) are presentation views of this
 guide, not separate implementation contracts.
 
 The controls below do not belong to the solver. They select, filter, render,
 split, or admit problems after the solver has established their semantics.
 
-The research-facing [task taxonomy](../research/task-taxonomy.md) composes query
+The research-facing [task taxonomy](task-taxonomy.md) composes query
 contract, reasoning structure, semantic status, and evidence burden into
 benchmark cells. The current generator exposes the lower-level controls listed
 here. The versioned `spatial/v2/benchmark-cells.yaml` registry maps selected
@@ -110,9 +116,9 @@ instantiation, consistency, certificate search, and deduplication can reject
 different paths at different rates.
 
 The implementation-level details are maintained in the source:
-[`random_proof.py`](../../spatial/v2/random_proof.py),
-[`random_proof_generation.py`](../../spatial/v2/random_proof_generation.py),
-and [`generation.py`](../../spatial/v2/generation.py).
+[`random_proof.py`](../../../spatial/v2/legacy/random_proof.py),
+[`random_proof_generation.py`](../../../spatial/v2/legacy/random_proof_generation.py),
+and [`generation.py`](../../../spatial/v2/legacy/generation.py).
 
 ## Knob classes
 
@@ -388,7 +394,7 @@ bases. These are preparation checks, not trained-model results.
 ```bash
 uv run --python 3.12 --no-project --with typer --with pyyaml \
   --with z3-solver --with transformers --with jinja2 \
-  python -m spatial.v2.generate_matrix \
+  python -m spatial.v2.legacy.generate_matrix \
   experiments/15-v2-ablation/matrix.yaml \
   --out data/spatial_v2_pilot.jsonl
 ```
@@ -399,7 +405,7 @@ manifest—not the requested YAML—is the authority for actual counts, paths,
 distributions, fingerprints, and admitted token volumes.
 
 The runnable training/evaluation orchestration is documented beside its code in
-[`experiments/15-v2-ablation`](../../experiments/15-v2-ablation/README.md).
+[`experiments/15-v2-ablation`](../../../experiments/15-v2-ablation/README.md).
 Training benefits, readable explanation quality, and internal reasoning
 faithfulness remain empirical questions.
 
@@ -410,4 +416,4 @@ families across all query contracts. MP→TRC→MP, MP→DJE→TRC, and
 TRC→MP→TRC are separately reserved. Admission requires
 replay-valid ordered dependencies and individual logical-premise removal to
 change query semantics. These are bounded interventions, not global shortest
-proof claims. See [study protocol](../archive/research/size-freeze-protocol.md).
+proof claims. See [study protocol](size-freeze-protocol.md).

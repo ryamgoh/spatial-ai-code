@@ -3,96 +3,67 @@
 
 == Motivation
 
-Spatial reasoning from language requires a model to identify objects, preserve
-their relative positions, and compose relationships across several statements.
-Unlike visual spatial intelligence, this setting removes object detection and
-image grounding: the answer must follow from the information stated in text.
-It is therefore useful for studying reasoning, intermediate representations,
-and generalisation without conflating them with perception.
+Spatial reasoning from text requires a model to compose stated relations and
+distinguish what is guaranteed from what is merely possible. Partial premises
+can admit several maps. An answer that holds in one such map need not follow
+from the information available to the reader.
 
-Reliable evaluation requires more than an answer that is true in one hidden
-map. A benchmark may generate a complete world, expose only part of it as text,
-and retain an answer derived from the complete world. That answer is possible,
-but it is not necessarily entailed by the information available to the model.
-Scoring it as uniquely correct rewards guessing omitted state rather than
-reasoning from evidence.
+SpatialEntail addresses this distinction through controlled spatial problems,
+solver-verified semantic answers, and auditable explanations. The dataset is
+the primary contribution. A supporting learning study asks how two matched
+explanation representations affect answer accuracy and generated-token cost.
 
-This project studies one formal response to that problem. It defines
-qualitative two-dimensional relations over finite named objects, interprets
-answers across every spatial world satisfying the visible premises, and uses
-the resulting semantics both to audit an existing benchmark and to construct
-checked supervision for large language models.
+== Scope
 
-== Problem and Scope
+The study uses atomic pairwise relations over distinct points in a shared
+two-dimensional plane. Its reasoning core decomposes exact directions into
+axis comparisons, propagates strict order and equality, and recombines the
+resulting comparisons. Unstated relations remain unknown. Coordinates do not
+encode unit movement, distances, or a bounded grid.
 
-SpatialEval Spatial-Map TQA is the motivating case study. Its 1,500 released
-text questions comprise Direction, Which, and Count queries. The source map is
-not available in the release, so this work does not attempt to recover it.
-Instead, it asks what follows from the released text under a declared
-open-world semantics: unstated relationships remain unknown, a candidate is
-possible when some satisfying map supports it, and it is entailed only when
-every satisfying map supports it.
+Direction, Selection, and Count are separate query families. Each supports
+Unique Answer, Listed Possibilities, and Exhaustive Possibilities contracts.
+Consistent and inconsistent stories are included explicitly. Selection also
+distinguishes no match, multiple certain matches, and uncertain membership.
 
-The same semantics underlies SpatialEntail, a controlled data and evaluation
-framework over all eight compass directions and finite Boolean combinations of
-spatial atoms. SpatialEntail generates typed answer certificates to verify gold
-solutions, renders conventional answer-only and Natural worked-solution targets,
-and records constructive witnesses for audit. The project is text-only and does
-not claim unrestricted spatial language understanding, metric geometry, visual
-grounding, or embodied navigation.
+This work does not evaluate a mixed logical-proof curriculum, broad structural
+generalization campaign, model sweep, visual grounding system, or navigation
+agent. Retired experiments remain archived for provenance rather than becoming
+required comparisons.
 
-== Research Questions
+== Research Objectives
 
-The report addresses three questions.
+The primary objective is to construct a dataset whose labels, selected evidence,
+rendered questions, and matched explanation views pass reproducible quality
+checks. Controlled chain lengths, verified distractors, semantic cases, and
+menu coverage make the intended comparisons inspectable.
 
-#figure(
-  table(
-    columns: (auto, 1fr),
-    inset: (x: 7pt, y: 5pt),
-    stroke: .5pt + luma(120),
-    fill: (_, y) => if y == 0 { luma(235) } else { none },
-    table.header([*RQ*], [*Question*]),
-    [RQ1], [How does SpatialMap evaluation change when answers are defined over all worlds satisfying the visible premises rather than one latent generating world?],
-    [RQ2], [Does verified Natural SFT improve answer accuracy and structural generalisation over answer-only SFT on the same solver-validated spatial problems?],
-    [RQ3], [As an optional extension, can a compact Chain-of-Symbol-like representation reduce token cost while retaining spatial answer accuracy?],
-  ),
-  caption: [Research questions linking benchmark validity, checked supervision, and representation.],
-) <research-questions>
+The supporting empirical question is whether Natural and Symbolic explanations
+of the same evidence produce different answer accuracy and token cost when
+used for matched supervised fine-tuning. Symbolic notation is not assumed to
+be shorter or more accurate. The dataset remains useful if neither adapter
+improves on its style-matched untuned baseline.
 
-== Contributions
+== Contribution and Evidence Boundary
 
-First, the project separates latent-world truth from textual entailment. Its
-solver represents each exact compass direction through X- and Y-axis
-comparisons, supports `NOT`, `AND`, `OR`, implication, and equivalence, and
-distinguishes consistency, possibility, entailment, ambiguity, and
-impossibility.
+The intended contribution combines controlled atomic spatial composition,
+three matched answer contracts, and checkable evidence for definite answers,
+possibilities, underdetermination, and inconsistency. Natural and Symbolic
+supervision must preserve the same selected evidence and conclusion.
 
-Second, the semantics is applied to the untouched SpatialMap-TQA release. The
-audit preserves every published question and oracle, checks complete candidate
-domains, and records counter-witnesses where several answers remain possible.
-The corrected evaluation view adds an explicit _Cannot be determined_ option
-without overwriting the released benchmark.
+The study currently has a written specification and executable semantic
+fixtures. These establish covered examples, not production readiness or
+learning gains. This report distinguishes the intended method from completed
+evidence throughout.
 
-Third, SpatialEntail turns the same formal contract into a generation and
-supervision pipeline. Accepted problems are solved, certificate-checked,
-rendered, parsed back, and re-solved. They carry explicit construction
-provenance, structural signatures, measured difficulty, and exact tokenizer
-admission metadata.
-
-Finally, the learning study compares conventional answer-only and verified
-Natural SFT on Qwen3.5-4B. It separates matched interpolation, unseen-depth
-extrapolation, held-out formula composition, and external transfer. A compact
-Chain-of-Symbol-like target is optional and is evaluated only as a
-token-efficiency extension; replayable answer certificates remain offline audit
-artifacts rather than the model's normal response format.
+The pivot was informed by inspected SpatialMap failures. This post-hoc history
+must be disclosed. SpatialMap stories and contract variants are external
+evaluation only, never training, development, or checkpoint-selection data.
 
 == Report Organization
 
-Chapter 2 positions the work against textual spatial benchmarks, spatial
-traces, explicit maps, and verified reasoning. Chapter 3 defines the formal
-problem and SpatialEval diagnosis. Chapter 4 presents SpatialEntail's solver,
-certificates, generator, difficulty taxonomy, and supervision views. Chapter 5
-predeclares the model, data, quality-review, and evaluation protocols. Chapter
-6 reports completed audit and artifact evidence and identifies the model
-analyses that remain unrun. Chapter 7 concludes. Formal proofs, complete artifact examples,
-configuration details, and extended results are placed in appendices.
+Chapter 2 gives the research context. Chapter 3 defines spatial semantics and
+answer contracts. Chapter 4 specifies evidence construction and release checks.
+Chapter 5 describes the bounded matched training and evaluation protocol.
+Chapter 6 records the current evidence and limitations; Chapter 7 concludes.
+Appendices record the spatial correctness argument and release requirements.

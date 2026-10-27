@@ -186,7 +186,7 @@ def test_depth_benchmark_can_persist_oracle_only_count_rows(tmp_path):
 
 
 def test_failed_release_can_resume_bound_completed_strata(tmp_path, monkeypatch):
-    from spatial.v2.generation import SpatialGeneratorV2
+    from spatial.v2.legacy.generation import SpatialGeneratorV2
 
     path = config(tmp_path)
     release = tmp_path / "release"

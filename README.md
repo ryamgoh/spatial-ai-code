@@ -4,6 +4,19 @@ This repository contains the data generation, fine-tuning, and evaluation code
 for the SpatialEval experiments. Training uses Axolotl; evaluation uses
 LM Evaluation Harness with a custom one- or two-stage vLLM backend.
 
+## Current study
+
+Start with [SpatialEntail Composition v1](experiments/spatialentail-composition-v1/README.md)
+and its [authoritative pivot](experiments/spatialentail-composition-v1/pivot_20261026.md).
+The primary contribution is a verified atomic spatial-composition dataset;
+the supporting experiment compares matched Natural and Symbolic supervision.
+Earlier experiments remain for provenance, not as required new-study baselines.
+
+The composition study currently has planning and executable evidence fixtures,
+not a released dataset or completed training run. The launch commands below
+illustrate existing infrastructure and historical experiments; they are not
+composition-study launch instructions.
+
 ## Repository map
 
 | Path | Purpose |

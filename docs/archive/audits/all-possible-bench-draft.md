@@ -9,7 +9,7 @@
 Status: hardening, updated 2026-10-15. Not frozen or sealed. The first
 calibration registry is `spatial/v2/all-possible-cells.yaml`; the separate
 hardening registry is `spatial/v2/all-possible-hardening-cells.yaml`. The
-generator is `spatial/v2/possibility.py`.
+generator is `spatial/v2/legacy/possibility.py`.
 
 ## Purpose
 

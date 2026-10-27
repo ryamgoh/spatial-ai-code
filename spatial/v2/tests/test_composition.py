@@ -2,8 +2,8 @@ from dataclasses import replace
 
 import pytest
 
-from spatial.v2.composition import COMPOSITIONS, assess_composition
-from spatial.v2.generation import GenerationPolicy, SpatialGeneratorV2
+from spatial.v2.legacy.composition import COMPOSITIONS, assess_composition
+from spatial.v2.legacy.generation import GenerationPolicy, SpatialGeneratorV2
 from spatial.v2.proofs import ProofConstructionError
 from spatial.v2.solver import And, DirectionQuery, SpatialSolverV2, direction_constraint
 from spatial.v2.symbolic_trace_codec import score_symbolic_training_trace

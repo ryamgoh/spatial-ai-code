@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from spatial.v2.generate_all import WorkloadSpec, generate_workload
-from spatial.v2.generation import BooleanShape, QueryKind, SemanticShape
+from spatial.v2.legacy.generate_all import WorkloadSpec, generate_workload
+from spatial.v2.legacy.generation import BooleanShape, QueryKind, SemanticShape
 from spatial.v2.grading import AnswerMode
 from spatial.v2.supervision_controls import SupervisionArm
 from spatial.v2.trace import TraceFormat

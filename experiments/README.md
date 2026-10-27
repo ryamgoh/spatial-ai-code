@@ -4,6 +4,21 @@ Every experiment lives in its own directory: its train/eval config yamls, its
 Slurm launchers, notes, and a README recording the research question, setup,
 and result.
 
+## Active research direction
+
+[`spatialentail-composition-v1`](spatialentail-composition-v1/README.md) is the
+active study. Its [pivot](spatialentail-composition-v1/pivot_20261026.md) governs
+new dataset, training, and evaluation work. New experiment-specific artifacts
+belong there; shared implementation stays in the existing shared packages.
+
+`spatialentail-randomized-v2`, the earlier SpatialEntail pilots, and the numbered
+experiments are historical research workflows. Preserve their results and
+reproduction paths without treating them as prerequisites or additional arms
+of the composition study. The layout and commands below document that existing
+infrastructure, not a new-study execution plan.
+
+## Historical numbering
+
 Numbering follows the dissertation (H036660, Ch. 4): Experiments **0–3**.
 Experiments **4a/4b** (Qwen3.5-4B pipeline smoke), **5** (GRPO), **6**
 (baseline task feasibility), **7** (SFT starting state), **7b** (untuned

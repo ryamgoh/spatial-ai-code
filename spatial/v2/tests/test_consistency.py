@@ -4,7 +4,7 @@ from spatial.v2.consistency import (
     check_consistency_certificate,
     generate_consistency_pair,
 )
-from spatial.v2.generation import ENTITY_NAMES
+from spatial.v2.legacy.generation import ENTITY_NAMES
 
 
 @pytest.mark.parametrize("axis", ("x", "y"))

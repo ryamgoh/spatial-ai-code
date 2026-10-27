@@ -7,7 +7,7 @@ import json
 from collections.abc import Sequence
 from pathlib import Path
 
-from spatial.v2.benchmark_registry import (
+from spatial.v2.legacy.benchmark_registry import (
     CellReadiness,
     RegistryProbeReport,
     generate_registry_pilot,
@@ -38,7 +38,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "registry",
         nargs="?",
         type=Path,
-        default=Path(__file__).with_name("benchmark-cells.yaml"),
+        default=Path(__file__).parents[1] / "benchmark-cells.yaml",
     )
     action = parser.add_mutually_exclusive_group()
     action.add_argument(

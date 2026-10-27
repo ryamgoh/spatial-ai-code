@@ -1,4 +1,8 @@
-"""Generate balanced, solver-verified SpatialMap V2 JSONL workloads."""
+"""Generate atomic-only V2 workloads, retaining the existing V2 answer interface.
+
+This CLI does not implement the composition study's pending release gates.
+Historical Boolean workloads use spatial.v2.legacy.generate_all.
+"""
 
 from __future__ import annotations
 
@@ -19,7 +23,6 @@ from spatial.v2.context_budget import (
     write_rejection_report,
 )
 from spatial.v2.generation import (
-    BooleanShape,
     GenerationMode,
     GenerationPolicy,
     MenuCoverage,
@@ -59,7 +62,6 @@ class WorkloadSpec:
     menu_coverages: tuple[MenuCoverage, ...] = (MenuCoverage.FULL,)
     trace_formats: tuple[TraceFormat, ...] = (TraceFormat.NATURAL,)
     supervision_arms: tuple[SupervisionArm, ...] = (SupervisionArm.CHECKED_TRACE,)
-    boolean_shapes: tuple[BooleanShape, ...] = (BooleanShape.ATOMIC,)
     query_directions: tuple[Direction, ...] | None = None
     target_directions: tuple[Direction, ...] | None = None
     num_entities: int = 6
@@ -72,7 +74,6 @@ class WorkloadSpec:
     min_membership_depth: int = 1
     max_membership_depth: int | None = None
     distractor_premises: int = 0
-    require_joint_count_dependency: bool = False
     max_attempts_per_sample: int = 2_000
     dev_split: float = 0
     context_budget: ContextBudget | None = None
@@ -102,7 +103,6 @@ class WorkloadSpec:
             "menu coverage": self.menu_coverages,
             "trace format": self.trace_formats,
             "supervision arm": self.supervision_arms,
-            "Boolean shape": self.boolean_shapes,
         }
         empty = [name for name, values in dimensions.items() if not values]
         if empty:
@@ -116,12 +116,6 @@ class WorkloadSpec:
             and TraceFormat.SYMBOLIC not in self.trace_formats
         ):
             raise ValueError("corrupted-trace requires a symbolic trace variant")
-        if (
-            self.generation_mode != "premise-first"
-            and any(shape is not BooleanShape.ATOMIC for shape in self.boolean_shapes)
-            and (set(self.semantic_shapes) != {SemanticShape.UNIQUE})
-        ):
-            raise ValueError("non-atomic Boolean shapes require unique semantic cells")
 
     def manifest_config(self) -> dict:
         def serialize(value):
@@ -178,9 +172,8 @@ def generate_workload(
         spec.answer_modes,
         spec.semantic_shapes,
         spec.menu_coverages,
-        spec.boolean_shapes,
     ):
-        query_kind, answer_mode, shape, coverage, boolean_shape = dimensions
+        query_kind, answer_mode, shape, coverage = dimensions
         if (
             query_kind is QueryKind.DIRECTION
             and shape is SemanticShape.UNIQUE
@@ -204,7 +197,6 @@ def generate_workload(
                     semantic_shape=shape,
                     menu_coverage=coverage,
                     trace_format=spec.trace_formats[0],
-                    boolean_shape=boolean_shape,
                     num_entities=spec.num_entities,
                     num_premises=spec.num_premises,
                     query_direction=query_direction,
@@ -217,7 +209,6 @@ def generate_workload(
                     min_membership_depth=spec.min_membership_depth,
                     max_membership_depth=spec.max_membership_depth,
                     distractor_premises=spec.distractor_premises,
-                    require_joint_count_dependency=spec.require_joint_count_dependency,
                 )
             except ValueError as exc:
                 raise ValueError(
@@ -331,7 +322,6 @@ def main(
         ),
     ),
     supervision_arms: str = typer.Option("checked-trace"),
-    boolean_shapes: str = typer.Option("atomic"),
     query_directions: str = typer.Option(
         "north,northeast,east,southeast,south,southwest,west,northwest",
         help="Balanced Which/Count query directions; ignored for Direction queries.",
@@ -350,7 +340,6 @@ def main(
     min_membership_depth: int = typer.Option(1, min=1),
     max_membership_depth: int | None = typer.Option(None, min=1),
     distractor_premises: int = typer.Option(0, min=0),
-    require_joint_count_dependency: bool = typer.Option(False),
     max_attempts_per_sample: int = typer.Option(2_000, min=1),
     dev_split: float = typer.Option(0, min=0.0, max=0.999999),
     tokenizer_name: str | None = typer.Option(None),
@@ -389,11 +378,6 @@ def main(
                     SupervisionArm,
                     "supervision arms",
                 ),
-                boolean_shapes=_enum_values(
-                    boolean_shapes,
-                    BooleanShape,
-                    "Boolean shapes",
-                ),
                 query_directions=_enum_values(
                     query_directions, Direction, "query directions"
                 ),
@@ -410,7 +394,6 @@ def main(
                 min_membership_depth=min_membership_depth,
                 max_membership_depth=max_membership_depth,
                 distractor_premises=distractor_premises,
-                require_joint_count_dependency=require_joint_count_dependency,
                 max_attempts_per_sample=max_attempts_per_sample,
                 test_split=test_split,
                 dev_split=dev_split,

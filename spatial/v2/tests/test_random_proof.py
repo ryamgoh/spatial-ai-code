@@ -3,7 +3,7 @@ from collections import Counter
 
 import pytest
 
-from spatial.v2.random_proof import (
+from spatial.v2.legacy.random_proof import (
     RandomProofPolicy,
     SemanticRule,
     TransitionPartition,

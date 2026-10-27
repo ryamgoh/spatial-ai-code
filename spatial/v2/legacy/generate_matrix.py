@@ -4,7 +4,7 @@ from pathlib import Path
 
 import typer
 
-from spatial.v2.matrix import generate_matrix
+from spatial.v2.legacy.matrix import generate_matrix
 
 app = typer.Typer(add_completion=False)
 
