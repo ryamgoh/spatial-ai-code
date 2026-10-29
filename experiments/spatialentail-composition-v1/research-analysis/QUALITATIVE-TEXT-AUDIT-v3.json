@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "checks": {
+    "paths_per_style": 3804,
+    "maps_per_style": 0,
+    "qualitative_scenarios_per_style": 727,
+    "pairs": 987
+  },
+  "source_sha256": "a0b3c392defc904e1451dd8a90b65d60ca6c03d334e4f02d23773607bc409c9a",
+  "auditor_sha256": "df75db4fa7b20e0ba2fd6f742f945bea8020f8ec59a0d12bf1ebe81988c58077",
+  "scope": "Printed chains, citations, endpoints, qualitative alternatives, cross-references and joint outcomes; audit-only whole-map completions; cross-style equality. Not a parser of all conclusion prose or a fluency judgment."
+}

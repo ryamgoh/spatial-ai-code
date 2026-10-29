@@ -1,0 +1,53 @@
+{
+  "bases": 282,
+  "paired_views": 987,
+  "numerical_coordinates_in_responses": 0,
+  "duplicate_qualitative_case_definitions": 0,
+  "changed_pairs_since_v2": 444,
+  "audit_witness_occurrences": 810,
+  "displayed_qualitative_cases": 727,
+  "deduplicated_views": 34,
+  "tokens": {
+    "natural": {
+      "median": 282,
+      "mean": 289.8,
+      "max": 868,
+      "total": 286081,
+      "max_id": "joint-0-base-count-m0-all-possible"
+    },
+    "symbolic": {
+      "median": 233,
+      "mean": 244.9,
+      "max": 744,
+      "total": 241717,
+      "max_id": "random-world-8-count-m0-all-possible"
+    }
+  },
+  "inspected_example_ids": [
+    "random-atoms-4-which-m0-single",
+    "depth-10-sample-4-direction-m0-all-possible",
+    "depth-9-sample-3-direction-m1-single",
+    "depth-9-sample-2-which-m0-single",
+    "depth-9-sample-2-count-m0-single",
+    "depth-10-sample-2-direction-m0-visible-possible",
+    "depth-10-sample-2-which-m0-single",
+    "depth-10-sample-2-count-m0-single",
+    "joint-0-base-direction-m0-single",
+    "fork-0-base-direction-m0-visible-possible",
+    "fork-0-base-direction-m0-all-possible",
+    "random-world-8-count-m1-visible-possible",
+    "joint-0-base-count-m0-single",
+    "empty-0-base-count-m0-visible-possible",
+    "empty-0-base-which-m0-single",
+    "cycle-0-base-which-m0-single",
+    "contingent-0-base-which-m0-single",
+    "random-atoms-2-count-m0-all-possible",
+    "coincidence-0-base-count-m0-all-possible",
+    "empty-0-base-direction-m1-single",
+    "empty-0-base-direction-m1-all-possible",
+    "empty-0-base-which-m0-all-possible",
+    "empty-0-base-direction-m1-visible-possible",
+    "joint-0-base-count-m0-all-possible",
+    "random-world-8-count-m0-all-possible"
+  ]
+}

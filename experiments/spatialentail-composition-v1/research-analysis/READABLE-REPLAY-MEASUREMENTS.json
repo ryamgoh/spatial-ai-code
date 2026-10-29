@@ -1,0 +1,325 @@
+{
+  "population": "987 paired contract/menu views, not independent stories",
+  "all_input_metadata_and_original_evidence_unchanged": true,
+  "hashes_verified": true,
+  "overall": {
+    "natural": {
+      "before": {
+        "n": 987,
+        "mean": 950.0,
+        "median": 861,
+        "p95": 2113,
+        "max": 2589,
+        "total": 937689
+      },
+      "after": {
+        "n": 987,
+        "mean": 330.2,
+        "median": 294,
+        "p95": 687,
+        "max": 1514,
+        "total": 325947
+      }
+    },
+    "symbolic": {
+      "before": {
+        "n": 987,
+        "mean": 833.0,
+        "median": 767,
+        "p95": 1854,
+        "max": 2281,
+        "total": 822201
+      },
+      "after": {
+        "n": 987,
+        "mean": 267.7,
+        "median": 239,
+        "p95": 552,
+        "max": 1182,
+        "total": 264230
+      }
+    }
+  },
+  "by_query_kind": {
+    "direction": {
+      "natural": {
+        "n": 333,
+        "mean": 186.8,
+        "median": 168,
+        "p95": 346,
+        "max": 405,
+        "total": 62213
+      },
+      "symbolic": {
+        "n": 333,
+        "mean": 152.7,
+        "median": 145,
+        "p95": 259,
+        "max": 299,
+        "total": 50849
+      }
+    },
+    "which": {
+      "natural": {
+        "n": 315,
+        "mean": 352.6,
+        "median": 318,
+        "p95": 734,
+        "max": 1514,
+        "total": 111054
+      },
+      "symbolic": {
+        "n": 315,
+        "mean": 286.0,
+        "median": 263,
+        "p95": 570,
+        "max": 1182,
+        "total": 90105
+      }
+    },
+    "count": {
+      "natural": {
+        "n": 339,
+        "mean": 450.4,
+        "median": 466,
+        "p95": 747,
+        "max": 916,
+        "total": 152680
+      },
+      "symbolic": {
+        "n": 339,
+        "mean": 363.6,
+        "median": 376,
+        "p95": 582,
+        "max": 734,
+        "total": 123276
+      }
+    }
+  },
+  "by_depth": {
+    "1": {
+      "natural": {
+        "n": 126,
+        "mean": 201.5,
+        "median": 173.0,
+        "p95": 416,
+        "max": 456,
+        "total": 25389
+      },
+      "symbolic": {
+        "n": 126,
+        "mean": 160.7,
+        "median": 141.0,
+        "p95": 332,
+        "max": 359,
+        "total": 20247
+      }
+    },
+    "2": {
+      "natural": {
+        "n": 93,
+        "mean": 260.5,
+        "median": 237,
+        "p95": 489,
+        "max": 530,
+        "total": 24231
+      },
+      "symbolic": {
+        "n": 93,
+        "mean": 210.0,
+        "median": 204,
+        "p95": 380,
+        "max": 409,
+        "total": 19533
+      }
+    },
+    "3": {
+      "natural": {
+        "n": 69,
+        "mean": 278.8,
+        "median": 235,
+        "p95": 559,
+        "max": 560,
+        "total": 19240
+      },
+      "symbolic": {
+        "n": 69,
+        "mean": 233.7,
+        "median": 197,
+        "p95": 439,
+        "max": 467,
+        "total": 16125
+      }
+    },
+    "4": {
+      "natural": {
+        "n": 75,
+        "mean": 315.2,
+        "median": 251,
+        "p95": 640,
+        "max": 653,
+        "total": 23637
+      },
+      "symbolic": {
+        "n": 75,
+        "mean": 255.5,
+        "median": 223,
+        "p95": 478,
+        "max": 491,
+        "total": 19165
+      }
+    },
+    "5": {
+      "natural": {
+        "n": 57,
+        "mean": 375,
+        "median": 360,
+        "p95": 654,
+        "max": 659,
+        "total": 21375
+      },
+      "symbolic": {
+        "n": 57,
+        "mean": 282.1,
+        "median": 262,
+        "p95": 490,
+        "max": 495,
+        "total": 16079
+      }
+    },
+    "6": {
+      "natural": {
+        "n": 75,
+        "mean": 383.6,
+        "median": 313,
+        "p95": 678,
+        "max": 725,
+        "total": 28772
+      },
+      "symbolic": {
+        "n": 75,
+        "mean": 307.5,
+        "median": 297,
+        "p95": 505,
+        "max": 534,
+        "total": 23061
+      }
+    },
+    "7": {
+      "natural": {
+        "n": 69,
+        "mean": 358.9,
+        "median": 321,
+        "p95": 656,
+        "max": 668,
+        "total": 24766
+      },
+      "symbolic": {
+        "n": 69,
+        "mean": 318.2,
+        "median": 309,
+        "p95": 543,
+        "max": 570,
+        "total": 21958
+      }
+    },
+    "8": {
+      "natural": {
+        "n": 60,
+        "mean": 467.1,
+        "median": 437.0,
+        "p95": 747,
+        "max": 767,
+        "total": 28028
+      },
+      "symbolic": {
+        "n": 60,
+        "mean": 341.9,
+        "median": 324.0,
+        "p95": 560,
+        "max": 581,
+        "total": 20514
+      }
+    },
+    "9": {
+      "natural": {
+        "n": 66,
+        "mean": 422.2,
+        "median": 373.0,
+        "p95": 756,
+        "max": 761,
+        "total": 27866
+      },
+      "symbolic": {
+        "n": 66,
+        "mean": 365.3,
+        "median": 339.5,
+        "p95": 662,
+        "max": 675,
+        "total": 24109
+      }
+    },
+    "10": {
+      "natural": {
+        "n": 66,
+        "mean": 426.0,
+        "median": 381.5,
+        "p95": 691,
+        "max": 781,
+        "total": 28117
+      },
+      "symbolic": {
+        "n": 66,
+        "mean": 379.9,
+        "median": 360.0,
+        "p95": 600,
+        "max": 627,
+        "total": 25072
+      }
+    }
+  },
+  "natural_shorter_pairs": 86,
+  "symbolic_shorter_pairs": 897,
+  "maxima": {
+    "natural": "random-atoms-4-which-m0-single",
+    "symbolic": "random-atoms-4-which-m0-single"
+  },
+  "cases": {
+    "direction/unique": 276,
+    "which/unique": 114,
+    "count/unique": 252,
+    "which/multiple-certain-match": 99,
+    "which/no-match": 30,
+    "direction/underdetermined": 39,
+    "count/underdetermined": 69,
+    "which/underdetermined": 54,
+    "direction/inconsistent": 18,
+    "which/inconsistent": 18,
+    "count/inconsistent": 18
+  },
+  "inspection_ids": [
+    "random-atoms-4-which-m0-single",
+    "depth-10-sample-4-direction-m0-all-possible",
+    "depth-9-sample-3-direction-m1-single",
+    "depth-9-sample-2-which-m0-single",
+    "depth-9-sample-2-count-m0-single",
+    "depth-10-sample-2-direction-m0-visible-possible",
+    "depth-10-sample-2-which-m0-single",
+    "depth-10-sample-2-count-m0-single",
+    "joint-0-base-direction-m0-single",
+    "fork-0-base-direction-m0-visible-possible",
+    "fork-0-base-direction-m0-all-possible",
+    "random-world-8-count-m1-visible-possible",
+    "joint-0-base-count-m0-single",
+    "empty-0-base-count-m0-visible-possible",
+    "empty-0-base-which-m0-single",
+    "cycle-0-base-which-m0-single",
+    "contingent-0-base-which-m0-single",
+    "random-atoms-2-count-m0-all-possible",
+    "coincidence-0-base-count-m0-all-possible",
+    "empty-0-base-direction-m1-single",
+    "empty-0-base-direction-m1-all-possible",
+    "empty-0-base-which-m0-all-possible",
+    "empty-0-base-direction-m1-visible-possible"
+  ]
+}

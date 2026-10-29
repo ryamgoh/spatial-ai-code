@@ -1,0 +1,400 @@
+query_kind,contract,semantic_case,possible_count,displayed_possible_count,returned_count,escape_reason,contains_zero,domain_sizes,literal_gold_potential,status,spatial_bases,admitted_bases,admitted_core_topologies
+direction,single,inconsistent,0,0,,inconsistent,False,[8],"[""E""]",renderer-admitted,6,6,6
+direction,all-possible,inconsistent,0,0,,inconsistent,False,[8],"[""E""]",renderer-admitted,6,6,6
+direction,visible-possible,inconsistent,0,0,,inconsistent,False,[8],"[""E""]",renderer-admitted,6,6,6
+direction,single,unique,1,0,,unique-unlisted,False,[8],"[""F""]",renderer-admitted,52,52,46
+direction,all-possible,unique,1,0,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,52,52,46
+direction,visible-possible,unique,1,0,,no-listed-possibilities,False,[8],"[""F""]",renderer-admitted,52,52,46
+direction,single,unique,1,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",renderer-admitted,52,52,46
+direction,all-possible,unique,1,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",renderer-admitted,52,52,46
+direction,visible-possible,unique,1,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",renderer-admitted,52,52,46
+direction,single,underdetermined,2,0,,underdetermined,False,[8],"[""E""]",renderer-admitted,1,1,1
+direction,all-possible,underdetermined,2,0,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,1,1,1
+direction,visible-possible,underdetermined,2,0,,no-listed-possibilities,False,[8],"[""F""]",renderer-admitted,1,1,1
+direction,single,underdetermined,2,1,,underdetermined,False,[8],"[""E""]",renderer-admitted,1,1,1
+direction,all-possible,underdetermined,2,1,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,1,1,1
+direction,visible-possible,underdetermined,2,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",renderer-admitted,1,1,1
+direction,single,underdetermined,2,2,,underdetermined,False,[8],"[""E""]",renderer-admitted,1,1,1
+direction,all-possible,underdetermined,2,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+direction,visible-possible,underdetermined,2,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+direction,single,underdetermined,3,0,,underdetermined,False,[8],"[""E""]",renderer-admitted,2,2,2
+direction,all-possible,underdetermined,3,0,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,2,2,2
+direction,visible-possible,underdetermined,3,0,,no-listed-possibilities,False,[8],"[""F""]",renderer-admitted,2,2,2
+direction,single,underdetermined,3,1,,underdetermined,False,[8],"[""E""]",renderer-admitted,2,2,2
+direction,all-possible,underdetermined,3,1,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,2,2,2
+direction,visible-possible,underdetermined,3,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",renderer-admitted,2,2,2
+direction,single,underdetermined,3,2,,underdetermined,False,[8],"[""E""]",renderer-admitted,2,2,2
+direction,all-possible,underdetermined,3,2,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,2,2,2
+direction,visible-possible,underdetermined,3,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,2,2,2
+direction,single,underdetermined,3,3,,underdetermined,False,[8],"[""E""]",renderer-admitted,2,2,2
+direction,all-possible,underdetermined,3,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+direction,visible-possible,underdetermined,3,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+direction,single,underdetermined,4,0,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,4,0,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,4,0,,no-listed-possibilities,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,4,1,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,4,1,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,4,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,4,2,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,4,2,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,4,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,4,3,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,4,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,4,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,4,4,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,4,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,4,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,5,1,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,5,1,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,5,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,5,2,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,5,2,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,5,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,5,3,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,5,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,5,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,5,4,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,5,4,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,5,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,6,2,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,6,2,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,6,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,6,3,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,6,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,6,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,6,4,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,6,4,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,6,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,7,3,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,7,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,7,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,7,4,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,all-possible,underdetermined,7,4,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,visible-possible,underdetermined,7,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+direction,single,underdetermined,8,4,,underdetermined,False,[8],"[""E""]",renderer-admitted,19,19,18
+direction,all-possible,underdetermined,8,4,,incomplete-coverage,False,[8],"[""F""]",renderer-admitted,19,19,18
+direction,visible-possible,underdetermined,8,4,4,,False,[8],"[""ABCD""]",renderer-admitted,19,19,18
+which,single,inconsistent,0,0,,inconsistent,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,all-possible,inconsistent,0,0,,inconsistent,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,visible-possible,inconsistent,0,0,,inconsistent,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,single,no-match,0,0,,no-match,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,11,11,11
+which,all-possible,no-match,0,0,,empty-set,False,"[4, 5, 6, 7, 8]","[""F""]",renderer-admitted,11,11,11
+which,visible-possible,no-match,0,0,,empty-set,False,"[4, 5, 6, 7, 8]","[""F""]",renderer-admitted,11,11,11
+which,single,underdetermined,1,1,,underdetermined,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,all-possible,underdetermined,1,1,1,,False,"[4, 5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,6,6,6
+which,visible-possible,underdetermined,1,1,1,,False,"[4, 5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,6,6,6
+which,single,unique,1,1,1,,False,"[4, 5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,22,22,21
+which,all-possible,unique,1,1,1,,False,"[4, 5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,22,22,21
+which,visible-possible,unique,1,1,1,,False,"[4, 5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,22,22,21
+which,single,underdetermined,2,2,,underdetermined,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,7,7,7
+which,all-possible,underdetermined,2,2,2,,False,"[4, 5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,7,7,7
+which,visible-possible,underdetermined,2,2,2,,False,"[4, 5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,7,7,7
+which,single,multiple-certain-match,2,2,,multiple-certain-match,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,2,2,2,,False,"[4, 5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,2,2,2,,False,"[4, 5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,2,2,2
+which,single,underdetermined,3,3,,underdetermined,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,all-possible,underdetermined,3,3,3,,False,"[4, 5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,6,6,6
+which,visible-possible,underdetermined,3,3,3,,False,"[4, 5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,6,6,6
+which,single,multiple-certain-match,3,3,,multiple-certain-match,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,3,3,3,,False,"[4, 5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,3,3,3,,False,"[4, 5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+which,single,underdetermined,4,4,,underdetermined,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,5,5,4
+which,all-possible,underdetermined,4,4,4,,False,"[4, 5, 6, 7, 8]","[""ABCD""]",renderer-admitted,5,5,4
+which,visible-possible,underdetermined,4,4,4,,False,"[4, 5, 6, 7, 8]","[""ABCD""]",renderer-admitted,5,5,4
+which,single,multiple-certain-match,4,4,,multiple-certain-match,False,"[4, 5, 6, 7, 8]","[""E""]",renderer-admitted,4,4,3
+which,all-possible,multiple-certain-match,4,4,4,,False,"[4, 5, 6, 7, 8]","[""ABCD""]",renderer-admitted,4,4,3
+which,visible-possible,multiple-certain-match,4,4,4,,False,"[4, 5, 6, 7, 8]","[""ABCD""]",renderer-admitted,4,4,3
+which,single,underdetermined,1,0,,underdetermined,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,underdetermined,1,0,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,underdetermined,1,0,,no-listed-possibilities,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,1,1,1
+which,single,unique,1,0,,unique-unlisted,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,20,20,19
+which,all-possible,unique,1,0,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,20,20,19
+which,visible-possible,unique,1,0,,no-listed-possibilities,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,20,20,19
+which,single,underdetermined,2,1,,underdetermined,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,3,3,3
+which,all-possible,underdetermined,2,1,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,3,3,3
+which,visible-possible,underdetermined,2,1,1,,False,"[5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,3,3,3
+which,single,multiple-certain-match,2,1,,multiple-certain-match,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,2,1,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,2,1,1,,False,"[5, 6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,2,2,2
+which,single,underdetermined,3,2,,underdetermined,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,6,6,6
+which,all-possible,underdetermined,3,2,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,6,6,6
+which,visible-possible,underdetermined,3,2,2,,False,"[5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,6,6,6
+which,single,multiple-certain-match,3,2,,multiple-certain-match,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,3,2,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,3,2,2,,False,"[5, 6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,2,2,2
+which,single,underdetermined,4,3,,underdetermined,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,3,3,3
+which,all-possible,underdetermined,4,3,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,3,3,3
+which,visible-possible,underdetermined,4,3,3,,False,"[5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,3,3,3
+which,single,multiple-certain-match,4,3,,multiple-certain-match,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,4,3,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,4,3,3,,False,"[5, 6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+which,single,underdetermined,5,4,,underdetermined,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,3,3,3
+which,all-possible,underdetermined,5,4,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,3,3,3
+which,visible-possible,underdetermined,5,4,4,,False,"[5, 6, 7, 8]","[""ABCD""]",renderer-admitted,3,3,3
+which,single,multiple-certain-match,5,4,,multiple-certain-match,False,"[5, 6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,multiple-certain-match,5,4,,incomplete-coverage,False,"[5, 6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,multiple-certain-match,5,4,4,,False,"[5, 6, 7, 8]","[""ABCD""]",renderer-admitted,2,2,2
+which,single,underdetermined,2,0,,underdetermined,False,"[6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,underdetermined,2,0,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,underdetermined,2,0,,no-listed-possibilities,False,"[6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,single,multiple-certain-match,2,0,,multiple-certain-match,False,"[6, 7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,2,0,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,2,0,,no-listed-possibilities,False,"[6, 7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,3,1,,underdetermined,False,"[6, 7, 8]","[""E""]",renderer-admitted,4,4,4
+which,all-possible,underdetermined,3,1,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,4,4,4
+which,visible-possible,underdetermined,3,1,1,,False,"[6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,4,4,4
+which,single,multiple-certain-match,3,1,,multiple-certain-match,False,"[6, 7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,3,1,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,3,1,1,,False,"[6, 7, 8]","[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,4,2,,underdetermined,False,"[6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,underdetermined,4,2,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,underdetermined,4,2,2,,False,"[6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,2,2,2
+which,single,multiple-certain-match,4,2,,multiple-certain-match,False,"[6, 7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,4,2,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,4,2,2,,False,"[6, 7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,5,3,,underdetermined,False,"[6, 7, 8]","[""E""]",renderer-admitted,3,3,3
+which,all-possible,underdetermined,5,3,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,3,3,3
+which,visible-possible,underdetermined,5,3,3,,False,"[6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,3,3,3
+which,single,multiple-certain-match,5,3,,multiple-certain-match,False,"[6, 7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,5,3,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,5,3,3,,False,"[6, 7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,6,4,,underdetermined,False,"[6, 7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,underdetermined,6,4,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,underdetermined,6,4,4,,False,"[6, 7, 8]","[""ABCD""]",renderer-admitted,2,2,2
+which,single,multiple-certain-match,6,4,,multiple-certain-match,False,"[6, 7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,multiple-certain-match,6,4,,incomplete-coverage,False,"[6, 7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,multiple-certain-match,6,4,4,,False,"[6, 7, 8]","[""ABCD""]",renderer-admitted,1,1,1
+which,single,underdetermined,3,0,,underdetermined,False,"[7, 8]","[""E""]",renderer-admitted,2,2,2
+which,all-possible,underdetermined,3,0,,incomplete-coverage,False,"[7, 8]","[""F""]",renderer-admitted,2,2,2
+which,visible-possible,underdetermined,3,0,,no-listed-possibilities,False,"[7, 8]","[""F""]",renderer-admitted,2,2,2
+which,single,multiple-certain-match,3,0,,multiple-certain-match,False,"[7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,3,0,,incomplete-coverage,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,3,0,,no-listed-possibilities,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,4,1,,underdetermined,False,"[7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,underdetermined,4,1,,incomplete-coverage,False,"[7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,underdetermined,4,1,1,,False,"[7, 8]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,1,1,1
+which,single,multiple-certain-match,4,1,,multiple-certain-match,False,"[7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,4,1,,incomplete-coverage,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,4,1,1,,False,"[7, 8]","[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,5,2,,underdetermined,False,"[7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,underdetermined,5,2,,incomplete-coverage,False,"[7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,underdetermined,5,2,2,,False,"[7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+which,single,multiple-certain-match,5,2,,multiple-certain-match,False,"[7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,5,2,,incomplete-coverage,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,5,2,2,,False,"[7, 8]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,6,3,,underdetermined,False,"[7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,underdetermined,6,3,,incomplete-coverage,False,"[7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,underdetermined,6,3,3,,False,"[7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+which,single,multiple-certain-match,6,3,,multiple-certain-match,False,"[7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,6,3,,incomplete-coverage,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,6,3,3,,False,"[7, 8]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,7,4,,underdetermined,False,"[7, 8]","[""E""]",renderer-admitted,1,1,1
+which,all-possible,underdetermined,7,4,,incomplete-coverage,False,"[7, 8]","[""F""]",renderer-admitted,1,1,1
+which,visible-possible,underdetermined,7,4,4,,False,"[7, 8]","[""ABCD""]",renderer-admitted,1,1,1
+which,single,multiple-certain-match,7,4,,multiple-certain-match,False,"[7, 8]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,7,4,,incomplete-coverage,False,"[7, 8]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,7,4,4,,False,"[7, 8]","[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,4,0,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,underdetermined,4,0,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,underdetermined,4,0,,no-listed-possibilities,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,multiple-certain-match,4,0,,multiple-certain-match,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,4,0,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,4,0,,no-listed-possibilities,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,5,1,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,underdetermined,5,1,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,underdetermined,5,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,multiple-certain-match,5,1,,multiple-certain-match,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,5,1,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,5,1,1,,False,[8],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,6,2,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,underdetermined,6,2,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,underdetermined,6,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,multiple-certain-match,6,2,,multiple-certain-match,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,6,2,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,6,2,2,,False,[8],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,7,3,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,underdetermined,7,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,underdetermined,7,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,multiple-certain-match,7,3,,multiple-certain-match,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,7,3,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,7,3,3,,False,[8],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,underdetermined,8,4,,underdetermined,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,underdetermined,8,4,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,underdetermined,8,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,single,multiple-certain-match,8,4,,multiple-certain-match,False,[8],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,all-possible,multiple-certain-match,8,4,,incomplete-coverage,False,[8],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+which,visible-possible,multiple-certain-match,8,4,4,,False,[8],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,inconsistent,0,0,,inconsistent,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,6,6,6
+count,all-possible,inconsistent,0,0,,inconsistent,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,6,6,6
+count,visible-possible,inconsistent,0,0,,inconsistent,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,6,6,6
+count,single,unique,1,0,,unique-unlisted,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,11,11,11
+count,all-possible,unique,1,0,,incomplete-coverage,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,11,11,11
+count,visible-possible,unique,1,0,,no-listed-possibilities,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,11,11,11
+count,single,unique,1,1,1,,True,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,11,11,11
+count,all-possible,unique,1,1,1,,True,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,11,11,11
+count,visible-possible,unique,1,1,1,,True,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,11,11,11
+count,single,unique,1,0,,unique-unlisted,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,32,32,27
+count,all-possible,unique,1,0,,incomplete-coverage,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,32,32,27
+count,visible-possible,unique,1,0,,no-listed-possibilities,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,32,32,27
+count,single,unique,1,1,1,,False,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,32,32,27
+count,all-possible,unique,1,1,1,,False,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,32,32,27
+count,visible-possible,unique,1,1,1,,False,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,32,32,27
+count,single,underdetermined,2,1,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,8,8,8
+count,all-possible,underdetermined,2,1,,incomplete-coverage,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,8,8,8
+count,visible-possible,underdetermined,2,1,1,,True,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,8,8,8
+count,single,underdetermined,2,2,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,8,8,8
+count,all-possible,underdetermined,2,2,2,,True,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,8,8,8
+count,visible-possible,underdetermined,2,2,2,,True,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,8,8,8
+count,single,underdetermined,2,1,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,3,3,3
+count,all-possible,underdetermined,2,1,,incomplete-coverage,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,3,3,3
+count,visible-possible,underdetermined,2,1,1,,False,"[5, 6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,3,3,3
+count,single,underdetermined,2,2,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,3,3,3
+count,all-possible,underdetermined,2,2,2,,False,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,3,3,3
+count,visible-possible,underdetermined,2,2,2,,False,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,3,3,3
+count,single,underdetermined,3,2,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,7,7,7
+count,all-possible,underdetermined,3,2,,incomplete-coverage,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,7,7,7
+count,visible-possible,underdetermined,3,2,2,,True,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,7,7,7
+count,single,underdetermined,3,3,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,7,7,7
+count,all-possible,underdetermined,3,3,3,,True,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,7,7,7
+count,visible-possible,underdetermined,3,3,3,,True,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,7,7,7
+count,single,underdetermined,3,2,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,3,2,,incomplete-coverage,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,3,2,2,,False,"[5, 6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+count,single,underdetermined,3,3,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,3,3,3,,False,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,3,3,3,,False,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,4,3,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,5,5,5
+count,all-possible,underdetermined,4,3,,incomplete-coverage,True,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,5,5,5
+count,visible-possible,underdetermined,4,3,3,,True,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,5,5,5
+count,single,underdetermined,4,4,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,5,5,5
+count,all-possible,underdetermined,4,4,4,,True,"[5, 6, 7, 8, 9]","[""ABCD""]",renderer-admitted,5,5,5
+count,visible-possible,underdetermined,4,4,4,,True,"[5, 6, 7, 8, 9]","[""ABCD""]",renderer-admitted,5,5,5
+count,single,underdetermined,4,3,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,4,3,,incomplete-coverage,False,"[5, 6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,4,3,3,,False,"[5, 6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,4,4,,underdetermined,False,"[5, 6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,4,4,4,,False,"[5, 6, 7, 8, 9]","[""ABCD""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,4,4,4,,False,"[5, 6, 7, 8, 9]","[""ABCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,5,4,,underdetermined,True,"[5, 6, 7, 8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,4,,incomplete-coverage,True,"[5, 6, 7, 8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,4,4,,True,"[5, 6, 7, 8, 9]","[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,2,0,,underdetermined,True,"[6, 7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,2,0,,incomplete-coverage,True,"[6, 7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,2,0,,no-listed-possibilities,True,"[6, 7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,single,underdetermined,2,0,,underdetermined,False,"[6, 7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,2,0,,incomplete-coverage,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,2,0,,no-listed-possibilities,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,single,underdetermined,3,1,,underdetermined,True,"[6, 7, 8, 9]","[""E""]",renderer-admitted,4,4,4
+count,all-possible,underdetermined,3,1,,incomplete-coverage,True,"[6, 7, 8, 9]","[""F""]",renderer-admitted,4,4,4
+count,visible-possible,underdetermined,3,1,1,,True,"[6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,4,4,4
+count,single,underdetermined,3,1,,underdetermined,False,"[6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,3,1,,incomplete-coverage,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,3,1,1,,False,"[6, 7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,1,1,1
+count,single,underdetermined,4,2,,underdetermined,True,"[6, 7, 8, 9]","[""E""]",renderer-admitted,4,4,4
+count,all-possible,underdetermined,4,2,,incomplete-coverage,True,"[6, 7, 8, 9]","[""F""]",renderer-admitted,4,4,4
+count,visible-possible,underdetermined,4,2,2,,True,"[6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,4,4,4
+count,single,underdetermined,4,2,,underdetermined,False,"[6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,4,2,,incomplete-coverage,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,4,2,2,,False,"[6, 7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+count,single,underdetermined,5,3,,underdetermined,True,"[6, 7, 8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,3,,incomplete-coverage,True,"[6, 7, 8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,3,3,,True,"[6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,3,,underdetermined,False,"[6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,5,3,,incomplete-coverage,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,5,3,3,,False,"[6, 7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,5,4,,underdetermined,False,"[6, 7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,5,4,,incomplete-coverage,False,"[6, 7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,5,4,4,,False,"[6, 7, 8, 9]","[""ABCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,6,4,,underdetermined,True,"[6, 7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,6,4,,incomplete-coverage,True,"[6, 7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,6,4,4,,True,"[6, 7, 8, 9]","[""ABCD""]",renderer-admitted,2,2,2
+count,single,underdetermined,3,0,,underdetermined,True,"[7, 8, 9]","[""E""]",renderer-admitted,3,3,3
+count,all-possible,underdetermined,3,0,,incomplete-coverage,True,"[7, 8, 9]","[""F""]",renderer-admitted,3,3,3
+count,visible-possible,underdetermined,3,0,,no-listed-possibilities,True,"[7, 8, 9]","[""F""]",renderer-admitted,3,3,3
+count,single,underdetermined,3,0,,underdetermined,False,"[7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,3,0,,incomplete-coverage,False,"[7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,3,0,,no-listed-possibilities,False,"[7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,single,underdetermined,4,1,,underdetermined,True,"[7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,4,1,,incomplete-coverage,True,"[7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,4,1,1,,True,"[7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,2,2,2
+count,single,underdetermined,4,1,,underdetermined,False,"[7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,4,1,,incomplete-coverage,False,"[7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,4,1,1,,False,"[7, 8, 9]","[""A"", ""B"", ""C"", ""D""]",renderer-admitted,1,1,1
+count,single,underdetermined,5,2,,underdetermined,True,"[7, 8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,2,,incomplete-coverage,True,"[7, 8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,2,2,,True,"[7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,2,,underdetermined,False,"[7, 8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,5,2,,incomplete-coverage,False,"[7, 8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,5,2,2,,False,"[7, 8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+count,single,underdetermined,6,3,,underdetermined,True,"[7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,6,3,,incomplete-coverage,True,"[7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,6,3,3,,True,"[7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,2,2,2
+count,single,underdetermined,6,3,,underdetermined,False,"[7, 8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,6,3,,incomplete-coverage,False,"[7, 8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,6,3,3,,False,"[7, 8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,6,4,,underdetermined,False,"[7, 8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,6,4,,incomplete-coverage,False,"[7, 8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,6,4,4,,False,"[7, 8, 9]","[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,7,4,,underdetermined,True,"[7, 8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,7,4,,incomplete-coverage,True,"[7, 8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,7,4,4,,True,"[7, 8, 9]","[""ABCD""]",renderer-admitted,2,2,2
+count,single,underdetermined,4,0,,underdetermined,True,"[8, 9]","[""E""]",renderer-admitted,2,2,2
+count,all-possible,underdetermined,4,0,,incomplete-coverage,True,"[8, 9]","[""F""]",renderer-admitted,2,2,2
+count,visible-possible,underdetermined,4,0,,no-listed-possibilities,True,"[8, 9]","[""F""]",renderer-admitted,2,2,2
+count,single,underdetermined,4,0,,underdetermined,False,"[8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,4,0,,incomplete-coverage,False,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,4,0,,no-listed-possibilities,False,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,1,,underdetermined,True,"[8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,1,,incomplete-coverage,True,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,1,1,,True,"[8, 9]","[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,1,,underdetermined,False,"[8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,1,,incomplete-coverage,False,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,1,1,,False,"[8, 9]","[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,6,2,,underdetermined,True,"[8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,6,2,,incomplete-coverage,True,"[8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,6,2,2,,True,"[8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",renderer-admitted,1,1,1
+count,single,underdetermined,6,2,,underdetermined,False,"[8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,6,2,,incomplete-coverage,False,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,6,2,2,,False,"[8, 9]","[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,7,3,,underdetermined,True,"[8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,7,3,,incomplete-coverage,True,"[8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,7,3,3,,True,"[8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,7,3,,underdetermined,False,"[8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,7,3,,incomplete-coverage,False,"[8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,7,3,3,,False,"[8, 9]","[""ABC"", ""ABD"", ""ACD"", ""BCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,7,4,,underdetermined,False,"[8, 9]","[""E""]",renderer-admitted,1,1,1
+count,all-possible,underdetermined,7,4,,incomplete-coverage,False,"[8, 9]","[""F""]",renderer-admitted,1,1,1
+count,visible-possible,underdetermined,7,4,4,,False,"[8, 9]","[""ABCD""]",renderer-admitted,1,1,1
+count,single,underdetermined,8,4,,underdetermined,True,"[8, 9]","[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,8,4,,incomplete-coverage,True,"[8, 9]","[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,8,4,4,,True,"[8, 9]","[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,0,,underdetermined,True,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,0,,incomplete-coverage,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,0,,no-listed-possibilities,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,5,0,,underdetermined,False,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,5,0,,incomplete-coverage,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,5,0,,no-listed-possibilities,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,6,1,,underdetermined,True,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,6,1,,incomplete-coverage,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,6,1,1,,True,[9],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,6,1,,underdetermined,False,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,6,1,,incomplete-coverage,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,6,1,1,,False,[9],"[""A"", ""B"", ""C"", ""D""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,7,2,,underdetermined,True,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,7,2,,incomplete-coverage,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,7,2,2,,True,[9],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,7,2,,underdetermined,False,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,7,2,,incomplete-coverage,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,7,2,2,,False,[9],"[""AB"", ""AC"", ""AD"", ""BC"", ""BD"", ""CD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,8,3,,underdetermined,True,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,8,3,,incomplete-coverage,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,8,3,3,,True,[9],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,8,3,,underdetermined,False,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,8,3,,incomplete-coverage,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,8,3,3,,False,[9],"[""ABC"", ""ABD"", ""ACD"", ""BCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,8,4,,underdetermined,False,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,8,4,,incomplete-coverage,False,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,8,4,4,,False,[9],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,single,underdetermined,9,4,,underdetermined,True,[9],"[""E""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,all-possible,underdetermined,9,4,,incomplete-coverage,True,[9],"[""F""]",interface-permitted-unobserved-not-proven-impossible,0,0,0
+count,visible-possible,underdetermined,9,4,4,,True,[9],"[""ABCD""]",interface-permitted-unobserved-not-proven-impossible,0,0,0

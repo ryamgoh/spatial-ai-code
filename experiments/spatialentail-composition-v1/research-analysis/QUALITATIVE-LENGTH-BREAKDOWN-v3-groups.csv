@@ -1,0 +1,541 @@
+grouping,group,style,views,bases,stories,E,F,mean,median,min,max,p95,total
+overall,{},natural,987,282,94,151,174,289.84903748733535,282,73,868,568,286081
+overall,{},symbolic,987,282,94,151,174,244.90070921985816,233,61,744,474,241717
+depth,"{""depth"": 1}",natural,126,37,17,6,17,191.03174603174602,173.0,73,401,361,24070
+depth,"{""depth"": 1}",symbolic,126,37,17,6,17,156.53174603174602,141.0,61,334,302,19723
+depth,"{""depth"": 2}",natural,93,27,11,6,19,246.1505376344086,237,79,473,453,22892
+depth,"{""depth"": 2}",symbolic,93,27,11,6,19,203.58064516129033,204,71,388,370,18933
+depth,"{""depth"": 3}",natural,69,19,7,3,15,252.56521739130434,235,74,484,483,17427
+depth,"{""depth"": 3}",symbolic,69,19,7,3,15,218.8695652173913,197,61,435,397,15102
+depth,"{""depth"": 4}",natural,75,18,6,3,24,280.4266666666667,251,76,568,555,21032
+depth,"{""depth"": 4}",symbolic,75,18,6,3,24,234.41333333333333,223,61,448,435,17581
+depth,"{""depth"": 5}",natural,57,18,6,3,5,346.63157894736844,360,74,564,559,19758
+depth,"{""depth"": 5}",symbolic,57,18,6,3,5,265.64912280701753,262,78,441,436,15142
+depth,"{""depth"": 6}",natural,75,18,6,4,19,345.8,313,78,618,594,25935
+depth,"{""depth"": 6}",symbolic,75,18,6,4,19,283.81333333333333,297,64,470,457,21286
+depth,"{""depth"": 7}",natural,69,18,6,3,16,318.82608695652175,321,73,576,534,21999
+depth,"{""depth"": 7}",symbolic,69,18,6,3,16,292.71014492753625,309,61,500,474,20197
+depth,"{""depth"": 8}",natural,60,18,6,3,9,427.9,437.0,77,669,608,25674
+depth,"{""depth"": 8}",symbolic,60,18,6,3,9,317.43333333333334,324.0,61,534,503,19046
+depth,"{""depth"": 9}",natural,66,18,6,3,15,372.7121212121212,373.0,80,638,597,24599
+depth,"{""depth"": 9}",symbolic,66,18,6,3,15,333.3484848484849,339.5,67,576,563,22001
+depth,"{""depth"": 10}",natural,66,18,6,4,12,374.1212121212121,381.5,81,658,549,24692
+depth,"{""depth"": 10}",symbolic,66,18,6,4,12,344.8787878787879,360.0,67,534,509,22762
+depth,"{""depth"": null}",natural,231,73,28,113,23,251.0952380952381,220,73,868,578,58003
+depth,"{""depth"": null}",symbolic,231,73,28,113,23,216.2077922077922,167,61,744,497,49944
+query_kind,"{""query_kind"": ""direction""}",natural,333,94,94,31,61,176.1021021021021,157,73,405,343,58642
+query_kind,"{""query_kind"": ""direction""}",symbolic,333,94,94,31,61,144.05705705705705,135,61,269,259,47971
+query_kind,"{""query_kind"": ""which""}",natural,315,94,94,79,55,308.2793650793651,310,74,686,537,97108
+query_kind,"{""query_kind"": ""which""}",symbolic,315,94,94,79,55,260.4095238095238,262,69,696,434,82029
+query_kind,"{""query_kind"": ""count""}",natural,339,94,94,41,58,384.4572271386431,401,74,868,618,130331
+query_kind,"{""query_kind"": ""count""}",symbolic,339,94,94,41,58,329.5486725663717,349,69,744,503,111717
+contract,"{""contract"": ""single""}",natural,329,282,94,115,41,301.3100303951368,293,82,686,576,99131
+contract,"{""contract"": ""single""}",symbolic,329,282,94,115,41,254.87537993920972,242,69,696,478,83854
+contract,"{""contract"": ""all-possible""}",natural,329,282,94,18,82,267.4012158054711,248,73,868,564,87975
+contract,"{""contract"": ""all-possible""}",symbolic,329,282,94,18,82,226.32218844984803,212,61,744,476,74460
+contract,"{""contract"": ""visible-possible""}",natural,329,282,94,18,51,300.83586626139817,294,82,865,555,98975
+contract,"{""contract"": ""visible-possible""}",symbolic,329,282,94,18,51,253.50455927051672,243,69,731,469,83403
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""direction""}",natural,111,94,94,19,17,179.7027027027027,152,82,404,343,19947
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""direction""}",symbolic,111,94,94,19,17,146.72972972972974,134,69,269,259,16287
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""direction""}",natural,111,94,94,6,27,157.2882882882883,144,73,404,338,17459
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""direction""}",symbolic,111,94,94,6,27,130.018018018018,111,61,262,256,14432
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""direction""}",natural,111,94,94,6,17,191.3153153153153,186,82,405,344,21236
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""direction""}",symbolic,111,94,94,6,17,155.42342342342343,157,69,264,260,17252
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""which""}",natural,105,94,94,67,7,351,349,82,686,572,36855
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""which""}",symbolic,105,94,94,67,7,295.6952380952381,290,69,696,463,31048
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""which""}",natural,105,94,94,6,31,280.2952380952381,284,74,584,537,29431
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""which""}",symbolic,105,94,94,6,31,236.92380952380952,239,69,541,413,24877
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""which""}",natural,105,94,94,6,17,293.54285714285714,286,82,546,461,30822
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""which""}",symbolic,105,94,94,6,17,248.6095238095238,243,69,455,392,26104
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""count""}",natural,113,94,94,29,17,374.5929203539823,402,82,669,600,42329
+query_kind+contract,"{""contract"": ""single"", ""query_kind"": ""count""}",symbolic,113,94,94,29,17,323.17699115044246,354,69,576,503,36519
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""count""}",natural,113,94,94,6,24,363.5840707964602,397,74,868,627,41085
+query_kind+contract,"{""contract"": ""all-possible"", ""query_kind"": ""count""}",symbolic,113,94,94,6,24,311.070796460177,339,69,744,503,35151
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""count""}",natural,113,94,94,6,17,415.1946902654867,404,82,865,621,46917
+query_kind+contract,"{""contract"": ""visible-possible"", ""query_kind"": ""count""}",symbolic,113,94,94,6,17,354.39823008849555,357,69,731,498,40047
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""direction""}",natural,57,17,17,0,6,92.10526315789474,92,73,100,97,5250
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""direction""}",symbolic,57,17,17,0,6,74.63157894736842,75,61,82,78,4254
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""which""}",natural,33,10,10,6,5,216.78787878787878,224,75,284,278,7154
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""which""}",symbolic,33,10,10,6,5,175.15151515151516,181,79,228,222,5780
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""count""}",natural,36,10,10,0,6,324.05555555555554,343.0,79,401,401,11666
+depth+query_kind,"{""depth"": 1, ""query_kind"": ""count""}",symbolic,36,10,10,0,6,269.1388888888889,288.5,72,334,334,9689
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""direction""}",natural,33,9,9,0,6,138.84848484848484,144,86,164,161,4582
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""direction""}",symbolic,33,9,9,0,6,109.33333333333333,111,71,119,119,3608
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""which""}",natural,27,9,9,6,7,244.77777777777777,246,81,347,336,6609
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""which""}",symbolic,27,9,9,6,7,203.37037037037038,213,91,271,264,5491
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""count""}",natural,33,9,9,0,6,354.57575757575756,367,79,473,473,11701
+depth+query_kind,"{""depth"": 2, ""query_kind"": ""count""}",symbolic,33,9,9,0,6,298,317,72,388,388,9834
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""direction""}",natural,30,7,7,0,9,144.93333333333334,144.0,74,184,183,4348
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""direction""}",symbolic,30,7,7,0,9,123.7,129.0,61,136,135,3711
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""which""}",natural,18,6,6,3,3,266.1666666666667,268.5,84,364,364,4791
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""which""}",symbolic,18,6,6,3,3,228.88888888888889,232.0,98,310,310,4120
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""count""}",natural,21,6,6,0,3,394.6666666666667,394,85,484,484,8288
+depth+query_kind,"{""depth"": 3, ""query_kind"": ""count""}",symbolic,21,6,6,0,3,346.23809523809524,343,88,435,435,7271
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""direction""}",natural,27,6,6,0,9,170.14814814814815,160,76,224,223,4594
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""direction""}",symbolic,27,6,6,0,9,140.2962962962963,148,61,161,157,3788
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""which""}",natural,21,6,6,3,6,273.7142857142857,281,78,428,381,5748
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""which""}",symbolic,21,6,6,3,6,227.61904761904762,251,82,317,283,4780
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""count""}",natural,27,6,6,0,9,395.9259259259259,405,79,568,560,10690
+depth+query_kind,"{""depth"": 4, ""query_kind"": ""count""}",symbolic,27,6,6,0,9,333.81481481481484,362,82,448,440,9013
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""direction""}",natural,18,6,6,0,0,232.33333333333334,244.5,158,256,256,4182
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""direction""}",symbolic,18,6,6,0,0,165.33333333333334,165.0,159,172,172,2976
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""which""}",natural,21,6,6,3,5,327.2857142857143,360,74,441,437,6873
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""which""}",symbolic,21,6,6,3,5,248.9047619047619,262,78,326,322,5227
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""count""}",natural,18,6,6,0,0,483.5,492.5,392,564,564,8703
+depth+query_kind,"{""depth"": 5, ""query_kind"": ""count""}",symbolic,18,6,6,0,0,385.5,392.5,311,441,441,6939
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""direction""}",natural,24,6,6,0,6,227.625,281.0,80,294,293,5463
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""direction""}",symbolic,24,6,6,0,6,177.16666666666666,188.0,64,196,194,4252
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""which""}",natural,24,6,6,4,4,343.8333333333333,338.5,78,499,493,8252
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""which""}",symbolic,24,6,6,4,4,278.25,299.5,85,359,353,6678
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""count""}",natural,27,6,6,0,9,452.5925925925926,456,84,618,618,12220
+depth+query_kind,"{""depth"": 6, ""query_kind"": ""count""}",symbolic,27,6,6,0,9,383.55555555555554,417,84,470,470,10356
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""direction""}",natural,24,6,6,0,6,195.75,190.0,73,309,308,4698
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""direction""}",symbolic,24,6,6,0,6,191.33333333333334,202.5,61,211,210,4592
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""which""}",natural,24,6,6,3,7,308.4166666666667,327.0,76,459,451,7402
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""which""}",symbolic,24,6,6,3,7,274.9166666666667,316.0,80,378,364,6598
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""count""}",natural,21,6,6,0,3,471.3809523809524,488,84,576,576,9899
+depth+query_kind,"{""depth"": 7, ""query_kind"": ""count""}",symbolic,21,6,6,0,3,428.9047619047619,437,84,500,500,9007
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""direction""}",natural,21,6,6,0,3,308.4761904761905,338,77,346,344,6478
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""direction""}",symbolic,21,6,6,0,3,213.38095238095238,221,61,225,225,4481
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""which""}",natural,18,6,6,3,3,422.3333333333333,455.5,87,550,550,7602
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""which""}",symbolic,18,6,6,3,3,309.27777777777777,326.5,101,406,406,5567
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""count""}",natural,21,6,6,0,3,552.0952380952381,592,85,669,669,11594
+depth+query_kind,"{""depth"": 8, ""query_kind"": ""count""}",symbolic,21,6,6,0,3,428.4761904761905,441,85,534,534,8998
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""direction""}",natural,21,6,6,0,3,271,222,83,383,380,5691
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""direction""}",symbolic,21,6,6,0,3,233.1904761904762,242,67,253,248,4897
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""which""}",natural,21,6,6,3,6,345.6666666666667,364,80,511,511,7259
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""which""}",symbolic,21,6,6,3,6,309.14285714285717,342,87,434,392,6492
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""count""}",natural,24,6,6,0,6,485.375,489.0,83,638,638,11649
+depth+query_kind,"{""depth"": 9, ""query_kind"": ""count""}",symbolic,24,6,6,0,6,442.1666666666667,474.0,83,576,568,10612
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""direction""}",natural,21,6,6,0,3,273.9047619047619,236,83,405,404,5752
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""direction""}",symbolic,21,6,6,0,3,251.14285714285714,260,67,269,264,5274
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""which""}",natural,21,6,6,4,3,363.1904761904762,380,81,537,537,7627
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""which""}",symbolic,21,6,6,4,3,334.76190476190476,361,85,417,415,7030
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""count""}",natural,24,6,6,0,6,471.375,504.5,81,658,658,11313
+depth+query_kind,"{""depth"": 10, ""query_kind"": ""count""}",symbolic,24,6,6,0,6,435.75,473.5,88,534,534,10458
+depth+query_kind,"{""depth"": null, ""query_kind"": ""direction""}",natural,57,19,19,31,10,133.40350877192984,122,73,261,249,7604
+depth+query_kind,"{""depth"": null, ""query_kind"": ""direction""}",symbolic,57,19,19,31,10,107.6842105263158,93,61,208,203,6138
+depth+query_kind,"{""depth"": null, ""query_kind"": ""which""}",natural,87,27,27,41,6,319.4367816091954,343,77,686,578,27791
+depth+query_kind,"{""depth"": null, ""query_kind"": ""which""}",symbolic,87,27,27,41,6,278.91954022988506,289,69,696,506,24266
+depth+query_kind,"{""depth"": null, ""query_kind"": ""count""}",natural,87,27,27,41,7,259.86206896551727,159,74,868,627,22608
+depth+query_kind,"{""depth"": null, ""query_kind"": ""count""}",symbolic,87,27,27,41,7,224.5977011494253,155,69,744,497,19540
+depth+contract,"{""contract"": ""single"", ""depth"": 1}",natural,42,37,17,6,5,199.64285714285714,203.0,92,401,361,8385
+depth+contract,"{""contract"": ""single"", ""depth"": 1}",symbolic,42,37,17,6,5,163.38095238095238,163.0,74,334,302,6862
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 1}",natural,42,37,17,0,6,183.66666666666666,92.0,73,401,361,7714
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 1}",symbolic,42,37,17,0,6,151.07142857142858,81.0,61,334,302,6345
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 1}",natural,42,37,17,0,6,189.78571428571428,179.0,93,396,356,7971
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 1}",symbolic,42,37,17,0,6,155.14285714285714,145.0,75,329,297,6516
+depth+contract,"{""contract"": ""single"", ""depth"": 2}",natural,31,27,11,6,4,260.93548387096774,274,118,473,453,8089
+depth+contract,"{""contract"": ""single"", ""depth"": 2}",symbolic,31,27,11,6,4,215.19354838709677,214,110,388,370,6671
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 2}",natural,31,27,11,0,8,230.7741935483871,203,79,473,453,7154
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 2}",symbolic,31,27,11,0,8,192.25806451612902,173,71,388,370,5960
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 2}",natural,31,27,11,0,7,246.74193548387098,237,119,468,448,7649
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 2}",symbolic,31,27,11,0,7,203.29032258064515,185,111,383,365,6302
+depth+contract,"{""contract"": ""single"", ""depth"": 3}",natural,23,19,7,3,4,269.3478260869565,262,130,484,483,6195
+depth+contract,"{""contract"": ""single"", ""depth"": 3}",symbolic,23,19,7,3,4,233.43478260869566,231,126,435,397,5369
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 3}",natural,23,19,7,0,6,233.52173913043478,183,74,484,483,5371
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 3}",symbolic,23,19,7,0,6,202.30434782608697,135,61,435,397,4653
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 3}",natural,23,19,7,0,5,254.82608695652175,225,131,479,478,5861
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 3}",symbolic,23,19,7,0,5,220.8695652173913,202,127,430,392,5080
+depth+contract,"{""contract"": ""single"", ""depth"": 4}",natural,25,18,6,3,7,314.96,294,144,568,560,7874
+depth+contract,"{""contract"": ""single"", ""depth"": 4}",symbolic,25,18,6,3,7,262.92,263,144,448,440,6573
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 4}",natural,25,18,6,0,9,234.92,216,76,560,487,5873
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 4}",symbolic,25,18,6,0,9,199.76,153,61,440,375,4994
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 4}",natural,25,18,6,0,8,291.4,249,145,555,494,7285
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 4}",symbolic,25,18,6,0,8,240.56,223,142,435,370,6014
+depth+contract,"{""contract"": ""single"", ""depth"": 5}",natural,19,18,6,3,1,361.2631578947368,376,158,564,564,6864
+depth+contract,"{""contract"": ""single"", ""depth"": 5}",symbolic,19,18,6,3,1,275.6842105263158,276,159,441,441,5238
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 5}",natural,19,18,6,0,2,345.42105263157896,368,74,564,564,6563
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 5}",symbolic,19,18,6,0,2,265.5263157894737,276,78,441,441,5045
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 5}",natural,19,18,6,0,2,333.2105263157895,331,159,559,559,6331
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 5}",symbolic,19,18,6,0,2,255.73684210526315,247,138,436,436,4859
+depth+contract,"{""contract"": ""single"", ""depth"": 6}",natural,25,18,6,4,6,390.08,429,168,618,594,9752
+depth+contract,"{""contract"": ""single"", ""depth"": 6}",symbolic,25,18,6,4,6,316.92,320,176,470,457,7923
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 6}",natural,25,18,6,0,7,295.56,293,78,618,586,7389
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 6}",symbolic,25,18,6,0,7,247,192,64,470,449,6175
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 6}",natural,25,18,6,0,6,351.76,298,169,613,581,8794
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 6}",symbolic,25,18,6,0,6,287.52,275,153,465,444,7188
+depth+contract,"{""contract"": ""single"", ""depth"": 7}",natural,23,18,6,3,5,353.9130434782609,366,186,576,534,8140
+depth+contract,"{""contract"": ""single"", ""depth"": 7}",symbolic,23,18,6,3,5,323.8695652173913,320,198,500,474,7449
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 7}",natural,23,18,6,0,6,285.8695652173913,308,73,576,534,6575
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 7}",symbolic,23,18,6,0,6,263.2173913043478,203,61,500,474,6054
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 7}",natural,23,18,6,0,5,316.69565217391306,286,176,571,529,7284
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 7}",symbolic,23,18,6,0,5,291.04347826086956,280,145,495,469,6694
+depth+contract,"{""contract"": ""single"", ""depth"": 8}",natural,20,18,6,3,2,452.35,458.5,204,669,608,9047
+depth+contract,"{""contract"": ""single"", ""depth"": 8}",symbolic,20,18,6,3,2,336.15,331.0,217,534,503,6723
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 8}",natural,20,18,6,0,4,395.85,394.5,77,669,600,7917
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 8}",symbolic,20,18,6,0,4,294.4,281.5,61,534,503,5888
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 8}",natural,20,18,6,0,3,435.5,433.0,205,664,595,8710
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 8}",symbolic,20,18,6,0,3,321.75,302.0,209,529,498,6435
+depth+contract,"{""contract"": ""single"", ""depth"": 9}",natural,22,18,6,3,4,409.95454545454544,379.0,214,638,597,9019
+depth+contract,"{""contract"": ""single"", ""depth"": 9}",symbolic,22,18,6,3,4,367.45454545454544,364.0,234,576,568,8084
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 9}",natural,22,18,6,0,6,326.09090909090907,365.0,80,638,589,7174
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 9}",symbolic,22,18,6,0,6,292.59090909090907,258.5,67,568,479,6437
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 9}",natural,22,18,6,0,5,382.09090909090907,378.0,182,633,584,8406
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 9}",symbolic,22,18,6,0,5,340,329.5,150,563,487,7480
+depth+contract,"{""contract"": ""single"", ""depth"": 10}",natural,22,18,6,4,3,403.59090909090907,398.5,232,658,549,8879
+depth+contract,"{""contract"": ""single"", ""depth"": 10}",symbolic,22,18,6,4,3,372.6818181818182,386.5,256,534,509,8199
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 10}",natural,22,18,6,0,5,342.3181818181818,371.5,81,658,549,7531
+depth+contract,"{""contract"": ""all-possible"", ""depth"": 10}",symbolic,22,18,6,0,5,316.09090909090907,319.5,67,534,502,6954
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 10}",natural,22,18,6,0,4,376.45454545454544,360.5,192,653,544,8282
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": 10}",symbolic,22,18,6,0,4,345.8636363636364,335.0,157,529,497,7609
+depth+contract,"{""contract"": ""single"", ""depth"": null}",natural,77,73,28,77,0,219.3116883116883,142,82,686,578,16887
+depth+contract,"{""contract"": ""single"", ""depth"": null}",symbolic,77,73,28,77,0,191.72727272727272,117,69,696,503,14763
+depth+contract,"{""contract"": ""all-possible"", ""depth"": null}",natural,77,73,28,18,23,243.03896103896105,96,73,868,593,18714
+depth+contract,"{""contract"": ""all-possible"", ""depth"": null}",symbolic,77,73,28,18,23,207.2077922077922,108,61,744,506,15955
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": null}",natural,77,73,28,18,0,290.93506493506493,286,82,865,581,22402
+depth+contract,"{""contract"": ""visible-possible"", ""depth"": null}",symbolic,77,73,28,18,0,249.6883116883117,257,69,731,472,19226
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""direction""}",natural,19,17,17,0,2,92.84210526315789,92,92,100,100,1764
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""direction""}",symbolic,19,17,17,0,2,75.21052631578948,74,74,82,82,1429
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""direction""}",natural,19,17,17,0,2,90.05263157894737,92,73,92,92,1711
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""direction""}",symbolic,19,17,17,0,2,73,74,61,75,75,1387
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""direction""}",natural,19,17,17,0,2,93.42105263157895,93,93,97,97,1775
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""direction""}",symbolic,19,17,17,0,2,75.6842105263158,75,75,78,78,1438
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""which""}",natural,11,10,10,6,1,229.0909090909091,232,173,278,278,2520
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""which""}",symbolic,11,10,10,6,1,184.1818181818182,189,141,222,222,2026
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""which""}",natural,11,10,10,0,2,216.36363636363637,224,75,284,284,2380
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""which""}",symbolic,11,10,10,0,2,175.54545454545453,181,79,228,228,1931
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""which""}",natural,11,10,10,0,2,204.9090909090909,187,171,246,246,2254
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""which""}",symbolic,11,10,10,0,2,165.72727272727272,152,138,199,199,1823
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""count""}",natural,12,10,10,0,2,341.75,349.0,279,401,401,4101
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 1, ""query_kind"": ""count""}",symbolic,12,10,10,0,2,283.9166666666667,292.0,228,334,334,3407
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""count""}",natural,12,10,10,0,2,301.9166666666667,343.0,79,401,401,3623
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 1, ""query_kind"": ""count""}",symbolic,12,10,10,0,2,252.25,288.5,72,334,334,3027
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""count""}",natural,12,10,10,0,2,328.5,338.0,230,396,396,3942
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 1, ""query_kind"": ""count""}",symbolic,12,10,10,0,2,271.25,283.5,186,329,329,3255
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""direction""}",natural,11,9,9,0,2,142.9090909090909,144,118,164,164,1572
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""direction""}",symbolic,11,9,9,0,2,112.27272727272727,111,110,119,119,1235
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""direction""}",natural,11,9,9,0,2,130.45454545454547,144,86,156,156,1435
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""direction""}",symbolic,11,9,9,0,2,103.54545454545455,111,71,111,111,1139
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""direction""}",natural,11,9,9,0,2,143.1818181818182,145,119,161,161,1575
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""direction""}",symbolic,11,9,9,0,2,112.18181818181819,112,111,114,114,1234
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""which""}",natural,9,9,9,6,0,265.22222222222223,274,197,347,347,2387
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""which""}",symbolic,9,9,9,6,0,218.33333333333334,214,159,271,271,1965
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""which""}",natural,9,9,9,0,4,235.77777777777777,248,81,336,336,2122
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""which""}",symbolic,9,9,9,0,4,197.77777777777777,214,91,264,264,1780
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""which""}",natural,9,9,9,0,3,233.33333333333334,237,195,298,298,2100
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""which""}",symbolic,9,9,9,0,3,194,185,156,235,235,1746
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""count""}",natural,11,9,9,0,2,375.45454545454544,375,303,473,473,4130
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 2, ""query_kind"": ""count""}",symbolic,11,9,9,0,2,315.54545454545456,322,246,388,388,3471
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""count""}",natural,11,9,9,0,2,327,367,79,473,473,3597
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 2, ""query_kind"": ""count""}",symbolic,11,9,9,0,2,276.45454545454544,322,72,388,388,3041
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""count""}",natural,11,9,9,0,2,361.27272727272725,362,262,468,468,3974
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 2, ""query_kind"": ""count""}",symbolic,11,9,9,0,2,302,317,204,383,383,3322
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""direction""}",natural,10,7,7,0,3,152.8,148.0,130,183,183,1528
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""direction""}",symbolic,10,7,7,0,3,131.3,133.5,126,135,135,1313
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""direction""}",natural,10,7,7,0,3,129.4,137.0,74,183,183,1294
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""direction""}",symbolic,10,7,7,0,3,109.2,127.0,61,135,135,1092
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""direction""}",natural,10,7,7,0,3,152.6,147.0,131,184,184,1526
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""direction""}",symbolic,10,7,7,0,3,130.6,130.0,127,136,136,1306
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""which""}",natural,6,6,6,3,0,294,277.0,237,357,357,1764
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""which""}",symbolic,6,6,6,3,0,250.66666666666666,242.0,197,310,310,1504
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""which""}",natural,6,6,6,0,2,249.83333333333334,268.5,84,364,364,1499
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""which""}",symbolic,6,6,6,0,2,215.83333333333334,232.0,98,289,289,1295
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""which""}",natural,6,6,6,0,1,254.66666666666666,238.5,197,326,326,1528
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""which""}",symbolic,6,6,6,0,1,220.16666666666666,211.5,164,272,272,1321
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""count""}",natural,7,6,6,0,1,414.7142857142857,402,347,484,484,2903
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 3, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,364.57142857142856,366,298,435,435,2552
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""count""}",natural,7,6,6,0,1,368.2857142857143,394,85,484,484,2578
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 3, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,323.7142857142857,343,88,435,435,2266
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""count""}",natural,7,6,6,0,1,401,389,342,479,479,2807
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 3, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,350.42857142857144,338,293,430,430,2453
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""direction""}",natural,9,6,6,0,3,183.11111111111111,185,144,224,224,1648
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""direction""}",symbolic,9,6,6,0,3,151,153,144,161,161,1359
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""direction""}",natural,9,6,6,0,3,144.55555555555554,152,76,222,222,1301
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""direction""}",symbolic,9,6,6,0,3,119.77777777777777,145,61,153,153,1078
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""direction""}",natural,9,6,6,0,3,182.77777777777777,186,145,223,223,1645
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""direction""}",symbolic,9,6,6,0,3,150.11111111111111,148,145,157,157,1351
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""which""}",natural,7,6,6,3,1,317.57142857142856,294,251,428,428,2223
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""which""}",symbolic,7,6,6,3,1,262.42857142857144,263,215,317,317,1837
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""which""}",natural,7,6,6,0,3,237.14285714285714,276,78,368,368,1660
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""which""}",symbolic,7,6,6,0,3,202.85714285714286,251,82,266,266,1420
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""which""}",natural,7,6,6,0,2,266.42857142857144,249,174,381,381,1865
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""which""}",symbolic,7,6,6,0,2,217.57142857142858,223,142,283,283,1523
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""count""}",natural,9,6,6,0,3,444.77777777777777,409,365,568,568,4003
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 4, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,375.22222222222223,369,320,448,448,3377
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""count""}",natural,9,6,6,0,3,323.55555555555554,397,79,560,560,2912
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 4, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,277.3333333333333,361,82,440,440,2496
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""count""}",natural,9,6,6,0,3,419.44444444444446,404,313,555,555,3775
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 4, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,348.8888888888889,357,265,435,435,3140
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""direction""}",natural,6,6,6,0,0,232,244.0,158,255,255,1392
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""direction""}",symbolic,6,6,6,0,0,165,164.5,159,171,171,990
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""direction""}",natural,6,6,6,0,0,232,244.0,158,255,255,1392
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""direction""}",symbolic,6,6,6,0,0,165,164.5,159,171,171,990
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""direction""}",natural,6,6,6,0,0,233,245.0,159,256,256,1398
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""direction""}",symbolic,6,6,6,0,0,166,165.5,160,172,172,996
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""which""}",natural,7,6,6,3,1,365.85714285714283,376,287,437,437,2561
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""which""}",symbolic,7,6,6,3,1,275,276,215,322,322,1925
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""which""}",natural,7,6,6,0,2,322.85714285714283,368,74,441,441,2260
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""which""}",symbolic,7,6,6,0,2,247.42857142857142,276,78,326,326,1732
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""which""}",natural,7,6,6,0,2,293.14285714285717,331,171,400,400,2052
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""which""}",symbolic,7,6,6,0,2,224.28571428571428,247,138,294,294,1570
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""count""}",natural,6,6,6,0,0,485.1666666666667,495.0,397,564,564,2911
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 5, ""query_kind"": ""count""}",symbolic,6,6,6,0,0,387.1666666666667,395.0,316,441,441,2323
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""count""}",natural,6,6,6,0,0,485.1666666666667,495.0,397,564,564,2911
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 5, ""query_kind"": ""count""}",symbolic,6,6,6,0,0,387.1666666666667,395.0,316,441,441,2323
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""count""}",natural,6,6,6,0,0,480.1666666666667,490.0,392,559,559,2881
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 5, ""query_kind"": ""count""}",symbolic,6,6,6,0,0,382.1666666666667,390.0,311,436,436,2293
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""direction""}",natural,8,6,6,0,2,245.125,282.0,168,293,293,1961
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,188.25,188.0,176,196,196,1506
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""direction""}",natural,8,6,6,0,2,192.625,178.0,80,293,293,1541
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,155.5,186.0,64,192,192,1244
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""direction""}",natural,8,6,6,0,2,245.125,283.0,169,294,294,1961
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,187.75,189.0,177,193,193,1502
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""which""}",natural,8,6,6,4,1,404.375,430.0,306,493,493,3235
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""which""}",symbolic,8,6,6,4,1,318.25,317.0,290,353,353,2546
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""which""}",natural,8,6,6,0,2,313.5,325.5,78,499,499,2508
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""which""}",symbolic,8,6,6,0,2,260.25,301.5,85,359,359,2082
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""which""}",natural,8,6,6,0,1,313.625,286.5,184,458,458,2509
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""which""}",symbolic,8,6,6,0,1,256.25,271.0,153,327,327,2050
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""count""}",natural,9,6,6,0,3,506.22222222222223,461,429,618,618,4556
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 6, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,430.1111111111111,423,402,470,470,3871
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""count""}",natural,9,6,6,0,3,371.1111111111111,436,84,618,618,3340
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 6, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,316.55555555555554,409,84,470,470,2849
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""count""}",natural,9,6,6,0,3,480.44444444444446,456,372,613,613,4324
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 6, ""query_kind"": ""count""}",symbolic,9,6,6,0,3,404,404,345,465,465,3636
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""direction""}",natural,8,6,6,0,2,206,190.0,186,308,308,1648
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,203.75,202.5,198,211,211,1630
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""direction""}",natural,8,6,6,0,2,175.25,189.0,73,308,308,1402
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,166.75,201.5,61,203,203,1334
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""direction""}",natural,8,6,6,0,2,206,191.0,187,309,309,1648
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""direction""}",symbolic,8,6,6,0,2,203.5,203.5,199,207,207,1628
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""which""}",natural,8,6,6,3,2,379.75,373.0,321,459,459,3038
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""which""}",symbolic,8,6,6,3,2,333.75,324.0,309,378,378,2670
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""which""}",natural,8,6,6,0,3,260.875,323.0,76,451,451,2087
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""which""}",symbolic,8,6,6,0,3,239.5,312.5,80,364,364,1916
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""which""}",natural,8,6,6,0,2,284.625,285.0,176,411,411,2277
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""which""}",symbolic,8,6,6,0,2,251.5,282.0,145,332,332,2012
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""count""}",natural,7,6,6,0,1,493.42857142857144,488,444,576,576,3454
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 7, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,449.85714285714283,437,421,500,500,3149
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""count""}",natural,7,6,6,0,1,440.85714285714283,488,84,576,576,3086
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 7, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,400.57142857142856,437,84,500,500,2804
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""count""}",natural,7,6,6,0,1,479.85714285714283,483,387,571,571,3359
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 7, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,436.2857142857143,432,364,495,495,3054
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""direction""}",natural,7,6,6,0,1,321.14285714285717,338,204,346,346,2248
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,221.14285714285714,221,217,225,225,1548
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""direction""}",natural,7,6,6,0,1,282.7142857142857,337,77,343,343,1979
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,197.71428571428572,220,61,224,224,1384
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""direction""}",natural,7,6,6,0,1,321.57142857142856,339,205,344,344,2251
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,221.28571428571428,221,218,225,225,1549
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""which""}",natural,6,6,6,3,0,454.6666666666667,471.0,336,544,544,2728
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""which""}",symbolic,6,6,6,3,0,336.8333333333333,331.0,243,406,406,2021
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""which""}",natural,6,6,6,0,2,398.3333333333333,471.0,87,550,550,2390
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""which""}",symbolic,6,6,6,0,2,286.3333333333333,326.5,101,392,392,1718
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""which""}",natural,6,6,6,0,1,414,433.0,295,510,510,2484
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""which""}",symbolic,6,6,6,0,1,304.6666666666667,302.0,209,362,362,1828
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""count""}",natural,7,6,6,0,1,581.5714285714286,594,446,669,669,4071
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 8, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,450.57142857142856,445,344,534,534,3154
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""count""}",natural,7,6,6,0,1,506.85714285714283,592,85,669,669,3548
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 8, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,398,441,85,534,534,2786
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""count""}",natural,7,6,6,0,1,567.8571428571429,587,441,664,664,3975
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 8, ""query_kind"": ""count""}",symbolic,7,6,6,0,1,436.85714285714283,436,339,529,529,3058
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""direction""}",natural,7,6,6,0,1,285.14285714285717,222,214,383,383,1996
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,242,242,234,253,253,1694
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""direction""}",natural,7,6,6,0,1,242.28571428571428,220,83,375,375,1696
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,215.42857142857142,239,67,245,245,1508
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""direction""}",natural,7,6,6,0,1,285.57142857142856,223,215,380,380,1999
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,242.14285714285714,243,235,248,248,1695
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""which""}",natural,7,6,6,3,1,397.85714285714283,372,347,511,511,2785
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""which""}",symbolic,7,6,6,3,1,358.57142857142856,362,276,434,434,2510
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""which""}",natural,7,6,6,0,3,304.57142857142856,364,80,511,511,2132
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""which""}",symbolic,7,6,6,0,3,270.57142857142856,342,87,366,366,1894
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""which""}",natural,7,6,6,0,2,334.57142857142856,325,182,471,471,2342
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""which""}",symbolic,7,6,6,0,2,298.2857142857143,328,150,392,392,2088
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""count""}",natural,8,6,6,0,2,529.75,492.5,468,638,638,4238
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 9, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,485,478.5,388,576,576,3880
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""count""}",natural,8,6,6,0,2,418.25,487.0,83,638,638,3346
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 9, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,379.375,465.0,83,568,568,3035
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""count""}",natural,8,6,6,0,2,508.125,487.5,412,633,633,4065
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 9, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,462.125,473.5,383,563,563,3697
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""direction""}",natural,7,6,6,0,1,285.7142857142857,236,232,404,404,2000
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,260.7142857142857,259,256,269,269,1825
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""direction""}",natural,7,6,6,0,1,249.85714285714286,234,83,404,404,1749
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,231.85714285714286,259,67,262,262,1623
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""direction""}",natural,7,6,6,0,1,286.14285714285717,237,233,405,405,2003
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""direction""}",symbolic,7,6,6,0,1,260.85714285714283,260,257,264,264,1826
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""which""}",natural,7,6,6,4,0,399,393,305,537,537,2793
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""which""}",symbolic,7,6,6,4,0,369.57142857142856,383,282,415,415,2587
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""which""}",natural,7,6,6,0,2,354.2857142857143,380,81,537,537,2480
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""which""}",symbolic,7,6,6,0,2,325.57142857142856,366,85,417,417,2279
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""which""}",natural,7,6,6,0,1,336.2857142857143,341,192,500,500,2354
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""which""}",symbolic,7,6,6,0,1,309.14285714285717,337,157,385,385,2164
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""count""}",natural,8,6,6,0,2,510.75,511.0,422,658,658,4086
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": 10, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,473.375,488.5,394,534,534,3787
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""count""}",natural,8,6,6,0,2,412.75,494.5,81,658,658,3302
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": 10, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,381.5,472.5,88,534,534,3052
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""count""}",natural,8,6,6,0,2,490.625,489.5,368,653,653,3925
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": 10, ""query_kind"": ""count""}",symbolic,8,6,6,0,2,452.375,467.5,333,529,529,3619
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""direction""}",natural,19,19,19,19,0,115.26315789473684,122,82,144,144,2190
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""direction""}",symbolic,19,19,19,19,0,92.52631578947368,93,69,113,113,1758
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""direction""}",natural,19,19,19,6,10,103.10526315789474,82,73,251,251,1959
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""direction""}",symbolic,19,19,19,6,10,87,69,61,205,205,1653
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""direction""}",natural,19,19,19,6,0,181.8421052631579,222,82,261,261,3455
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""direction""}",symbolic,19,19,19,6,0,143.52631578947367,167,69,208,208,2727
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""which""}",natural,29,27,27,29,0,373.13793103448273,368,82,686,681,10821
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""which""}",symbolic,29,27,27,29,0,326.1034482758621,320,69,696,660,9457
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""which""}",natural,29,27,27,6,6,272.86206896551727,274,77,584,575,7913
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""which""}",symbolic,29,27,27,6,6,235.51724137931035,227,69,541,506,6830
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""which""}",natural,29,27,27,6,0,312.3103448275862,352,82,546,466,9057
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""which""}",symbolic,29,27,27,6,0,275.13793103448273,313,69,455,439,7979
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""count""}",natural,29,27,27,29,0,133.6551724137931,142,82,170,169,3876
+depth+query_kind+contract,"{""contract"": ""single"", ""depth"": null, ""query_kind"": ""count""}",symbolic,29,27,27,29,0,122.34482758620689,127,69,158,157,3548
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""count""}",natural,29,27,27,6,7,304.8965517241379,309,74,868,825,8842
+depth+query_kind+contract,"{""contract"": ""all-possible"", ""depth"": null, ""query_kind"": ""count""}",symbolic,29,27,27,6,7,257.6551724137931,261,69,744,733,7472
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""count""}",natural,29,27,27,6,0,341.0344827586207,311,82,865,746,9890
+depth+query_kind+contract,"{""contract"": ""visible-possible"", ""depth"": null, ""query_kind"": ""count""}",symbolic,29,27,27,6,0,293.7931034482759,282,69,731,664,8520
+semantic_case,"{""semantic_case"": ""unique""}",natural,642,173,76,0,123,301.5093457943925,297.5,73,669,571,193569
+semantic_case,"{""semantic_case"": ""unique""}",symbolic,642,173,76,0,123,253.3816199376947,242.5,61,576,474,162671
+semantic_case,"{""semantic_case"": ""multiple-certain-match""}",natural,99,30,30,33,9,337.62626262626264,352,81,584,546,33425
+semantic_case,"{""semantic_case"": ""multiple-certain-match""}",symbolic,99,30,30,33,9,284.7070707070707,293,85,447,418,28186
+semantic_case,"{""semantic_case"": ""no-match""}",natural,30,10,10,10,20,246.6,230.0,171,368,366,7398
+semantic_case,"{""semantic_case"": ""no-match""}",symbolic,30,10,10,10,20,201.6,209.0,137,282,278,6048
+semantic_case,"{""semantic_case"": ""underdetermined""}",natural,162,51,22,54,22,289.2345679012346,269.5,73,868,593,46856
+semantic_case,"{""semantic_case"": ""underdetermined""}",symbolic,162,51,22,54,22,250.56172839506172,227.5,61,744,506,40591
+semantic_case,"{""semantic_case"": ""inconsistent""}",natural,54,18,6,54,0,89.5,89.5,82,96,96,4833
+semantic_case,"{""semantic_case"": ""inconsistent""}",symbolic,54,18,6,54,0,78.16666666666667,73.0,69,108,108,4221
+answer,"{""answer"": ""A""}",natural,111,38,32,0,0,322.18918918918916,308,92,658,595,35763
+answer,"{""answer"": ""A""}",symbolic,111,38,32,0,0,278.9009009009009,263,75,501,476,30958
+answer,"{""answer"": ""B""}",natural,123,41,33,0,0,342.5934959349593,339,92,669,560,42139
+answer,"{""answer"": ""B""}",symbolic,123,41,33,0,0,285.4634146341463,262,74,534,478,35112
+answer,"{""answer"": ""D""}",natural,142,49,42,0,0,299.16901408450707,275.0,92,638,589,42482
+answer,"{""answer"": ""D""}",symbolic,142,49,42,0,0,243.88732394366198,232.5,74,568,470,34632
+answer,"{""answer"": ""E""}",natural,151,109,63,151,0,219.158940397351,143,82,686,547,33093
+answer,"{""answer"": ""E""}",symbolic,151,109,63,151,0,188.58278145695365,127,69,696,441,28476
+answer,"{""answer"": ""AC""}",natural,10,5,5,0,0,292.5,333.0,160,392,392,2925
+answer,"{""answer"": ""AC""}",symbolic,10,5,5,0,0,232.6,249.0,149,319,319,2326
+answer,"{""answer"": ""C""}",natural,157,53,41,0,0,310.03821656050957,325,92,594,562,48676
+answer,"{""answer"": ""C""}",symbolic,157,53,41,0,0,261.6496815286624,259,74,534,497,41079
+answer,"{""answer"": ""F""}",natural,174,82,51,0,174,205.683908045977,170.0,73,608,494,35789
+answer,"{""answer"": ""F""}",symbolic,174,82,51,0,174,176.05172413793105,137.5,61,576,429,30633
+answer,"{""answer"": ""ACD""}",natural,6,3,3,0,0,312,257.5,226,465,465,1872
+answer,"{""answer"": ""ACD""}",symbolic,6,3,3,0,0,239.16666666666666,208.5,183,336,336,1435
+answer,"{""answer"": ""ABCD""}",natural,55,40,26,0,0,357.0181818181818,332,220,825,575,19636
+answer,"{""answer"": ""ABCD""}",symbolic,55,40,26,0,0,305.45454545454544,307,167,744,506,16800
+answer,"{""answer"": ""ABD""}",natural,12,6,6,0,0,382.1666666666667,361.5,241,593,593,4586
+answer,"{""answer"": ""ABD""}",symbolic,12,6,6,0,0,330,326.5,196,497,497,3960
+answer,"{""answer"": ""AD""}",natural,8,4,4,0,0,484.375,357.0,275,868,868,3875
+answer,"{""answer"": ""AD""}",symbolic,8,4,4,0,0,426.625,326.0,261,733,733,3413
+answer,"{""answer"": ""BCD""}",natural,11,7,7,0,0,439.72727272727275,402,352,746,746,4837
+answer,"{""answer"": ""BCD""}",symbolic,11,7,7,0,0,359.27272727272725,326,283,664,664,3952
+answer,"{""answer"": ""CD""}",natural,11,6,6,0,0,359.8181818181818,335,216,482,482,3958
+answer,"{""answer"": ""CD""}",symbolic,11,6,6,0,0,309.54545454545456,337,178,395,395,3405
+answer,"{""answer"": ""BD""}",natural,6,3,3,0,0,428,372.5,286,627,627,2568
+answer,"{""answer"": ""BD""}",symbolic,6,3,3,0,0,365.1666666666667,374.0,246,477,477,2191
+answer,"{""answer"": ""ABC""}",natural,6,3,3,0,0,423,403.5,369,501,501,2538
+answer,"{""answer"": ""ABC""}",symbolic,6,3,3,0,0,376.5,396.5,316,417,417,2259
+answer,"{""answer"": ""BC""}",natural,2,1,1,0,0,327.5,327.5,326,329,329,655
+answer,"{""answer"": ""BC""}",symbolic,2,1,1,0,0,283,283.0,282,284,284,566
+answer,"{""answer"": ""AB""}",natural,2,1,1,0,0,344.5,344.5,343,346,346,689
+answer,"{""answer"": ""AB""}",symbolic,2,1,1,0,0,260,260.0,259,261,261,520
+contract+answer,"{""answer"": ""A"", ""contract"": ""single""}",natural,35,35,29,0,0,324.1714285714286,308,92,658,600,11346
+contract+answer,"{""answer"": ""A"", ""contract"": ""single""}",symbolic,35,35,29,0,0,281.34285714285716,263,75,501,479,9847
+contract+answer,"{""answer"": ""A"", ""contract"": ""all-possible""}",natural,38,38,32,0,0,324.7631578947368,302.0,92,658,600,12341
+contract+answer,"{""answer"": ""A"", ""contract"": ""all-possible""}",symbolic,38,38,32,0,0,280.7105263157895,262.5,75,501,479,10667
+contract+answer,"{""answer"": ""A"", ""contract"": ""visible-possible""}",natural,38,38,32,0,0,317.7894736842105,303.0,93,653,595,12076
+contract+answer,"{""answer"": ""A"", ""contract"": ""visible-possible""}",symbolic,38,38,32,0,0,274.8421052631579,256.0,76,496,474,10444
+contract+answer,"{""answer"": ""B"", ""contract"": ""single""}",natural,41,41,33,0,0,345.2926829268293,341,92,669,560,14157
+contract+answer,"{""answer"": ""B"", ""contract"": ""single""}",symbolic,41,41,33,0,0,287.7073170731707,262,74,534,478,11796
+contract+answer,"{""answer"": ""B"", ""contract"": ""all-possible""}",natural,41,41,33,0,0,345.2926829268293,341,92,669,560,14157
+contract+answer,"{""answer"": ""B"", ""contract"": ""all-possible""}",symbolic,41,41,33,0,0,287.7073170731707,262,74,534,478,11796
+contract+answer,"{""answer"": ""B"", ""contract"": ""visible-possible""}",natural,41,41,33,0,0,337.1951219512195,338,93,664,555,13825
+contract+answer,"{""answer"": ""B"", ""contract"": ""visible-possible""}",symbolic,41,41,33,0,0,280.9756097560976,260,75,529,473,11520
+contract+answer,"{""answer"": ""D"", ""contract"": ""single""}",natural,46,46,39,0,0,303.5217391304348,278.0,92,638,589,13962
+contract+answer,"{""answer"": ""D"", ""contract"": ""single""}",symbolic,46,46,39,0,0,247.34782608695653,238.0,74,568,470,11378
+contract+answer,"{""answer"": ""D"", ""contract"": ""all-possible""}",natural,47,47,40,0,0,302.8936170212766,275,92,638,589,14236
+contract+answer,"{""answer"": ""D"", ""contract"": ""all-possible""}",symbolic,47,47,40,0,0,246.91489361702128,234,74,568,470,11605
+contract+answer,"{""answer"": ""D"", ""contract"": ""visible-possible""}",natural,49,49,42,0,0,291.51020408163265,244,93,633,584,14284
+contract+answer,"{""answer"": ""D"", ""contract"": ""visible-possible""}",symbolic,49,49,42,0,0,237.73469387755102,223,75,563,465,11649
+contract+answer,"{""answer"": ""E"", ""contract"": ""single""}",natural,115,109,63,115,0,259.74782608695654,225,82,686,572,29871
+contract+answer,"{""answer"": ""E"", ""contract"": ""single""}",symbolic,115,109,63,115,0,223.1478260869565,192,69,696,463,25662
+contract+answer,"{""answer"": ""AC"", ""contract"": ""all-possible""}",natural,5,5,5,0,0,301.2,336,168,392,392,1506
+contract+answer,"{""answer"": ""AC"", ""contract"": ""all-possible""}",symbolic,5,5,5,0,0,239.2,261,156,319,319,1196
+contract+answer,"{""answer"": ""AC"", ""contract"": ""visible-possible""}",natural,5,5,5,0,0,283.8,330,160,389,389,1419
+contract+answer,"{""answer"": ""AC"", ""contract"": ""visible-possible""}",symbolic,5,5,5,0,0,226,237,149,317,317,1130
+contract+answer,"{""answer"": ""C"", ""contract"": ""single""}",natural,51,51,39,0,0,314.7843137254902,326,92,594,562,16054
+contract+answer,"{""answer"": ""C"", ""contract"": ""single""}",symbolic,51,51,39,0,0,265.29411764705884,261,74,534,500,13530
+contract+answer,"{""answer"": ""C"", ""contract"": ""all-possible""}",natural,53,53,41,0,0,312.3018867924528,325,92,594,562,16552
+contract+answer,"{""answer"": ""C"", ""contract"": ""all-possible""}",symbolic,53,53,41,0,0,263.62264150943395,259,74,534,500,13972
+contract+answer,"{""answer"": ""C"", ""contract"": ""visible-possible""}",natural,53,53,41,0,0,303.20754716981133,309,93,589,557,16070
+contract+answer,"{""answer"": ""C"", ""contract"": ""visible-possible""}",symbolic,53,53,41,0,0,256.1698113207547,258,75,529,495,13577
+contract+answer,"{""answer"": ""F"", ""contract"": ""single""}",natural,41,41,34,0,41,335.1463414634146,346,100,608,594,13741
+contract+answer,"{""answer"": ""F"", ""contract"": ""single""}",symbolic,41,41,34,0,41,283.9268292682927,270,82,576,460,11641
+contract+answer,"{""answer"": ""F"", ""contract"": ""all-possible""}",natural,82,82,51,0,82,103.3170731707317,83.0,73,366,249,8472
+contract+answer,"{""answer"": ""F"", ""contract"": ""all-possible""}",symbolic,82,82,51,0,82,94.45121951219512,84.0,61,278,211,7745
+contract+answer,"{""answer"": ""F"", ""contract"": ""visible-possible""}",natural,51,51,38,0,51,266.19607843137254,223,97,542,518,13576
+contract+answer,"{""answer"": ""F"", ""contract"": ""visible-possible""}",symbolic,51,51,38,0,51,220.52941176470588,191,78,487,396,11247
+contract+answer,"{""answer"": ""ACD"", ""contract"": ""all-possible""}",natural,3,3,3,0,0,326.6666666666667,264,251,465,465,980
+contract+answer,"{""answer"": ""ACD"", ""contract"": ""all-possible""}",symbolic,3,3,3,0,0,251,212,205,336,336,753
+contract+answer,"{""answer"": ""ACD"", ""contract"": ""visible-possible""}",natural,3,3,3,0,0,297.3333333333333,243,226,423,423,892
+contract+answer,"{""answer"": ""ACD"", ""contract"": ""visible-possible""}",symbolic,3,3,3,0,0,227.33333333333334,197,183,302,302,682
+contract+answer,"{""answer"": ""ABCD"", ""contract"": ""all-possible""}",natural,15,15,14,0,0,452.53333333333336,465,246,825,825,6788
+contract+answer,"{""answer"": ""ABCD"", ""contract"": ""all-possible""}",symbolic,15,15,14,0,0,378.26666666666665,364,198,744,744,5674
+contract+answer,"{""answer"": ""ABCD"", ""contract"": ""visible-possible""}",natural,40,40,26,0,0,321.2,305.5,220,546,466,12848
+contract+answer,"{""answer"": ""ABCD"", ""contract"": ""visible-possible""}",symbolic,40,40,26,0,0,278.15,274.0,167,455,434,11126
+contract+answer,"{""answer"": ""ABD"", ""contract"": ""all-possible""}",natural,6,6,6,0,0,407.1666666666667,415.5,249,593,593,2443
+contract+answer,"{""answer"": ""ABD"", ""contract"": ""all-possible""}",symbolic,6,6,6,0,0,349.1666666666667,368.0,203,497,497,2095
+contract+answer,"{""answer"": ""ABD"", ""contract"": ""visible-possible""}",natural,6,6,6,0,0,357.1666666666667,342.5,241,581,581,2143
+contract+answer,"{""answer"": ""ABD"", ""contract"": ""visible-possible""}",symbolic,6,6,6,0,0,310.8333333333333,315.0,196,486,486,1865
+contract+answer,"{""answer"": ""AD"", ""contract"": ""all-possible""}",natural,4,4,4,0,0,515.25,440.0,313,868,868,2061
+contract+answer,"{""answer"": ""AD"", ""contract"": ""all-possible""}",symbolic,4,4,4,0,0,450,388.5,290,733,733,1800
+contract+answer,"{""answer"": ""AD"", ""contract"": ""visible-possible""}",natural,4,4,4,0,0,453.5,337.0,275,865,865,1814
+contract+answer,"{""answer"": ""AD"", ""contract"": ""visible-possible""}",symbolic,4,4,4,0,0,403.25,310.5,261,731,731,1613
+contract+answer,"{""answer"": ""BCD"", ""contract"": ""all-possible""}",natural,4,4,4,0,0,413,403.5,352,493,493,1652
+contract+answer,"{""answer"": ""BCD"", ""contract"": ""all-possible""}",symbolic,4,4,4,0,0,326.75,309.0,285,404,404,1307
+contract+answer,"{""answer"": ""BCD"", ""contract"": ""visible-possible""}",natural,7,7,7,0,0,455,402,352,746,746,3185
+contract+answer,"{""answer"": ""BCD"", ""contract"": ""visible-possible""}",symbolic,7,7,7,0,0,377.85714285714283,350,283,664,664,2645
+contract+answer,"{""answer"": ""CD"", ""contract"": ""visible-possible""}",natural,6,6,6,0,0,343.1666666666667,328.0,216,473,473,2059
+contract+answer,"{""answer"": ""CD"", ""contract"": ""visible-possible""}",symbolic,6,6,6,0,0,295,300.5,178,387,387,1770
+contract+answer,"{""answer"": ""CD"", ""contract"": ""all-possible""}",natural,5,5,5,0,0,379.8,373,309,482,482,1899
+contract+answer,"{""answer"": ""CD"", ""contract"": ""all-possible""}",symbolic,5,5,5,0,0,327,345,263,395,395,1635
+contract+answer,"{""answer"": ""BD"", ""contract"": ""all-possible""}",natural,3,3,3,0,0,436,392,289,627,627,1308
+contract+answer,"{""answer"": ""BD"", ""contract"": ""all-possible""}",symbolic,3,3,3,0,0,371.3333333333333,389,248,477,477,1114
+contract+answer,"{""answer"": ""BD"", ""contract"": ""visible-possible""}",natural,3,3,3,0,0,420,353,286,621,621,1260
+contract+answer,"{""answer"": ""BD"", ""contract"": ""visible-possible""}",symbolic,3,3,3,0,0,359,359,246,472,472,1077
+contract+answer,"{""answer"": ""ABC"", ""contract"": ""all-possible""}",natural,3,3,3,0,0,431.3333333333333,424,369,501,501,1294
+contract+answer,"{""answer"": ""ABC"", ""contract"": ""all-possible""}",symbolic,3,3,3,0,0,383,416,316,417,417,1149
+contract+answer,"{""answer"": ""ABC"", ""contract"": ""visible-possible""}",natural,3,3,3,0,0,414.6666666666667,383,369,492,492,1244
+contract+answer,"{""answer"": ""ABC"", ""contract"": ""visible-possible""}",symbolic,3,3,3,0,0,370,385,317,408,408,1110
+contract+answer,"{""answer"": ""BC"", ""contract"": ""all-possible""}",natural,1,1,1,0,0,329,329,329,329,329,329
+contract+answer,"{""answer"": ""BC"", ""contract"": ""all-possible""}",symbolic,1,1,1,0,0,284,284,284,284,284,284
+contract+answer,"{""answer"": ""BC"", ""contract"": ""visible-possible""}",natural,1,1,1,0,0,326,326,326,326,326,326
+contract+answer,"{""answer"": ""BC"", ""contract"": ""visible-possible""}",symbolic,1,1,1,0,0,282,282,282,282,282,282
+contract+answer,"{""answer"": ""E"", ""contract"": ""all-possible""}",natural,18,18,6,18,0,89.5,89.5,82,96,96,1611
+contract+answer,"{""answer"": ""E"", ""contract"": ""all-possible""}",symbolic,18,18,6,18,0,78.16666666666667,73.0,69,108,108,1407
+contract+answer,"{""answer"": ""E"", ""contract"": ""visible-possible""}",natural,18,18,6,18,0,89.5,89.5,82,96,96,1611
+contract+answer,"{""answer"": ""E"", ""contract"": ""visible-possible""}",symbolic,18,18,6,18,0,78.16666666666667,73.0,69,108,108,1407
+contract+answer,"{""answer"": ""AB"", ""contract"": ""all-possible""}",natural,1,1,1,0,0,346,346,346,346,346,346
+contract+answer,"{""answer"": ""AB"", ""contract"": ""all-possible""}",symbolic,1,1,1,0,0,261,261,261,261,261,261
+contract+answer,"{""answer"": ""AB"", ""contract"": ""visible-possible""}",natural,1,1,1,0,0,343,343,343,343,343,343
+contract+answer,"{""answer"": ""AB"", ""contract"": ""visible-possible""}",symbolic,1,1,1,0,0,259,259,259,259,259,259
+recipe,"{""recipe"": ""controlled-depth""}",natural,654,180,60,32,128,320.8272171253823,331.0,73,669,571,209821
+recipe,"{""recipe"": ""controlled-depth""}",symbolic,654,180,60,32,128,270.5061162079511,261.0,61,576,474,176911
+recipe,"{""recipe"": ""random-world""}",natural,117,36,12,32,15,285.2649572649573,251,73,825,593,33376
+recipe,"{""recipe"": ""random-world""}",symbolic,117,36,12,32,15,243.35897435897436,205,61,744,506,28473
+recipe,"{""recipe"": ""random-atoms""}",natural,111,36,12,56,10,201.40540540540542,142,74,681,482,22356
+recipe,"{""recipe"": ""random-atoms""}",symbolic,111,36,12,56,10,169.2882882882883,111,61,696,415,18791
+recipe,"{""recipe"": ""chain""}",natural,12,3,1,1,5,219.58333333333334,204.0,79,319,319,2635
+recipe,"{""recipe"": ""chain""}",symbolic,12,3,1,1,5,172.5,157.5,72,254,254,2070
+recipe,"{""recipe"": ""fork""}",natural,9,3,1,2,2,217,195,131,303,303,1953
+recipe,"{""recipe"": ""fork""}",symbolic,9,3,1,2,2,216.44444444444446,210,113,300,300,1948
+recipe,"{""recipe"": ""empty""}",natural,15,3,1,1,8,166.26666666666668,171,74,287,287,2494
+recipe,"{""recipe"": ""empty""}",symbolic,15,3,1,1,8,135.73333333333332,137,61,236,236,2036
+recipe,"{""recipe"": ""singleton""}",natural,9,3,1,0,0,193.33333333333334,184,92,304,304,1740
+recipe,"{""recipe"": ""singleton""}",symbolic,9,3,1,0,0,154.33333333333334,148,74,241,241,1389
+recipe,"{""recipe"": ""multiple""}",natural,12,3,1,1,3,194.91666666666666,170.0,73,354,354,2339
+recipe,"{""recipe"": ""multiple""}",symbolic,12,3,1,1,3,159.16666666666666,137.0,61,293,293,1910
+recipe,"{""recipe"": ""contingent""}",natural,12,3,1,4,2,195.75,239.0,74,289,289,2349
+recipe,"{""recipe"": ""contingent""}",symbolic,12,3,1,4,2,169.75,203.5,71,248,248,2037
+recipe,"{""recipe"": ""joint""}",natural,9,3,1,3,1,370.8888888888889,353,74,868,868,3338
+recipe,"{""recipe"": ""joint""}",symbolic,9,3,1,3,1,318.8888888888889,320,61,733,733,2870
+recipe,"{""recipe"": ""cycle""}",natural,18,6,2,10,0,156.94444444444446,88.0,84,354,354,2825
+recipe,"{""recipe"": ""cycle""}",symbolic,18,6,2,10,0,128.33333333333334,71.5,69,293,293,2310
+recipe,"{""recipe"": ""coincidence""}",natural,9,3,1,9,0,95,95,95,95,95,855
+recipe,"{""recipe"": ""coincidence""}",symbolic,9,3,1,9,0,108,108,108,108,108,972
+split,"{""split"": ""train-pilot""}",natural,330,99,33,61,43,284.8606060606061,279.0,73,868,581,94004
+split,"{""split"": ""train-pilot""}",symbolic,330,99,33,61,43,238.45454545454547,220.5,61,744,458,78690
+split,"{""split"": ""dev-pilot""}",natural,246,69,23,24,52,282.1016260162602,275.5,73,608,522,69397
+split,"{""split"": ""dev-pilot""}",symbolic,246,69,23,24,52,242.09756097560975,224.0,61,534,444,59556
+split,"{""split"": ""in-range-test-pilot""}",natural,279,78,26,59,52,263.0430107526882,247,74,618,564,73389
+split,"{""split"": ""in-range-test-pilot""}",symbolic,279,78,26,59,52,210.42293906810036,197,61,506,436,58708
+split,"{""split"": ""extrapolation-pilot""}",natural,132,36,12,7,27,373.4166666666667,375.0,80,658,597,49291
+split,"{""split"": ""extrapolation-pilot""}",symbolic,132,36,12,7,27,339.1136363636364,347.0,67,576,529,44763

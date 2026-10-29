@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checks": {
+    "paths_per_style": 3804,
+    "maps_per_style": 810,
+    "pairs": 987
+  },
+  "source_sha256": "2dc1c408dbd4fab7ab1e4a1c0e38b604e3417770f8ecc5ca3c7d4d1589425c06",
+  "auditor_sha256": "c68a28c62a8174d880c77f7ea5d59955c532be739eb4052ce41f9253af6c3751",
+  "scope": "Printed chains, citations, endpoints, whole-map premises, distinctness, query outcomes, and cross-style equality. Not a parser of all conclusion prose or a fluency judgment."
+}
