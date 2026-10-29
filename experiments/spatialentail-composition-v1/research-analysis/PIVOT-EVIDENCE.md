@@ -441,9 +441,19 @@ one or all witnesses for Direction, Selection, and Count and require rejection.
 Menu checks include domain validity, five qualifying Selection objects,
 unlisted unique Selection/Count answers, and partially listed Count sets.
 
-Still pending: generated evidence records/renderers, new nine-template prompt
-integration, migrated A-F encoder/decoder, full release audits, and model runs.
-Legacy text round trips do not establish that the new prompt interface works.
+Implementation update: the [expanded evidence path](../README.md#expanded-evidence-path)
+now constructs checked evidence and matched renderings for all fourteen fixtures
+and all 57 contract/menu views. It reuses shared Direction/Selection certificates,
+adds replayable strict-cycle/forced-coincidence conflicts, and supports Count
+through fixed memberships and verified pair incompatibilities. Count support is
+bounded to eight eligible objects and rejects uncovered higher-order exclusions.
+The separately versioned interface includes nine prompt templates, full-prompt
+round trips, A-F mapping, and strict answer parsers.
+The prose in this note remains hand-authored; it is not the generated renderer.
+The generated pack uses fixed fixture stories, not random generation, and does
+not establish dataset release readiness. Broader evidence feasibility, manual
+coverage audits, final format/sampling freeze, release gates, runtime structured
+decoding, and model runs remain pending.
 
 Validation on 2026-10-27: all 75 evidence tests passed. Combined with
 `spatial/v2/tests/test_solver_correctness.py`, 740 tests passed using Python 3.12
