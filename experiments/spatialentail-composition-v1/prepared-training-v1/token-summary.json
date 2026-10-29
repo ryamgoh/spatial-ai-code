@@ -1,0 +1,228 @@
+{
+  "natural": {
+    "train": {
+      "prompt_tokens": {
+        "min": 405,
+        "median": 473,
+        "p95": 563,
+        "max": 751,
+        "total": 766007
+      },
+      "target_tokens": {
+        "min": 55,
+        "median": 466,
+        "p95": 1520,
+        "max": 3618,
+        "total": 898788
+      },
+      "supervised_tokens": {
+        "min": 57,
+        "median": 468,
+        "p95": 1522,
+        "max": 3620,
+        "total": 901980
+      },
+      "training_tokens": {
+        "min": 485,
+        "median": 920,
+        "p95": 2103,
+        "max": 4184,
+        "total": 1667987
+      },
+      "stage2_reserved_tokens": {
+        "min": 4546,
+        "median": 4614,
+        "p95": 4704,
+        "max": 4892,
+        "total": 7375043
+      }
+    },
+    "dev": {
+      "prompt_tokens": {
+        "min": 405,
+        "median": 469,
+        "p95": 545,
+        "max": 575,
+        "total": 247414
+      },
+      "target_tokens": {
+        "min": 55,
+        "median": 430,
+        "p95": 1296,
+        "max": 2878,
+        "total": 274716
+      },
+      "supervised_tokens": {
+        "min": 57,
+        "median": 432,
+        "p95": 1298,
+        "max": 2880,
+        "total": 275760
+      },
+      "training_tokens": {
+        "min": 485,
+        "median": 897,
+        "p95": 1837,
+        "max": 3383,
+        "total": 523174
+      },
+      "stage2_reserved_tokens": {
+        "min": 4546,
+        "median": 4610,
+        "p95": 4686,
+        "max": 4716,
+        "total": 2409016
+      }
+    },
+    "test": {
+      "prompt_tokens": {
+        "min": 405,
+        "median": 469,
+        "p95": 525,
+        "max": 569,
+        "total": 251631
+      },
+      "target_tokens": {
+        "min": 55,
+        "median": 374,
+        "p95": 1353,
+        "max": 3112,
+        "total": 279797
+      },
+      "supervised_tokens": {
+        "min": 57,
+        "median": 376,
+        "p95": 1355,
+        "max": 3114,
+        "total": 280865
+      },
+      "training_tokens": {
+        "min": 485,
+        "median": 833,
+        "p95": 1837,
+        "max": 3638,
+        "total": 532496
+      },
+      "stage2_reserved_tokens": {
+        "min": 4546,
+        "median": 4610,
+        "p95": 4666,
+        "max": 4710,
+        "total": 2462925
+      }
+    }
+  },
+  "symbolic": {
+    "train": {
+      "prompt_tokens": {
+        "min": 404,
+        "median": 472,
+        "p95": 562,
+        "max": 750,
+        "total": 764411
+      },
+      "target_tokens": {
+        "min": 51,
+        "median": 416,
+        "p95": 1361,
+        "max": 3172,
+        "total": 777108
+      },
+      "supervised_tokens": {
+        "min": 53,
+        "median": 418,
+        "p95": 1363,
+        "max": 3174,
+        "total": 780300
+      },
+      "training_tokens": {
+        "min": 480,
+        "median": 861,
+        "p95": 1893,
+        "max": 3737,
+        "total": 1544711
+      },
+      "stage2_reserved_tokens": {
+        "min": 4545,
+        "median": 4613,
+        "p95": 4703,
+        "max": 4891,
+        "total": 7373447
+      }
+    },
+    "dev": {
+      "prompt_tokens": {
+        "min": 404,
+        "median": 468,
+        "p95": 544,
+        "max": 574,
+        "total": 246892
+      },
+      "target_tokens": {
+        "min": 51,
+        "median": 375,
+        "p95": 1151,
+        "max": 2520,
+        "total": 236156
+      },
+      "supervised_tokens": {
+        "min": 53,
+        "median": 377,
+        "p95": 1153,
+        "max": 2522,
+        "total": 237200
+      },
+      "training_tokens": {
+        "min": 480,
+        "median": 846,
+        "p95": 1641,
+        "max": 3024,
+        "total": 484092
+      },
+      "stage2_reserved_tokens": {
+        "min": 4545,
+        "median": 4609,
+        "p95": 4685,
+        "max": 4715,
+        "total": 2408494
+      }
+    },
+    "test": {
+      "prompt_tokens": {
+        "min": 404,
+        "median": 468,
+        "p95": 524,
+        "max": 568,
+        "total": 251097
+      },
+      "target_tokens": {
+        "min": 51,
+        "median": 294,
+        "p95": 1187,
+        "max": 2490,
+        "total": 240909
+      },
+      "supervised_tokens": {
+        "min": 53,
+        "median": 296,
+        "p95": 1189,
+        "max": 2492,
+        "total": 241977
+      },
+      "training_tokens": {
+        "min": 480,
+        "median": 790,
+        "p95": 1674,
+        "max": 3015,
+        "total": 493074
+      },
+      "stage2_reserved_tokens": {
+        "min": 4545,
+        "median": 4609,
+        "p95": 4665,
+        "max": 4709,
+        "total": 2462391
+      }
+    }
+  }
+}

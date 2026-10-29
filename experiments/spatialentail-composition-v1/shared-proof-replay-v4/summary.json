@@ -1,0 +1,1466 @@
+{
+  "bases": 300,
+  "pairs": 1719,
+  "changed_pairs": 80,
+  "failures": [],
+  "tokens": {
+    "natural": {
+      "before": {
+        "count": 1719,
+        "mean": 265.91913903432226,
+        "min": 57,
+        "max": 1127
+      },
+      "after": {
+        "count": 1719,
+        "mean": 258.20302501454336,
+        "min": 57,
+        "max": 930
+      }
+    },
+    "symbolic": {
+      "before": {
+        "count": 1719,
+        "mean": 223.98662012798138,
+        "min": 61,
+        "max": 812
+      },
+      "after": {
+        "count": 1719,
+        "mean": 220.1977894124491,
+        "min": 61,
+        "max": 790
+      }
+    }
+  },
+  "groups": {
+    "controlled-depth/depth-1/natural": {
+      "before": {
+        "count": 54,
+        "mean": 191.8148148148148,
+        "min": 73,
+        "max": 369
+      },
+      "after": {
+        "count": 54,
+        "mean": 191.8148148148148,
+        "min": 73,
+        "max": 369
+      }
+    },
+    "controlled-depth/depth-1/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 159.16666666666666,
+        "min": 61,
+        "max": 310
+      },
+      "after": {
+        "count": 54,
+        "mean": 159.16666666666666,
+        "min": 61,
+        "max": 310
+      }
+    },
+    "controlled-depth/depth-2/natural": {
+      "before": {
+        "count": 54,
+        "mean": 220.62962962962962,
+        "min": 74,
+        "max": 415
+      },
+      "after": {
+        "count": 54,
+        "mean": 220.62962962962962,
+        "min": 74,
+        "max": 415
+      }
+    },
+    "controlled-depth/depth-2/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 191.9814814814815,
+        "min": 71,
+        "max": 362
+      },
+      "after": {
+        "count": 54,
+        "mean": 191.9814814814815,
+        "min": 71,
+        "max": 362
+      }
+    },
+    "controlled-depth/depth-3/natural": {
+      "before": {
+        "count": 54,
+        "mean": 241.22222222222223,
+        "min": 73,
+        "max": 481
+      },
+      "after": {
+        "count": 54,
+        "mean": 241.22222222222223,
+        "min": 73,
+        "max": 481
+      }
+    },
+    "controlled-depth/depth-3/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 209.33333333333334,
+        "min": 61,
+        "max": 394
+      },
+      "after": {
+        "count": 54,
+        "mean": 209.33333333333334,
+        "min": 61,
+        "max": 394
+      }
+    },
+    "controlled-depth/depth-4/natural": {
+      "before": {
+        "count": 51,
+        "mean": 257.3921568627451,
+        "min": 73,
+        "max": 492
+      },
+      "after": {
+        "count": 51,
+        "mean": 257.3921568627451,
+        "min": 73,
+        "max": 492
+      }
+    },
+    "controlled-depth/depth-4/symbolic": {
+      "before": {
+        "count": 51,
+        "mean": 219.31372549019608,
+        "min": 61,
+        "max": 443
+      },
+      "after": {
+        "count": 51,
+        "mean": 219.31372549019608,
+        "min": 61,
+        "max": 443
+      }
+    },
+    "controlled-depth/depth-5/natural": {
+      "before": {
+        "count": 51,
+        "mean": 276.0980392156863,
+        "min": 74,
+        "max": 513
+      },
+      "after": {
+        "count": 51,
+        "mean": 276.0980392156863,
+        "min": 74,
+        "max": 513
+      }
+    },
+    "controlled-depth/depth-5/symbolic": {
+      "before": {
+        "count": 51,
+        "mean": 223.11764705882354,
+        "min": 61,
+        "max": 394
+      },
+      "after": {
+        "count": 51,
+        "mean": 223.11764705882354,
+        "min": 61,
+        "max": 394
+      }
+    },
+    "controlled-depth/depth-6/natural": {
+      "before": {
+        "count": 54,
+        "mean": 310.5,
+        "min": 74,
+        "max": 569
+      },
+      "after": {
+        "count": 54,
+        "mean": 310.5,
+        "min": 74,
+        "max": 569
+      }
+    },
+    "controlled-depth/depth-6/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 245.42592592592592,
+        "min": 61,
+        "max": 436
+      },
+      "after": {
+        "count": 54,
+        "mean": 245.42592592592592,
+        "min": 61,
+        "max": 436
+      }
+    },
+    "controlled-depth/depth-7/natural": {
+      "before": {
+        "count": 54,
+        "mean": 346.8703703703704,
+        "min": 77,
+        "max": 620
+      },
+      "after": {
+        "count": 54,
+        "mean": 346.8703703703704,
+        "min": 77,
+        "max": 620
+      }
+    },
+    "controlled-depth/depth-7/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 274.0740740740741,
+        "min": 61,
+        "max": 469
+      },
+      "after": {
+        "count": 54,
+        "mean": 274.0740740740741,
+        "min": 61,
+        "max": 469
+      }
+    },
+    "controlled-depth/depth-8/natural": {
+      "before": {
+        "count": 54,
+        "mean": 352.8333333333333,
+        "min": 77,
+        "max": 666
+      },
+      "after": {
+        "count": 54,
+        "mean": 352.8333333333333,
+        "min": 77,
+        "max": 666
+      }
+    },
+    "controlled-depth/depth-8/symbolic": {
+      "before": {
+        "count": 54,
+        "mean": 289.75925925925924,
+        "min": 61,
+        "max": 497
+      },
+      "after": {
+        "count": 54,
+        "mean": 289.75925925925924,
+        "min": 61,
+        "max": 497
+      }
+    },
+    "controlled-depth/depth-9/natural": {
+      "before": {
+        "count": 51,
+        "mean": 299.0980392156863,
+        "min": 74,
+        "max": 567
+      },
+      "after": {
+        "count": 51,
+        "mean": 299.0980392156863,
+        "min": 74,
+        "max": 567
+      }
+    },
+    "controlled-depth/depth-9/symbolic": {
+      "before": {
+        "count": 51,
+        "mean": 296.80392156862746,
+        "min": 61,
+        "max": 538
+      },
+      "after": {
+        "count": 51,
+        "mean": 296.80392156862746,
+        "min": 61,
+        "max": 538
+      }
+    },
+    "controlled-depth/depth-10/natural": {
+      "before": {
+        "count": 51,
+        "mean": 369.9019607843137,
+        "min": 74,
+        "max": 662
+      },
+      "after": {
+        "count": 51,
+        "mean": 369.9019607843137,
+        "min": 74,
+        "max": 662
+      }
+    },
+    "controlled-depth/depth-10/symbolic": {
+      "before": {
+        "count": 51,
+        "mean": 294.62745098039215,
+        "min": 61,
+        "max": 484
+      },
+      "after": {
+        "count": 51,
+        "mean": 294.62745098039215,
+        "min": 61,
+        "max": 484
+      }
+    },
+    "random-world/depth-None/natural": {
+      "before": {
+        "count": 459,
+        "mean": 238.37254901960785,
+        "min": 73,
+        "max": 763
+      },
+      "after": {
+        "count": 459,
+        "mean": 238.37254901960785,
+        "min": 73,
+        "max": 763
+      }
+    },
+    "random-world/depth-None/symbolic": {
+      "before": {
+        "count": 459,
+        "mean": 203.24618736383442,
+        "min": 61,
+        "max": 638
+      },
+      "after": {
+        "count": 459,
+        "mean": 203.24618736383442,
+        "min": 61,
+        "max": 638
+      }
+    },
+    "random-atoms/depth-None/natural": {
+      "before": {
+        "count": 237,
+        "mean": 228.77215189873417,
+        "min": 73,
+        "max": 930
+      },
+      "after": {
+        "count": 237,
+        "mean": 228.77215189873417,
+        "min": 73,
+        "max": 930
+      }
+    },
+    "random-atoms/depth-None/symbolic": {
+      "before": {
+        "count": 237,
+        "mean": 199.0632911392405,
+        "min": 61,
+        "max": 790
+      },
+      "after": {
+        "count": 237,
+        "mean": 199.0632911392405,
+        "min": 61,
+        "max": 790
+      }
+    },
+    "chain/depth-None/natural": {
+      "before": {
+        "count": 15,
+        "mean": 201.46666666666667,
+        "min": 79,
+        "max": 319
+      },
+      "after": {
+        "count": 15,
+        "mean": 201.46666666666667,
+        "min": 79,
+        "max": 319
+      }
+    },
+    "chain/depth-None/symbolic": {
+      "before": {
+        "count": 15,
+        "mean": 158.26666666666668,
+        "min": 71,
+        "max": 254
+      },
+      "after": {
+        "count": 15,
+        "mean": 158.26666666666668,
+        "min": 71,
+        "max": 254
+      }
+    },
+    "fork/depth-None/natural": {
+      "before": {
+        "count": 18,
+        "mean": 176.05555555555554,
+        "min": 57,
+        "max": 311
+      },
+      "after": {
+        "count": 18,
+        "mean": 176.05555555555554,
+        "min": 57,
+        "max": 311
+      }
+    },
+    "fork/depth-None/symbolic": {
+      "before": {
+        "count": 18,
+        "mean": 173.27777777777777,
+        "min": 62,
+        "max": 308
+      },
+      "after": {
+        "count": 18,
+        "mean": 173.27777777777777,
+        "min": 62,
+        "max": 308
+      }
+    },
+    "empty/depth-None/natural": {
+      "before": {
+        "count": 15,
+        "mean": 166.2,
+        "min": 73,
+        "max": 287
+      },
+      "after": {
+        "count": 15,
+        "mean": 166.2,
+        "min": 73,
+        "max": 287
+      }
+    },
+    "empty/depth-None/symbolic": {
+      "before": {
+        "count": 15,
+        "mean": 135.73333333333332,
+        "min": 61,
+        "max": 236
+      },
+      "after": {
+        "count": 15,
+        "mean": 135.73333333333332,
+        "min": 61,
+        "max": 236
+      }
+    },
+    "singleton/depth-None/natural": {
+      "before": {
+        "count": 15,
+        "mean": 173.73333333333332,
+        "min": 73,
+        "max": 302
+      },
+      "after": {
+        "count": 15,
+        "mean": 173.73333333333332,
+        "min": 73,
+        "max": 302
+      }
+    },
+    "singleton/depth-None/symbolic": {
+      "before": {
+        "count": 15,
+        "mean": 142.66666666666666,
+        "min": 61,
+        "max": 251
+      },
+      "after": {
+        "count": 15,
+        "mean": 142.66666666666666,
+        "min": 61,
+        "max": 251
+      }
+    },
+    "multiple/depth-None/natural": {
+      "before": {
+        "count": 15,
+        "mean": 205.73333333333332,
+        "min": 74,
+        "max": 362
+      },
+      "after": {
+        "count": 15,
+        "mean": 205.73333333333332,
+        "min": 74,
+        "max": 362
+      }
+    },
+    "multiple/depth-None/symbolic": {
+      "before": {
+        "count": 15,
+        "mean": 168.93333333333334,
+        "min": 61,
+        "max": 301
+      },
+      "after": {
+        "count": 15,
+        "mean": 168.93333333333334,
+        "min": 61,
+        "max": 301
+      }
+    },
+    "contingent/depth-None/natural": {
+      "before": {
+        "count": 12,
+        "mean": 199.08333333333334,
+        "min": 79,
+        "max": 294
+      },
+      "after": {
+        "count": 12,
+        "mean": 199.08333333333334,
+        "min": 79,
+        "max": 294
+      }
+    },
+    "contingent/depth-None/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 169.0,
+        "min": 71,
+        "max": 247
+      },
+      "after": {
+        "count": 12,
+        "mean": 169.0,
+        "min": 71,
+        "max": 247
+      }
+    },
+    "joint/depth-None/natural": {
+      "before": {
+        "count": 12,
+        "mean": 366.3333333333333,
+        "min": 74,
+        "max": 873
+      },
+      "after": {
+        "count": 12,
+        "mean": 366.3333333333333,
+        "min": 74,
+        "max": 873
+      }
+    },
+    "joint/depth-None/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 311.3333333333333,
+        "min": 61,
+        "max": 732
+      },
+      "after": {
+        "count": 12,
+        "mean": 311.3333333333333,
+        "min": 61,
+        "max": 732
+      }
+    },
+    "cycle/depth-None/natural": {
+      "before": {
+        "count": 24,
+        "mean": 160.08333333333334,
+        "min": 74,
+        "max": 362
+      },
+      "after": {
+        "count": 24,
+        "mean": 160.08333333333334,
+        "min": 74,
+        "max": 362
+      }
+    },
+    "cycle/depth-None/symbolic": {
+      "before": {
+        "count": 24,
+        "mean": 131.45833333333334,
+        "min": 61,
+        "max": 301
+      },
+      "after": {
+        "count": 24,
+        "mean": 131.45833333333334,
+        "min": 61,
+        "max": 301
+      }
+    },
+    "coincidence/depth-None/natural": {
+      "before": {
+        "count": 9,
+        "mean": 95.0,
+        "min": 95,
+        "max": 95
+      },
+      "after": {
+        "count": 9,
+        "mean": 95.0,
+        "min": 95,
+        "max": 95
+      }
+    },
+    "coincidence/depth-None/symbolic": {
+      "before": {
+        "count": 9,
+        "mean": 108.0,
+        "min": 108,
+        "max": 108
+      },
+      "after": {
+        "count": 9,
+        "mean": 108.0,
+        "min": 108,
+        "max": 108
+      }
+    },
+    "match-chain/depth-1/natural": {
+      "before": {
+        "count": 12,
+        "mean": 204.75,
+        "min": 82,
+        "max": 268
+      },
+      "after": {
+        "count": 12,
+        "mean": 204.75,
+        "min": 82,
+        "max": 268
+      }
+    },
+    "match-chain/depth-1/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 167.08333333333334,
+        "min": 83,
+        "max": 216
+      },
+      "after": {
+        "count": 12,
+        "mean": 167.08333333333334,
+        "min": 83,
+        "max": 216
+      }
+    },
+    "match-chain/depth-2/natural": {
+      "before": {
+        "count": 12,
+        "mean": 242.0,
+        "min": 90,
+        "max": 332
+      },
+      "after": {
+        "count": 12,
+        "mean": 242.0,
+        "min": 90,
+        "max": 332
+      }
+    },
+    "match-chain/depth-2/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 207.16666666666666,
+        "min": 90,
+        "max": 282
+      },
+      "after": {
+        "count": 12,
+        "mean": 207.16666666666666,
+        "min": 90,
+        "max": 282
+      }
+    },
+    "match-chain/depth-3/natural": {
+      "before": {
+        "count": 12,
+        "mean": 220.33333333333334,
+        "min": 82,
+        "max": 306
+      },
+      "after": {
+        "count": 12,
+        "mean": 220.33333333333334,
+        "min": 82,
+        "max": 306
+      }
+    },
+    "match-chain/depth-3/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 193.66666666666666,
+        "min": 76,
+        "max": 268
+      },
+      "after": {
+        "count": 12,
+        "mean": 193.66666666666666,
+        "min": 76,
+        "max": 268
+      }
+    },
+    "match-chain/depth-4/natural": {
+      "before": {
+        "count": 12,
+        "mean": 239.08333333333334,
+        "min": 79,
+        "max": 359
+      },
+      "after": {
+        "count": 12,
+        "mean": 239.08333333333334,
+        "min": 79,
+        "max": 359
+      }
+    },
+    "match-chain/depth-4/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 213.66666666666666,
+        "min": 77,
+        "max": 318
+      },
+      "after": {
+        "count": 12,
+        "mean": 213.66666666666666,
+        "min": 77,
+        "max": 318
+      }
+    },
+    "match-chain/depth-5/natural": {
+      "before": {
+        "count": 12,
+        "mean": 259.75,
+        "min": 87,
+        "max": 375
+      },
+      "after": {
+        "count": 12,
+        "mean": 259.75,
+        "min": 87,
+        "max": 375
+      }
+    },
+    "match-chain/depth-5/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 235.0,
+        "min": 83,
+        "max": 338
+      },
+      "after": {
+        "count": 12,
+        "mean": 235.0,
+        "min": 83,
+        "max": 338
+      }
+    },
+    "match-chain/depth-6/natural": {
+      "before": {
+        "count": 12,
+        "mean": 249.58333333333334,
+        "min": 80,
+        "max": 352
+      },
+      "after": {
+        "count": 12,
+        "mean": 249.58333333333334,
+        "min": 80,
+        "max": 352
+      }
+    },
+    "match-chain/depth-6/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 232.0,
+        "min": 78,
+        "max": 328
+      },
+      "after": {
+        "count": 12,
+        "mean": 232.0,
+        "min": 78,
+        "max": 328
+      }
+    },
+    "match-chain/depth-7/natural": {
+      "before": {
+        "count": 12,
+        "mean": 292.8333333333333,
+        "min": 92,
+        "max": 410
+      },
+      "after": {
+        "count": 12,
+        "mean": 292.8333333333333,
+        "min": 92,
+        "max": 410
+      }
+    },
+    "match-chain/depth-7/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 272.5,
+        "min": 92,
+        "max": 382
+      },
+      "after": {
+        "count": 12,
+        "mean": 272.5,
+        "min": 92,
+        "max": 382
+      }
+    },
+    "match-chain/depth-8/natural": {
+      "before": {
+        "count": 12,
+        "mean": 291.25,
+        "min": 93,
+        "max": 395
+      },
+      "after": {
+        "count": 12,
+        "mean": 291.25,
+        "min": 93,
+        "max": 395
+      }
+    },
+    "match-chain/depth-8/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 278.25,
+        "min": 91,
+        "max": 380
+      },
+      "after": {
+        "count": 12,
+        "mean": 278.25,
+        "min": 91,
+        "max": 380
+      }
+    },
+    "match-chain/depth-9/natural": {
+      "before": {
+        "count": 12,
+        "mean": 302.8333333333333,
+        "min": 90,
+        "max": 438
+      },
+      "after": {
+        "count": 12,
+        "mean": 302.8333333333333,
+        "min": 90,
+        "max": 438
+      }
+    },
+    "match-chain/depth-9/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 290.75,
+        "min": 86,
+        "max": 420
+      },
+      "after": {
+        "count": 12,
+        "mean": 290.75,
+        "min": 86,
+        "max": 420
+      }
+    },
+    "match-chain/depth-10/natural": {
+      "before": {
+        "count": 12,
+        "mean": 303.1666666666667,
+        "min": 86,
+        "max": 415
+      },
+      "after": {
+        "count": 12,
+        "mean": 303.1666666666667,
+        "min": 86,
+        "max": 415
+      }
+    },
+    "match-chain/depth-10/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 295.4166666666667,
+        "min": 85,
+        "max": 408
+      },
+      "after": {
+        "count": 12,
+        "mean": 295.4166666666667,
+        "min": 85,
+        "max": 408
+      }
+    },
+    "rival-chain/depth-1/natural": {
+      "before": {
+        "count": 12,
+        "mean": 214.91666666666666,
+        "min": 87,
+        "max": 306
+      },
+      "after": {
+        "count": 12,
+        "mean": 214.91666666666666,
+        "min": 87,
+        "max": 306
+      }
+    },
+    "rival-chain/depth-1/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 175.08333333333334,
+        "min": 83,
+        "max": 246
+      },
+      "after": {
+        "count": 12,
+        "mean": 175.08333333333334,
+        "min": 83,
+        "max": 246
+      }
+    },
+    "rival-chain/depth-2/natural": {
+      "before": {
+        "count": 12,
+        "mean": 219.33333333333334,
+        "min": 79,
+        "max": 326
+      },
+      "after": {
+        "count": 12,
+        "mean": 219.33333333333334,
+        "min": 79,
+        "max": 326
+      }
+    },
+    "rival-chain/depth-2/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 180.66666666666666,
+        "min": 77,
+        "max": 264
+      },
+      "after": {
+        "count": 12,
+        "mean": 180.66666666666666,
+        "min": 77,
+        "max": 264
+      }
+    },
+    "rival-chain/depth-3/natural": {
+      "before": {
+        "count": 12,
+        "mean": 231.83333333333334,
+        "min": 82,
+        "max": 332
+      },
+      "after": {
+        "count": 12,
+        "mean": 231.83333333333334,
+        "min": 82,
+        "max": 332
+      }
+    },
+    "rival-chain/depth-3/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 192.5,
+        "min": 84,
+        "max": 272
+      },
+      "after": {
+        "count": 12,
+        "mean": 192.5,
+        "min": 84,
+        "max": 272
+      }
+    },
+    "rival-chain/depth-4/natural": {
+      "before": {
+        "count": 12,
+        "mean": 226.58333333333334,
+        "min": 84,
+        "max": 340
+      },
+      "after": {
+        "count": 12,
+        "mean": 226.58333333333334,
+        "min": 84,
+        "max": 340
+      }
+    },
+    "rival-chain/depth-4/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 190.25,
+        "min": 76,
+        "max": 282
+      },
+      "after": {
+        "count": 12,
+        "mean": 190.25,
+        "min": 76,
+        "max": 282
+      }
+    },
+    "rival-chain/depth-5/natural": {
+      "before": {
+        "count": 12,
+        "mean": 220.83333333333334,
+        "min": 79,
+        "max": 309
+      },
+      "after": {
+        "count": 12,
+        "mean": 220.83333333333334,
+        "min": 79,
+        "max": 309
+      }
+    },
+    "rival-chain/depth-5/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 188.25,
+        "min": 77,
+        "max": 262
+      },
+      "after": {
+        "count": 12,
+        "mean": 188.25,
+        "min": 77,
+        "max": 262
+      }
+    },
+    "rival-chain/depth-6/natural": {
+      "before": {
+        "count": 12,
+        "mean": 249.41666666666666,
+        "min": 90,
+        "max": 357
+      },
+      "after": {
+        "count": 12,
+        "mean": 249.41666666666666,
+        "min": 90,
+        "max": 357
+      }
+    },
+    "rival-chain/depth-6/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 213.25,
+        "min": 89,
+        "max": 303
+      },
+      "after": {
+        "count": 12,
+        "mean": 213.25,
+        "min": 89,
+        "max": 303
+      }
+    },
+    "rival-chain/depth-7/natural": {
+      "before": {
+        "count": 12,
+        "mean": 230.16666666666666,
+        "min": 79,
+        "max": 285
+      },
+      "after": {
+        "count": 12,
+        "mean": 230.16666666666666,
+        "min": 79,
+        "max": 285
+      }
+    },
+    "rival-chain/depth-7/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 203.33333333333334,
+        "min": 77,
+        "max": 250
+      },
+      "after": {
+        "count": 12,
+        "mean": 203.33333333333334,
+        "min": 77,
+        "max": 250
+      }
+    },
+    "rival-chain/depth-8/natural": {
+      "before": {
+        "count": 12,
+        "mean": 260.0,
+        "min": 84,
+        "max": 376
+      },
+      "after": {
+        "count": 12,
+        "mean": 260.0,
+        "min": 84,
+        "max": 376
+      }
+    },
+    "rival-chain/depth-8/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 230.91666666666666,
+        "min": 76,
+        "max": 328
+      },
+      "after": {
+        "count": 12,
+        "mean": 230.91666666666666,
+        "min": 76,
+        "max": 328
+      }
+    },
+    "rival-chain/depth-9/natural": {
+      "before": {
+        "count": 12,
+        "mean": 283.4166666666667,
+        "min": 91,
+        "max": 382
+      },
+      "after": {
+        "count": 12,
+        "mean": 283.4166666666667,
+        "min": 91,
+        "max": 382
+      }
+    },
+    "rival-chain/depth-9/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 255.0,
+        "min": 91,
+        "max": 335
+      },
+      "after": {
+        "count": 12,
+        "mean": 255.0,
+        "min": 91,
+        "max": 335
+      }
+    },
+    "rival-chain/depth-10/natural": {
+      "before": {
+        "count": 12,
+        "mean": 257.0833333333333,
+        "min": 89,
+        "max": 364
+      },
+      "after": {
+        "count": 12,
+        "mean": 257.0833333333333,
+        "min": 89,
+        "max": 364
+      }
+    },
+    "rival-chain/depth-10/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 231.91666666666666,
+        "min": 81,
+        "max": 328
+      },
+      "after": {
+        "count": 12,
+        "mean": 231.91666666666666,
+        "min": 81,
+        "max": 328
+      }
+    },
+    "shared-exclusion/depth-1/natural": {
+      "before": {
+        "count": 12,
+        "mean": 194.16666666666666,
+        "min": 77,
+        "max": 268
+      },
+      "after": {
+        "count": 12,
+        "mean": 194.16666666666666,
+        "min": 77,
+        "max": 268
+      }
+    },
+    "shared-exclusion/depth-1/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 159.16666666666666,
+        "min": 77,
+        "max": 216
+      },
+      "after": {
+        "count": 12,
+        "mean": 159.16666666666666,
+        "min": 77,
+        "max": 216
+      }
+    },
+    "shared-exclusion/depth-2/natural": {
+      "before": {
+        "count": 12,
+        "mean": 304.5,
+        "min": 87,
+        "max": 416
+      },
+      "after": {
+        "count": 12,
+        "mean": 304.5,
+        "min": 87,
+        "max": 416
+      }
+    },
+    "shared-exclusion/depth-2/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 233.0,
+        "min": 83,
+        "max": 306
+      },
+      "after": {
+        "count": 12,
+        "mean": 233.0,
+        "min": 83,
+        "max": 306
+      }
+    },
+    "shared-exclusion/depth-3/natural": {
+      "before": {
+        "count": 12,
+        "mean": 407.5833333333333,
+        "min": 85,
+        "max": 582
+      },
+      "after": {
+        "count": 12,
+        "mean": 384.25,
+        "min": 85,
+        "max": 535
+      }
+    },
+    "shared-exclusion/depth-3/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 291.5833333333333,
+        "min": 90,
+        "max": 402
+      },
+      "after": {
+        "count": 12,
+        "mean": 296.5833333333333,
+        "min": 90,
+        "max": 402
+      }
+    },
+    "shared-exclusion/depth-4/natural": {
+      "before": {
+        "count": 12,
+        "mean": 430.3333333333333,
+        "min": 85,
+        "max": 650
+      },
+      "after": {
+        "count": 12,
+        "mean": 367.5833333333333,
+        "min": 85,
+        "max": 531
+      }
+    },
+    "shared-exclusion/depth-4/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 310.8333333333333,
+        "min": 83,
+        "max": 457
+      },
+      "after": {
+        "count": 12,
+        "mean": 288.9166666666667,
+        "min": 83,
+        "max": 406
+      }
+    },
+    "shared-exclusion/depth-5/natural": {
+      "before": {
+        "count": 12,
+        "mean": 447.1666666666667,
+        "min": 84,
+        "max": 727
+      },
+      "after": {
+        "count": 12,
+        "mean": 359.25,
+        "min": 84,
+        "max": 543
+      }
+    },
+    "shared-exclusion/depth-5/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 326.3333333333333,
+        "min": 76,
+        "max": 513
+      },
+      "after": {
+        "count": 12,
+        "mean": 296.1666666666667,
+        "min": 76,
+        "max": 428
+      }
+    },
+    "shared-exclusion/depth-6/natural": {
+      "before": {
+        "count": 12,
+        "mean": 425.0,
+        "min": 84,
+        "max": 562
+      },
+      "after": {
+        "count": 12,
+        "mean": 344.6666666666667,
+        "min": 84,
+        "max": 459
+      }
+    },
+    "shared-exclusion/depth-6/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 343.1666666666667,
+        "min": 76,
+        "max": 495
+      },
+      "after": {
+        "count": 12,
+        "mean": 298.1666666666667,
+        "min": 76,
+        "max": 394
+      }
+    },
+    "shared-exclusion/depth-7/natural": {
+      "before": {
+        "count": 12,
+        "mean": 512.5,
+        "min": 75,
+        "max": 654
+      },
+      "after": {
+        "count": 12,
+        "mean": 337.75,
+        "min": 75,
+        "max": 427
+      }
+    },
+    "shared-exclusion/depth-7/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 345.4166666666667,
+        "min": 78,
+        "max": 431
+      },
+      "after": {
+        "count": 12,
+        "mean": 275.9166666666667,
+        "min": 78,
+        "max": 341
+      }
+    },
+    "shared-exclusion/depth-8/natural": {
+      "before": {
+        "count": 12,
+        "mean": 570.0833333333334,
+        "min": 86,
+        "max": 884
+      },
+      "after": {
+        "count": 12,
+        "mean": 430.25,
+        "min": 86,
+        "max": 574
+      }
+    },
+    "shared-exclusion/depth-8/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 470.6666666666667,
+        "min": 91,
+        "max": 696
+      },
+      "after": {
+        "count": 12,
+        "mean": 375.3333333333333,
+        "min": 91,
+        "max": 510
+      }
+    },
+    "shared-exclusion/depth-9/natural": {
+      "before": {
+        "count": 12,
+        "mean": 657.8333333333334,
+        "min": 89,
+        "max": 1113
+      },
+      "after": {
+        "count": 12,
+        "mean": 400.5833333333333,
+        "min": 89,
+        "max": 608
+      }
+    },
+    "shared-exclusion/depth-9/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 480.3333333333333,
+        "min": 82,
+        "max": 766
+      },
+      "after": {
+        "count": 12,
+        "mean": 336.9166666666667,
+        "min": 82,
+        "max": 495
+      }
+    },
+    "shared-exclusion/depth-10/natural": {
+      "before": {
+        "count": 12,
+        "mean": 755.75,
+        "min": 96,
+        "max": 1127
+      },
+      "after": {
+        "count": 12,
+        "mean": 476.5833333333333,
+        "min": 96,
+        "max": 662
+      }
+    },
+    "shared-exclusion/depth-10/symbolic": {
+      "before": {
+        "count": 12,
+        "mean": 574.3333333333334,
+        "min": 96,
+        "max": 812
+      },
+      "after": {
+        "count": 12,
+        "mean": 431.9166666666667,
+        "min": 96,
+        "max": 602
+      }
+    }
+  }
+}

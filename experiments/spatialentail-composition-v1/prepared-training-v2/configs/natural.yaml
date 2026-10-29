@@ -1,0 +1,58 @@
+base_model: Qwen/Qwen3.5-4B
+revision_of_model: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+adapter: qlora
+load_in_4bit: true
+lora_r: 64
+lora_alpha: 128
+lora_target_modules:
+- q_proj
+- k_proj
+- v_proj
+- o_proj
+- gate_proj
+- down_proj
+- up_proj
+- linear_attn.in_proj_qkv
+- linear_attn.in_proj_z
+- linear_attn.out_proj
+lora_qkv_kernel: false
+lora_o_kernel: false
+lora_mlp_kernel: false
+embeddings_skip_upcast: true
+attn_implementation: sdpa
+sample_packing: false
+pad_to_sequence_len: false
+group_by_length: false
+shuffle_merged_datasets: false
+train_on_inputs: false
+learning_rate: 5.0e-05
+sequence_len: 8192
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+warmup_ratio: 0.05
+fp16: false
+bf16: true
+max_grad_norm: 0.05
+num_epochs: 2
+logging_steps: 1
+output_dir: experiments/spatialentail-composition-v1/prepared-training-v2/models/natural-seed-42
+datasets:
+- path: experiments/spatialentail-composition-v1/prepared-training-v2/data/natural-train-tokenized.jsonl
+  ds_type: json
+  type: null
+dataset_prepared_path: experiments/spatialentail-composition-v1/prepared-training-v2/cache/natural
+val_set_size: 0
+eval_strategy: 'no'
+save_strategy: epoch
+save_total_limit: 2
+load_best_model_at_end: false
+seed: 42
+data_seed: 42
+dataset_num_proc: 1
+dataloader_num_workers: 0
+use_wandb: false

@@ -1,0 +1,12 @@
+{
+  "status": "frozen-prepared-not-launched",
+  "manifest_sha256": "e01aaed5063863758de15d3af196bfdf46ceb9cf94bb34af6467cf59b4dd4cea",
+  "audit_sha256": "8e6e73e321be1be4c99189b6f39363c5340d7c5d6c730b824f89f79c6fab957e",
+  "reviewer": "Primary coding assistant; agent inspection, not an independent human review",
+  "launch_gates": [
+    "Verify seal, source, environment, dataset and tokenizer hashes on the GPU host.",
+    "Run pinned Axolotl preprocess and inspect the actual assistant-only loss mask.",
+    "Validate GPU model loading, QLoRA targets and an inference/structured-decoding smoke test.",
+    "No sbatch or training has been launched by preparation."
+  ]
+}

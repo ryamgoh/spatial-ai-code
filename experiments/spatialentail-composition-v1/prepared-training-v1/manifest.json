@@ -1,0 +1,167 @@
+{
+  "status": "prepared-awaiting-audit-seal",
+  "candidate_sha256": "03bcd8cd880d1c697ab7f8b61f94d084b8b8dfa742eafa4283ce0356904bfb39",
+  "candidate_path": "experiments/spatialentail-composition-v1/study-candidate-v2",
+  "model": "Qwen/Qwen3.5-4B",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "seed": 42,
+  "counts": {
+    "attempted_stories": 200,
+    "accepted_stories": 200,
+    "canonical_story_groups": 192,
+    "attempted_bases": 600,
+    "accepted_bases": 600,
+    "views": 2652,
+    "families": 188,
+    "attempt_status": {
+      "accepted": 600
+    },
+    "splits": {
+      "train": 1596,
+      "test": 534,
+      "dev": 522
+    },
+    "answer_frequencies": {
+      "E": 758,
+      "F": 780,
+      "ABCD": 268,
+      "BCD": 65,
+      "A": 104,
+      "B": 159,
+      "AC": 30,
+      "C": 137,
+      "CD": 45,
+      "ABD": 34,
+      "BD": 33,
+      "D": 118,
+      "BC": 37,
+      "AB": 24,
+      "ABC": 38,
+      "ACD": 14,
+      "AD": 8
+    },
+    "reference_crosschecks": {
+      "not-run: limited to Direction with at most six objects": 498,
+      "passed: shared domain types; independent reference search": 102
+    },
+    "coverage_frequencies": {
+      "partial": 1368,
+      "full": 1284
+    }
+  },
+  "attempt_policy": {
+    "seed": 20261029,
+    "world_stories": 100,
+    "unconstrained_atom_stories": 50,
+    "targeted_stories": 50,
+    "attempt_budget": 200,
+    "retry_to_quota": false,
+    "split_policy": "source-recipe-stratified-families-v1",
+    "compact_unique_direction": true,
+    "object_count_random": [
+      5,
+      8
+    ],
+    "candidate_count_random": [
+      4,
+      7
+    ],
+    "menu_policy": "full-plus-one-partial-when-feasible; otherwise-one-menu"
+  },
+  "tokenizer_sha256": {
+    "tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+    "tokenizer_config.json": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8",
+    "chat_template.jinja": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+  },
+  "preparation_versions": {
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.3",
+    "jinja2": "3.1.6"
+  },
+  "style_prompts": {
+    "natural": "Solve the spatial problem using the stated map assumptions and answer contract. Explain the necessary deductions or witness maps in ordinary English, including coordinate comparisons where useful. Cite premises by their 1-based sentence positions when needed. End with exactly one line 'Answer: <letters>' using the required letter format.",
+    "symbolic": "Solve the spatial problem using the stated map assumptions and answer contract. Explain the necessary deductions or witness maps using direction predicates and explicit x/y comparisons. Cite premises by their 1-based sentence positions when needed. End with exactly one line 'Answer: <letters>' using the required letter format."
+  },
+  "context": 8192,
+  "stage1_cap": 4096,
+  "stage2_cap": 16,
+  "enable_thinking": false,
+  "selection": "macro-contract Stage-1 dev accuracy; earliest epoch wins ties",
+  "accuracy_loss_tolerance_pp": 2,
+  "epochs": 2,
+  "evaluation": {
+    "temperature": 0,
+    "top_p": 1,
+    "stop": [
+      "<|im_end|>",
+      "<|endoftext|>"
+    ],
+    "stage2_all_rows": true
+  },
+  "audit_selection_sha256": "360c4c3e61825c943a52305d2eb3cc1f07e20cc6e6939e101e7a1670709c3b51",
+  "source_sha256": {
+    "spatial/v2/__init__.py": "cbd16bf20ee50b893668858175fd713585d1f5f001046293d390e57fedc6a4b7",
+    "spatial/v2/answer_certificate_renderers.py": "b307ec3892b5b9c8eb67f57352ba93c691072686ae12a4f5ba23e923ce9ddc50",
+    "spatial/v2/answer_certificates.py": "fb13f8d05184d090302f5b55b5fa883c37c21c6d137b51934959e83aa6446ebd",
+    "spatial/v2/audit_spatialeval.py": "5076de20c9c40656dd6619009baa13cc4c179afb16e4e7fdc5ffe44eef593822",
+    "spatial/v2/certificate_generation.py": "254bb7adad30503958ac8b8cb1c87e437ebad09e22386dc9a3c331720e68bffe",
+    "spatial/v2/composition_audit.py": "fe8e1a0bcc7bc8108d505ef45f09d97d830c42af0a1f8f8f87712d50138d97af",
+    "spatial/v2/composition_conflicts.py": "b340e0519a40b3ffa6ec10a13c4e945f6afed58e21d9df313583e7a26b19da6e",
+    "spatial/v2/composition_contracts.py": "fe6913f0d1d0c17ff2043dc29f4cbf6c83caa83bf64943898816590eae176ad1",
+    "spatial/v2/composition_dataset.py": "47d432629720fb7a03a9c2913a2699f3fd339257ca62fd056498e0f254c5a629",
+    "spatial/v2/composition_direction.py": "5d491838771343cd4b2c49c1248633184e23816aa62ab6d6523eaba3747b1c41",
+    "spatial/v2/composition_evaluation.py": "99f7cdef5d7ae863984614b91df027dc5371560885f2d82a270fe98e2a66bb30",
+    "spatial/v2/composition_evidence.py": "c492820b9c65785e4825e1980768c2ed606f77e488b176243de60ea2826d20b9",
+    "spatial/v2/composition_pilot.py": "020e695797288eddaec01ddc6baf2f5b10a12d9d298bb7aa2097d5d0d42e6c9c",
+    "spatial/v2/composition_training.py": "f56e594c7f668556cb95f9392920d8da3b237d6353946b3f322d3e733a0b5446",
+    "spatial/v2/consistency.py": "ee1e75a05de437220e22624fc2dff69dc27d9ec9a24f41ae2256fe2fd09846a8",
+    "spatial/v2/context_budget.py": "bc2cdeffe962090677e57c0275755f6917152e31832e8b8b3e79e04cb8443268",
+    "spatial/v2/count_certificate_renderers.py": "c2678384b47e9748d0ac282210e2c2c01ad825a494952474ef6030b2064a8d96",
+    "spatial/v2/count_certificates.py": "f5c0bf20d14d552b4f9bb5642c18cfa08a511f812696e8f9e456d38cc72d91da",
+    "spatial/v2/difficulty.py": "e2c599844946cf096cce77dc64098e2381e18c7a3084129b3db2a7e19d75a88d",
+    "spatial/v2/evaluation_chat.py": "ae225d6ec82d0b84e15a21f27be893fc37fa5e2264d1c8ef1a1678e183891421",
+    "spatial/v2/generate_all.py": "04c89373b29dda2051cf8cefb9feebd404534063230a0a46c960c6119c047040",
+    "spatial/v2/generation.py": "455a111e6307dfdc220a1a6d6a0ddff956958513e1d7ffe84627a1e81554e6f5",
+    "spatial/v2/grading.py": "03bfeb85bedb4f82717e028e50f5d1772a908f095c7c0290bd90f41688bd25c2",
+    "spatial/v2/model_certificate_renderers.py": "6a9b9f194db7276631fd1209b24c9c694ff1572d92ef8daa4467992a67ee33e6",
+    "spatial/v2/model_certificates.py": "c7e6e75980d0348f4514daaea5ec259edfac6b5be83e71c5a022904f2e9b0963",
+    "spatial/v2/natural_evidence.py": "83091e159ec33a5951864452e8060bbd6cdd09423d90fa798112bf99e96656c9",
+    "spatial/v2/proof_complexity.py": "a5bfde8982318478584667bad96e7e28dbd3d34b8c6f2d16b8d1c43168c60269",
+    "spatial/v2/proof_renderers.py": "58f7fd380803577eaf59e45cd9c560bf72ca87dd456e6297a3cf11f1aab85377",
+    "spatial/v2/proofs.py": "2cad261095ccd5b065b3cbc607362c79edf78b3dd843e7b6f581cd73b753cf6e",
+    "spatial/v2/serialization.py": "53dd40e6f6997f5919dcfc16b7175d2bf28e8aa769b3ac196235a160508cd40a",
+    "spatial/v2/solver.py": "31daa8da830cb7dfe56b079d24d53f6b944806f70bfba12f4ea0193cc46f6c95",
+    "spatial/v2/spatialeval_adapter.py": "b1639264c8d7284263dcaca7692398ce30d8a1597affac3373e7bc7b70181556",
+    "spatial/v2/structure.py": "3831348cc767044e9511692bd1d66ba7eac24a1ee32c8048c6f148b5f9379ede",
+    "spatial/v2/supervision_controls.py": "90fc8c4d3512704bdbe696ac5228a295d053927c93a4c11aa6fd341c5784a396",
+    "spatial/v2/symbolic_trace_codec.py": "e9dc99d2f14848ed6fcd167fd61164c37ea87a08f43e57cdf4a61bf70b598fcd",
+    "spatial/v2/text.py": "9022b50ae55e83a23a11a7ab5f1cf6d3a3297bf624263b1b4441c93333971d09",
+    "spatial/v2/trace.py": "da65d0dd99e771d91c9e7805b050facdd3c0b7bf5384d7bbfe1dd01a789720b5",
+    "spatial/v2/which_certificate_renderers.py": "10c465ba833f7a65b62c2994599cb5938f67ff0572ac5e93b76196f50735f1f2",
+    "spatial/v2/which_certificates.py": "84ccecfb9f81b37e4ecd4600f27d400cf4528f882b3c868b88a2c6dcc13f4203",
+    "spatial/v2/workload_manifest.py": "7a9fb004656c65d24b44bc642e7994395c77fc1edd4eeaf68c5e64005341fd7f"
+  },
+  "environment_sha256": {
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e",
+    "finetune/finetune.py": "0719d45c389754772205eb15d6aaba02caf11ff878e0583f0ea439d0110a1e91"
+  },
+  "files": {
+    "audit-selection.json": "360c4c3e61825c943a52305d2eb3cc1f07e20cc6e6939e101e7a1670709c3b51",
+    "configs/natural.yaml": "9e67833ab9be4782b09ddec2b8ecee4644515cfeefb33076413619a5e5ce5858",
+    "configs/symbolic.yaml": "024b498a618662b9e1e8c47da69b08857e677cd7db255df69880b90742585e64",
+    "data/natural-dev-inputs.jsonl": "8ddc80c21161acf91d2236f1970e3e0f69f3055d6e5ed3dda9dbd323c9f0fc7a",
+    "data/natural-test-inputs.jsonl": "ec1ba2b775a26475ea4902cd3d250dbe8581cdf46a4193e76025c2711047444e",
+    "data/natural-train-inputs.jsonl": "07fc17e9bd3df6fb1c326bdd367d950e93e9b645b047731063c688f96735eb48",
+    "data/natural-train-messages.jsonl": "bc545823290287f3b932cc99e33fa25610e725b5191745a8bcd0d083f5ebf934",
+    "data/natural-train-tokenized.jsonl": "ce2c30c182f2eec0c9f2272f3a68b411513773f4b7b55fad955075539dc62a19",
+    "data/symbolic-dev-inputs.jsonl": "2df3920fa7bac2dc1b4536809610340ac021c815a2617bba50b649885c547748",
+    "data/symbolic-test-inputs.jsonl": "f8fe24b7174fc03cd63d92c0e4f59e27ef3693e762cb2e9f31138975c2492e90",
+    "data/symbolic-train-inputs.jsonl": "ffcfce0b765b560c3db85be0500cd8e81971a14213df2b84fe9a561419d3f4b0",
+    "data/symbolic-train-messages.jsonl": "6efc016a4d065c6044d86741627341835e70a6b04c5ed75b0e0b6b8c57b01f4a",
+    "data/symbolic-train-tokenized.jsonl": "084a51ec5ed04a204fb11baa3b25a28a8c73b8d50327690d74dc81cfd0f72571",
+    "references.jsonl": "09de9e05d46759192bead645538e457c0147bef891b521d07399aeec825fde4f",
+    "token-measurements.jsonl": "1b0f7746d682ee389f8c4da0bf1f5fd8a251064a4043fe5dd9e1ec6d3724ca77",
+    "token-summary.json": "6ac5d5b1c3f7ce0d6b1d3705d55ab012e281ac46499e24da151e32a9af05170b"
+  }
+}

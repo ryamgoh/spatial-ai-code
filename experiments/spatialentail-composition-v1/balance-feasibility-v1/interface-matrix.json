@@ -1,0 +1,7845 @@
+[
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "unique-unlisted",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "direction",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "no-match",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "no-match",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "empty-set",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "no-match",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "empty-set",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "unique-unlisted",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "single",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "multiple-certain-match",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "all-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "which",
+    "contract": "visible-possible",
+    "semantic_case": "multiple-certain-match",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "inconsistent",
+    "possible_count": 0,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "inconsistent",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "unique-unlisted",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "unique-unlisted",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "unique",
+    "possible_count": 1,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 2,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 3,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      7,
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 4,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      8,
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 5,
+    "displayed_possible_count": 0,
+    "returned_count": null,
+    "escape_reason": "no-listed-possibilities",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 6,
+    "displayed_possible_count": 1,
+    "returned_count": 1,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 7,
+    "displayed_possible_count": 2,
+    "returned_count": 2,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "AB",
+      "AC",
+      "AD",
+      "BC",
+      "BD",
+      "CD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 3,
+    "returned_count": 3,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "ABC",
+      "ABD",
+      "ACD",
+      "BCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 8,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": false,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "single",
+    "semantic_case": "underdetermined",
+    "possible_count": 9,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "underdetermined",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "E"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "all-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 9,
+    "displayed_possible_count": 4,
+    "returned_count": null,
+    "escape_reason": "incomplete-coverage",
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "F"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  },
+  {
+    "query_kind": "count",
+    "contract": "visible-possible",
+    "semantic_case": "underdetermined",
+    "possible_count": 9,
+    "displayed_possible_count": 4,
+    "returned_count": 4,
+    "escape_reason": null,
+    "contains_zero": true,
+    "domain_sizes": [
+      9
+    ],
+    "literal_gold_potential": [
+      "ABCD"
+    ],
+    "status": "interface-permitted-not-yet-spatially-witnessed"
+  }
+]

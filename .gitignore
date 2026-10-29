@@ -221,6 +221,23 @@ experiments/spatialentail-eval/prepared-*/
 slurm/archive/logs/*
 !slurm/archive/logs/.gitkeep
 
+# Composition payloads stay local; track manifests, summaries, audits and receipts.
+# Ignore rules are not backups. Preserve payloads before cleaning ignored files.
+/experiments/spatialentail-composition-v1/composition-training-v*.tar.gz
+/experiments/spatialentail-composition-v1/direction-smoke-v1.json
+/experiments/spatialentail-composition-v1/evidence-smoke-v1.json
+/experiments/spatialentail-composition-v1/generator-pilot-v*/pilot.json
+/experiments/spatialentail-composition-v1/generator-pilot-v*/model-inputs.jsonl
+/experiments/spatialentail-composition-v1/study-candidate-v*/pilot.json
+/experiments/spatialentail-composition-v1/study-candidate-v*/model-inputs.jsonl
+/experiments/spatialentail-composition-v1/depth-feasibility-*/attempts.jsonl
+/experiments/spatialentail-composition-v1/balance-feasibility-v*/attempts.jsonl
+/experiments/spatialentail-composition-v1/unique-selection-expansion-v*/attempts.jsonl
+/experiments/spatialentail-composition-v1/shared-proof-replay-v*/attempts.jsonl
+/experiments/spatialentail-composition-v1/prepared-training-v*/data/
+/experiments/spatialentail-composition-v1/prepared-training-v*/references.jsonl
+/experiments/spatialentail-composition-v1/prepared-training-v*/token-measurements.jsonl
+
 # finetune model outputs (moved to experiments/<exp>/models/)
 finetune/outputs/
 experiments/**/models/
