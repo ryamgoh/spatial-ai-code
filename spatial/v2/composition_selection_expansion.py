@@ -18,9 +18,14 @@ SEED = 20261031
 PATTERNS = ("match-chain", "rival-chain", "shared-exclusion")
 
 
-def make_story(pattern, depth, sample, rng):
+def make_story(pattern, depth, sample, rng, *, direction=None):
     if pattern not in PATTERNS or not 1 <= depth <= 10 or sample not in (0, 1):
         raise ValueError("outside fixed expansion scope")
+    if direction is not None and not isinstance(direction, Direction):
+        raise ValueError("direction must be a Direction")
+    directions = tuple(Direction)
+    diagonal = direction is not None and directions.index(direction) % 2 == 1
+    match_direction = Direction.NORTHEAST if diagonal else Direction.NORTH
     candidates = tuple(f"C{i}" for i in range(rng.randint(5, 7)))
     objects = ["O", *candidates]
     atoms = []
@@ -39,16 +44,16 @@ def make_story(pattern, depth, sample, rng):
 
     exclusions = (Direction.SOUTH, Direction.EAST, Direction.WEST)
     if pattern == "match-chain":
-        chain("C0", depth, Direction.NORTH)
+        chain("C0", depth, match_direction)
         for candidate in candidates[1:]:
             add(candidate, rng.choice(exclusions), "O")
     elif pattern == "rival-chain":
-        add("C0", Direction.NORTH, "O")
+        add("C0", match_direction, "O")
         chain("C1", depth, Direction.SOUTH)
         for candidate in candidates[2:]:
             add(candidate, rng.choice(exclusions), "O")
     else:
-        add("C0", Direction.NORTH, "O")
+        add("C0", match_direction, "O")
         previous = "O"
         for i in range(depth - 1):
             node = f"Trunk{i}"
@@ -57,8 +62,13 @@ def make_story(pattern, depth, sample, rng):
             previous = node
         for candidate in candidates[1:]:
             add(candidate, rng.choice(exclusions), previous)
-    directions = tuple(Direction)
-    turn = rng.randrange(4) * 2
+    # Only quarter-turns preserve the axis constraints. Diagonals start from
+    # an actual NE construction, not a 45-degree relabeling of the N story.
+    turn = (
+        rng.randrange(4) * 2
+        if direction is None
+        else (directions.index(direction) - directions.index(match_direction)) % 8
+    )
     atoms = [
         direction_constraint(
             atom.subject,
@@ -68,7 +78,8 @@ def make_story(pattern, depth, sample, rng):
         for atom in atoms
     ]
     story = Story(
-        f"unique-expansion-{pattern}-d{depth}-s{sample}",
+        f"unique-expansion-{pattern}-d{depth}-s{sample}"
+        + (f"-{direction.value}" if direction is not None else ""),
         f"unique-expansion-{pattern}-s{sample}",
         pattern,
         tuple(objects),
@@ -76,7 +87,7 @@ def make_story(pattern, depth, sample, rng):
         "C0",
         "O",
         candidates,
-        directions[turn],
+        directions[(directions.index(match_direction) + turn) % 8],
         (),
     )
     return scramble(story, rng)

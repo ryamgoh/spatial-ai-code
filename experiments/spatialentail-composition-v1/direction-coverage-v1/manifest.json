@@ -1,0 +1,1765 @@
+{
+  "status": "completed-development-only",
+  "seed": 20261101,
+  "attempt_budget": 240,
+  "source_sha256": {
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/__init__.py": "cbd16bf20ee50b893668858175fd713585d1f5f001046293d390e57fedc6a4b7",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/answer_certificate_renderers.py": "b307ec3892b5b9c8eb67f57352ba93c691072686ae12a4f5ba23e923ce9ddc50",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/answer_certificates.py": "fb13f8d05184d090302f5b55b5fa883c37c21c6d137b51934959e83aa6446ebd",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/audit_spatialeval.py": "5076de20c9c40656dd6619009baa13cc4c179afb16e4e7fdc5ffe44eef593822",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/certificate_generation.py": "254bb7adad30503958ac8b8cb1c87e437ebad09e22386dc9a3c331720e68bffe",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_audit.py": "fe8e1a0bcc7bc8108d505ef45f09d97d830c42af0a1f8f8f87712d50138d97af",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_balance.py": "ab18f77ebc39fa24c24ede31299d45ac0e0ea0fed1d96bccd5abbedd9c2ca9ba",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_compact.py": "f7ecf10014a82c98d43c6cdf6f53e4702a1ef8135737c0b65b69c6332f4e2824",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_conflicts.py": "b340e0519a40b3ffa6ec10a13c4e945f6afed58e21d9df313583e7a26b19da6e",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_contracts.py": "fe6913f0d1d0c17ff2043dc29f4cbf6c83caa83bf64943898816590eae176ad1",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_dataset.py": "47d432629720fb7a03a9c2913a2699f3fd339257ca62fd056498e0f254c5a629",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_depth.py": "5a97d6923fd8540b2c6ddda40aef08943fc336f1850507dcdc49b468e7b6acc1",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_direction.py": "5d491838771343cd4b2c49c1248633184e23816aa62ab6d6523eaba3747b1c41",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_direction_coverage.py": "243532a94e2bc8c7738089f3b834dda1e5160a86027fe4f8efa7cdde9f13da5b",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_evaluation.py": "8229293decf9e68eb8cd69980903760781b0b3644955c327938b9e8ea5f77da8",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_evidence.py": "c492820b9c65785e4825e1980768c2ed606f77e488b176243de60ea2826d20b9",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_feasibility.py": "5b743bb9cac8458343dfe455b5ac5a2889fcd6e75e2675dc961cb00479b1d6f6",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_feasibility_report.py": "8b9df3f2762d9f539bd3638e174ed891e09065292febcf91018374724638d2c1",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_organization.py": "cb7466d304cbddf4940726279d5a5648c223e0c94009dd9e3311572c4728f4de",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_pilot.py": "020e695797288eddaec01ddc6baf2f5b10a12d9d298bb7aa2097d5d0d42e6c9c",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_readable.py": "3ab4c812bc15751e6458a61223ddc7fbe055f1ae57681aeb58e249d302558355",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_readable_audit.py": "c9e20c02790a12be0c146c6c35b44b22f1c96085b9c1ef797696240e9050a96e",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_readable_preview.py": "85ef25939c08fd187bfca4d49fdf4d519a90ab79bbc6ad0890edd9a0e164a679",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_readable_replay.py": "a26d879bf6f8e7eb8f5dcdb839c1187a1b78c3e726e6d3355a701838046e146d",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_refinement.py": "cf066dafa9a7a46e297c7d95512c757f458ebf189ce3bdd71089f7ddb081c9ab",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_rerender.py": "c54f28ed8923b6cbb14fa7b99b755facb4a07f701f32da2282ef7ca12268deb4",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_scenario_audit.py": "34ce3e2b473faa58f43cfc8a833687accf8d40d42a777ac95843e2d97e8938ef",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_scenarios.py": "cfc48b1dce5363a501fab012e130cc4377b43ee38703293ae4246038af0db5a0",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_selection.py": "1fe9992a70e6cafe1e001dde330dfdce2f07b8a6062a88122b7b05c523dd7a82",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_selection_expansion.py": "8f73a41cf21c58dd7746575c4efe84b1f09c7d67766bde8c858838bd9aff192f",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_shared_paths.py": "b864037ce668180d61c10360ce4dbd59070d29ecd0f34d0cf3bcc8bcdf7e17b2",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_training.py": "f56e594c7f668556cb95f9392920d8da3b237d6353946b3f322d3e733a0b5446",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/consistency.py": "ee1e75a05de437220e22624fc2dff69dc27d9ec9a24f41ae2256fe2fd09846a8",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/context_budget.py": "bc2cdeffe962090677e57c0275755f6917152e31832e8b8b3e79e04cb8443268",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/count_certificate_renderers.py": "c2678384b47e9748d0ac282210e2c2c01ad825a494952474ef6030b2064a8d96",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/count_certificates.py": "f5c0bf20d14d552b4f9bb5642c18cfa08a511f812696e8f9e456d38cc72d91da",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/difficulty.py": "e2c599844946cf096cce77dc64098e2381e18c7a3084129b3db2a7e19d75a88d",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/evaluation_chat.py": "ae225d6ec82d0b84e15a21f27be893fc37fa5e2264d1c8ef1a1678e183891421",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/generate_all.py": "04c89373b29dda2051cf8cefb9feebd404534063230a0a46c960c6119c047040",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/generation.py": "455a111e6307dfdc220a1a6d6a0ddff956958513e1d7ffe84627a1e81554e6f5",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/grading.py": "03bfeb85bedb4f82717e028e50f5d1772a908f095c7c0290bd90f41688bd25c2",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/model_certificate_renderers.py": "6a9b9f194db7276631fd1209b24c9c694ff1572d92ef8daa4467992a67ee33e6",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/model_certificates.py": "c7e6e75980d0348f4514daaea5ec259edfac6b5be83e71c5a022904f2e9b0963",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/natural_evidence.py": "83091e159ec33a5951864452e8060bbd6cdd09423d90fa798112bf99e96656c9",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/proof_complexity.py": "a5bfde8982318478584667bad96e7e28dbd3d34b8c6f2d16b8d1c43168c60269",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/proof_renderers.py": "58f7fd380803577eaf59e45cd9c560bf72ca87dd456e6297a3cf11f1aab85377",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/proofs.py": "2cad261095ccd5b065b3cbc607362c79edf78b3dd843e7b6f581cd73b753cf6e",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/serialization.py": "53dd40e6f6997f5919dcfc16b7175d2bf28e8aa769b3ac196235a160508cd40a",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/solver.py": "31daa8da830cb7dfe56b079d24d53f6b944806f70bfba12f4ea0193cc46f6c95",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/spatialeval_adapter.py": "b1639264c8d7284263dcaca7692398ce30d8a1597affac3373e7bc7b70181556",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/structure.py": "3831348cc767044e9511692bd1d66ba7eac24a1ee32c8048c6f148b5f9379ede",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/supervision_controls.py": "90fc8c4d3512704bdbe696ac5228a295d053927c93a4c11aa6fd341c5784a396",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/symbolic_trace_codec.py": "e9dc99d2f14848ed6fcd167fd61164c37ea87a08f43e57cdf4a61bf70b598fcd",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/text.py": "9022b50ae55e83a23a11a7ab5f1cf6d3a3297bf624263b1b4441c93333971d09",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/trace.py": "da65d0dd99e771d91c9e7805b050facdd3c0b7bf5384d7bbfe1dd01a789720b5",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/which_certificate_renderers.py": "10c465ba833f7a65b62c2994599cb5938f67ff0572ac5e93b76196f50735f1f2",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/which_certificates.py": "84ccecfb9f81b37e4ecd4600f27d400cf4528f882b3c868b88a2c6dcc13f4203",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/workload_manifest.py": "7a9fb004656c65d24b44bc642e7994395c77fc1edd4eeaf68c5e64005341fd7f",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/research-analysis/DIRECTION-COVERAGE-PROTOCOL-v1.md": "be9e4ec2ffe756265230dbf6f7223e7f0cc86805b2d8deeacfa0800cbe8d67bc"
+  },
+  "versions": {
+    "z3-solver": "4.16.0.0",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.3"
+  },
+  "tokenizer_sha256": {
+    "tokenizer_config.json": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8",
+    "config.json": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+    "tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+    "chat_template.jinja": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+  },
+  "schedule": [
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d1-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d2-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d3-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d4-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d5-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d6-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d7-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d8-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d9-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-North",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-Northeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-East",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-Southeast",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-South",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-Southwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-West",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-match-chain-d10-s0-Northwest",
+      "family": "unique-expansion-match-chain-s0",
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d1-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d2-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d3-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d4-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d5-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d6-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d7-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d8-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d9-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-North",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-Northeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-East",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-Southeast",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-South",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-Southwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-West",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-rival-chain-d10-s0-Northwest",
+      "family": "unique-expansion-rival-chain-s0",
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d1-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 1
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d2-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 2
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d3-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 3
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d4-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 4
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d5-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 5
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d6-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 6
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d7-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 7
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d8-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 8
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d9-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 9
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-North",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-Northeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-East",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-Southeast",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-South",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-Southwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-West",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 10
+    },
+    {
+      "story_id": "unique-expansion-shared-exclusion-d10-s0-Northwest",
+      "family": "unique-expansion-shared-exclusion-s0",
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 10
+    }
+  ],
+  "all_checks_passed": false,
+  "output_sha256": {
+    "examples.md": "e040d189a107b57b9f19e9f1c91c7582b318107ed6c27cc0c91d87ca1f815f4b",
+    "summary.json": "6f86262d05409c86da6baaddb4d024158c1077a71ec81068ac5c08daa164af2b",
+    "attempts.jsonl": "dc0dd204465e6ea583f7f4e34163f54dd96133fce7feb171dc93148f3698fd3d"
+  }
+}

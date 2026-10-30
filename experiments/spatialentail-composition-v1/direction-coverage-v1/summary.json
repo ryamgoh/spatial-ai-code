@@ -1,0 +1,1619 @@
+{
+  "attempts": 240,
+  "statuses": {
+    "accepted": 214,
+    "verification-failed": 26
+  },
+  "failures": [
+    {
+      "base_id": "unique-expansion-rival-chain-d2-s0-East-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d3-s0-North-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d3-s0-Southeast-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d3-s0-South-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d3-s0-Southwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d4-s0-South-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d4-s0-Southwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d4-s0-Northwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d5-s0-North-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d5-s0-East-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d5-s0-South-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d5-s0-Southwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d6-s0-Northeast-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d6-s0-Northwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d7-s0-North-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d7-s0-South-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d7-s0-West-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d7-s0-Northwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d8-s0-East-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d8-s0-Southwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d8-s0-West-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d9-s0-East-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d9-s0-South-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d9-s0-Northwest-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d10-s0-Northeast-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    },
+    {
+      "base_id": "unique-expansion-rival-chain-d10-s0-East-which",
+      "stage": "target-coverage",
+      "status": "verification-failed",
+      "reason": "unique/depth support mismatch"
+    }
+  ],
+  "coverage": [
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "North",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northeast",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "East",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southeast",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "South",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Southwest",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "West",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "match-chain",
+      "direction": "Northwest",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 2,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 3,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 3,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 3,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 3,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 4,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 4,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 4,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 5,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 5,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 5,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 5,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 6,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 6,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 7,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 7,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 7,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 7,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 8,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 8,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 8,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 9,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 9,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 9,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "North",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northeast",
+      "depth": 10,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "East",
+      "depth": 10,
+      "status": "verification-failed"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southeast",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "South",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Southwest",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "West",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "rival-chain",
+      "direction": "Northwest",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 1,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 2,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 3,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 4,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 5,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 6,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 7,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 8,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 9,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "North",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northeast",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "East",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southeast",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "South",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Southwest",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "West",
+      "depth": 10,
+      "status": "accepted"
+    },
+    {
+      "pattern": "shared-exclusion",
+      "direction": "Northwest",
+      "depth": 10,
+      "status": "accepted"
+    }
+  ],
+  "families": 3,
+  "accepted_views_per_style": 1284,
+  "tokens": {
+    "natural": {
+      "mean": 251.30919003115264,
+      "max": 427
+    },
+    "symbolic": {
+      "mean": 240.61059190031153,
+      "max": 444
+    }
+  }
+}

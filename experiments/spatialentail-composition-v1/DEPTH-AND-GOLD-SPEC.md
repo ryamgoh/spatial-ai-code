@@ -5,7 +5,13 @@
 Design amendment with an implemented first feasibility pilot, not a production freeze.
 Subordinate to [the authoritative pivot](pivot_20261026.md).
 The user requires a report before production generation and final sealing.
-No production attempt budget, final dataset size or new seal is authorized here.
+Candidate sizes, source proportions, depth weights, family floors and paired-menu
+probability were approved on 2026-10-30 and are recorded in the
+[pivot's approved settings](pivot_20261026.md#approved-candidate-settings).
+The [compiled allocation](PRODUCTION-ALLOCATION-v1.md) now supplies source batches,
+semantic/gold checks and development exclusions. Structural preflight passed
+with 31,251 query attempts; the concrete settings still await execution
+approval/freeze. No seal or training is authorized.
 The [first feasibility verdict](research-analysis/DEPTH-FEASIBILITY-VERDICT.md)
 reports passing depth mechanics but a Direction token blocker and unfinished
 coverage/diversity requirements. Gate 1 is not yet passed.
@@ -166,18 +172,19 @@ No requirement exists to generate exactly three query types from every story
 if that would defeat depth or semantic coverage. Any queries that are generated
 still share the story's role. Query coverage is enforced across the dataset.
 
-## Numeric Decisions Still Pending
+## Numeric Decisions
 
-These must be reported and approved before production, not silently inherited
-from the 200-story release:
+Approved values are distinguished from remaining choices below. Do not silently
+inherit pending settings from the 200-story release.
 
 | Setting | Required Decision |
 |---|---|
 | Pilot budget | Fixed attempts per supported depth/query and semantic category |
-| Production size | Distinct stories/families and questions per role |
-| Depth quotas | Minimum distinct bases/families per applicable query/depth cell |
-| Semantic mix | Per-query proportions; enough substantive Unique Selection |
-| Menu policy | Full/paired-partial/necessarily-incomplete proportions |
+| Production size | Approved base counts: 6,000 / 1,200 / 2,400 / 1,200; actual story/family counts still audited |
+| Depth quotas | Approved weights and family minima: 50 / 10 / 20 / 50 per applicable query/depth cell |
+| Source mix | Approved 70% controlled, 15% random-world, 10% random-atoms, 5% targeted in-range; extrapolation all controlled |
+| Semantic mix | Within-source semantic proportions and substantive minima remain to be completed |
+| Menu policy | Approved 20% seeded omission chance among eligible bases, always retaining the primary control |
 | Literal gold coverage | Minimum feasible examples per contract/string |
 | Controls | Candidate/object/premise/distractor bounds and matching policy |
 | Execution budget | Seeds, solver timeouts, attempt caps and acceptance ordering |

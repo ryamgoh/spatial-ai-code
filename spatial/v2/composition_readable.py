@@ -18,8 +18,9 @@ from spatial.v2.composition_contracts import (
     witness_outcome,
 )
 from spatial.v2.composition_evidence import CountSupport, verify_evidence
+from spatial.v2.composition_organization import VERSION, organize_outline
 from spatial.v2.composition_scenarios import qualitative_outline, render_scenario
-from spatial.v2.composition_shared_paths import collapsed_path, factor_shared_paths
+from spatial.v2.composition_shared_paths import collapsed_path
 from spatial.v2.difficulty import Axis, _axis_path, derive_axis_proof
 from spatial.v2.grading import AnswerMode
 from spatial.v2.model_certificates import ContingencyCertificate
@@ -33,7 +34,6 @@ from spatial.v2.solver import (
     direction_signs,
 )
 
-VERSION = "readable-shared-evidence-v4"
 ABBREVIATIONS = {
     "North": "N",
     "Northeast": "NE",
@@ -377,7 +377,7 @@ def build_outline(evidence, menu, mode, *, solver=None):
             "unlisted": value if reason == "unlisted" else None,
         }
     )
-    return factor_shared_paths(qualitative_outline(units, problem, VERSION))
+    return organize_outline(qualitative_outline(units, problem, VERSION), problem, mode)
 
 
 def _join(values):
@@ -456,11 +456,159 @@ def _render_path(unit, symbolic):
     )
 
 
-def _render_unit(unit, symbolic):
+def _spatial_path(text):
+    for axis, position, order, lower, higher in (
+        (
+            "x",
+            "horizontal position",
+            "left to right",
+            "to the left of",
+            "to the right of",
+        ),
+        ("y", "height", "bottom to top", "below", "above"),
+    ):
+        text = (
+            text.replace(
+                f"The {axis}-coordinates increase strictly along",
+                f"From {order}, the order is",
+            )
+            .replace(
+                f"Following the {axis}-coordinates,",
+                "Horizontally," if axis == "x" else "Vertically,",
+            )
+            .replace(
+                f"shares its {axis}-coordinate with", f"has the same {position} as"
+            )
+            .replace(f"has a smaller {axis}-coordinate than", f"is {lower}")
+            .replace(f"has a greater {axis}-coordinate than", f"is {higher}")
+            .replace(f"share the same {axis}-coordinate", f"share the same {position}")
+        )
+    return text
+
+
+def _branch(unit):
+    if (
+        unit["kind"] != "path"
+        or "comparison" in unit
+        or not unit.get("shared_segments")
+    ):
+        return None
+    path = collapsed_path(unit)
+    if len(path["indices"]) != 2:
+        return None
+    first, second = path["indices"]
+    if isinstance(first, str) and isinstance(second, int):
+        reference, anchor, candidate = path["nodes"]
+        common_sign, leaf_sign = (1 if s else 0 for s in path["signs"])
+        comparison, premise = first, second
+    elif isinstance(first, int) and isinstance(second, str):
+        candidate, anchor, reference = path["nodes"]
+        leaf_sign, common_sign = (-1 if s else 0 for s in path["signs"])
+        comparison, premise = second, first
+    else:
+        return None
+    if premise >= unit["original_count"] or (common_sign == leaf_sign == 0):
+        return None
+    return (
+        (path["axis"], anchor, reference, common_sign, leaf_sign, comparison),
+        candidate,
+        premise,
+    )
+
+
+def _render_branches(branches, symbolic):
+    (axis, anchor, reference, common, leaf, comparison), _, _ = branches[0]
+    candidates = [b[1] for b in branches]
+    sources = [b[2] + 1 for b in branches]
+    op = {-1: "<", 0: "=", 1: ">"}
+    if symbolic:
+        return (
+            f"Branches {_set(candidates)} with respective premises {_set('p' + str(i) for i in sources)}: "
+            f"{axis}(c) {op[leaf]} {axis}({anchor}); "
+            f"[{comparison}] {axis}({anchor}) {op[common]} {axis}({reference})."
+        )
+    position = "horizontal position" if axis == "x" else "height"
+    relations = (
+        {-1: "to the left of", 0: f"at the same {position} as", 1: "to the right of"}
+        if axis == "x"
+        else {-1: "below", 0: f"at the same {position} as", 1: "above"}
+    )
+    return (
+        f"{_join(candidates)} are each {relations[leaf]} {anchor} "
+        f"(respective premise sources: {_join(sources)}). "
+        f"By {comparison}, {anchor} is {relations[common]} {reference}."
+    )
+
+
+def _paragraphs(outline, symbolic):
+    units, index = outline["units"], 0
+    spatial = outline["version"] == VERSION
+    while index < len(units):
+        first = _branch(units[index]) if spatial else None
+        branches = [first] if first else []
+        stop = index + 1
+        while first and stop < len(units):
+            branch = _branch(units[stop])
+            if not branch or branch[0] != first[0]:
+                break
+            branches.append(branch)
+            stop += 1
+        if len(branches) >= 2:
+            yield _render_branches(branches, symbolic)
+            index = stop
+        else:
+            yield _render_unit(units[index], symbolic, spatial)
+            index += 1
+
+
+def _render_unit(unit, symbolic, spatial=False):
     kind = unit["kind"]
     if kind == "path":
         prefix = f"Comparison {unit['comparison']}: " if "comparison" in unit else ""
-        return prefix + _render_path(unit, symbolic)
+        text = _render_path(unit, symbolic)
+        return prefix + (_spatial_path(text) if spatial and not symbolic else text)
+    if kind == "purpose":
+        reference = unit["reference"]
+        mode = AnswerMode(unit["mode"])
+        if unit["query_kind"] == "direction":
+            return (
+                f"Determine the direction of {unit['target']} relative to {reference}, "
+                "checking both horizontal and vertical relations."
+            )
+        relation = f"{unit['direction'].lower()} of {reference}"
+        if unit["query_kind"] == "count":
+            return (
+                f"Determine how many eligible objects can be {relation} together. "
+                "Individual possibilities alone do not establish a joint count."
+            )
+        if mode is AnswerMode.SINGLE:
+            return (
+                f"We need exactly one eligible object to be {relation} in every valid map. "
+                "Check both qualifying objects and the alternatives, including unlisted candidates."
+            )
+        return (
+            f"Determine which {'listed' if mode is AnswerMode.VISIBLE_POSSIBLE else 'eligible'} "
+            f"objects can be {relation}. A possible match need not be guaranteed."
+        )
+    if kind == "membership-group":
+        names = [m["candidate"] for m in unit["memberships"]]
+        axis, sign, reference = unit["axis"], unit["sign"], unit["reference"]
+        if symbolic:
+            return (
+                f"For each c in {_set(names)}: {axis}(c) { {-1: '<', 0: '=', 1: '>'}[sign] } "
+                f"{axis}({reference}) => not {ABBREVIATIONS[unit['direction']]}(c,{reference})."
+            )
+        relation = (
+            f"share the same {'horizontal position' if axis == 'x' else 'height'} as"
+            if sign == 0
+            else "are all " + ("to the left of" if sign == -1 else "to the right of")
+            if axis == "x"
+            else "are all " + ("below" if sign == -1 else "above")
+        )
+        return (
+            f"{_join(names)} {relation} {reference}, "
+            f"so none can be {unit['direction'].lower()} of {reference}."
+        )
     if kind == "direction":
         target, reference, value = unit["target"], unit["reference"], unit["value"]
         result = (
@@ -608,19 +756,27 @@ def _render_unit(unit, symbolic):
 
 
 def render_outline(outline):
-    if outline["version"] not in (VERSION, "readable-qualitative-evidence-v3"):
+    if outline["version"] not in (
+        VERSION,
+        "readable-shared-evidence-v4",
+        "readable-qualitative-evidence-v3",
+    ):
         raise VerificationError("unknown outline version")
     return {
-        style: "\n\n".join(
-            _render_unit(unit, style == "symbolic") for unit in outline["units"]
-        )
+        style: "\n\n".join(_paragraphs(outline, style == "symbolic"))
         for style in ("natural", "symbolic")
     }
 
 
 def check_pair(evidence, menu, mode, pair, *, solver=None):
     """Check trusted-template output integrity, not arbitrary free-form prose."""
-    expected = render_outline(build_outline(evidence, menu, mode, solver=solver))
+    outline = build_outline(evidence, menu, mode, solver=solver)
+    check_rendered_outline(evidence, menu, mode, outline, pair)
+
+
+def check_rendered_outline(evidence, menu, mode, outline, pair):
+    """Check output of an already built/verified outline; callers still audit text."""
+    expected = render_outline(outline)
     if pair != expected:
         raise VerificationError("rendered text differs from the checked explanation")
     gold = encode(evidence.semantics, menu, mode).letters

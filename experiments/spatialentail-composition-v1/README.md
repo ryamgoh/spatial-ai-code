@@ -14,6 +14,12 @@ Unique Answer, Listed Possibilities, and Exhaustive Possibilities contracts.
   admission rules and split policy for the prior 200-story release.
 - [Depth and gold specification](DEPTH-AND-GOLD-SPEC.md): amended 1-8 training
   and 9-10 benchmark scope, proposed measurement rules, and pre-generation gates.
+- [Production integration](PRODUCTION-INTEGRATION-v1.md): candidate runner,
+  approved candidate settings, verification boundaries and remaining source-family work.
+- [Production allocation](PRODUCTION-ALLOCATION-v1.md): fixed source schedule,
+  development exclusions, family assignment and executable-settings review.
+- [CPU execution](CPU-EXECUTION-v1.md): question-local solver reuse, ordered
+  multiprocessing, checkpoints, development timing and the Slurm normal launcher.
 - [Depth feasibility protocol](research-analysis/DEPTH-FEASIBILITY-PROTOCOL.md):
   fixed 94-story / 282-query pilot, recorded before execution.
 - [Depth feasibility verdict](research-analysis/DEPTH-FEASIBILITY-VERDICT.md):
@@ -27,15 +33,51 @@ Unique Answer, Listed Possibilities, and Exhaustive Possibilities contracts.
 
 The pivot now requires a depth-controlled replacement: train/dev/in-range test
 at depths 1-8, plus a separate extrapolation benchmark at depths 9-10.
-The depth measurer and bounded feasibility generator are implemented in
-[`composition_depth.py`](../../spatial/v2/composition_depth.py) and
-[`composition_feasibility.py`](../../spatial/v2/composition_feasibility.py).
-Production quotas and attempt budgets remain pending; the pilot is not a release.
-The completed pilot accepted 247/282 bases. All 180 controlled queries measured
-the requested depths 1-10 before token admission, but 35 Direction bases failed
-the paired token gate. Selection/Count passed this scaffold's token checks.
-Production remains blocked by Direction rendering length, semantic/gold gaps,
-and insufficient query-relevant structural diversity.
+The depth measurer, readable paired explanations and all-direction controlled
+Selection checks are implemented. The first pilot's 35 Direction token failures
+are historical; subsequent compact/readable replays addressed that blocker.
+See the [all-direction results](research-analysis/DIRECTION-COVERAGE-RESULTS-v2.md)
+and [question-led prose results](research-analysis/PROSE-ORGANIZATION-RESULTS-v5.md).
+
+The new [`composition_production.py`](../../spatial/v2/composition_production.py)
+assembles existing constructors, verified admission, quota accounting and paired
+candidate exports. Its [configuration](production-config-v1.json) has approved
+numeric candidate settings, but is not yet an executable production freeze. The new
+[`sampled-forest constructor`](../../spatial/v2/composition_scene_sampler.py)
+varies core graph structure and preserves related variants under one scaffold
+family ID. The new allocation compiler assembles explicit source batches,
+development exclusions and structural supply checks without solver admission.
+Its compiled configuration is separate from the numeric policy. Structural
+preflight passed with 31,251 query attempts after collision exclusions, with
+enough scheduled supply for every required quota and no scene-bound failures.
+The executable settings were subsequently approved and the serial candidate
+was launched, then stopped by the user after 554 completed questions because
+throughput was inadequate. Its partial output is preserved; this is not a
+completed solver-verified candidate dataset. The new CPU executor supports
+bounded solver-result reuse and 1-128 worker processes with ordered quota
+selection and hash-pinned checkpoints. No replacement production run or Slurm
+job has been launched. See the CPU execution note before restarting.
+The forest source now also supports mixed-relation chains and separately
+necessary axis paths, with measured depth and shared lineage identities.
+Controlled Count batches must explicitly request their match count; retained
+quotas use solver-verified values. Same-menu contract differences are reported
+separately from full/omission answer changes. The Count weights and stronger
+diversity floors received subsequent approval on 2026-10-30, recorded separately
+from the earlier numeric approval.
+The runner now enforces explicit depth-family floors, retains bounded matched
+full/omission menu pairs, and checks all eight directions per split/query type
+without equal-frequency or per-depth direction quotas. The source mixture,
+50/10/20/50 family floors and 20% omission chance are approved. Retained source
+quotas enforce the mixture rather than allowing excess from another source to
+fill it. The new
+[`sampled-targeted constructor`](../../spatial/v2/composition_targeted_sampler.py)
+adds ambiguity, contradiction and fixed-membership patterns on varying forest
+cores. It shares family identities with the controlled generator, so related
+versions cannot cross splits under different generator names. All 45 legacy
+targeted family IDs remain development-used. The allocation compiler partitions
+a bounded fresh scaffold pool and quarantines structural collisions without
+reassignment or refill.
+The separate three-contract SpatialMap-TQA-Corr adapter is also still pending.
 Report feasibility and proposed production settings before generating a new
 training/benchmark set, then report the production audit before final sealing.
 Do not launch training from an earlier package as though it meets this design.

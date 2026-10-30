@@ -54,6 +54,33 @@ def _chain(paragraph, style):
             )
             require(endpoint == [expected], "incorrect printed endpoint")
         return axis, nodes, signs, citations.split(", ")
+    # Normalize the spatial prose grammar into the same axis-link representation.
+    for axis, position, order, lower, higher in (
+        (
+            "x",
+            "horizontal position",
+            "left to right",
+            "to the left of",
+            "to the right of",
+        ),
+        ("y", "height", "bottom to top", "below", "above"),
+    ):
+        paragraph = (
+            paragraph.replace(
+                f"From {order}, the order is",
+                f"The {axis}-coordinates increase strictly along",
+            )
+            .replace(
+                "Horizontally," if axis == "x" else "Vertically,",
+                f"Following the {axis}-coordinates,",
+            )
+            .replace(
+                f"has the same {position} as", f"shares its {axis}-coordinate with"
+            )
+            .replace(f"is {lower}", f"has a smaller {axis}-coordinate than")
+            .replace(f"is {higher}", f"has a greater {axis}-coordinate than")
+            .replace(f"share the same {position}", f"share the same {axis}-coordinate")
+        )
     match = re.search(r"\((?:premise )?sources: ([^)]+)\)", paragraph)
     if not match:
         return None
@@ -244,6 +271,148 @@ def _check_map(paragraph, style, problem):
     return coordinates
 
 
+def _check_branches(paragraph, style, atoms, assumptions, comparisons):
+    if style == "symbolic":
+        match = re.fullmatch(
+            r"Branches \{([^}]+)\} with respective premises \{([^}]+)\}: ([xy])\(c\) ([<=>]) ([xy])\((\w+)\); \[(comparison \d+)\] ([xy])\((\w+)\) ([<=>]) ([xy])\((\w+)\)\.",
+            paragraph,
+        )
+        require(match is not None, "invalid grouped branch syntax")
+        candidates, citations = match[1].split(", "), match[2].split(", ")
+        axis, anchor, reference, comparison = match[3], match[6], match[12], match[7]
+        require(
+            match[3] == match[5] == match[8] == match[11] and anchor == match[9],
+            "branches mix axes or anchors",
+        )
+        leaf, common = ({"<": -1, "=": 0, ">": 1}[match[i]] for i in (4, 10))
+    else:
+        match = re.fullmatch(
+            r"(.+) are each (.+) (\w+) \(respective premise sources: ([^)]+)\)\. By (comparison \d+), (\w+) is (.+) (\w+)\.",
+            paragraph,
+        )
+        require(match is not None, "invalid grouped branch syntax")
+        candidates, citations = _names(match[1]), _names(match[4])
+        anchor, reference, comparison = match[3], match[8], match[5]
+        require(anchor == match[6], "branches mix anchors")
+        relations = {
+            "to the left of": ("x", -1),
+            "to the right of": ("x", 1),
+            "at the same horizontal position as": ("x", 0),
+            "below": ("y", -1),
+            "above": ("y", 1),
+            "at the same height as": ("y", 0),
+        }
+        require(
+            match[2] in relations and match[7] in relations, "unknown branch relation"
+        )
+        axis, leaf = relations[match[2]]
+        common_axis, common = relations[match[7]]
+        require(axis == common_axis, "branches mix axes")
+    require(
+        len(candidates) == len(citations) >= 2
+        and len(set(candidates)) == len(candidates),
+        "missing or repeated branch candidates",
+    )
+    require(
+        not ({leaf, common} >= {-1, 1}) and (leaf or common), "noncomposable branch"
+    )
+    checked = []
+    for candidate, citation in zip(candidates, citations):
+        nodes, signs, sources = (
+            [candidate, anchor, reference],
+            [leaf, common],
+            [citation, comparison],
+        )
+        if 1 in signs:
+            nodes, signs, sources = (
+                nodes[::-1],
+                [-s for s in signs[::-1]],
+                sources[::-1],
+            )
+        checked.append(
+            _check_chain(
+                (axis, nodes, ["<" if s else "=" for s in signs], sources),
+                atoms,
+                assumptions,
+                comparisons,
+            )
+        )
+    return checked
+
+
+def _check_group(paragraph, style, chains, unit, problem):
+    if style == "symbolic":
+        match = re.fullmatch(
+            r"For each c in \{([^}]+)\}: ([xy])\(c\) ([<=>]) (\w+)\((\w+)\) => not (\w+)\(c,(\w+)\)\.",
+            paragraph,
+        )
+        require(match is not None, "invalid grouped symbolic exclusion")
+        members = match[1].split(", ")
+        axis, sign = match[2], {"<": -1, "=": 0, ">": 1}[match[3]]
+        reference = match[5]
+        require(
+            match[4] == axis and match[7] == reference, "group mixes axes or references"
+        )
+        short = dict(zip(("N", "NE", "E", "SE", "S", "SW", "W", "NW"), SIGNS))
+        require(match[6] in short, "unknown grouped direction")
+        direction = short[match[6]]
+    else:
+        match = re.fullmatch(
+            r"(.+) (are all to the left of|are all to the right of|are all below|are all above|share the same horizontal position as|share the same height as) (\w+), so none can be (\w+) of (\w+)\.",
+            paragraph,
+        )
+        require(match is not None, "invalid grouped natural exclusion")
+        members, reference, direction = (
+            _names(match[1]),
+            match[3],
+            match[4].capitalize(),
+        )
+        require(reference == match[5], "group mixes references")
+        axis, sign = {
+            "are all to the left of": ("x", -1),
+            "are all to the right of": ("x", 1),
+            "are all below": ("y", -1),
+            "are all above": ("y", 1),
+            "share the same horizontal position as": ("x", 0),
+            "share the same height as": ("y", 0),
+        }[match[2]]
+    require(
+        members == [m["candidate"] for m in unit["memberships"]]
+        and len(set(members)) == len(members) >= 2
+        and all(
+            m["status"] == "impossible"
+            and m["reference"] == reference
+            and m["direction"] == direction
+            for m in unit["memberships"]
+        )
+        and (axis, sign, reference, direction)
+        == (unit["axis"], unit["sign"], unit["reference"], unit["direction"]),
+        "group differs from selected memberships",
+    )
+    query = problem["query"]
+    require(
+        direction in SIGNS
+        and query["directions"] == [direction]
+        and reference == query["reference"]
+        and set(members) <= set(query["candidates"])
+        and SIGNS[direction]["xy".index(axis)] != sign,
+        "group does not exclude the queried direction",
+    )
+    # Shared definitions may occur among the paths, so match by endpoints.
+    for member in members:
+        require(
+            any(
+                ax == axis
+                and {nodes[0], nodes[-1]} == {member, reference}
+                and (0 if "<" not in signs else -1 if nodes[0] == member else 1) == sign
+                and all(source[0] == "premise" for source in sources)
+                for ax, nodes, signs, sources in chains
+            ),
+            "group lacks unconditional candidate support",
+        )
+    return axis, sign, reference, direction, members
+
+
 def check_row(row, problem):
     qualitative = "audit_witnesses" in row["explanation_outline"]
     scenario_count = check_scenarios(row, problem) if qualitative else 0
@@ -253,7 +422,34 @@ def check_row(row, problem):
         chains, maps, assumptions = [], [], []
         comparisons = {}
         labels = []
+        groups = []
+        expected_groups = [
+            u
+            for u in row["explanation_outline"]["units"]
+            if u["kind"] == "membership-group"
+        ]
         for paragraph in text.split("\n\n"):
+            if (
+                paragraph.startswith("Branches ")
+                or "(respective premise sources:" in paragraph
+            ):
+                expanded = _check_branches(
+                    paragraph, style, atoms, assumptions, comparisons
+                )
+                chains.extend(expanded)
+                labels.extend([None] * len(expanded))
+                continue
+            if (
+                paragraph.startswith("For each c in ")
+                or ", so none can be " in paragraph
+            ):
+                require(len(groups) < len(expected_groups), "extra grouped exclusion")
+                groups.append(
+                    _check_group(
+                        paragraph, style, chains, expected_groups[len(groups)], problem
+                    )
+                )
+                continue
             definition = re.match(r"^Comparison (\d+): ", paragraph)
             if definition:
                 paragraph = paragraph[definition.end() :]
@@ -348,7 +544,8 @@ def check_row(row, problem):
         require(
             len(maps) == sum(u["kind"] == "model" for u in units), "missing printed map"
         )
-        parsed[style] = (chains, maps)
+        require(len(groups) == len(expected_groups), "missing grouped exclusion")
+        parsed[style] = (chains, maps, groups)
     require(
         parsed["natural"] == parsed["symbolic"],
         "styles expose different printed chains or maps",

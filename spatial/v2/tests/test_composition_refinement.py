@@ -75,3 +75,23 @@ def test_replay_rejects_token_failure(source, monkeypatch):
     monkeypatch.setattr(refinement, "token_measurement", lambda *a: {"admitted": False})
     with pytest.raises(ValueError, match="token admission"):
         refinement.replay_record(source, None, SpatialSolverV2(backend="z3"))
+
+
+def test_question_led_replay_preserves_metadata_and_selected_evidence(
+    source, monkeypatch
+):
+    from spatial.v2.composition_organization import evidence_inventory
+
+    original = deepcopy(source)
+    monkeypatch.setattr(refinement, "token_measurement", lambda *a: {"admitted": True})
+    result = refinement.replay_record(
+        source, None, SpatialSolverV2(backend="z3"), question_led=True
+    )
+    assert source == original
+    old, new = source["rows"][0], result["rows"][0]
+    assert evidence_inventory(old["explanation_outline"]) == evidence_inventory(
+        new["explanation_outline"]
+    )
+    assert new["references"] != old["references"]
+    assert new["answer"] == old["answer"]
+    assert new["substantive_depth_support"] == old["substantive_depth_support"]

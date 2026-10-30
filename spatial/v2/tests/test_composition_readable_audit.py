@@ -35,7 +35,7 @@ def test_corrupt_printed_chain_rejected(style, mutation):
     before = row["references"][style]
     if mutation == "link":
         after = before.replace(
-            "has a smaller x-coordinate", "shares its x-coordinate"
+            "is to the left of", "has the same horizontal position as"
         ).replace("< x(X)", "= x(X)")
     elif mutation == "citation":
         after = before.replace("sources: 2", "sources: 99").replace("p2", "p99")
@@ -44,7 +44,12 @@ def test_corrupt_printed_chain_rejected(style, mutation):
             "=> x(Z) < x(X)", "=> x(Z) < x(Y)"
         )
     else:
-        after = "\n\n".join(before.split("\n\n")[1:])
+        paragraphs = before.split("\n\n")
+        index = next(
+            i for i, p in enumerate(paragraphs) if "sources:" in p or p.startswith("[")
+        )
+        paragraphs.pop(index)
+        after = "\n\n".join(paragraphs)
     assert after != before
     row["references"][style] = after
     with pytest.raises(ValueError):

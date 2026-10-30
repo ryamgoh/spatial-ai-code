@@ -164,13 +164,16 @@ def check_witness(problem: SpatialProblem, coordinates: dict, value: Value) -> N
 
 
 def analyze(
-    problem: SpatialProblem, *, solver: SpatialSolverV2 | None = None
+    problem: SpatialProblem,
+    *,
+    solver: SpatialSolverV2 | None = None,
+    include_witnesses: bool = True,
 ) -> Semantics:
-    """Conclusive full-domain labels; not sufficient alone for synthetic release."""
+    """Conclusive labels; omit maps only for label comparisons, never evidence."""
     validate_problem(problem)
     solver = solver or SpatialSolverV2(backend="z3")
     try:
-        result = solver.analyze(problem, include_witnesses=True)
+        result = solver.analyze(problem, include_witnesses=include_witnesses)
     except RuntimeError as exc:
         raise VerificationError(f"solver failure: {exc}") from exc
     if result.error is not None:
@@ -195,8 +198,9 @@ def analyze(
     witnesses = {
         key.value if isinstance(key, Direction) else key: coordinates
         for key, coordinates in result.witnesses.items()
+        if include_witnesses
     }
-    if set(witnesses) != possible:
+    if include_witnesses and set(witnesses) != possible:
         raise VerificationError("witnesses must cover every possible value")
     for value, coordinates in witnesses.items():
         check_witness(problem, coordinates, value)

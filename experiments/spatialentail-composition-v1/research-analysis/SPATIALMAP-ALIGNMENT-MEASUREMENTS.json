@@ -1,0 +1,92 @@
+{
+  "scope": "Read-only alignment analysis; no new benchmark release or training data",
+  "original_file": "data/spatialeval_org.jsonl",
+  "original_sha256": "53f4cff9d3baef1a1495fbf028f2a5ec80b85de2afb2ed7031f721f271982766",
+  "original_rows": 1500,
+  "original_query_counts": {"direction": 500, "which": 500, "count": 500},
+  "original_count_query_directions": {
+    "Southeast": 68, "Southwest": 63, "Northeast": 49, "West": 79,
+    "Northwest": 58, "South": 56, "North": 73, "East": 54
+  },
+  "original_cardinal_count_queries": 262,
+  "original_cardinal_count_queries_with_native_gold_zero": 262,
+  "original_objects_per_row": 6,
+  "original_atomic_premises_per_row": 9,
+  "original_unique_undirected_edges_per_row": 9,
+  "original_connected_components_per_row": 1,
+  "original_premise_direction_occurrences": {
+    "Northwest": 3393,
+    "Southeast": 3468,
+    "Northeast": 3369,
+    "Southwest": 3270
+  },
+  "historical_adapter_domains": {
+    "direction_values": 4,
+    "which_candidates": 4,
+    "which_candidates_equal_normalized_original_options_rows": 500,
+    "count_candidates": 5
+  },
+  "latest_controlled_selection": {
+    "source": "direction-coverage-v2/attempts.jsonl",
+    "bases": 240,
+    "bundles": 480,
+    "views_per_style": 1440,
+    "unique_semantic_cases": 240,
+    "bundles_with_identical_gold_across_three_contracts": 480,
+    "objects_min": 6,
+    "objects_max": 16,
+    "eligible_candidate_counts": {"5": 96, "6": 72, "7": 72},
+    "tree_constructions": 240
+  },
+  "current_solver_spot_checks": [
+    {
+      "id": "spatialmap.tqa.2000.0",
+      "domain": "eight exact directions",
+      "original_gold": "A",
+      "possible": ["Northeast"],
+      "unique": "A",
+      "listed": "A",
+      "exhaustive": "A"
+    },
+    {
+      "id": "spatialmap.tqa.2003.0",
+      "domain": "eight exact directions",
+      "original_gold": "C",
+      "possible": ["North", "Northeast", "Northwest"],
+      "unique": "E",
+      "listed": "CD",
+      "exhaustive": "F"
+    },
+    {
+      "id": "spatialmap.tqa.2000.1",
+      "domain": "original four displayed candidates",
+      "original_gold": "B",
+      "possible": ["Narwhal's Novelties", "Police Supply Store"],
+      "certain": [],
+      "unique": "E",
+      "listed": "BD",
+      "exhaustive": "BD"
+    },
+    {
+      "id": "spatialmap.tqa.2000.1",
+      "domain": "all five nonreference scene objects; explicit scope change",
+      "original_gold": "B",
+      "possible": ["Narwhal's Novelties", "Oz Oddities", "Police Supply Store"],
+      "certain": [],
+      "unique": "E",
+      "listed": "BD",
+      "exhaustive": "F"
+    },
+    {
+      "id": "spatialmap.tqa.2000.2",
+      "domain": "counts of all five nonreference scene objects",
+      "original_gold": "D",
+      "possible": [0],
+      "unique": "D",
+      "listed": "D",
+      "exhaustive": "D"
+    }
+  ],
+  "spot_check_method": "Historical parser, deterministic bijective ASCII renaming, eight-direction domain for Direction, current analyze and encode with original A-D values. The second Which calculation explicitly expands eligibility and is not claimed to preserve the historical question scope.",
+  "limits": "Structural census covers all 1500 original rows. New semantic spot checks cover four source questions only, not a complete eight-direction relabeling of the release. Prior 667/833 audit counts refer to the historical adapter semantics."
+}

@@ -193,7 +193,7 @@ def split_conflicts(attempts):
 
 def verify_transformations(story, problem, semantics, solver):
     variant, names = renamed_problem(problem)
-    changed = analyze(variant, solver=solver)
+    changed = analyze(variant, solver=solver, include_witnesses=False)
     expected = signature(semantics)
     if isinstance(problem.query, WhichQuery):
         expected = (
@@ -216,7 +216,9 @@ def verify_transformations(story, problem, semantics, solver):
                 )
             ),
         )
-        if signature(analyze(reduced, solver=solver)) != signature(semantics):
+        if signature(
+            analyze(reduced, solver=solver, include_witnesses=False)
+        ) != signature(semantics):
             raise VerificationError("distractor removal changed full semantics")
 
 

@@ -233,6 +233,7 @@ slurm/archive/logs/*
 /experiments/spatialentail-composition-v1/depth-feasibility-*/attempts.jsonl
 /experiments/spatialentail-composition-v1/balance-feasibility-v*/attempts.jsonl
 /experiments/spatialentail-composition-v1/unique-selection-expansion-v*/attempts.jsonl
+/experiments/spatialentail-composition-v1/direction-coverage-v*/attempts.jsonl
 /experiments/spatialentail-composition-v1/shared-proof-replay-v*/attempts.jsonl
 /experiments/spatialentail-composition-v1/prepared-training-v*/data/
 /experiments/spatialentail-composition-v1/prepared-training-v*/references.jsonl

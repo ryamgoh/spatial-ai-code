@@ -216,7 +216,7 @@ def verify_evidence(evidence: Evidence, *, solver=None) -> None:
     problem = semantics.problem
     if certificate.problem != problem:
         raise VerificationError("certificate and semantics refer to different problems")
-    actual = analyze(problem, solver=solver)
+    actual = analyze(problem, solver=solver, include_witnesses=False)
     if (actual.consistent, actual.possible, actual.certain) != (
         semantics.consistent,
         semantics.possible,

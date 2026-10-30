@@ -32,7 +32,7 @@ from spatial.v2.composition_pilot import construct_stories, story_key
 from spatial.v2.composition_readable import (
     VERSION,
     build_outline,
-    check_pair,
+    check_rendered_outline,
     render_outline,
 )
 from spatial.v2.composition_readable_audit import check_row
@@ -294,7 +294,9 @@ def interface_matrix():
     }
 
 
-def build_attempt(story, problem, requested_depth, tokenizer, solver):
+def build_attempt(
+    story, problem, requested_depth, tokenizer, solver, *, menu_selector=menu_inventory
+):
     kind = type(problem.query).__name__.removesuffix("Query").lower()
     base_id = story.story_id + "-" + kind
     record = {
@@ -309,9 +311,9 @@ def build_attempt(story, problem, requested_depth, tokenizer, solver):
         "stage": "semantics",
     }
     try:
-        semantics = analyze(problem, solver=solver)
+        semantics = analyze(problem, solver=solver, include_witnesses=False)
         record["semantics"] = semantic_profile(semantics)
-        menus = menu_inventory(semantics, stable_int(base_id))
+        menus = menu_selector(semantics, stable_int(base_id))
         record["semantic_views"] = [
             {"query_kind": kind, **row_metadata(semantics, menu, mode)}
             for menu in menus
@@ -340,7 +342,7 @@ def build_attempt(story, problem, requested_depth, tokenizer, solver):
                     raise ValueError("prompt roundtrip mismatch")
                 outline = build_outline(evidence, menu, mode, solver=solver)
                 pair = render_outline(outline)
-                check_pair(evidence, menu, mode, pair, solver=solver)
+                check_rendered_outline(evidence, menu, mode, outline, pair)
                 row = {
                     "id": f"{base_id}-m{index}-{mode.value}",
                     "base_id": base_id,

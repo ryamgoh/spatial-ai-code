@@ -64,8 +64,8 @@ def test_shared_reference_mutations_fail_independent_audit(shared, style, mutati
         elif name == "symbolic":
             after = before.replace(" < ", " = ")
         else:
-            after = before.replace("greater", "smaller").replace(
-                "increase strictly", "decrease strictly"
+            after = before.replace("above", "below").replace(
+                "to the right of", "to the left of"
             )
         assert after != before
         row["references"][name] = after

@@ -39,7 +39,7 @@ def test_mixed_direction_actual_relationships_in_both_styles():
     assert "x(X) >" not in symbolic  # Paths are oriented in increasing order.
     assert "=> NE(X,Z)" in symbolic
     assert "place X exactly northeast of Z" in natural
-    assert "x-coordinate" in natural and "y-coordinate" in natural
+    assert "horizontal position" in natural and "bottom to top" in natural
     assert "x(Z) = x(Y) < x(X) => x(Z) < x(X)" in symbolic
     assert "y(Z) < y(Y) < y(X) => y(Z) < y(X)" in symbolic
     assert "The only possible value is Northeast." in natural
@@ -232,7 +232,7 @@ def test_mutated_rendered_outputs_are_rejected(style, mutation):
     before = pair[style]
     if mutation == "relation":
         pair[style] = (
-            before.replace("greater", "smaller")
+            before.replace("to the right of", "to the left of")
             if style == "natural"
             else before.replace("<", ">")
         )
@@ -285,9 +285,7 @@ def test_single_links_are_not_repeated_and_count_grammar_is_singular():
     )
     assert "[p1] y(O) < y(U)." in pair["symbolic"]
     assert "y(O) < y(U) => y(O) < y(U)" not in pair["symbolic"]
-    assert (
-        "U has a greater y-coordinate than O (premise sources: 1)." in pair["natural"]
-    )
+    assert "U is above O (premise sources: 1)." in pair["natural"]
     assert "leaves only size 2." in pair["natural"]
 
 

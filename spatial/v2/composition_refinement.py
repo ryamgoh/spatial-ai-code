@@ -10,7 +10,8 @@ from pathlib import Path
 from spatial.v2.composition_contracts import encode, parse_answer, parse_prompt
 from spatial.v2.composition_evidence import build_evidence
 from spatial.v2.composition_feasibility import token_measurement
-from spatial.v2.composition_readable import VERSION, render_outline
+from spatial.v2.composition_organization import evidence_inventory, organize_outline
+from spatial.v2.composition_readable import render_outline
 from spatial.v2.composition_readable_audit import check_row
 from spatial.v2.composition_selection import (
     describe,
@@ -105,7 +106,7 @@ def selection_comparison(old, additions, previous, expanded):
     return result
 
 
-def replay_record(original, tokenizer, solver):
+def replay_record(original, tokenizer, solver, *, question_led=False):
     if original["status"] != "accepted":
         raise ValueError("replay requires accepted bases")
     record = deepcopy(original)
@@ -136,15 +137,32 @@ def replay_record(original, tokenizer, solver):
         check_row(row, record["problem"])
         if render_outline(row["explanation_outline"]) != row["references"]:
             raise ValueError("saved references differ from original outline")
-        outline = factor_shared_paths(row["explanation_outline"])
-        outline["version"] = VERSION
+        outline = (
+            organize_outline(row["explanation_outline"], problem, mode)
+            if question_led
+            else factor_shared_paths(row["explanation_outline"])
+        )
+        if not question_led:
+            outline["version"] = "readable-shared-evidence-v4"
         # Removing display-only factoring must recover exactly the old evidence.
         restored = deepcopy(outline)
         restored["version"] = row["explanation_outline"]["version"]
         restored["units"] = [u for u in restored["units"] if "comparison" not in u]
         for unit in restored["units"]:
             unit.pop("shared_segments", None)
-        if restored != row["explanation_outline"]:
+        unchanged = (
+            evidence_inventory(outline)
+            == evidence_inventory(row["explanation_outline"])
+            and {k: v for k, v in outline.items() if k not in ("version", "units")}
+            == {
+                k: v
+                for k, v in row["explanation_outline"].items()
+                if k not in ("version", "units")
+            }
+            if question_led
+            else restored == row["explanation_outline"]
+        )
+        if not unchanged:
             raise ValueError("factoring changed selected evidence")
         row["explanation_outline"] = outline
         row["references"] = render_outline(outline)
@@ -176,15 +194,18 @@ def replay_record(original, tokenizer, solver):
     return record
 
 
-def replay(records, output, tokenizer):
+def replay(records, output, tokenizer, *, question_led=False):
     solver = SpatialSolverV2(backend="z3", timeout_ms=5000)
     result = {"bases": len(records), "pairs": 0, "changed_pairs": 0, "failures": []}
     lengths = {style: {"before": [], "after": []} for style in ("natural", "symbolic")}
     groups = {}
+    examples = {}
     with (output / "attempts.jsonl").open("w") as stream:
         for index, original in enumerate(records, 1):
             try:
-                record = replay_record(original, tokenizer, solver)
+                record = replay_record(
+                    original, tokenizer, solver, question_led=question_led
+                )
             except (ValueError, RuntimeError) as exc:
                 record = {
                     "base_id": original["base_id"],
@@ -193,6 +214,28 @@ def replay(records, output, tokenizer):
                 }
                 result["failures"].append(record)
             else:
+                if question_led:
+                    key = (
+                        f"{record['recipe']}/depth-{record['requested_depth']}"
+                        if record["recipe"] in PATTERNS
+                        and record["requested_depth"] in (3, 10)
+                        else record["query_kind"]
+                    )
+                    if key not in examples:
+                        row = next(
+                            (
+                                r
+                                for r in record["rows"]
+                                if r["contract"] == "single"
+                                and r["returned_count"] is not None
+                            ),
+                            record["rows"][0],
+                        )
+                        examples[key] = (
+                            f"## {key}\n\n`{row['id']}`\n\n### Prompt\n\n```text\n"
+                            f"{row['prompt']}\n```\n\n### Natural\n\n{row['references']['natural']}"
+                            f"\n\n### Symbolic\n\n```text\n{row['references']['symbolic']}\n```\n"
+                        )
                 result["pairs"] += len(record["rows"])
                 result["changed_pairs"] += sum(
                     a["references"] != b["references"]
@@ -239,21 +282,51 @@ def replay(records, output, tokenizer):
         key: {phase: stats(values) for phase, values in phases.items()}
         for key, phases in groups.items()
     }
+    if question_led:
+        (output / "examples.md").write_text(
+            "# Question-Led Paired Explanations\n\n"
+            "Saved development questions, not production data. Full evidence and gold are preserved.\n\n"
+            + "\n".join(examples.values())
+        )
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--task", choices=("selection", "replay"), required=True)
+    parser.add_argument(
+        "--task", choices=("selection", "replay", "question-led"), required=True
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--tokenizer", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("refusing to overwrite refinement artifacts")
     records, previous, expanded, hashes = load_inputs()
+    if args.task == "question-led":
+        source = EXPERIMENT / "shared-proof-replay-v4"
+        manifest = json.loads((source / "manifest.json").read_text())
+        for name, expected in manifest["output_sha256"].items():
+            if digest(source / name) != expected:
+                raise ValueError(f"source output hash mismatch: {source / name}")
+        for path in source.iterdir():
+            if path.is_file():
+                hashes[str(path)] = digest(path)
+        records = [
+            [
+                json.loads(line)
+                for line in (source / "attempts.jsonl").read_text().splitlines()
+            ],
+            [],
+        ]
     code = list((ROOT / "spatial/v2").glob("*.py"))
     protocol = (
-        EXPERIMENT / "research-analysis/SELECTION-AND-PROSE-REFINEMENT-PROTOCOL-v1.md"
+        EXPERIMENT
+        / "research-analysis"
+        / (
+            "PROSE-ORGANIZATION-PROTOCOL-v5.md"
+            if args.task == "question-led"
+            else "SELECTION-AND-PROSE-REFINEMENT-PROTOCOL-v1.md"
+        )
     )
     hashes.update({str(p): digest(p) for p in [*code, protocol]})
     tokenizer = None
@@ -262,7 +335,7 @@ def main():
         if args.task == "selection"
         else ["z3-solver", "transformers", "tokenizers"]
     )
-    if args.task == "replay":
+    if args.task != "selection":
         from transformers import AutoTokenizer
 
         if args.tokenizer is None or args.tokenizer.name != REVISION:
@@ -291,7 +364,12 @@ def main():
     result = (
         selection_comparison(*records, previous, expanded)
         if args.task == "selection"
-        else replay(records[0] + records[1], args.output, tokenizer)
+        else replay(
+            records[0] + records[1],
+            args.output,
+            tokenizer,
+            question_led=args.task == "question-led",
+        )
     )
     if any(digest(Path(p)) != h for p, h in hashes.items()):
         raise ValueError("source or input changed during refinement")

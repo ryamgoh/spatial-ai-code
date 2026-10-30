@@ -71,7 +71,7 @@ def measure_depth(problem, *, solver=None):
     and equality rules for negative membership rather than duplicating them.
     """
     solver = solver or SpatialSolverV2(backend="z3", timeout_ms=5000)
-    semantics = analyze(problem, solver=solver)
+    semantics = analyze(problem, solver=solver, include_witnesses=False)
     if not semantics.consistent:
         raise UnsupportedEvidence("inconsistent: no entailed-depth descriptor")
     query = problem.query
@@ -91,7 +91,7 @@ def measure_depth(problem, *, solver=None):
     membership_problem = replace(
         problem, query=WhichQuery(query.directions, query.reference, query.candidates)
     )
-    memberships = analyze(membership_problem, solver=solver)
+    memberships = analyze(membership_problem, solver=solver, include_witnesses=False)
     if memberships.possible != memberships.certain:
         raise UnsupportedEvidence("non-fixed-memberships")
     supports = [
@@ -113,7 +113,7 @@ def measure_depth(problem, *, solver=None):
                 # The atomic interface does not represent an empty conjunction.
                 continue
             reduced = replace(problem, premise=And(retained))
-            after = analyze(reduced, solver=solver)
+            after = analyze(reduced, solver=solver, include_witnesses=False)
             changed = signature(after) != signature(semantics)
             ablations.append(
                 {

@@ -1,0 +1,23 @@
+{
+  "status": "passed-development-only",
+  "source": "../shared-proof-replay-v4",
+  "replay": "../shared-proof-replay-v5",
+  "bases": 300,
+  "pairs_revalidated": 1719,
+  "grouped_exclusions": 880,
+  "grouped_branch_paragraphs": 97,
+  "checks": [
+    "Version-4 and version-5 output hashes match their saved manifests",
+    "Final organizer applied to every version-4 outline exactly matches the saved version-5 outline",
+    "Final renderer exactly reproduces all saved version-5 references",
+    "Organizing every version-5 outline again is idempotent",
+    "Independent printed-text audit passes on all 1719 version-5 pairs"
+  ],
+  "source_sha256": {
+    "spatial/v2/composition_organization.py": "cb7466d304cbddf4940726279d5a5648c223e0c94009dd9e3311572c4728f4de",
+    "spatial/v2/composition_readable.py": "3ab4c812bc15751e6458a61223ddc7fbe055f1ae57681aeb58e249d302558355",
+    "spatial/v2/composition_readable_audit.py": "c9e20c02790a12be0c146c6c35b44b22f1c96085b9c1ef797696240e9050a96e",
+    "spatial/v2/composition_refinement.py": "cf066dafa9a7a46e297c7d95512c757f458ebf189ce3bdd71089f7ddb081c9ab"
+  },
+  "note": "The replay manifest preserves the sources used during replay. A subsequent fix made repeated organization preserve grouping. This full revalidation confirms the final sources produce identical saved outputs; no replay artifact or original manifest was rewritten."
+}

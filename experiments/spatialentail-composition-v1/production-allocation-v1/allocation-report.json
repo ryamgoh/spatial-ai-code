@@ -1,0 +1,6542 @@
+{
+  "scheduled_bases": 31251,
+  "scheduled_stories": 18290,
+  "scheduled_by_split": {
+    "extrapolation-test": 3600,
+    "train": 17394,
+    "in-range-test": 6843,
+    "dev": 3414
+  },
+  "scheduled_by_stratum": {
+    "dev/count/1": 104,
+    "dev/count/2": 104,
+    "dev/count/3": 104,
+    "dev/count/4": 104,
+    "dev/count/5": 104,
+    "dev/count/6": 104,
+    "dev/count/7": 104,
+    "dev/count/8": 104,
+    "dev/count/semantic": 306,
+    "dev/direction/1": 104,
+    "dev/direction/2": 104,
+    "dev/direction/3": 104,
+    "dev/direction/4": 104,
+    "dev/direction/5": 104,
+    "dev/direction/6": 104,
+    "dev/direction/7": 104,
+    "dev/direction/8": 104,
+    "dev/direction/semantic": 306,
+    "dev/which/1": 104,
+    "dev/which/2": 104,
+    "dev/which/3": 104,
+    "dev/which/4": 104,
+    "dev/which/5": 104,
+    "dev/which/6": 104,
+    "dev/which/7": 104,
+    "dev/which/8": 104,
+    "dev/which/semantic": 306,
+    "extrapolation-test/count/10": 600,
+    "extrapolation-test/count/9": 600,
+    "extrapolation-test/direction/10": 600,
+    "extrapolation-test/direction/9": 600,
+    "extrapolation-test/which/10": 600,
+    "extrapolation-test/which/9": 600,
+    "in-range-test/count/1": 207,
+    "in-range-test/count/2": 207,
+    "in-range-test/count/3": 207,
+    "in-range-test/count/4": 207,
+    "in-range-test/count/5": 207,
+    "in-range-test/count/6": 207,
+    "in-range-test/count/7": 207,
+    "in-range-test/count/8": 207,
+    "in-range-test/count/semantic": 625,
+    "in-range-test/direction/1": 207,
+    "in-range-test/direction/2": 207,
+    "in-range-test/direction/3": 207,
+    "in-range-test/direction/4": 207,
+    "in-range-test/direction/5": 207,
+    "in-range-test/direction/6": 207,
+    "in-range-test/direction/7": 207,
+    "in-range-test/direction/8": 207,
+    "in-range-test/direction/semantic": 625,
+    "in-range-test/which/1": 207,
+    "in-range-test/which/2": 207,
+    "in-range-test/which/3": 207,
+    "in-range-test/which/4": 207,
+    "in-range-test/which/5": 207,
+    "in-range-test/which/6": 207,
+    "in-range-test/which/7": 207,
+    "in-range-test/which/8": 207,
+    "in-range-test/which/semantic": 625,
+    "train/count/1": 335,
+    "train/count/2": 376,
+    "train/count/3": 418,
+    "train/count/4": 460,
+    "train/count/5": 544,
+    "train/count/6": 586,
+    "train/count/7": 670,
+    "train/count/8": 796,
+    "train/count/semantic": 1613,
+    "train/direction/1": 335,
+    "train/direction/2": 376,
+    "train/direction/3": 418,
+    "train/direction/4": 460,
+    "train/direction/5": 544,
+    "train/direction/6": 586,
+    "train/direction/7": 670,
+    "train/direction/8": 796,
+    "train/direction/semantic": 1613,
+    "train/which/1": 335,
+    "train/which/2": 376,
+    "train/which/3": 418,
+    "train/which/4": 460,
+    "train/which/5": 544,
+    "train/which/6": 586,
+    "train/which/7": 670,
+    "train/which/8": 796,
+    "train/which/semantic": 1613
+  },
+  "scheduled_by_source": {
+    "dev/count/controlled": 832,
+    "dev/count/random-atoms": 99,
+    "dev/count/random-world": 147,
+    "dev/count/targeted": 60,
+    "dev/direction/controlled": 832,
+    "dev/direction/random-atoms": 99,
+    "dev/direction/random-world": 147,
+    "dev/direction/targeted": 60,
+    "dev/which/controlled": 832,
+    "dev/which/random-atoms": 99,
+    "dev/which/random-world": 147,
+    "dev/which/targeted": 60,
+    "extrapolation-test/count/controlled": 1200,
+    "extrapolation-test/direction/controlled": 1200,
+    "extrapolation-test/which/controlled": 1200,
+    "in-range-test/count/controlled": 1656,
+    "in-range-test/count/random-atoms": 199,
+    "in-range-test/count/random-world": 307,
+    "in-range-test/count/targeted": 119,
+    "in-range-test/direction/controlled": 1656,
+    "in-range-test/direction/random-atoms": 199,
+    "in-range-test/direction/random-world": 307,
+    "in-range-test/direction/targeted": 119,
+    "in-range-test/which/controlled": 1656,
+    "in-range-test/which/random-atoms": 199,
+    "in-range-test/which/random-world": 307,
+    "in-range-test/which/targeted": 119,
+    "train/count/controlled": 4185,
+    "train/count/random-atoms": 530,
+    "train/count/random-world": 784,
+    "train/count/targeted": 299,
+    "train/direction/controlled": 4185,
+    "train/direction/random-atoms": 530,
+    "train/direction/random-world": 784,
+    "train/direction/targeted": 299,
+    "train/which/controlled": 4185,
+    "train/which/random-atoms": 530,
+    "train/which/random-world": 784,
+    "train/which/targeted": 299
+  },
+  "families_by_stratum": {
+    "dev/count/1": 104,
+    "dev/count/2": 104,
+    "dev/count/3": 104,
+    "dev/count/4": 104,
+    "dev/count/5": 104,
+    "dev/count/6": 104,
+    "dev/count/7": 104,
+    "dev/count/8": 104,
+    "dev/count/semantic": 306,
+    "dev/direction/1": 104,
+    "dev/direction/2": 104,
+    "dev/direction/3": 104,
+    "dev/direction/4": 104,
+    "dev/direction/5": 104,
+    "dev/direction/6": 104,
+    "dev/direction/7": 104,
+    "dev/direction/8": 104,
+    "dev/direction/semantic": 306,
+    "dev/which/1": 104,
+    "dev/which/2": 104,
+    "dev/which/3": 104,
+    "dev/which/4": 104,
+    "dev/which/5": 104,
+    "dev/which/6": 104,
+    "dev/which/7": 104,
+    "dev/which/8": 104,
+    "dev/which/semantic": 306,
+    "extrapolation-test/count/10": 600,
+    "extrapolation-test/count/9": 600,
+    "extrapolation-test/direction/10": 600,
+    "extrapolation-test/direction/9": 600,
+    "extrapolation-test/which/10": 600,
+    "extrapolation-test/which/9": 600,
+    "in-range-test/count/1": 207,
+    "in-range-test/count/2": 207,
+    "in-range-test/count/3": 207,
+    "in-range-test/count/4": 207,
+    "in-range-test/count/5": 207,
+    "in-range-test/count/6": 207,
+    "in-range-test/count/7": 207,
+    "in-range-test/count/8": 207,
+    "in-range-test/count/semantic": 625,
+    "in-range-test/direction/1": 207,
+    "in-range-test/direction/2": 207,
+    "in-range-test/direction/3": 207,
+    "in-range-test/direction/4": 207,
+    "in-range-test/direction/5": 207,
+    "in-range-test/direction/6": 207,
+    "in-range-test/direction/7": 207,
+    "in-range-test/direction/8": 207,
+    "in-range-test/direction/semantic": 625,
+    "in-range-test/which/1": 207,
+    "in-range-test/which/2": 207,
+    "in-range-test/which/3": 207,
+    "in-range-test/which/4": 207,
+    "in-range-test/which/5": 207,
+    "in-range-test/which/6": 207,
+    "in-range-test/which/7": 207,
+    "in-range-test/which/8": 207,
+    "in-range-test/which/semantic": 625,
+    "train/count/1": 335,
+    "train/count/2": 376,
+    "train/count/3": 418,
+    "train/count/4": 460,
+    "train/count/5": 544,
+    "train/count/6": 586,
+    "train/count/7": 670,
+    "train/count/8": 796,
+    "train/count/semantic": 1613,
+    "train/direction/1": 335,
+    "train/direction/2": 376,
+    "train/direction/3": 418,
+    "train/direction/4": 460,
+    "train/direction/5": 544,
+    "train/direction/6": 586,
+    "train/direction/7": 670,
+    "train/direction/8": 796,
+    "train/direction/semantic": 1613,
+    "train/which/1": 335,
+    "train/which/2": 376,
+    "train/which/3": 418,
+    "train/which/4": 460,
+    "train/which/5": 544,
+    "train/which/6": 586,
+    "train/which/7": 670,
+    "train/which/8": 796,
+    "train/which/semantic": 1613
+  },
+  "insufficient_base_supply": {},
+  "insufficient_source_supply": {},
+  "insufficient_family_supply": {},
+  "requested_count_value_supply": {
+    "dev/count/1/0": 21,
+    "dev/count/1/1": 21,
+    "dev/count/1/2": 21,
+    "dev/count/1/3": 21,
+    "dev/count/1/4": 20,
+    "dev/count/2/0": 21,
+    "dev/count/2/1": 21,
+    "dev/count/2/2": 21,
+    "dev/count/2/3": 21,
+    "dev/count/2/4": 20,
+    "dev/count/3/0": 21,
+    "dev/count/3/1": 21,
+    "dev/count/3/2": 21,
+    "dev/count/3/3": 21,
+    "dev/count/3/4": 20,
+    "dev/count/4/0": 21,
+    "dev/count/4/1": 21,
+    "dev/count/4/2": 21,
+    "dev/count/4/3": 21,
+    "dev/count/4/4": 20,
+    "dev/count/5/0": 21,
+    "dev/count/5/1": 21,
+    "dev/count/5/2": 21,
+    "dev/count/5/3": 21,
+    "dev/count/5/4": 20,
+    "dev/count/6/0": 21,
+    "dev/count/6/1": 21,
+    "dev/count/6/2": 21,
+    "dev/count/6/3": 21,
+    "dev/count/6/4": 20,
+    "dev/count/7/0": 21,
+    "dev/count/7/1": 21,
+    "dev/count/7/2": 21,
+    "dev/count/7/3": 21,
+    "dev/count/7/4": 20,
+    "dev/count/8/0": 21,
+    "dev/count/8/1": 21,
+    "dev/count/8/2": 21,
+    "dev/count/8/3": 21,
+    "dev/count/8/4": 20,
+    "extrapolation-test/count/10/0": 120,
+    "extrapolation-test/count/10/1": 120,
+    "extrapolation-test/count/10/2": 120,
+    "extrapolation-test/count/10/3": 120,
+    "extrapolation-test/count/10/4": 120,
+    "extrapolation-test/count/9/0": 120,
+    "extrapolation-test/count/9/1": 120,
+    "extrapolation-test/count/9/2": 120,
+    "extrapolation-test/count/9/3": 120,
+    "extrapolation-test/count/9/4": 120,
+    "in-range-test/count/1/0": 42,
+    "in-range-test/count/1/1": 41,
+    "in-range-test/count/1/2": 42,
+    "in-range-test/count/1/3": 41,
+    "in-range-test/count/1/4": 41,
+    "in-range-test/count/2/0": 42,
+    "in-range-test/count/2/1": 41,
+    "in-range-test/count/2/2": 42,
+    "in-range-test/count/2/3": 41,
+    "in-range-test/count/2/4": 41,
+    "in-range-test/count/3/0": 42,
+    "in-range-test/count/3/1": 41,
+    "in-range-test/count/3/2": 42,
+    "in-range-test/count/3/3": 41,
+    "in-range-test/count/3/4": 41,
+    "in-range-test/count/4/0": 42,
+    "in-range-test/count/4/1": 41,
+    "in-range-test/count/4/2": 42,
+    "in-range-test/count/4/3": 41,
+    "in-range-test/count/4/4": 41,
+    "in-range-test/count/5/0": 42,
+    "in-range-test/count/5/1": 41,
+    "in-range-test/count/5/2": 42,
+    "in-range-test/count/5/3": 41,
+    "in-range-test/count/5/4": 41,
+    "in-range-test/count/6/0": 42,
+    "in-range-test/count/6/1": 41,
+    "in-range-test/count/6/2": 42,
+    "in-range-test/count/6/3": 41,
+    "in-range-test/count/6/4": 41,
+    "in-range-test/count/7/0": 42,
+    "in-range-test/count/7/1": 41,
+    "in-range-test/count/7/2": 42,
+    "in-range-test/count/7/3": 41,
+    "in-range-test/count/7/4": 41,
+    "in-range-test/count/8/0": 42,
+    "in-range-test/count/8/1": 41,
+    "in-range-test/count/8/2": 42,
+    "in-range-test/count/8/3": 41,
+    "in-range-test/count/8/4": 41,
+    "train/count/1/0": 69,
+    "train/count/1/1": 69,
+    "train/count/1/2": 65,
+    "train/count/1/3": 66,
+    "train/count/1/4": 66,
+    "train/count/2/0": 78,
+    "train/count/2/1": 74,
+    "train/count/2/2": 75,
+    "train/count/2/3": 75,
+    "train/count/2/4": 74,
+    "train/count/3/0": 84,
+    "train/count/3/1": 83,
+    "train/count/3/2": 84,
+    "train/count/3/3": 84,
+    "train/count/3/4": 83,
+    "train/count/4/0": 93,
+    "train/count/4/1": 92,
+    "train/count/4/2": 93,
+    "train/count/4/3": 92,
+    "train/count/4/4": 90,
+    "train/count/5/0": 111,
+    "train/count/5/1": 110,
+    "train/count/5/2": 108,
+    "train/count/5/3": 107,
+    "train/count/5/4": 108,
+    "train/count/6/0": 120,
+    "train/count/6/1": 116,
+    "train/count/6/2": 117,
+    "train/count/6/3": 116,
+    "train/count/6/4": 117,
+    "train/count/7/0": 135,
+    "train/count/7/1": 134,
+    "train/count/7/2": 134,
+    "train/count/7/3": 135,
+    "train/count/7/4": 132,
+    "train/count/8/0": 161,
+    "train/count/8/1": 159,
+    "train/count/8/2": 158,
+    "train/count/8/3": 159,
+    "train/count/8/4": 159
+  },
+  "insufficient_count_value_supply": {},
+  "nonhomogeneous_supply": {
+    "dev/count/2": 60,
+    "dev/count/3": 60,
+    "dev/count/4": 61,
+    "dev/count/5": 62,
+    "dev/count/6": 63,
+    "dev/count/7": 64,
+    "dev/count/8": 64,
+    "dev/direction/2": 60,
+    "dev/direction/3": 60,
+    "dev/direction/4": 61,
+    "dev/direction/5": 62,
+    "dev/direction/6": 63,
+    "dev/direction/7": 64,
+    "dev/direction/8": 64,
+    "dev/which/2": 60,
+    "dev/which/3": 60,
+    "dev/which/4": 61,
+    "dev/which/5": 62,
+    "dev/which/6": 63,
+    "dev/which/7": 64,
+    "dev/which/8": 64,
+    "extrapolation-test/count/10": 360,
+    "extrapolation-test/count/9": 360,
+    "extrapolation-test/direction/10": 360,
+    "extrapolation-test/direction/9": 360,
+    "extrapolation-test/which/10": 360,
+    "extrapolation-test/which/9": 360,
+    "in-range-test/count/2": 121,
+    "in-range-test/count/3": 122,
+    "in-range-test/count/4": 124,
+    "in-range-test/count/5": 126,
+    "in-range-test/count/6": 127,
+    "in-range-test/count/7": 128,
+    "in-range-test/count/8": 129,
+    "in-range-test/direction/2": 121,
+    "in-range-test/direction/3": 122,
+    "in-range-test/direction/4": 124,
+    "in-range-test/direction/5": 126,
+    "in-range-test/direction/6": 127,
+    "in-range-test/direction/7": 128,
+    "in-range-test/direction/8": 129,
+    "in-range-test/which/2": 121,
+    "in-range-test/which/3": 122,
+    "in-range-test/which/4": 124,
+    "in-range-test/which/5": 126,
+    "in-range-test/which/6": 127,
+    "in-range-test/which/7": 128,
+    "in-range-test/which/8": 129,
+    "train/count/2": 226,
+    "train/count/3": 250,
+    "train/count/4": 275,
+    "train/count/5": 326,
+    "train/count/6": 353,
+    "train/count/7": 406,
+    "train/count/8": 479,
+    "train/direction/2": 226,
+    "train/direction/3": 250,
+    "train/direction/4": 275,
+    "train/direction/5": 326,
+    "train/direction/6": 353,
+    "train/direction/7": 406,
+    "train/direction/8": 479,
+    "train/which/2": 226,
+    "train/which/3": 250,
+    "train/which/4": 275,
+    "train/which/5": 326,
+    "train/which/6": 353,
+    "train/which/7": 406,
+    "train/which/8": 479
+  },
+  "insufficient_nonhomogeneous_supply": {},
+  "scene_bounds_failures": [],
+  "boundary": "Structural supply only; no solver answers, menus, explanations or token admission.",
+  "schema": "composition-allocation-v1",
+  "status": "allocation-preflight-complete-not-execution-approved",
+  "raw_attempt_budget": 32400,
+  "structural_excluded_bases": 1149,
+  "structural_excluded_stories": 430,
+  "structural_exclusions": [
+    {
+      "story_id": "production-b2905-s572",
+      "family_id": "random/2026110201/random-atoms-572",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77a3a0f27dc61c1f366cf5dec2c349f2af14ce08bb29da794238908f25e3cbba",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s256",
+      "family_id": "random/2026110200/random-world-256",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1b0480183c941585e575d89c48724200e6e36c0d83867afd3a06c2ae2b030121",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s48",
+      "family_id": "random/2026110211/random-atoms-48",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9c6f01ee49385bc0cd5aab16bf056db084e78c8be3066f96fe8a52fef1bbb908",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s7",
+      "family_id": "random/2026110210/random-world-7",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "386615399d4752ac25ba595b23c70a01ebd0993e8adaeb7ebd841d685ede6015",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2025-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "1f9b823b1261d9b35d29eb814143eaac6af6f14f05c6a6d0672a23eff3463f0d",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s309",
+      "family_id": "random/2026110200/random-world-309",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0a4a55cff929fdc31303a052dedbfad5eae5ddca0fc9ac3c64ee73ed657c92f3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s448",
+      "family_id": "random/2026110200/random-world-448",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "4abb145737189772e7b865156054c6123d4aa6e45fc4c25c1e5b25ec9b7078e0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2477-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "166b43ed103ded43411762f6acad12e6a443c99d062206e2acd4bc5e3cb23a8f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s467",
+      "family_id": "random/2026110200/random-world-467",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f59befffcd93452a9ee4eecc975c5bf38f74c3f622cb06286d0c99416dded6d3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s225",
+      "family_id": "random/2026110201/random-atoms-225",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "207dd17403519801bbdcc410e18f719a90ff439e0d6451833d175b5ff91dfa42",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s50",
+      "family_id": "random/2026110221/random-atoms-50",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s456",
+      "family_id": "random/2026110200/random-world-456",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s530",
+      "family_id": "random/2026110200/random-world-530",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "27b4d286dcd6722435feaee380504ef1123ee9fb05064de818f3cab07736a262",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s784",
+      "family_id": "random/2026110200/random-world-784",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "614b7951253ad99ac41a4257ca04b23fcfe1e75d579953570a107f87ed19e594",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s686",
+      "family_id": "random/2026110200/random-world-686",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0efaa1e5092a3ef01bdbe17c24453d2734d0b24a54d16f77fad1a088418bfbb8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s1",
+      "family_id": "random/2026110211/random-atoms-1",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e1dae8f2b01c7c526ddcf063ff26ba93f033a0156cd4c5ad63538eb93274877d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s109",
+      "family_id": "random/2026110211/random-atoms-109",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "dba6dd1322a762c2ad51570b0c589430425fcb875749209f41dcf087cb21d82b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s104",
+      "family_id": "random/2026110220/random-world-104",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c36a65b63b6730f4fc44f42c6faeda6f44443e00b9fed60eb1a493b3a7fae6c6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s170",
+      "family_id": "random/2026110210/random-world-170",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53b7c3484b17e0af4787db5d1a916724e311ab5d4727029c0c7ba563bbaeee6e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s72",
+      "family_id": "random/2026110200/random-world-72",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b211-s3",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "26208c4531e1d61f486bcef5aeee9e7c6504287ecf3c463d1b9042bb2bcda42a",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s267",
+      "family_id": "random/2026110201/random-atoms-267",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "81a61b1b100bdea0a66fd06a237113327a19a376451d45a476a41ecef12f9913",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s309",
+      "family_id": "random/2026110220/random-world-309",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "04eca71a618d1b33dc0b1e3a2e1e6fedb5e0347eb1e0defaac6e39be7b414834",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s107",
+      "family_id": "random/2026110200/random-world-107",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s450",
+      "family_id": "random/2026110201/random-atoms-450",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "fc556265144c1229a6efb174f16a58997c98723abff0099c1c93b4e57d3c5aea",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s144",
+      "family_id": "random/2026110221/random-atoms-144",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s586",
+      "family_id": "random/2026110201/random-atoms-586",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5bc41e6b1609dba4633482b8e75cf786dde8cef36aa74dcc2f59e17c21dc2514",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s28",
+      "family_id": "random/2026110221/random-atoms-28",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "be2c957f009647ea2477d21f59bac0d05196ff408d2887e7d7b97818877a87e7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s598",
+      "family_id": "random/2026110201/random-atoms-598",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0b5abb40a973a69b9d1ed04aefe34fe15ee935b7e6063f1eeb7957dca87f176a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s33",
+      "family_id": "random/2026110210/random-world-33",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "4abb145737189772e7b865156054c6123d4aa6e45fc4c25c1e5b25ec9b7078e0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s493",
+      "family_id": "random/2026110200/random-world-493",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1c3da7cb2475bd8e8f386f2589fb6361f952bcd6cac146cbd561766e18045081",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s204",
+      "family_id": "random/2026110200/random-world-204",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s312",
+      "family_id": "random/2026110220/random-world-312",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3240cec3fab97c8849291a7689f9994f4925eebd6e2a150a7cec8138dcfbc242",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s22",
+      "family_id": "random/2026110200/random-world-22",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s390",
+      "family_id": "random/2026110200/random-world-390",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s320",
+      "family_id": "random/2026110220/random-world-320",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "395167156b20604260ff0aaad5dbe6d51ed96f7bff56c0070f90d2516e90197f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s884",
+      "family_id": "random/2026110200/random-world-884",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7bbd2c08cfa2865edd55e414bccada4a009428cf6d0a2f209f145d62621a739e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s71",
+      "family_id": "random/2026110200/random-world-71",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1390741a07118b0aff759945aa926e681da373902b65afe386a30cbae22fc465",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s256",
+      "family_id": "random/2026110201/random-atoms-256",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1b97e6903eb74a34dde5c67abf506e21ffc60183d19a00ce4969431a963aa80c",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2597-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "4ed805e1f737e4fed6b43e2684c267cc590e6e8d3670cbae2ff9e0c988fc3d30",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1820-s3",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "d5fb5c165d731e4e8ea1de7e8296616d49e07610d18f36b4ea3e3b32bc3e66bb",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s189",
+      "family_id": "random/2026110200/random-world-189",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d2cd77a78019bd3cf4cd53517277387f1a9d582428c9eaa248cd043df4ac15f7",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2560-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "fbb9493b9e02cadfb8805b8f8034d0022d97be505f0e5bb362b2fdd829b77d31",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s329",
+      "family_id": "random/2026110201/random-atoms-329",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s103",
+      "family_id": "random/2026110221/random-atoms-103",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "81a61b1b100bdea0a66fd06a237113327a19a376451d45a476a41ecef12f9913",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s7",
+      "family_id": "random/2026110211/random-atoms-7",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a47f8065150f2d7fce01707ee728b11766f9ccba89afdb25e017d5800d3a671",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s251",
+      "family_id": "random/2026110220/random-world-251",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s206",
+      "family_id": "random/2026110220/random-world-206",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0a4a55cff929fdc31303a052dedbfad5eae5ddca0fc9ac3c64ee73ed657c92f3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s105",
+      "family_id": "random/2026110210/random-world-105",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1d9f446f5043cd5976343fdb08b6e3819f794e4d1ab5d00bc094bc87e440b698",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s203",
+      "family_id": "random/2026110220/random-world-203",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3ce2c83972d5aafae05242f43bdd5ae5a08ed8e5af617d18e7e9097ea21ffa9d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s311",
+      "family_id": "random/2026110200/random-world-311",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b88519fa056f5ff8dfe34a924245db81fc748ef730594d350f508c01a35a0e50",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s228",
+      "family_id": "random/2026110220/random-world-228",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e6e59d145583a2beee3a355db83641607b69309290b08e172a7eb34cbd02763b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2357-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "421c2a53d8be67407a98b9b640bbdc05d73e873a886ff21aef4dc741acb625e0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s138",
+      "family_id": "random/2026110200/random-world-138",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s107",
+      "family_id": "random/2026110210/random-world-107",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s375",
+      "family_id": "random/2026110201/random-atoms-375",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "464b13d5d6e56007cf0ee40dd5e538542cb1eb3dbbec4fc1b49626f616e12008",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s325",
+      "family_id": "random/2026110200/random-world-325",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a94f3b3b1a4064a0cc310ec32ee3955d90eb359a2ecd84241fee68f2fed03fe",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s535",
+      "family_id": "random/2026110201/random-atoms-535",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s265",
+      "family_id": "random/2026110200/random-world-265",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7abfd06121fd1910b8f310aef14c329fc904ce10eabf5982f90a49e02b9c62f8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1656-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "bf56241dd2c69b03860a5a5b70dc17a166177778079cefbd689cd992e9b60f9d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s118",
+      "family_id": "random/2026110211/random-atoms-118",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s64",
+      "family_id": "random/2026110221/random-atoms-64",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "42ea1e2e11f6f4130f3f8d97e4e5338462905ff06fbcf4403fdfdcd0c71febc9",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s52",
+      "family_id": "random/2026110220/random-world-52",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a1682f331452d657e3c9ebbb08adc0eb0a0b895d2b7b36b5cf4774c6372c7dd3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s650",
+      "family_id": "random/2026110200/random-world-650",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "6e8eed0eaa9f8baf0e2fc06e2b2af352a97baa71239d4e66029cc306a8d96090",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s163",
+      "family_id": "random/2026110221/random-atoms-163",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b795-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "1c38475704e4ac6c7408aeb62b531b493e2d0c21e853c9c859701685388c745d",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s276",
+      "family_id": "random/2026110200/random-world-276",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1532-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "9cb7e385ae9dd7ed315cb3d12350dd9ce1a7afc75629c01d935881256dc71bfa",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s49",
+      "family_id": "random/2026110220/random-world-49",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b385-s3",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "030d5138ccb9aef086a416c9f4ae57f93bd152667a34f85f025d9531499994ca",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s695",
+      "family_id": "random/2026110200/random-world-695",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2080-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "dda9bbcc04b9b5b45d57dc96f4f4114c95128ef4eba2a5d44be11fe2843aa8f9",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b25-s1",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "28e84769faa39b9ee2c2ebc01bf4e6b4a26c4303edf7f789285caaeda35ff9d4",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s605",
+      "family_id": "random/2026110200/random-world-605",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3b6d5d3f17e0b85859d206511f7830583ecb6beb38f003ff361746ac5ca213f7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s157",
+      "family_id": "random/2026110220/random-world-157",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s25",
+      "family_id": "random/2026110211/random-atoms-25",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3f53b2c6a978c132a996912e026e9eb86a05ae6b644e88f786c85012db0cca44",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1877-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "946c2abe1f43c91a1d1afa73ecfba9878f1411ca7fcbfed754dc3b730b19de06",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s280",
+      "family_id": "random/2026110220/random-world-280",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s48",
+      "family_id": "random/2026110210/random-world-48",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "27b4d286dcd6722435feaee380504ef1123ee9fb05064de818f3cab07736a262",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s134",
+      "family_id": "random/2026110220/random-world-134",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9f636467ca702c5a11c0d55a519ba8d4e08dd617ce56b05cd72b4d8b2c49e5c3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s119",
+      "family_id": "random/2026110211/random-atoms-119",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1536-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "0bec73ccfbdb5dc978e83c352a69e3c725ea96a85b466ed6cc074ed5419cd32a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s570",
+      "family_id": "random/2026110201/random-atoms-570",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "04eca71a618d1b33dc0b1e3a2e1e6fedb5e0347eb1e0defaac6e39be7b414834",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s45",
+      "family_id": "random/2026110210/random-world-45",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3ce2c83972d5aafae05242f43bdd5ae5a08ed8e5af617d18e7e9097ea21ffa9d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s219",
+      "family_id": "random/2026110221/random-atoms-219",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "08c3b49dd674b1eeaa5d40db191de929f086c8f9be39956354a9bb276bb098ff",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s147",
+      "family_id": "random/2026110210/random-world-147",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5f38d1d3d6ff1fe1853cf25fedea51b0e4c63cf67b8e059ba223a44c965fb88e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s400",
+      "family_id": "random/2026110201/random-atoms-400",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "395167156b20604260ff0aaad5dbe6d51ed96f7bff56c0070f90d2516e90197f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2191-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "f9078e9b8c0a74a569b0b1a043a3427fcf28c7ee66598f51133b0a9f6d37de1b",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s237",
+      "family_id": "random/2026110201/random-atoms-237",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s293",
+      "family_id": "random/2026110220/random-world-293",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e1dae8f2b01c7c526ddcf063ff26ba93f033a0156cd4c5ad63538eb93274877d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2311-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "2999a08815829877121eda57a35df46fc66288e3d1be944f7a28b644c50bb591",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b575-s1",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "d4f0a78a736d6c2bd25e4b6cc77a1318d43c812ecb7375cee34abbf621b8eb72",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s18",
+      "family_id": "random/2026110211/random-atoms-18",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "031533768df02a888c17fe6819e8acf0be65438b2ff2c282f6d15eaa3ddc280e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1652-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "7b636099dfdd650c248215e9affef1090a383e517d6b34b9907612170f3b835d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s22",
+      "family_id": "random/2026110210/random-world-22",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "fba42c07c7e5b2dc29bd3b30b95b38131acdd4bf0165ef3bd0aab225e2bcfc29",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s153",
+      "family_id": "random/2026110210/random-world-153",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d7b9d9642164caf98d92cfa75973e157d6fffdd60166a17fe0889fc2b048dad9",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s214",
+      "family_id": "random/2026110220/random-world-214",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "db12cc6fcc66cf51adcbfbc85845c76e6446de2b9e454a862bf4dcbb41069481",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s386",
+      "family_id": "random/2026110201/random-atoms-386",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3f53b2c6a978c132a996912e026e9eb86a05ae6b644e88f786c85012db0cca44",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s46",
+      "family_id": "random/2026110210/random-world-46",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "bb74f0803883e0cd4855b4bf10c02f668f64bb1a8eec04e55bf8798fbbee7a58",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s615",
+      "family_id": "random/2026110200/random-world-615",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s861",
+      "family_id": "random/2026110200/random-world-861",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "031533768df02a888c17fe6819e8acf0be65438b2ff2c282f6d15eaa3ddc280e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s693",
+      "family_id": "random/2026110200/random-world-693",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "71dd5adf4b5da4d58bee7c749c014181527b4823680fc41b1b0e467d56619473",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s881",
+      "family_id": "random/2026110200/random-world-881",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s37",
+      "family_id": "random/2026110211/random-atoms-37",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b4d0e18c1a906cc73792124bc14bd7f4e3e641863b5604c893dff5e6b93a0988",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s648",
+      "family_id": "random/2026110200/random-world-648",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9fe9e672a914dc3800dc7fe87a6a786a433127ac041ad764797ab9b7922a8b5e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s432",
+      "family_id": "random/2026110200/random-world-432",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s165",
+      "family_id": "random/2026110200/random-world-165",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "614b7951253ad99ac41a4257ca04b23fcfe1e75d579953570a107f87ed19e594",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b843-s1",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "e8101ffabfe718356745b0397998064396c56aa30278eef8458e4b67e74de855",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s106",
+      "family_id": "random/2026110211/random-atoms-106",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s830",
+      "family_id": "random/2026110200/random-world-830",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "031533768df02a888c17fe6819e8acf0be65438b2ff2c282f6d15eaa3ddc280e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b700-s0",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "6861f006fc08468fb48ed47d583c235a4e0b361951df38dc4cf5102a49bcfaa4",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s182",
+      "family_id": "random/2026110200/random-world-182",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d2cd77a78019bd3cf4cd53517277387f1a9d582428c9eaa248cd043df4ac15f7",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s117",
+      "family_id": "random/2026110211/random-atoms-117",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f7c9e8cf944bd63885dcc5e53f0fbc52b727fd8e388feae0f75e884ee9231c0e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s216",
+      "family_id": "random/2026110220/random-world-216",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77a3a0f27dc61c1f366cf5dec2c349f2af14ce08bb29da794238908f25e3cbba",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s210",
+      "family_id": "random/2026110221/random-atoms-210",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "395167156b20604260ff0aaad5dbe6d51ed96f7bff56c0070f90d2516e90197f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s564",
+      "family_id": "random/2026110200/random-world-564",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s246",
+      "family_id": "random/2026110200/random-world-246",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s177",
+      "family_id": "random/2026110200/random-world-177",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "fc556265144c1229a6efb174f16a58997c98723abff0099c1c93b4e57d3c5aea",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s431",
+      "family_id": "random/2026110200/random-world-431",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s380",
+      "family_id": "random/2026110200/random-world-380",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "fba42c07c7e5b2dc29bd3b30b95b38131acdd4bf0165ef3bd0aab225e2bcfc29",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s42",
+      "family_id": "random/2026110221/random-atoms-42",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "80b13dd76002d383263317485ed75f0e1aa6efcd97b16e9125346364d50b6279",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s187",
+      "family_id": "random/2026110201/random-atoms-187",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b808f5ab1b38310b375772e696a5aa42463ef6e6866c8afcf523d8035493d740",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s54",
+      "family_id": "random/2026110200/random-world-54",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b978d58c607e18b084ea6e00bd3c0ed0052cf0ebb918818195b0d3baddeee569",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s28",
+      "family_id": "random/2026110210/random-world-28",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9ff80814408004274a5a4bbcfe20c90fb4a53f81c04c1cb25a76b4e347d0713b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s59",
+      "family_id": "random/2026110221/random-atoms-59",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0b5abb40a973a69b9d1ed04aefe34fe15ee935b7e6063f1eeb7957dca87f176a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b3-s18",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "1520a8fb5728338d7b08903ae912b3918aed08d5d5bc8a11b9ebe8ef2084266e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s569",
+      "family_id": "random/2026110200/random-world-569",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s532",
+      "family_id": "random/2026110201/random-atoms-532",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b76bb374f4e5816391493d6f3dd27ab89ffc3a94ace1a1d493e914b47b830440",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s317",
+      "family_id": "random/2026110201/random-atoms-317",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9c6f01ee49385bc0cd5aab16bf056db084e78c8be3066f96fe8a52fef1bbb908",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s14",
+      "family_id": "random/2026110211/random-atoms-14",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1840-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "3bd824fe1d96c75be457cb5ed3599af2990829b823548fa21d32345bcdac4e72",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b494-s1",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "cf3666d75acefbebc905a3a8d5e9500f29ec1affcea191729b458be139515f99",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s236",
+      "family_id": "random/2026110220/random-world-236",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0efaa1e5092a3ef01bdbe17c24453d2734d0b24a54d16f77fad1a088418bfbb8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b714-s4",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "3a0cb7bc7c3ea4a78d5423ad2ba9211b667e4c5a41a5a6d29030792d3dd2dd5f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s351",
+      "family_id": "random/2026110220/random-world-351",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b304-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "1855b71e078a871ba21419c2c4ba316cce70d3ec9710e6e6323f3de7a5e0a72f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b424-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "5337f31ceb52d538b2d29a8cfaaa498074ba5c311ebf420e2ee49d6cfbc84aaf",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s197",
+      "family_id": "random/2026110221/random-atoms-197",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1c3da7cb2475bd8e8f386f2589fb6361f952bcd6cac146cbd561766e18045081",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s868",
+      "family_id": "random/2026110200/random-world-868",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3e0c7ec3c9a68e3459e18c43e9e16942f485afd7d78a7d691f6e052ff91376a0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2292-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "9865990870734c960a86831ee2502b338f5de960b7be74dc203d5fb8baf99b34",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s347",
+      "family_id": "random/2026110200/random-world-347",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "75a105ece5350c57c0c4ca8aaf2c9d680223a398461dca31f697a8327a4a285f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s67",
+      "family_id": "random/2026110220/random-world-67",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d2cd77a78019bd3cf4cd53517277387f1a9d582428c9eaa248cd043df4ac15f7",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s114",
+      "family_id": "random/2026110201/random-atoms-114",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s823",
+      "family_id": "random/2026110200/random-world-823",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s773",
+      "family_id": "random/2026110200/random-world-773",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ca22c58e6a686d31eab5faff69e9074fb1adc19e70041637b616e4c9d0da7ceb",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s284",
+      "family_id": "random/2026110201/random-atoms-284",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5bc41e6b1609dba4633482b8e75cf786dde8cef36aa74dcc2f59e17c21dc2514",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1839-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "946c2abe1f43c91a1d1afa73ecfba9878f1411ca7fcbfed754dc3b730b19de06",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s335",
+      "family_id": "random/2026110220/random-world-335",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "80b13dd76002d383263317485ed75f0e1aa6efcd97b16e9125346364d50b6279",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s142",
+      "family_id": "random/2026110200/random-world-142",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s54",
+      "family_id": "random/2026110221/random-atoms-54",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s305",
+      "family_id": "random/2026110220/random-world-305",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "fc556265144c1229a6efb174f16a58997c98723abff0099c1c93b4e57d3c5aea",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s840",
+      "family_id": "random/2026110200/random-world-840",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "27b4d286dcd6722435feaee380504ef1123ee9fb05064de818f3cab07736a262",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s370",
+      "family_id": "random/2026110201/random-atoms-370",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1cf36cbfc0bb99f244369cacceb1250f22186b54413e8bc19ec26f548fa3b281",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b161-s2",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "e0bdcecf2ffc5b6e5cb355eb0259029749065107df9178174e0d2af6b3032c06",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s76",
+      "family_id": "random/2026110211/random-atoms-76",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e9d33c67c162059ce78b81e588252aa169ce81b2063c45c47fbdbaa687cd8451",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s236",
+      "family_id": "random/2026110201/random-atoms-236",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1390741a07118b0aff759945aa926e681da373902b65afe386a30cbae22fc465",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s341",
+      "family_id": "random/2026110220/random-world-341",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "75a105ece5350c57c0c4ca8aaf2c9d680223a398461dca31f697a8327a4a285f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s88",
+      "family_id": "random/2026110210/random-world-88",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ca0a7f497b8be72f9c37f9eeca18f387a6024b6509b0d224b581c911976b6631",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s899",
+      "family_id": "random/2026110200/random-world-899",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s121",
+      "family_id": "random/2026110200/random-world-121",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s508",
+      "family_id": "random/2026110201/random-atoms-508",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3f53b2c6a978c132a996912e026e9eb86a05ae6b644e88f786c85012db0cca44",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b184-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "e78a76717ca659b1d65f9639f410a750feb1a7026536bcd068f61401b5fca638",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s18",
+      "family_id": "random/2026110210/random-world-18",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c275530e4fb19cd9aac74ede61771b26e9ba6188e2fa92ccf22236a7a761425a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s383",
+      "family_id": "random/2026110201/random-atoms-383",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5bc41e6b1609dba4633482b8e75cf786dde8cef36aa74dcc2f59e17c21dc2514",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s613",
+      "family_id": "random/2026110200/random-world-613",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s118",
+      "family_id": "random/2026110210/random-world-118",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f72a7ef058289b2526756e29b3308c5064ed55c1f8192c5c574ff22896e5235a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s81",
+      "family_id": "random/2026110200/random-world-81",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1997-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "a814b1f2f6c5d4d056379a744265ab0d5c31c6783d3979ec0a6658cca3d8f2d5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s299",
+      "family_id": "random/2026110220/random-world-299",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s158",
+      "family_id": "random/2026110220/random-world-158",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d7343d12f095eb2b2cce119f934b3514e3002e11cac8daeabc5edb24a9ed3ed4",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s55",
+      "family_id": "random/2026110210/random-world-55",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ce87de1d2eb267fd62669cd8ca31931f17fc6614a733c9bb4acc03ea0c455b05",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s26",
+      "family_id": "random/2026110221/random-atoms-26",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s444",
+      "family_id": "random/2026110200/random-world-444",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9fe9e672a914dc3800dc7fe87a6a786a433127ac041ad764797ab9b7922a8b5e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s783",
+      "family_id": "random/2026110200/random-world-783",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "6f9e6f65cb231006f5e636330b80ed67b41db632cc747133a97fb132fd7e5339",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b784-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "5d1fe1d80d2a9ce7478f3b8678fb92d816ba9467b0000fcf93127e399b3774f5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2625-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "8905594e44e638a7314ed6c415ef6d245c35aae4cee830ba00dc2189d9f2ec03",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1905-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "8515733f26089d27febd5da8725196525d88d57a53bf7dc6ccb40f2f3cb83686",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s32",
+      "family_id": "random/2026110221/random-atoms-32",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3b6d5d3f17e0b85859d206511f7830583ecb6beb38f003ff361746ac5ca213f7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s421",
+      "family_id": "random/2026110201/random-atoms-421",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "75a105ece5350c57c0c4ca8aaf2c9d680223a398461dca31f697a8327a4a285f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s24",
+      "family_id": "random/2026110220/random-world-24",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "6ecaeb4e7545f4061340b03d10a4c977de5d76848bc625efb8db66ddb372ad73",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b64-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "e91e993b8c9fbad272373d480ca367b0ebcc85e3751e1f22f6045b8a435fbdec",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s179",
+      "family_id": "random/2026110220/random-world-179",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "47ce3c4f6ce8bc8185a4b60459782a7daf227e400c3c50891b56e0f32bef95ba",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s314",
+      "family_id": "random/2026110200/random-world-314",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s17",
+      "family_id": "random/2026110211/random-atoms-17",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f1826aa01c31bd1267d133e1a862b8aff24c5964375fe732d034a1256ffeb407",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s407",
+      "family_id": "random/2026110201/random-atoms-407",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s21",
+      "family_id": "random/2026110201/random-atoms-21",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c275530e4fb19cd9aac74ede61771b26e9ba6188e2fa92ccf22236a7a761425a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s202",
+      "family_id": "random/2026110220/random-world-202",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2052-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "c7da4edb1d23429180bcea31f954b2e8ba68a55a999aaed72529fcd0707e7237",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s290",
+      "family_id": "random/2026110220/random-world-290",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s659",
+      "family_id": "random/2026110200/random-world-659",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2551-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "acb9ab9b662abda44e25a7fe86a4d175f404fe0b3c767a936f835148ee2fcda1",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s62",
+      "family_id": "random/2026110210/random-world-62",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s697",
+      "family_id": "random/2026110200/random-world-697",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c275530e4fb19cd9aac74ede61771b26e9ba6188e2fa92ccf22236a7a761425a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s217",
+      "family_id": "random/2026110201/random-atoms-217",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "207dd17403519801bbdcc410e18f719a90ff439e0d6451833d175b5ff91dfa42",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s542",
+      "family_id": "random/2026110201/random-atoms-542",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a94f3b3b1a4064a0cc310ec32ee3955d90eb359a2ecd84241fee68f2fed03fe",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s209",
+      "family_id": "random/2026110221/random-atoms-209",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s88",
+      "family_id": "random/2026110221/random-atoms-88",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a47f8065150f2d7fce01707ee728b11766f9ccba89afdb25e017d5800d3a671",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1296-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "967bfb08d407fb9bd17d0e12fe87dcca50e3ef766d31bbe5d6981d59d917fdf7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b415-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "874ece028e59ebe4df0de7262963eb13ce1ad6a2f8fdc6c643a67aeb12769c9c",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s234",
+      "family_id": "random/2026110220/random-world-234",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1b97e6903eb74a34dde5c67abf506e21ffc60183d19a00ce4969431a963aa80c",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s590",
+      "family_id": "random/2026110200/random-world-590",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "bb74f0803883e0cd4855b4bf10c02f668f64bb1a8eec04e55bf8798fbbee7a58",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s77",
+      "family_id": "random/2026110211/random-atoms-77",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b936-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "fa40fa09c59ce440ad3201307cfa3d279f20a2066f0a477eafdb011a1e369699",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s211",
+      "family_id": "random/2026110220/random-world-211",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f59befffcd93452a9ee4eecc975c5bf38f74c3f622cb06286d0c99416dded6d3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s404",
+      "family_id": "random/2026110201/random-atoms-404",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b175-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "26208c4531e1d61f486bcef5aeee9e7c6504287ecf3c463d1b9042bb2bcda42a",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s95",
+      "family_id": "random/2026110211/random-atoms-95",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "50e152777efb51e8bc3eae63a1fababc11a3fa414d49c1ce574dc59531925d00",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s663",
+      "family_id": "random/2026110200/random-world-663",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f59befffcd93452a9ee4eecc975c5bf38f74c3f622cb06286d0c99416dded6d3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b544-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "6bad846372558c853d8693be74918eab371e308292b7848b49174630088bbe1c",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1780-s24",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "a5f409b8fcc757ec836e8b8b184dd6034330c5a6f9f55a132ffe972dd07a8024",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s89",
+      "family_id": "random/2026110220/random-world-89",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b978d58c607e18b084ea6e00bd3c0ed0052cf0ebb918818195b0d3baddeee569",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s295",
+      "family_id": "random/2026110200/random-world-295",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d2cd77a78019bd3cf4cd53517277387f1a9d582428c9eaa248cd043df4ac15f7",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s85",
+      "family_id": "random/2026110211/random-atoms-85",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "031533768df02a888c17fe6819e8acf0be65438b2ff2c282f6d15eaa3ddc280e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s891",
+      "family_id": "random/2026110200/random-world-891",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "207dd17403519801bbdcc410e18f719a90ff439e0d6451833d175b5ff91dfa42",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b928-s2",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "7f8322a99c2d42281d44e6cefb1ce0afee55f0d2b3b39b645a7b91ddcb7c551b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s33",
+      "family_id": "random/2026110201/random-atoms-33",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3241841df259e3e683b36917735308c9a6aa3be152d8344d5520e1f3af4e76ed",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2907-s72",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57d441d7aa95736a3a5bc4f3b170504fdbb4fa42e4d5b4f609170e4ed5105621",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1416-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "5c75a25ac824561e8be3a5a28daa3207df25d5d2495f709a9b5317d4216edde2",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1292-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "70b656ff906d87bdfce47db6bec71bcd5ddf079107d622ad79ca7db3819809ad",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s52",
+      "family_id": "random/2026110200/random-world-52",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2a1621ec618b3d05f00d14112c9cdd011987cf4a53b0229b64a7b6f4473d82ad",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b892-s12",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "3b342f765c4a422c288fc429c98bbb9d78dc1ef1946bb6980f95bc7e4b0f7949",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s331",
+      "family_id": "random/2026110200/random-world-331",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3d10b7e63a70d0762ef918a90a13d968b64eb3dffa88ec4cd990981db4f2dcb6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s320",
+      "family_id": "random/2026110200/random-world-320",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s227",
+      "family_id": "random/2026110221/random-atoms-227",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77ff6dbf755ab96bef6ec0624590223b75052809a48a2a851afcdbfc7585c06d",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s33",
+      "family_id": "random/2026110211/random-atoms-33",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77ff6dbf755ab96bef6ec0624590223b75052809a48a2a851afcdbfc7585c06d",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s47",
+      "family_id": "random/2026110200/random-world-47",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "58a8cb89648ac0d2d9d547cd76a0b979a899f0d362f7cbf309bfd12c9c2f58cd",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b664-s17",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "8428e552da2978b506258aa9b152f4423f104ad08cb51c203f9a177f66b3d805",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s128",
+      "family_id": "random/2026110200/random-world-128",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9e157038a18087d4c67bb91213c23034696a703d48c7287f83f45d9835ae4e17",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s513",
+      "family_id": "random/2026110200/random-world-513",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aafedffc8c0617db42ddca7451c5f893a0307672a5d49587469c0aa941b721d8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s26",
+      "family_id": "random/2026110220/random-world-26",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5bc41e6b1609dba4633482b8e75cf786dde8cef36aa74dcc2f59e17c21dc2514",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s149",
+      "family_id": "random/2026110210/random-world-149",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ca22c58e6a686d31eab5faff69e9074fb1adc19e70041637b616e4c9d0da7ceb",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2505-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "6b12e65abb47d570693c111b3d6f06fdc0ce11e36ff731dd7b12d2191155d605",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1056-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "e8ec82feb9d97859e0c9c7b0753cc8644a1ad495c55350086b4b2c71d084b4c4",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s196",
+      "family_id": "random/2026110200/random-world-196",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "80b13dd76002d383263317485ed75f0e1aa6efcd97b16e9125346364d50b6279",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s157",
+      "family_id": "random/2026110201/random-atoms-157",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a1682f331452d657e3c9ebbb08adc0eb0a0b895d2b7b36b5cf4774c6372c7dd3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s17",
+      "family_id": "random/2026110210/random-world-17",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "464b13d5d6e56007cf0ee40dd5e538542cb1eb3dbbec4fc1b49626f616e12008",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s4",
+      "family_id": "random/2026110221/random-atoms-4",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s201",
+      "family_id": "random/2026110201/random-atoms-201",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2652-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "e124da84afe1b62260cc54d7887ba7ea11637e7ccaede83f82629e41d2965fa0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b464-s1",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "874ece028e59ebe4df0de7262963eb13ce1ad6a2f8fdc6c643a67aeb12769c9c",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s145",
+      "family_id": "random/2026110210/random-world-145",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "261ffc330f65daacedcfb021b2595be1a24b4d086ed9bbd24ac8a3f03bb607d3",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s188",
+      "family_id": "random/2026110221/random-atoms-188",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s268",
+      "family_id": "random/2026110200/random-world-268",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b76bb374f4e5816391493d6f3dd27ab89ffc3a94ace1a1d493e914b47b830440",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s232",
+      "family_id": "random/2026110221/random-atoms-232",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s490",
+      "family_id": "random/2026110200/random-world-490",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "031533768df02a888c17fe6819e8acf0be65438b2ff2c282f6d15eaa3ddc280e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1797-s1",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "d32d7960081569779b4736447161229adfb943262c0e0b8dc99894807e9cb815",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s680",
+      "family_id": "random/2026110200/random-world-680",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s205",
+      "family_id": "random/2026110221/random-atoms-205",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s43",
+      "family_id": "random/2026110221/random-atoms-43",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1390741a07118b0aff759945aa926e681da373902b65afe386a30cbae22fc465",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s559",
+      "family_id": "random/2026110200/random-world-559",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1cf36cbfc0bb99f244369cacceb1250f22186b54413e8bc19ec26f548fa3b281",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s197",
+      "family_id": "random/2026110220/random-world-197",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c3d763d07135225f19d843ba738474633450d31798b0e4708ba9a60a83b35dcf",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s77",
+      "family_id": "random/2026110221/random-atoms-77",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9ff80814408004274a5a4bbcfe20c90fb4a53f81c04c1cb25a76b4e347d0713b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s235",
+      "family_id": "random/2026110201/random-atoms-235",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s543",
+      "family_id": "random/2026110201/random-atoms-543",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s517",
+      "family_id": "random/2026110200/random-world-517",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "8c8b72fdd4cc93ae10a028bca01698b65ac07f206bea3320f333d3ede22cc0f5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1412-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "62f103f331f81da78a8db383632552f231e982db4acab5bc73643ed653cae88f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s119",
+      "family_id": "random/2026110200/random-world-119",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3240cec3fab97c8849291a7689f9994f4925eebd6e2a150a7cec8138dcfbc242",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s750",
+      "family_id": "random/2026110200/random-world-750",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s223",
+      "family_id": "random/2026110201/random-atoms-223",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2265-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "6176a3256416edc88bb317201eedce312a137828f8dd92afe3c3bd7a2ac3a71f",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2200-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "dd2dcfca46beeb973119fac2a398e9a113526dce98050bed88cbc984550fc3a5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s281",
+      "family_id": "random/2026110200/random-world-281",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d5f9b93c12cd00f777643014fa9354b574dcfc559b399c985b34840334a553fc",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s146",
+      "family_id": "random/2026110210/random-world-146",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e6e59d145583a2beee3a355db83641607b69309290b08e172a7eb34cbd02763b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2412-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "9ac6b5fae4682f685fcc94059d11e3ba5d532a4710096944a9f7b19626511043",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s172",
+      "family_id": "random/2026110210/random-world-172",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5b3c8d9077115a6c46cd02c29996ad9d306834ee477bc83ac6ff19c8bfa754e6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s53",
+      "family_id": "random/2026110201/random-atoms-53",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9ff80814408004274a5a4bbcfe20c90fb4a53f81c04c1cb25a76b4e347d0713b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s26",
+      "family_id": "random/2026110211/random-atoms-26",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s5",
+      "family_id": "random/2026110201/random-atoms-5",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1b97e6903eb74a34dde5c67abf506e21ffc60183d19a00ce4969431a963aa80c",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s13",
+      "family_id": "random/2026110221/random-atoms-13",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "58a8cb89648ac0d2d9d547cd76a0b979a899f0d362f7cbf309bfd12c9c2f58cd",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s800",
+      "family_id": "random/2026110200/random-world-800",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s80",
+      "family_id": "random/2026110221/random-atoms-80",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2319-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "421c2a53d8be67407a98b9b640bbdc05d73e873a886ff21aef4dc741acb625e0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b775-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "e279cc95ea52cd2fb6709230e0bb87a8e2de3f3ffa317193bf3afb596b22a020",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b610-s0",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "116d4c9f8e226be1680672c687dacce74915e5178a9a179931c05bc3e946c1c0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s106",
+      "family_id": "random/2026110220/random-world-106",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s529",
+      "family_id": "random/2026110201/random-atoms-529",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "0f031a66b3838019e4df66e487f613b1f3b8bed2f0762fd11f7570b1e3fd7ed0",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s355",
+      "family_id": "random/2026110200/random-world-355",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ca0a7f497b8be72f9c37f9eeca18f387a6024b6509b0d224b581c911976b6631",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s181",
+      "family_id": "random/2026110200/random-world-181",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "50e152777efb51e8bc3eae63a1fababc11a3fa414d49c1ce574dc59531925d00",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s323",
+      "family_id": "random/2026110220/random-world-323",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s155",
+      "family_id": "random/2026110200/random-world-155",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a5e19245e497b639ff66cf97e26ae1c6fcab592de90687096d34a3546d181761",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2145-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "4c7e588c995046132d84a1c1cfb67a3983352d0be3bb27dfdf9194c10d487811",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s291",
+      "family_id": "random/2026110201/random-atoms-291",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s548",
+      "family_id": "random/2026110200/random-world-548",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1176-s5",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "9199b985951d7ec870ae29b5bc85368b3098b71ea817465e731120182a8a2d0c",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s239",
+      "family_id": "random/2026110221/random-atoms-239",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "395167156b20604260ff0aaad5dbe6d51ed96f7bff56c0070f90d2516e90197f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s209",
+      "family_id": "random/2026110201/random-atoms-209",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s471",
+      "family_id": "random/2026110201/random-atoms-471",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "846fc55b9c9eac96e799f0771439fdb5d8ea5f434506d171c70a8236f9f4096e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b268-s1",
+      "family_id": "sampled-forest-v1/a04a902081f411968486d5171b3c8491cb4454b6d20977e9c1c64a6280e000f9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "c7da4edb1d23429180bcea31f954b2e8ba68a55a999aaed72529fcd0707e7237",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s97",
+      "family_id": "random/2026110201/random-atoms-97",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2071-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "ddb5d254ed19aa3acebe86f42f0ad81991585eb56db34e9248d29a62cc95096c",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s76",
+      "family_id": "random/2026110210/random-world-76",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "db12cc6fcc66cf51adcbfbc85845c76e6446de2b9e454a862bf4dcbb41069481",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s75",
+      "family_id": "random/2026110220/random-world-75",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b88519fa056f5ff8dfe34a924245db81fc748ef730594d350f508c01a35a0e50",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b55-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "61e666c1d14f86286a4fdb0776afa42a62b9077420fa6185050838b5e9651c85",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s235",
+      "family_id": "random/2026110220/random-world-235",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b76bb374f4e5816391493d6f3dd27ab89ffc3a94ace1a1d493e914b47b830440",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s98",
+      "family_id": "random/2026110200/random-world-98",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9fe9e672a914dc3800dc7fe87a6a786a433127ac041ad764797ab9b7922a8b5e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s160",
+      "family_id": "random/2026110220/random-world-160",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b808f5ab1b38310b375772e696a5aa42463ef6e6866c8afcf523d8035493d740",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2320-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "a82cdcde687ebbb4606d56ae45f47811a19109f6a821fb1f8538e8e12bcd8aff",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s274",
+      "family_id": "random/2026110220/random-world-274",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3241841df259e3e683b36917735308c9a6aa3be152d8344d5520e1f3af4e76ed",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1809-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "158c87a66f7fd793f95dd77526941654d9e1811ce49c248e3bdcf4c68ed80ea8",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s134",
+      "family_id": "random/2026110221/random-atoms-134",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aafedffc8c0617db42ddca7451c5f893a0307672a5d49587469c0aa941b721d8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s80",
+      "family_id": "random/2026110200/random-world-80",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "dba6dd1322a762c2ad51570b0c589430425fcb875749209f41dcf087cb21d82b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s78",
+      "family_id": "random/2026110220/random-world-78",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "6f9e6f65cb231006f5e636330b80ed67b41db632cc747133a97fb132fd7e5339",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s21",
+      "family_id": "random/2026110220/random-world-21",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7abfd06121fd1910b8f310aef14c329fc904ce10eabf5982f90a49e02b9c62f8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2199-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "24af35024e16e0e1b751fbd8ac5a870edce74bdd6c59b09b087960af35ad16e2",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s437",
+      "family_id": "random/2026110201/random-atoms-437",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77ff6dbf755ab96bef6ec0624590223b75052809a48a2a851afcdbfc7585c06d",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s272",
+      "family_id": "random/2026110201/random-atoms-272",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s421",
+      "family_id": "random/2026110200/random-world-421",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c36a65b63b6730f4fc44f42c6faeda6f44443e00b9fed60eb1a493b3a7fae6c6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s361",
+      "family_id": "random/2026110200/random-world-361",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "614b7951253ad99ac41a4257ca04b23fcfe1e75d579953570a107f87ed19e594",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s741",
+      "family_id": "random/2026110200/random-world-741",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2439-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "166b43ed103ded43411762f6acad12e6a443c99d062206e2acd4bc5e3cb23a8f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s463",
+      "family_id": "random/2026110201/random-atoms-463",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2117-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "ded6f9f93c286404ed3317b8d87d4c61b8dad91dbf1b71daad75a7b0f4fe1b0b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2431-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "a4f86b02211b0662e74b7fdbd77a6a4c5fed6c1654618336fcc776c5c7c03078",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s86",
+      "family_id": "random/2026110210/random-world-86",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1d9f446f5043cd5976343fdb08b6e3819f794e4d1ab5d00bc094bc87e440b698",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s795",
+      "family_id": "random/2026110200/random-world-795",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d7343d12f095eb2b2cce119f934b3514e3002e11cac8daeabc5edb24a9ed3ed4",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b535-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "d4f0a78a736d6c2bd25e4b6cc77a1318d43c812ecb7375cee34abbf621b8eb72",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s143",
+      "family_id": "random/2026110200/random-world-143",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2559-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "4ed805e1f737e4fed6b43e2684c267cc590e6e8d3670cbae2ff9e0c988fc3d30",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s83",
+      "family_id": "random/2026110210/random-world-83",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s469",
+      "family_id": "random/2026110200/random-world-469",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s139",
+      "family_id": "random/2026110201/random-atoms-139",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d7343d12f095eb2b2cce119f934b3514e3002e11cac8daeabc5edb24a9ed3ed4",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s345",
+      "family_id": "random/2026110201/random-atoms-345",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e6e59d145583a2beee3a355db83641607b69309290b08e172a7eb34cbd02763b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s827",
+      "family_id": "random/2026110200/random-world-827",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s372",
+      "family_id": "random/2026110201/random-atoms-372",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "464b13d5d6e56007cf0ee40dd5e538542cb1eb3dbbec4fc1b49626f616e12008",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s158",
+      "family_id": "random/2026110210/random-world-158",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3d10b7e63a70d0762ef918a90a13d968b64eb3dffa88ec4cd990981db4f2dcb6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2925-s25",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7f8322a99c2d42281d44e6cefb1ce0afee55f0d2b3b39b645a7b91ddcb7c551b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s675",
+      "family_id": "random/2026110200/random-world-675",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s704",
+      "family_id": "random/2026110200/random-world-704",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "04eca71a618d1b33dc0b1e3a2e1e6fedb5e0347eb1e0defaac6e39be7b414834",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s889",
+      "family_id": "random/2026110200/random-world-889",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "5b3c8d9077115a6c46cd02c29996ad9d306834ee477bc83ac6ff19c8bfa754e6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s394",
+      "family_id": "random/2026110201/random-atoms-394",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1d9f446f5043cd5976343fdb08b6e3819f794e4d1ab5d00bc094bc87e440b698",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s558",
+      "family_id": "random/2026110201/random-atoms-558",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1495b223a5268cee4119a9c867a43ca9c51885fb07097bc6bb15563e90820db3",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1052-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "c0b8bf22484426e884dfe41a1b39bc4187dc061f9571bf9fef36b32f5980f0e1",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1772-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "5a64b7b4ed267e8fb6a0a58f957a557083e54239db999bbc8f1e644dfc841dfb",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b295-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "490f0073b3db5f9ccf7d0b6cb66b3da72452ce7de5dc535b791456cd7e385c55",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s156",
+      "family_id": "random/2026110200/random-world-156",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "4d87c2fe3393a41f6204c16627ec28ecd5081346fd74c6470c106fc572e56fdc",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1783-s6",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "d32d7960081569779b4736447161229adfb943262c0e0b8dc99894807e9cb815",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s340",
+      "family_id": "random/2026110200/random-world-340",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "614b7951253ad99ac41a4257ca04b23fcfe1e75d579953570a107f87ed19e594",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s357",
+      "family_id": "random/2026110201/random-atoms-357",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1783-s15",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "4ebc646a832f8eec89826748e3e2a0601e7c4d53bec23401aaf4bdea343986d4",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s280",
+      "family_id": "random/2026110200/random-world-280",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s422",
+      "family_id": "random/2026110200/random-world-422",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "80b13dd76002d383263317485ed75f0e1aa6efcd97b16e9125346364d50b6279",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s83",
+      "family_id": "random/2026110221/random-atoms-83",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1b0480183c941585e575d89c48724200e6e36c0d83867afd3a06c2ae2b030121",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s174",
+      "family_id": "random/2026110221/random-atoms-174",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "77ff6dbf755ab96bef6ec0624590223b75052809a48a2a851afcdbfc7585c06d",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s175",
+      "family_id": "random/2026110210/random-world-175",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53b7c3484b17e0af4787db5d1a916724e311ab5d4727029c0c7ba563bbaeee6e",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s91",
+      "family_id": "random/2026110210/random-world-91",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e4a0c70e8112ddcc2de34b357e7f971c81256562dcd786b177c1de8266b0bf12",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1172-s0",
+      "family_id": "sampled-forest-v1/19cea83a9a4425a2f3178039d5bebe5b057d79f3a76e7b1ad9eebf588a32a1f4",
+      "split": "dev",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "b5b9cb87182ba9168bffd5ecf4547aeef42afe63508e011c94be5c83eacb1b5d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s10",
+      "family_id": "random/2026110221/random-atoms-10",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "bc5d1f14d17ef2e0d6401dd71b6a182de7651757fc1c3ca16579215ea72a1197",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s326",
+      "family_id": "random/2026110201/random-atoms-326",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s8",
+      "family_id": "random/2026110221/random-atoms-8",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7abfd06121fd1910b8f310aef14c329fc904ce10eabf5982f90a49e02b9c62f8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s787",
+      "family_id": "random/2026110200/random-world-787",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1932-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "9de1c04460247b69b975469d805b38a314b440cd5062bfb8d77dd84219bbc6d7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s762",
+      "family_id": "random/2026110200/random-world-762",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9f636467ca702c5a11c0d55a519ba8d4e08dd617ce56b05cd72b4d8b2c49e5c3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1831-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "63ae0a1eabc7e9d591d4b852585eaa964b4f56e7ea9055650a66ee014068b918",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b655-s7",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "6861f006fc08468fb48ed47d583c235a4e0b361951df38dc4cf5102a49bcfaa4",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b1959-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "a814b1f2f6c5d4d056379a744265ab0d5c31c6783d3979ec0a6658cca3d8f2d5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s747",
+      "family_id": "random/2026110200/random-world-747",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s304",
+      "family_id": "random/2026110201/random-atoms-304",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aafedffc8c0617db42ddca7451c5f893a0307672a5d49587469c0aa941b721d8",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s149",
+      "family_id": "random/2026110220/random-world-149",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s416",
+      "family_id": "random/2026110201/random-atoms-416",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s18",
+      "family_id": "random/2026110200/random-world-18",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s94",
+      "family_id": "random/2026110220/random-world-94",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s92",
+      "family_id": "random/2026110201/random-atoms-92",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1390741a07118b0aff759945aa926e681da373902b65afe386a30cbae22fc465",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s153",
+      "family_id": "random/2026110201/random-atoms-153",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "58a8cb89648ac0d2d9d547cd76a0b979a899f0d362f7cbf309bfd12c9c2f58cd",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s12",
+      "family_id": "random/2026110201/random-atoms-12",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s310",
+      "family_id": "random/2026110201/random-atoms-310",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9f636467ca702c5a11c0d55a519ba8d4e08dd617ce56b05cd72b4d8b2c49e5c3",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s481",
+      "family_id": "random/2026110200/random-world-481",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "e6e59d145583a2beee3a355db83641607b69309290b08e172a7eb34cbd02763b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s113",
+      "family_id": "random/2026110210/random-world-113",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s222",
+      "family_id": "random/2026110220/random-world-222",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "8c8b72fdd4cc93ae10a028bca01698b65ac07f206bea3320f333d3ede22cc0f5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s22",
+      "family_id": "random/2026110221/random-atoms-22",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "7a580adda8c455997c80adb453e8b18df69dbdacb6815aa26605308418c72927",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s170",
+      "family_id": "random/2026110220/random-world-170",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "846fc55b9c9eac96e799f0771439fdb5d8ea5f434506d171c70a8236f9f4096e",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s209",
+      "family_id": "random/2026110220/random-world-209",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "1e38232fcc73318d14336560091706ed8fb3abfbaa8782182de83f167d06ca32",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s168",
+      "family_id": "random/2026110201/random-atoms-168",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "27b4d286dcd6722435feaee380504ef1123ee9fb05064de818f3cab07736a262",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2237-s0",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "24af35024e16e0e1b751fbd8ac5a870edce74bdd6c59b09b087960af35ad16e2",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s39",
+      "family_id": "random/2026110221/random-atoms-39",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f72a7ef058289b2526756e29b3308c5064ed55c1f8192c5c574ff22896e5235a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s13",
+      "family_id": "random/2026110201/random-atoms-13",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "58a8cb89648ac0d2d9d547cd76a0b979a899f0d362f7cbf309bfd12c9c2f58cd",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s55",
+      "family_id": "random/2026110201/random-atoms-55",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s154",
+      "family_id": "random/2026110221/random-atoms-154",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d5f9b93c12cd00f777643014fa9354b574dcfc559b399c985b34840334a553fc",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s505",
+      "family_id": "random/2026110201/random-atoms-505",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2532-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "a876bc0c6b362096d7e28a55f4cc5da636fc137a197d36473c5f1fc002154943",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s473",
+      "family_id": "random/2026110200/random-world-473",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "be2c957f009647ea2477d21f59bac0d05196ff408d2887e7d7b97818877a87e7",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s302",
+      "family_id": "random/2026110201/random-atoms-302",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "80b13dd76002d383263317485ed75f0e1aa6efcd97b16e9125346364d50b6279",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s207",
+      "family_id": "random/2026110200/random-world-207",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a94f3b3b1a4064a0cc310ec32ee3955d90eb359a2ecd84241fee68f2fed03fe",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s811",
+      "family_id": "random/2026110200/random-world-811",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "aded7b0859e4ab18213f95d26e7ce94beabb635d901cea3e67480af6a4eb2924",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s95",
+      "family_id": "random/2026110210/random-world-95",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "207dd17403519801bbdcc410e18f719a90ff439e0d6451833d175b5ff91dfa42",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s396",
+      "family_id": "random/2026110201/random-atoms-396",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a72719715cd48d2e28c2936ed63ced5a3a917ed671bc501801939ba6c128f2a6",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s408",
+      "family_id": "random/2026110201/random-atoms-408",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s115",
+      "family_id": "random/2026110220/random-world-115",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f1826aa01c31bd1267d133e1a862b8aff24c5964375fe732d034a1256ffeb407",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2440-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "4251e7ab5664daa6b6d7a42cc61443e8aacc22131f75d2e9b02bfc4dee375dab",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s98",
+      "family_id": "random/2026110210/random-world-98",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "9e157038a18087d4c67bb91213c23034696a703d48c7287f83f45d9835ae4e17",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s676",
+      "family_id": "random/2026110200/random-world-676",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c275530e4fb19cd9aac74ede61771b26e9ba6188e2fa92ccf22236a7a761425a",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s271",
+      "family_id": "random/2026110200/random-world-271",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "42ea1e2e11f6f4130f3f8d97e4e5338462905ff06fbcf4403fdfdcd0c71febc9",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s61",
+      "family_id": "random/2026110211/random-atoms-61",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "47ce3c4f6ce8bc8185a4b60459782a7daf227e400c3c50891b56e0f32bef95ba",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s2",
+      "family_id": "random/2026110221/random-atoms-2",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "8c8b72fdd4cc93ae10a028bca01698b65ac07f206bea3320f333d3ede22cc0f5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s52",
+      "family_id": "random/2026110221/random-atoms-52",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c3d763d07135225f19d843ba738474633450d31798b0e4708ba9a60a83b35dcf",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2914-s65",
+      "family_id": "random/2026110211/random-atoms-65",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s271",
+      "family_id": "random/2026110220/random-world-271",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2da32592c64851a9b6e3feb49384dabb8616080700333c91ea7f392b3bf89985",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s728",
+      "family_id": "random/2026110200/random-world-728",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2172-s1",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "f8d374a4c272339c66d4bfe2d6464700eb7716fccce28e2415f8013054075da5",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s158",
+      "family_id": "random/2026110221/random-atoms-158",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b76bb374f4e5816391493d6f3dd27ab89ffc3a94ace1a1d493e914b47b830440",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s788",
+      "family_id": "random/2026110200/random-world-788",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "614b7951253ad99ac41a4257ca04b23fcfe1e75d579953570a107f87ed19e594",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s44",
+      "family_id": "random/2026110221/random-atoms-44",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "2a1621ec618b3d05f00d14112c9cdd011987cf4a53b0229b64a7b6f4473d82ad",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s304",
+      "family_id": "random/2026110200/random-world-304",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "6ecaeb4e7545f4061340b03d10a4c977de5d76848bc625efb8db66ddb372ad73",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1951-s6",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "0b2abcc79faa1137806f20b13ec9bd513234a1c6a2b7987bef4c8cd3f0e738c7",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s572",
+      "family_id": "random/2026110200/random-world-572",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "d7b9d9642164caf98d92cfa75973e157d6fffdd60166a17fe0889fc2b048dad9",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s332",
+      "family_id": "random/2026110220/random-world-332",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "feb7d031fa512ad37af833073f138126cd3719619d5d98875ea202d429bd07e0",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s229",
+      "family_id": "random/2026110221/random-atoms-229",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3e0c7ec3c9a68e3459e18c43e9e16942f485afd7d78a7d691f6e052ff91376a0",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s426",
+      "family_id": "random/2026110200/random-world-426",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "988b5384dd6147eb7c3fd2751117b35ca0e8b17a8b537b35e7c53326780c07ce",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s259",
+      "family_id": "random/2026110220/random-world-259",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "27b4d286dcd6722435feaee380504ef1123ee9fb05064de818f3cab07736a262",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s70",
+      "family_id": "random/2026110201/random-atoms-70",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "a56728529f63759b30f9dd49925a71bd1d6a4af955ca7314f3d57c7f01de6ef5",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s94",
+      "family_id": "random/2026110221/random-atoms-94",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "4d87c2fe3393a41f6204c16627ec28ecd5081346fd74c6470c106fc572e56fdc",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s424",
+      "family_id": "random/2026110200/random-world-424",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "ca22c58e6a686d31eab5faff69e9074fb1adc19e70041637b616e4c9d0da7ceb",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s442",
+      "family_id": "random/2026110201/random-atoms-442",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3ce2c83972d5aafae05242f43bdd5ae5a08ed8e5af617d18e7e9097ea21ffa9d",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s470",
+      "family_id": "random/2026110201/random-atoms-470",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3f53b2c6a978c132a996912e026e9eb86a05ae6b644e88f786c85012db0cca44",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s280",
+      "family_id": "random/2026110201/random-atoms-280",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "13ededdc7fcbfca90a945c3a4a64d92729a7374674d0622f73f55519a9500612",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s611",
+      "family_id": "random/2026110200/random-world-611",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s443",
+      "family_id": "random/2026110200/random-world-443",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b2fed043a810e454f5a8bf03963a202779995d7d6b5660e8a2950bd82ca6410d",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s54",
+      "family_id": "random/2026110210/random-world-54",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "345dea618ce34305adbedf7b9859ccdb50b5ade597a41ca80d13518419af252f",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2079-s2",
+      "family_id": "sampled-forest-v1/38e6bba35115cf3ab2a662c4695ac5d2820d56d21ebb72cbbf44b166b61d1ff3",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "ded6f9f93c286404ed3317b8d87d4c61b8dad91dbf1b71daad75a7b0f4fe1b0b",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s317",
+      "family_id": "random/2026110220/random-world-317",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "3a94f3b3b1a4064a0cc310ec32ee3955d90eb359a2ecd84241fee68f2fed03fe",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2923-s135",
+      "family_id": "random/2026110221/random-atoms-135",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "57a882ccfd459d19b51c648a7742f962a4e8b5e2aba5c64630b8c4ecbae7a62b",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s46",
+      "family_id": "random/2026110220/random-world-46",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "53e43a16d9a79bb1c96764b43a738d72c4c2ce2d2f1c3db177568dd8d2b4da55",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b1960-s9",
+      "family_id": "sampled-forest-v1/7cb6cdb9bbb49d06cd81f9bb1112e7af0f13e2b097dfc0bc8731cdbf205c2529",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which"
+      ],
+      "story_key": "7a6133fa51779ca1f4a2f7dee83d292ee503b99106a2367356cbf34cdf159176",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s669",
+      "family_id": "random/2026110200/random-world-669",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "f1826aa01c31bd1267d133e1a862b8aff24c5964375fe732d034a1256ffeb407",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2905-s341",
+      "family_id": "random/2026110201/random-atoms-341",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "dfe9ecc7250d934712f3e7c06a1e24747742d77e78219cf1228373fe18d63a55",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b97-s3",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "61e666c1d14f86286a4fdb0776afa42a62b9077420fa6185050838b5e9651c85",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b342-s2",
+      "family_id": "sampled-forest-v1/29ad90ab11d1e61a1de303169e6d52d1f2f9fe6afc4c0bd63cbedca2c6b07fa9",
+      "split": "train",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "490f0073b3db5f9ccf7d0b6cb66b3da72452ce7de5dc535b791456cd7e385c55",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2913-s169",
+      "family_id": "random/2026110210/random-world-169",
+      "split": "dev",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b41bedf76061925deae99da45ac91083d31886f6bea21ba83188c7ad2c6c4806",
+      "reasons": [
+        "cross-split-story",
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2385-s0",
+      "family_id": "sampled-forest-v1/cbd0950cea64e7d3c0617fe8d5e7d52db75ae881d890d8fd10d7880e6317eaec",
+      "split": "in-range-test",
+      "query_kinds": [
+        "count"
+      ],
+      "story_key": "ad16480b1e0a0bee92d62e4d08f9bedb90cb7989453ae31fdb8face9f7bd28b3",
+      "reasons": [
+        "development-story"
+      ]
+    },
+    {
+      "story_id": "production-b2922-s297",
+      "family_id": "random/2026110220/random-world-297",
+      "split": "in-range-test",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "b76bb374f4e5816391493d6f3dd27ab89ffc3a94ace1a1d493e914b47b830440",
+      "reasons": [
+        "cross-split-story"
+      ]
+    },
+    {
+      "story_id": "production-b2904-s488",
+      "family_id": "random/2026110200/random-world-488",
+      "split": "train",
+      "query_kinds": [
+        "direction",
+        "which",
+        "count"
+      ],
+      "story_key": "c3d763d07135225f19d843ba738474633450d31798b0e4708ba9a60a83b35dcf",
+      "reasons": [
+        "cross-split-story"
+      ]
+    }
+  ],
+  "targeted_attempt_weights": {
+    "empty": 3,
+    "multiple": 3,
+    "contingent": 2,
+    "singleton": 1,
+    "consistent-cycle": 1,
+    "inconsistent-cycle": 1,
+    "coincidence": 1
+  },
+  "controlled_attempt_cycle": {
+    "depth_1": [
+      [
+        "homogeneous",
+        "North"
+      ],
+      [
+        "homogeneous",
+        "Northeast"
+      ],
+      [
+        "homogeneous",
+        "East"
+      ],
+      [
+        "homogeneous",
+        "Southeast"
+      ],
+      [
+        "homogeneous",
+        "South"
+      ],
+      [
+        "homogeneous",
+        "Southwest"
+      ],
+      [
+        "homogeneous",
+        "West"
+      ],
+      [
+        "homogeneous",
+        "Northwest"
+      ]
+    ],
+    "depth_2_through_10": [
+      [
+        "homogeneous",
+        "North"
+      ],
+      [
+        "homogeneous",
+        "Northeast"
+      ],
+      [
+        "homogeneous",
+        "East"
+      ],
+      [
+        "homogeneous",
+        "Southeast"
+      ],
+      [
+        "homogeneous",
+        "South"
+      ],
+      [
+        "homogeneous",
+        "Southwest"
+      ],
+      [
+        "homogeneous",
+        "West"
+      ],
+      [
+        "homogeneous",
+        "Northwest"
+      ],
+      [
+        "axis-split",
+        "North"
+      ],
+      [
+        "axis-split",
+        "Northeast"
+      ],
+      [
+        "axis-split",
+        "East"
+      ],
+      [
+        "axis-split",
+        "Southeast"
+      ],
+      [
+        "axis-split",
+        "South"
+      ],
+      [
+        "axis-split",
+        "Southwest"
+      ],
+      [
+        "axis-split",
+        "West"
+      ],
+      [
+        "axis-split",
+        "Northwest"
+      ],
+      [
+        "mixed-chain",
+        "Northeast"
+      ],
+      [
+        "mixed-chain",
+        "Southeast"
+      ],
+      [
+        "mixed-chain",
+        "Southwest"
+      ],
+      [
+        "mixed-chain",
+        "Northwest"
+      ]
+    ]
+  },
+  "literal_gold_policy": "At least one base per feasible literal string per in-range split/contract, enforced by required_coverage.",
+  "inventory_counts": {
+    "files": 30,
+    "families": 368,
+    "story_keys": 3218
+  },
+  "remaining_execution_gates": [
+    "Numeric settings are approved; the executable source schedule is not frozen."
+  ]
+}
