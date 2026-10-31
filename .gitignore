@@ -238,6 +238,23 @@ slurm/archive/logs/*
 /experiments/spatialentail-composition-v1/prepared-training-v*/data/
 /experiments/spatialentail-composition-v1/prepared-training-v*/references.jsonl
 /experiments/spatialentail-composition-v1/prepared-training-v*/token-measurements.jsonl
+/experiments/spatialentail-composition-v1/prepared-thinking-v*/data/
+/experiments/spatialentail-composition-v1/prepared-thinking-v*/tokenizer/
+/experiments/spatialentail-composition-v1/prepared-thinking-v*/cache/
+
+# Entailment run payloads and per-query checkpoints stay local too.
+# Keep configuration, manifests, summaries, audits and review reports visible.
+/experiments/spatialentail-composition-v1/entailment-candidate-v*/checkpoints/
+/experiments/spatialentail-composition-v1/entailment-candidate-v*/reserve-checkpoints/
+/experiments/spatialentail-composition-v1/entailment-candidate-v*/*.jsonl
+/experiments/spatialentail-composition-v1/entailment-candidate-v*/*.jsonl.tmp
+/experiments/spatialentail-composition-v1/production-candidate-v*/checkpoints/
+/experiments/spatialentail-composition-v1/production-candidate-v*/*.jsonl
+/experiments/spatialentail-composition-v1/production-candidate-v*/*.jsonl.tmp
+/experiments/spatialentail-composition-v1/spatialmap-entailment-all-five-v*/*.jsonl
+/experiments/spatialentail-composition-v1/spatialmap-unique-v*/*.jsonl
+/experiments/spatialentail-composition-v1/unique-training-candidate-v*/*.jsonl
+/experiments/spatialentail-composition-v1/.entailment-candidate-v*.lock
 
 # finetune model outputs (moved to experiments/<exp>/models/)
 finetune/outputs/

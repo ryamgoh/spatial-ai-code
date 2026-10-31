@@ -67,8 +67,10 @@ def _path(edges: tuple[Edge, ...], start: str, end: str) -> tuple[Edge, ...] | N
     return None
 
 
-def build_conflict(problem: SpatialProblem) -> Conflict:
-    validate_problem(problem)
+def build_conflict(
+    problem: SpatialProblem, *, allow_multiword_names: bool = False
+) -> Conflict:
+    validate_problem(problem, allow_multiword_names=allow_multiword_names)
     axes = tuple(_edges(problem, axis) for axis in (0, 1))
     for edges in axes:
         for edge in edges:
@@ -77,7 +79,7 @@ def build_conflict(problem: SpatialProblem) -> Conflict:
             back = _path(edges, edge.end, edge.start)
             if back is not None:
                 result = Conflict(problem, "strict-cycle", ((edge, *back),))
-                check_conflict(result)
+                check_conflict(result, allow_multiword_names=allow_multiword_names)
                 return result
     for a, b in combinations(problem.objects, 2):
         paths = tuple(
@@ -86,16 +88,16 @@ def build_conflict(problem: SpatialProblem) -> Conflict:
         )
         if all(path is not None for path in paths):
             result = Conflict(problem, "forced-coincidence", paths)
-            check_conflict(result)
+            check_conflict(result, allow_multiword_names=allow_multiword_names)
             return result
     raise UnsupportedEvidence(
         "no supported strict-cycle or forced-coincidence conflict"
     )
 
 
-def check_conflict(conflict: Conflict) -> None:
+def check_conflict(conflict: Conflict, *, allow_multiword_names: bool = False) -> None:
     """Replay paths without a solver; no minimal-conflict claim is made."""
-    validate_problem(conflict.problem)
+    validate_problem(conflict.problem, allow_multiword_names=allow_multiword_names)
     allowed = {edge for axis in (0, 1) for edge in _edges(conflict.problem, axis)}
     for path in conflict.paths:
         if not path or any(edge not in allowed for edge in path):
@@ -142,21 +144,27 @@ def verify_conflict(conflict: Conflict, solver: SpatialSolverV2) -> None:
         raise VerificationError("cited conflict subset is satisfiable")
 
 
-def render_conflict(conflict: Conflict, *, symbolic: bool) -> str:
-    check_conflict(conflict)
+def render_conflict(
+    conflict: Conflict,
+    *,
+    symbolic: bool,
+    allow_multiword_names: bool = False,
+    premise_prefix: str = "p",
+) -> str:
+    check_conflict(conflict, allow_multiword_names=allow_multiword_names)
     lines = []
     for path in conflict.paths:
         for edge in path:
             axis = "xy"[edge.axis]
             if symbolic:
                 lines.append(
-                    f"p{edge.premise_index + 1}: {axis}({edge.start}) "
+                    f"{premise_prefix}{edge.premise_index + 1}: {axis}({edge.start}) "
                     f"{'<' if edge.strict else '='} {axis}({edge.end})"
                 )
             else:
                 relation = "less than" if edge.strict else "equal to"
                 lines.append(
-                    f"From p{edge.premise_index + 1}, {edge.start}'s {axis}-coordinate "
+                    f"From {premise_prefix}{edge.premise_index + 1}, {edge.start}'s {axis}-coordinate "
                     f"is {relation} {edge.end}'s {axis}-coordinate."
                 )
         start, end, axis = path[0].start, path[-1].end, "xy"[path[0].axis]
@@ -177,6 +185,6 @@ def render_conflict(conflict: Conflict, *, symbolic: bool) -> str:
         lines.append(
             f"{a} and {b} would share both coordinates, violating the distinct-point axiom."
         )
-    ids = ", ".join(f"p{i + 1}" for i in conflict.premise_indices)
+    ids = ", ".join(f"{premise_prefix}{i + 1}" for i in conflict.premise_indices)
     lines.append(f"Conflicting premises: {ids}. No minimality claim is made.")
     return "\n".join(lines)

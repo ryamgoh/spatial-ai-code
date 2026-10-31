@@ -98,7 +98,15 @@ def _support(depth, direction, pattern, *, exclude=False):
     return objects, atoms
 
 
-def _core(scaffold, depth, direction, matches=1, *, proof_pattern="homogeneous"):
+def _core(
+    scaffold,
+    depth,
+    direction,
+    matches=1,
+    *,
+    proof_pattern="homogeneous",
+    shared_selection_support=False,
+):
     directions = tuple(Direction)
     opposite = directions[(directions.index(direction) + 4) % 8]
     candidates = tuple(f"C{i}" for i in range(scaffold.candidates))
@@ -122,7 +130,15 @@ def _core(scaffold, depth, direction, matches=1, *, proof_pattern="homogeneous")
     objects.extend(support_objects)
     atoms.extend(support_atoms)
     for candidate in candidates[1:matches]:
-        add(candidate, "O", direction)
+        if shared_selection_support:
+            # Reuse each terminal support edge, not a direct-to-reference shortcut.
+            atoms.extend(
+                replace(atom, subject=candidate)
+                for atom in support_atoms
+                if atom.subject == "C0"
+            )
+        else:
+            add(candidate, "O", direction)
 
     # A tree rooted at O, pointing opposite the query, fixes all nonmatches.
     # Only intermediate nodes can be reused as parents; candidates stay leaves.
@@ -185,7 +201,14 @@ def family_id(scaffold):
 
 
 def sample_scene(
-    seed, depth, *, direction=None, variant=0, matches=1, proof_pattern="homogeneous"
+    seed,
+    depth,
+    *,
+    direction=None,
+    variant=0,
+    matches=1,
+    proof_pattern="homogeneous",
+    shared_selection_support=False,
 ):
     if type(depth) is not int or not 1 <= depth <= 10:
         raise ValueError("depth must be an integer from 1 through 10")
@@ -194,11 +217,22 @@ def sample_scene(
     scaffold = sample_scaffold(seed)
     if type(matches) is not int or not 0 <= matches <= scaffold.candidates:
         raise ValueError("matches must be an integer within the candidate domain")
+    if type(shared_selection_support) is not bool:
+        raise TypeError("shared_selection_support must be a bool")
+    if shared_selection_support and not 2 <= matches <= 4:
+        raise ValueError("shared Selection support requires two through four matches")
     if direction is None:
         direction = tuple(Direction)[stable_int(f"{seed}/direction") % 8]
     if not isinstance(direction, Direction):
         raise TypeError("direction must be a Direction")
-    core = _core(scaffold, depth, direction, matches, proof_pattern=proof_pattern)
+    core = _core(
+        scaffold,
+        depth,
+        direction,
+        matches,
+        proof_pattern=proof_pattern,
+        shared_selection_support=shared_selection_support,
+    )
     rng = random.Random(stable_int(f"{seed}/{depth}/{variant}/presentation"))
     objects, atoms = list(core.objects), list(core.premise.operands)
     distractors = []
@@ -220,7 +254,8 @@ def sample_scene(
         replace(
             core,
             story_id=f"{VERSION}-{seed}-d{depth}-{direction.value}-v{variant}-m{matches}"
-            + (f"-{proof_pattern}" if proof_pattern != "homogeneous" else ""),
+            + (f"-{proof_pattern}" if proof_pattern != "homogeneous" else "")
+            + ("-shared-selection-v1" if shared_selection_support else ""),
             recipe=VERSION
             if proof_pattern == "homogeneous"
             else f"{VERSION}/{proof_pattern}",

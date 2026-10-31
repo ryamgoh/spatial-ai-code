@@ -1,0 +1,55 @@
+{
+  "schema": "unique-thinking-training-v1",
+  "status": "locally-validated-not-launched",
+  "model": "Qwen/Qwen3-4B-Thinking-2507",
+  "revision": "768f209d9ea81521153ed38c47d515654e938aea",
+  "examples_per_style": 6000,
+  "distinct_questions": 6000,
+  "versions": {
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "jinja2": "3.1.6"
+  },
+  "training_started": false,
+  "sealed": false,
+  "protected_sha256": {
+    "experiments/spatialentail-composition-v1/unique-training-candidate-v3/manifest.json": "2d1342306560426225b929bafe35f19dcd8e8e951e2128114c81007dc432e894",
+    "experiments/spatialentail-composition-v1/unique-training-candidate-v3/evidence.jsonl": "bd4bc3051bc44c8e0dfec5c26c4e23dbdb3f7bc6e7872d92b8315150fb0d0cb5",
+    "experiments/spatialentail-composition-v1/unique-training-candidate-v3/references.jsonl": "66640c3ede0bb42482dc4f6191e18e2ed6b775c6b8a1333cabefb243c8c8a66c",
+    "experiments/spatialentail-composition-v1/unique-training-candidate-v3/natural-training.jsonl": "d308963e79c4fb91b0c4eb825006192059521fccd96233556f00048542ac4739",
+    "experiments/spatialentail-composition-v1/unique-training-candidate-v3/symbolic-training.jsonl": "7636ada869681b6384e66fd7c050a7bfbe143c8d47b69c42de80610708e94978",
+    "experiments/spatialentail-composition-v1/unique-only-selection-v1/selection.json": "e0336924c93a238e1c21a6c33672d1b18ccb8daba0ec4a23e254d17fb33b7de6"
+  },
+  "source_sha256": {
+    "spatial/v2/entailment_thinking_training.py": "66206b054f54a58e7b0beef1b39c5950be9ea0c2cc770c2fcbbf57f10ff04a94",
+    "finetune/finetune.py": "0719d45c389754772205eb15d6aaba02caf11ff878e0583f0ea439d0110a1e91",
+    "pyproject.toml": "b87dd3db9e20ddbd253ee2c8f3dbd4547fc107800546ce85b0abd8d4eb29fcb2",
+    "uv.lock": "43c60173ca0d6aa6a6e60d35b56becd2afa8f6182167be9bb4cf778ebc79fd5e"
+  },
+  "training_method": "QLoRA from standard BF16 checkpoint; 4-bit loading, BF16 compute",
+  "loss_policy": "mask native generation prefix; supervise reasoning, closing think, answer and turn end",
+  "selection": "Unique Stage-1 synthetic dev view accuracy; earliest epoch wins ties",
+  "development_evaluation_status": "fixed selection preserved; current-model evaluation package pending",
+  "stage2_status": "not validated by training preparation; native-thinking replay integration pending",
+  "gpu_validation": "opening steps of actual training; no separate smoke-test job",
+  "actual_axolotl_loader_validated": false,
+  "baseline_generation_budget_validated": false,
+  "files": {
+    "configs/natural.yaml": "3110ae1ec197a522b4e70e35c9b7b051d4d62777084bda10cb4423bfd966890b",
+    "configs/symbolic.yaml": "afe6d8f8c06f7f85445c9f99a059f7dc770bb236b5a4c01172adcbf95da066dc",
+    "data/natural-train-messages.jsonl": "93269e0de563d52125383466def1658416a2364957d8a9a7e1d66c83dab91b62",
+    "data/natural-train-tokenized.jsonl": "1eee9fc0b570a71d84057c7be62c39e5da4a84bb85e23b95cff1138790c2933e",
+    "data/order.jsonl": "c46c48208320d1b3754abc7b21170514e5d43d9d324176e27e183815d9e240a2",
+    "data/symbolic-train-messages.jsonl": "5217b0a1891aa71049c050aa31778ad5f9bf4faafa8f00dd5593156a96feba2a",
+    "data/symbolic-train-tokenized.jsonl": "e0ccaaa0565dc43f1dde9cbdc9e804ad71421736aeb8bb683d2aa15cb044a19c",
+    "data/token-measurements.jsonl": "c95899523581aa7dd6560ac5ff6c41bfe1287c8ddc83faa51a38a5b194c0a5d2",
+    "mask-examples.json": "4116853544540095b9ee54db5695ced033345cfe197bf76397bc365367d8cf01",
+    "model-selection.json": "2eca9763095dd48dc725afcf73f818e2270d59544bdd9603a898580134b3b0bb",
+    "token-summary.json": "0ed9ed790c20eb40504520a30d394e75e51defeded05c61cdccce1a7b4ff5827",
+    "tokenizer/config.json": "5beea1a4a34c62782bfb2f911c606741a3bab8f92d80a118fa053c28af12e8ba",
+    "tokenizer/merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "tokenizer/tokenizer.json": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+    "tokenizer/tokenizer_config.json": "60adcfc35f5f251e19a196ec977b4ca0fcfb534852911b3196d68d5e3b146aa0",
+    "tokenizer/vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  }
+}

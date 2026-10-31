@@ -360,6 +360,19 @@ class ClaimAnalysis:
     error: str | None = None
 
 
+@dataclass(frozen=True)
+class EntailmentAnalysis:
+    """Full-domain entailment checks, not an enumeration of positive possibilities."""
+
+    consistent: bool
+    entailed_values: tuple[str | int, ...] = ()
+    counterexamples: dict[str | int, dict[str, tuple[int, int]]] = field(
+        default_factory=dict
+    )
+    engine: str = ""
+    error: str | None = None
+
+
 class _UnionFind:
     def __init__(self, values: tuple[str, ...]) -> None:
         self.parent = {value: value for value in values}
@@ -1109,6 +1122,188 @@ class _Z3Engine:
             return None
         return self._canonical_coordinates(solver, objects, x, y)
 
+    def _entailment_claims(self, problem, x, y):
+        query = problem.query
+        if isinstance(query, DirectionQuery):
+            claims = [
+                (
+                    direction.value,
+                    self._atom(x, y, query.target, query.reference, direction),
+                )
+                for direction in Direction
+                if direction in query.candidate_directions
+            ]
+        elif isinstance(query, WhichQuery):
+            claims = [
+                (candidate, self._region(x, y, candidate, query))
+                for candidate in query.candidates
+            ]
+        else:
+            count = self.z3.Sum(
+                *(
+                    self.z3.If(self._region(x, y, candidate, query), 1, 0)
+                    for candidate in query.candidates
+                )
+            )
+            claims = [
+                (value, count == value) for value in range(len(query.candidates) + 1)
+            ]
+        return claims
+
+    def _entailment_model(self, solver, objects, x, y):
+        """Select a unique audit representative without ordering every object pair.
+
+        Coordinate ranks of any qualitative arrangement lie in 0..n-1, so these
+        bounds select witnesses only. Unbounded Solver checks determine labels.
+        """
+        optimizer = self.z3.Optimize()
+        optimizer.set(timeout=self.timeout_ms, priority="lex")
+        optimizer.add(*solver.assertions())
+        for obj in objects:
+            for coordinate in (x[obj], y[obj]):
+                optimizer.add(coordinate >= 0, coordinate < len(objects))
+                optimizer.minimize(coordinate)
+        if not self._check(optimizer):
+            raise RuntimeError("rank-bounded audit representative was unsatisfiable")
+        return optimizer.model()
+
+    def _entailment_coordinates(self, problem, solver, x, y, value=None):
+        atoms = conjunctive_atoms(problem.premise)
+        if atoms is None or any(len(atom.allowed) != 1 for atom in atoms):
+            return self._normalize_coordinates(
+                problem.objects,
+                self._entailment_model(solver, problem.objects, x, y),
+                x,
+                y,
+            )
+        selected = [
+            (atom.subject, atom.reference, next(iter(atom.allowed))) for atom in atoms
+        ]
+        query = problem.query
+        if value is not None:
+            if isinstance(query, DirectionQuery):
+                pairs = [(query.target, query.reference)]
+            elif isinstance(query, WhichQuery):
+                pairs = [(value, query.reference)]
+            else:
+                # Fix one feasible alternative count, then its joint query
+                # relations. Context pairs never need separate SMT completion.
+                predicates = dict(self._entailment_claims(problem, x, y))
+                chosen = None
+                for count in range(len(query.candidates) + 1):
+                    if count == value:
+                        continue
+                    solver.push()
+                    solver.add(predicates[count])
+                    feasible = self._check(solver)
+                    solver.pop()
+                    if feasible:
+                        chosen = count
+                        solver.add(predicates[count])
+                        break
+                if chosen is None:
+                    raise RuntimeError("non-entailed Count has no alternative count")
+                pairs = [(candidate, query.reference) for candidate in query.candidates]
+            for subject, reference in pairs:
+                chosen_direction = None
+                for direction in Direction:
+                    solver.push()
+                    atom = self._atom(x, y, subject, reference, direction)
+                    solver.add(atom)
+                    feasible = self._check(solver)
+                    solver.pop()
+                    if feasible:
+                        chosen_direction = direction
+                        solver.add(atom)
+                        selected.append((subject, reference, direction))
+                        break
+                if chosen_direction is None:
+                    raise RuntimeError(
+                        "counterexample query relation has no completion"
+                    )
+        coordinates = _ReferenceEngine._coordinates_from_atoms(
+            problem.objects, selected
+        )
+        if coordinates is None:
+            raise RuntimeError(
+                "satisfiable atomic premises failed graph witness construction"
+            )
+        return coordinates
+
+    @staticmethod
+    def _claim_holds_in_coordinates(problem, value, coordinates):
+        query = problem.query
+        if isinstance(query, DirectionQuery):
+            return (
+                direction_between(
+                    coordinates[query.target], coordinates[query.reference]
+                ).value
+                == value
+            )
+        members = {
+            candidate
+            for candidate in query.candidates
+            if direction_between(coordinates[candidate], coordinates[query.reference])
+            in query.directions
+        }
+        return (
+            value in members if isinstance(query, WhichQuery) else len(members) == value
+        )
+
+    def analyze_entailment(self, problem: SpatialProblem) -> EntailmentAnalysis:
+        """Check negated query claims; extract models without pair canonicalization."""
+        built = self._build_solver(problem.objects, problem.premise)
+        if built is None:
+            return EntailmentAnalysis(False, engine=self.name)
+        solver, x, y = built
+        if not self._check(solver):
+            return EntailmentAnalysis(False, engine=self.name)
+        claims = self._entailment_claims(problem, x, y)
+        entailed, counterexamples = [], {}
+        base_coordinates = self._entailment_coordinates(problem, solver, x, y)
+        for value, predicate in claims:
+            # A single valid arrangement may refute several different claims.
+            if not self._claim_holds_in_coordinates(problem, value, base_coordinates):
+                counterexamples[value] = base_coordinates.copy()
+                continue
+            solver.push()
+            try:
+                solver.add(self.z3.Not(predicate))
+                if self._check(solver):
+                    counterexamples[value] = self._entailment_coordinates(
+                        problem, solver, x, y, value
+                    )
+                else:
+                    entailed.append(value)
+            finally:
+                solver.pop()
+        return EntailmentAnalysis(
+            True, tuple(entailed), counterexamples, engine=self.name
+        )
+
+    def negative_categories(self, problem, values):
+        """Audit-only split of established negatives; never generate positive models."""
+        built = self._build_solver(problem.objects, problem.premise)
+        if built is None:
+            raise ValueError("negative categories require consistent premises")
+        solver, x, y = built
+        if not self._check(solver):
+            raise ValueError("negative categories require consistent premises")
+        predicates = dict(self._entailment_claims(problem, x, y))
+        if not set(values) <= set(predicates):
+            raise ValueError("negative claim is outside the query domain")
+        categories = {}
+        for value in values:
+            solver.push()
+            try:
+                solver.add(predicates[value])
+                categories[value] = (
+                    "contingent" if self._check(solver) else "impossible"
+                )
+            finally:
+                solver.pop()
+        return categories
+
 
 class SpatialSolverV2:
     """Analyze structured eight-direction problems without dataset knowledge."""
@@ -1169,6 +1364,30 @@ class SpatialSolverV2:
                 engine=self._engine.name,
                 error=error,
             )
+
+    def analyze_entailment(self, problem: SpatialProblem) -> EntailmentAnalysis:
+        """Return forced query values and one counterexample per non-entailed value.
+
+        This versioned study path requires Z3. Legacy possibility analysis and
+        canonical witness generation retain their original behavior.
+        """
+        if not isinstance(problem, SpatialProblem):
+            raise TypeError("analyze_entailment expects a SpatialProblem")
+        if not isinstance(self._engine, _Z3Engine):
+            raise TypeError("direct entailment analysis requires the z3 backend")
+        try:
+            return self._engine.analyze_entailment(problem)
+        except RuntimeError as exc:
+            return EntailmentAnalysis(False, engine=self._engine.name, error=str(exc))
+
+    def negative_categories(self, problem: SpatialProblem) -> dict[str | int, str]:
+        """Diagnostic categories for non-entailed claims, not supervised answer sets."""
+        result = self.analyze_entailment(problem)
+        if result.error:
+            raise RuntimeError(result.error)
+        if not result.consistent:
+            return {}
+        return self._engine.negative_categories(problem, tuple(result.counterexamples))
 
     def semantic_signature(self, problem: SpatialProblem) -> tuple:
         """Query possibilities and membership statuses without Z3 witness rendering.

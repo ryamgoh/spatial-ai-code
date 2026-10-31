@@ -1,0 +1,1541 @@
+{
+  "status": "coverage-complete-not-training-ready",
+  "manifest_sha256": "ca236e0033a5a5a99168c3f44767a1224be10687ef0ae7e0577a9e409addb02b",
+  "records_path": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-controlled-coverage-53x_vbxx/records.jsonl",
+  "records_sha256": "5d87ca0e24bc489d004619d37142a1bed0333ad3c0dc14d7290e9798d38443f3",
+  "originals_unchanged": true,
+  "sources_unchanged": true,
+  "attempts": 968,
+  "statuses": {
+    "accepted": 968
+  },
+  "count_depth_direction_cells_passed": 400,
+  "count_depth_direction_cells_required": 400,
+  "case_counts": [
+    {
+      "query": "count",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "count",
+      "case": "listed",
+      "status": "accepted",
+      "count": 216
+    },
+    {
+      "query": "count",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "count",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 216
+    },
+    {
+      "query": "direction",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "direction",
+      "case": "listed",
+      "status": "accepted",
+      "count": 56
+    },
+    {
+      "query": "direction",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "direction",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 56
+    },
+    {
+      "query": "which",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "which",
+      "case": "listed",
+      "status": "accepted",
+      "count": 56
+    },
+    {
+      "query": "which",
+      "case": "multiple",
+      "status": "accepted",
+      "count": 96
+    },
+    {
+      "query": "which",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 36
+    },
+    {
+      "query": "which",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 56
+    }
+  ],
+  "scene_sizes": [
+    {
+      "span": 1,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "East",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "East",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "North",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "North",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northeast",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northeast",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northwest",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Northwest",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "South",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "South",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southeast",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southeast",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southwest",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "Southwest",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          12,
+          12
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "West",
+      "compact": true,
+      "extra_size": 0,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          6,
+          6
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 1,
+      "direction": "West",
+      "compact": true,
+      "extra_size": 3,
+      "completed": 13,
+      "expected": 13,
+      "sizes": [
+        [
+          9,
+          9
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 2,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          15,
+          18
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 3,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 4,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          16,
+          19
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 5,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          17,
+          20
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 6,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          19,
+          22
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 7,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 8,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          20,
+          23
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 9,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          21,
+          24
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "East",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "North",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "Northeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "Northwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "South",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "Southeast",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "Southwest",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 14,
+      "expected": 14,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    },
+    {
+      "span": 10,
+      "direction": "West",
+      "compact": false,
+      "extra_size": 0,
+      "completed": 8,
+      "expected": 8,
+      "sizes": [
+        [
+          23,
+          26
+        ]
+      ],
+      "complete_and_matched": true
+    }
+  ],
+  "max_target_tokens": {
+    "natural": 2527,
+    "symbolic": 2796
+  },
+  "failures": []
+}

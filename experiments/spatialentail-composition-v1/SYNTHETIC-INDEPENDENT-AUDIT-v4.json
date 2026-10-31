@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "scope": "all retained bases, claims, views and model inputs",
+  "independent_of": [
+    "production entailment analysis",
+    "production contract encoder",
+    "production path replay",
+    "production counterexample checker"
+  ],
+  "counts": {
+    "bases": 10800,
+    "positive_claims": 8794,
+    "counterexamples": 62614,
+    "views": 38523,
+    "input_rows": 77046
+  },
+  "families": 2314,
+  "candidate_manifest_sha256": "fb2cee949e844b8cdfabe9ca51567a401c986e95bad4a17a69d73536a5fa4700",
+  "auditor_sha256": "8286c138e7b2e25334bd18641035439f475feb5a79afbcec16ee836322a724a1",
+  "not_covered": [
+    "manual prose quality",
+    "token remeasurement",
+    "coverage quota re-solving"
+  ],
+  "sealed": false
+}

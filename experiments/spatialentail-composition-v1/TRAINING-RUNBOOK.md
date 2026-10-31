@@ -1,12 +1,50 @@
-# Frozen Synthetic Training Preparation
+# SpatialEntail Training Preparation
 
 ## Status and Scope
 
-**On hold for the amended study.** This runbook describes the prior sealed
-200-story package, not the planned depth-controlled replacement. Do not run its
-training commands for the amended experiment. Follow the
-[depth and gold specification](DEPTH-AND-GOLD-SPEC.md) and report to the user
-before production generation and final sealing.
+**Active model: Qwen/Qwen3-4B-Thinking-2507 (BF16, thinking-only)**, selected in
+[`active-model.json`](active-model.json), not Qwen3.5-4B. Future matched training,
+baseline and evaluation runs must use its pinned model/tokenizer revision.
+No `enable_thinking` override is needed; the native template opens the thinking
+block. The earlier non-thinking setting is withdrawn.
+The [current prepared package](prepared-thinking-v1/README.md) now contains
+matched configs and 6,000 pre-tokenized examples per arm. All 12,000 examples
+passed native thinking-format, answer, token-boundary and assistant-loss checks.
+Maximum full training sequences are 1,766 Natural / 1,930 Symbolic tokens;
+maximum supervised targets are 1,105 / 1,264. No source data was regenerated.
+The existing QLoRA recipe uses four-bit loading from the BF16 checkpoint and
+BF16 compute; both arms retain the same two-epoch schedule and seeded order.
+
+The user approved checking GPU operation in the opening steps of the actual
+training job, not a separate smoke-test job. Actual Axolotl loading and CUDA
+execution remain untested locally. The fixed development evaluation package
+and Stage-2 thinking replay still need integration; no evaluation selection
+was changed. Current reference lengths fit, but untuned generation length is
+not certified by those measurements.
+
+Token counts in the legacy sections below use Qwen3.5-4B and must not be
+relabelled as Qwen3-4B-Thinking-2507 results.
+The historical model settings and commands later in this runbook are not the
+new study's trainer configuration.
+
+The active study is now [Unique-only](UNIQUE-ONLY-v1.md) for Direction,
+Which, and Count, with matched Natural/Symbolic arms. Its approved training
+target is 6,000 distinct questions and 6,000 examples per style, with one menu
+per question and 1,200 A-D / 600 E / 200 F per query.
+The all-controlled replacement is tracked by `CONTROLLED-TRAINING-BUILD-v2.json`
+and `CONTROLLED-TRAINING-EXPORT-AUDIT-v2.json`. Its current reference revision is
+`unique-training-candidate-v3/`, tracked by `SPATIAL-PROSE-RERENDER-v3.json`.
+Use it only when the build/export audits and reference-only audit report success.
+V3 preserves the v2 questions and evidence; only explanation text/version and
+token measurements change.
+Its chat datasets are `natural-training.jsonl` and `symbolic-training.jsonl`.
+None of the legacy commands below launches this new study.
+
+**Legacy commands below.** This runbook describes the prior sealed 200-story
+package, not the all-controlled replacement. Do not run its training commands
+for the amended experiment. Follow [the active specification](UNIQUE-ONLY-v1.md).
+An audited chat-data export is not a GPU smoke test, trainer configuration,
+sealed release or authorization to submit a training job.
 
 The prior package's `prepared-training-v2/seal.json` binds its original
 preparation. It does not establish sufficient depth or answer coverage for

@@ -35,6 +35,25 @@ STYLES = {
         "'Answer: <letters>' using the required letter format."
     ),
 }
+ENTAILMENT_STYLES = {
+    "natural": (
+        "Solve the spatial entailment problem using the stated assumptions and "
+        "answer contract. Explain entailed claims with deductions and non-entailed "
+        "claims with checked counterexample relationships in ordinary English. "
+        "Do not treat a claim as entailed merely because it could hold. Cite "
+        "premises by their 1-based sentence positions when needed. End with "
+        "exactly one line 'Answer: <letters>' using the required letter format."
+    ),
+    "symbolic": (
+        "Solve the spatial entailment problem using the stated assumptions and "
+        "answer contract. Explain entailed claims with deductions and non-entailed "
+        "claims with checked counterexample relationships using direction "
+        "predicates and explicit x/y comparisons. Do not treat a claim as "
+        "entailed merely because it could hold. Cite premises by their 1-based "
+        "sentence positions when needed. End with exactly one line "
+        "'Answer: <letters>' using the required letter format."
+    ),
+}
 COMPLETION = (
     "Based on the question and your reasoning above, give only the final answer."
 )
@@ -49,8 +68,41 @@ def content_hash(value):
 
 
 def messages(row, style):
+    if row.get("study_scope") is not None:
+        from spatial.v2.entailment_unique_study import validate_row
+
+        validate_row(row)
+    from spatial.v2.entailment_contracts import VERSION as ENTAILMENT_VERSION
+    from spatial.v2.entailment_scene_protocol import (
+        COMMON_INSTRUCTION,
+        PLAIN_VERSIONS,
+        SHORT_VERSION,
+        UNIQUE_INSTRUCTION,
+    )
+    from spatial.v2.entailment_scene_protocol import (
+        SCOPE as SCENE_SCOPE,
+    )
+
+    styles = ENTAILMENT_STYLES if row.get("interface") == ENTAILMENT_VERSION else STYLES
+    system = styles[style]
+    if row.get("prompt_version") is not None:
+        if (
+            row.get("interface") != ENTAILMENT_VERSION
+            or row["prompt_version"] not in PLAIN_VERSIONS
+            or row.get("scope_policy") != SCENE_SCOPE
+        ):
+            raise ValueError("unknown spatial prompt protocol")
+        if row["prompt_version"] == SHORT_VERSION:
+            from spatial.v2.entailment_unique_study import validate_row
+
+            validate_row(row)
+            system += "\n\n" + UNIQUE_INSTRUCTION
+        else:
+            system += "\n\n" + COMMON_INSTRUCTION
+    elif row.get("scope_policy") is not None:
+        raise ValueError("scope policy requires its prompt protocol")
     return [
-        {"role": "system", "content": STYLES[style]},
+        {"role": "system", "content": system},
         {"role": "user", "content": row["prompt"]},
     ]
 
@@ -72,9 +124,17 @@ def completion_suffix(*, terminated=False):
 
 
 def tokenize_example(tokenizer, row, style):
+    from spatial.v2.entailment_contracts import VERSION as ENTAILMENT_VERSION
+    from spatial.v2.entailment_contracts import parse_answer as parse_entailment_answer
+
     source = messages(row, style)
     target = row["references"][style]
-    if parse_answer(target, row["contract"], stage=1) != row["answer"]:
+    parser = (
+        parse_entailment_answer
+        if row.get("interface") == ENTAILMENT_VERSION
+        else parse_answer
+    )
+    if parser(target, row["contract"], stage=1) != row["answer"]:
         raise ValueError("invalid training answer")
     prefix = prompt_text(tokenizer, row, style)
     full = tokenizer.apply_chat_template(

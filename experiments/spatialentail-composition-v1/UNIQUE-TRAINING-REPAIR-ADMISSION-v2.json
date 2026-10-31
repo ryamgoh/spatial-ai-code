@@ -1,0 +1,1073 @@
+{
+  "status": "bounded-admission-complete-not-selected",
+  "attempted_slots": 1600,
+  "manifest_sha256": "a1450d50b539c2ea5d9b1e5c5b49ee27ca80b0164a65bc1eba608d6c5cb8d9ba",
+  "metadata_directory": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-unique-second-batch-91b99h43",
+  "records_sha256": "24a4bcd4a5e6c54bdf13f5bb76e1d5dd666ecbe0a1b517a1c1b355979018d236",
+  "full_records_sha256": "946ae92b268739c12e8015b5be622e462aecc007a1251cabd8d00367be50560b",
+  "statuses": {
+    "preflight-rejected": 40,
+    "pre-admission-rejected": 975,
+    "accepted": 585
+  },
+  "combined_supply": {
+    "status": "necessary-bounds-pass-not-full-feasibility",
+    "targets": {
+      "direction": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 450,
+        "inconsistent": 150
+      },
+      "which": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 225,
+        "inconsistent": 75,
+        "multiple-entailed": 300
+      },
+      "count": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 450,
+        "inconsistent": 150
+      }
+    },
+    "training_bases_available": 15450,
+    "source_census": [
+      {
+        "query": "direction",
+        "source": "controlled",
+        "bases": 3886,
+        "source_quota": 1400,
+        "eligible_bases": {
+          "A-D": 3886,
+          "unique-unlisted": 782,
+          "no-entailed-answer": 0,
+          "inconsistent": 0
+        }
+      },
+      {
+        "query": "direction",
+        "source": "random-world",
+        "bases": 638,
+        "source_quota": 300,
+        "eligible_bases": {
+          "A-D": 330,
+          "unique-unlisted": 65,
+          "no-entailed-answer": 308,
+          "inconsistent": 0
+        }
+      },
+      {
+        "query": "direction",
+        "source": "random-atoms",
+        "bases": 283,
+        "source_quota": 200,
+        "eligible_bases": {
+          "A-D": 64,
+          "unique-unlisted": 10,
+          "no-entailed-answer": 64,
+          "inconsistent": 155
+        }
+      },
+      {
+        "query": "direction",
+        "source": "targeted",
+        "bases": 363,
+        "source_quota": 100,
+        "eligible_bases": {
+          "A-D": 199,
+          "unique-unlisted": 29,
+          "no-entailed-answer": 114,
+          "inconsistent": 50
+        }
+      },
+      {
+        "query": "which",
+        "source": "controlled",
+        "bases": 3886,
+        "source_quota": 1400,
+        "eligible_bases": {
+          "A-D": 2099,
+          "unique-unlisted": 399,
+          "no-entailed-answer": 0,
+          "inconsistent": 0,
+          "multiple-entailed": 1787
+        }
+      },
+      {
+        "query": "which",
+        "source": "random-world",
+        "bases": 868,
+        "source_quota": 300,
+        "eligible_bases": {
+          "A-D": 147,
+          "unique-unlisted": 15,
+          "no-entailed-answer": 665,
+          "inconsistent": 0,
+          "multiple-entailed": 56
+        }
+      },
+      {
+        "query": "which",
+        "source": "random-atoms",
+        "bases": 502,
+        "source_quota": 200,
+        "eligible_bases": {
+          "A-D": 49,
+          "unique-unlisted": 5,
+          "no-entailed-answer": 157,
+          "inconsistent": 271,
+          "multiple-entailed": 25
+        }
+      },
+      {
+        "query": "which",
+        "source": "targeted",
+        "bases": 289,
+        "source_quota": 100,
+        "eligible_bases": {
+          "A-D": 0,
+          "unique-unlisted": 0,
+          "no-entailed-answer": 125,
+          "inconsistent": 50,
+          "multiple-entailed": 114
+        }
+      },
+      {
+        "query": "count",
+        "source": "controlled",
+        "bases": 3796,
+        "source_quota": 1400,
+        "eligible_bases": {
+          "A-D": 3796,
+          "unique-unlisted": 749,
+          "no-entailed-answer": 0,
+          "inconsistent": 0
+        }
+      },
+      {
+        "query": "count",
+        "source": "random-world",
+        "bases": 427,
+        "source_quota": 300,
+        "eligible_bases": {
+          "A-D": 95,
+          "unique-unlisted": 26,
+          "no-entailed-answer": 332,
+          "inconsistent": 0
+        }
+      },
+      {
+        "query": "count",
+        "source": "random-atoms",
+        "bases": 300,
+        "source_quota": 200,
+        "eligible_bases": {
+          "A-D": 48,
+          "unique-unlisted": 10,
+          "no-entailed-answer": 82,
+          "inconsistent": 170
+        }
+      },
+      {
+        "query": "count",
+        "source": "targeted",
+        "bases": 212,
+        "source_quota": 100,
+        "eligible_bases": {
+          "A-D": 0,
+          "unique-unlisted": 0,
+          "no-entailed-answer": 162,
+          "inconsistent": 50
+        }
+      }
+    ],
+    "answer_subset_checks": [
+      {
+        "query": "direction",
+        "categories": [
+          "A-D"
+        ],
+        "required": 1200,
+        "raw": 4479,
+        "source": 1864,
+        "stratum": 1993,
+        "upper_bound": 1864,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "unique-unlisted"
+        ],
+        "required": 200,
+        "raw": 886,
+        "source": 886,
+        "stratum": 886,
+        "upper_bound": 886,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "no-entailed-answer"
+        ],
+        "required": 450,
+        "raw": 486,
+        "source": 464,
+        "stratum": 486,
+        "upper_bound": 464,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "inconsistent"
+        ],
+        "required": 150,
+        "raw": 205,
+        "source": 205,
+        "stratum": 205,
+        "upper_bound": 205,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "unique-unlisted"
+        ],
+        "required": 1400,
+        "raw": 4479,
+        "source": 1864,
+        "stratum": 1993,
+        "upper_bound": 1864,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "no-entailed-answer"
+        ],
+        "required": 1650,
+        "raw": 4965,
+        "source": 1928,
+        "stratum": 2000,
+        "upper_bound": 1928,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "inconsistent"
+        ],
+        "required": 1350,
+        "raw": 4684,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 650,
+        "raw": 1372,
+        "source": 1256,
+        "stratum": 1372,
+        "upper_bound": 1256,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 350,
+        "raw": 1091,
+        "source": 1091,
+        "stratum": 1091,
+        "upper_bound": 1091,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 600,
+        "raw": 691,
+        "source": 600,
+        "stratum": 600,
+        "upper_bound": 600,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 1850,
+        "raw": 4965,
+        "source": 1928,
+        "stratum": 2000,
+        "upper_bound": 1928,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 1550,
+        "raw": 4684,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 1800,
+        "raw": 5170,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 800,
+        "raw": 1577,
+        "source": 1382,
+        "stratum": 1382,
+        "upper_bound": 1382,
+        "shortfall": 0
+      },
+      {
+        "query": "direction",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 2000,
+        "raw": 5170,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D"
+        ],
+        "required": 1200,
+        "raw": 2295,
+        "source": 1596,
+        "stratum": 1596,
+        "upper_bound": 1596,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted"
+        ],
+        "required": 200,
+        "raw": 419,
+        "source": 419,
+        "stratum": 419,
+        "upper_bound": 419,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "no-entailed-answer"
+        ],
+        "required": 225,
+        "raw": 947,
+        "source": 557,
+        "stratum": 600,
+        "upper_bound": 557,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "inconsistent"
+        ],
+        "required": 75,
+        "raw": 321,
+        "source": 250,
+        "stratum": 321,
+        "upper_bound": 250,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "multiple-entailed"
+        ],
+        "required": 300,
+        "raw": 1982,
+        "source": 1581,
+        "stratum": 1595,
+        "upper_bound": 1581,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted"
+        ],
+        "required": 1400,
+        "raw": 2295,
+        "source": 1596,
+        "stratum": 1596,
+        "upper_bound": 1596,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "no-entailed-answer"
+        ],
+        "required": 1425,
+        "raw": 3242,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "inconsistent"
+        ],
+        "required": 1275,
+        "raw": 2616,
+        "source": 1797,
+        "stratum": 1917,
+        "upper_bound": 1797,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "multiple-entailed"
+        ],
+        "required": 1500,
+        "raw": 4277,
+        "source": 1777,
+        "stratum": 1791,
+        "upper_bound": 1777,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 425,
+        "raw": 1366,
+        "source": 961,
+        "stratum": 999,
+        "upper_bound": 961,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 275,
+        "raw": 740,
+        "source": 664,
+        "stratum": 740,
+        "upper_bound": 664,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "multiple-entailed"
+        ],
+        "required": 500,
+        "raw": 2401,
+        "source": 1601,
+        "stratum": 1615,
+        "upper_bound": 1601,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 300,
+        "raw": 1268,
+        "source": 600,
+        "stratum": 600,
+        "upper_bound": 600,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "no-entailed-answer",
+          "multiple-entailed"
+        ],
+        "required": 525,
+        "raw": 2929,
+        "source": 1982,
+        "stratum": 2000,
+        "upper_bound": 1982,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 375,
+        "raw": 2303,
+        "source": 1756,
+        "stratum": 1916,
+        "upper_bound": 1756,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 1625,
+        "raw": 3242,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 1475,
+        "raw": 2616,
+        "source": 1797,
+        "stratum": 1917,
+        "upper_bound": 1797,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "multiple-entailed"
+        ],
+        "required": 1700,
+        "raw": 4277,
+        "source": 1777,
+        "stratum": 1791,
+        "upper_bound": 1777,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 1500,
+        "raw": 3563,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "no-entailed-answer",
+          "multiple-entailed"
+        ],
+        "required": 1725,
+        "raw": 5224,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 1575,
+        "raw": 4598,
+        "source": 1903,
+        "stratum": 2000,
+        "upper_bound": 1903,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 500,
+        "raw": 1687,
+        "source": 999,
+        "stratum": 999,
+        "upper_bound": 999,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer",
+          "multiple-entailed"
+        ],
+        "required": 725,
+        "raw": 3348,
+        "source": 1987,
+        "stratum": 2000,
+        "upper_bound": 1987,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 575,
+        "raw": 2722,
+        "source": 1771,
+        "stratum": 1936,
+        "upper_bound": 1771,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "no-entailed-answer",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 600,
+        "raw": 3250,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 1700,
+        "raw": 3563,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer",
+          "multiple-entailed"
+        ],
+        "required": 1925,
+        "raw": 5224,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 1775,
+        "raw": 4598,
+        "source": 1903,
+        "stratum": 2000,
+        "upper_bound": 1903,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "no-entailed-answer",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 1800,
+        "raw": 5545,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 800,
+        "raw": 3669,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "which",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent",
+          "multiple-entailed"
+        ],
+        "required": 2000,
+        "raw": 5545,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D"
+        ],
+        "required": 1200,
+        "raw": 3939,
+        "source": 1543,
+        "stratum": 1543,
+        "upper_bound": 1543,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "unique-unlisted"
+        ],
+        "required": 200,
+        "raw": 785,
+        "source": 785,
+        "stratum": 785,
+        "upper_bound": 785,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "no-entailed-answer"
+        ],
+        "required": 450,
+        "raw": 576,
+        "source": 482,
+        "stratum": 576,
+        "upper_bound": 482,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "inconsistent"
+        ],
+        "required": 150,
+        "raw": 220,
+        "source": 220,
+        "stratum": 220,
+        "upper_bound": 220,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "unique-unlisted"
+        ],
+        "required": 1400,
+        "raw": 3939,
+        "source": 1543,
+        "stratum": 1543,
+        "upper_bound": 1543,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "no-entailed-answer"
+        ],
+        "required": 1650,
+        "raw": 4515,
+        "source": 1930,
+        "stratum": 2000,
+        "upper_bound": 1930,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "inconsistent"
+        ],
+        "required": 1350,
+        "raw": 4159,
+        "source": 1745,
+        "stratum": 1763,
+        "upper_bound": 1745,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 650,
+        "raw": 1361,
+        "source": 1241,
+        "stratum": 1349,
+        "upper_bound": 1241,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 350,
+        "raw": 1005,
+        "source": 1005,
+        "stratum": 1005,
+        "upper_bound": 1005,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 600,
+        "raw": 796,
+        "source": 600,
+        "stratum": 600,
+        "upper_bound": 600,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer"
+        ],
+        "required": 1850,
+        "raw": 4515,
+        "source": 1930,
+        "stratum": 2000,
+        "upper_bound": 1930,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "inconsistent"
+        ],
+        "required": 1550,
+        "raw": 4159,
+        "source": 1745,
+        "stratum": 1763,
+        "upper_bound": 1745,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 1800,
+        "raw": 4735,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 800,
+        "raw": 1581,
+        "source": 1349,
+        "stratum": 1349,
+        "upper_bound": 1349,
+        "shortfall": 0
+      },
+      {
+        "query": "count",
+        "categories": [
+          "A-D",
+          "unique-unlisted",
+          "no-entailed-answer",
+          "inconsistent"
+        ],
+        "required": 2000,
+        "raw": 4735,
+        "source": 2000,
+        "stratum": 2000,
+        "upper_bound": 2000,
+        "shortfall": 0
+      }
+    ],
+    "conflicts": [],
+    "full_selection_attempted": false,
+    "limitations": [
+      "Bounds prove impossibility when violated, not feasibility when satisfied.",
+      "Count-value, family and all coverage constraints still require a full selection check if these bounds pass.",
+      "Historical prompt token counts do not certify a short-protocol export."
+    ]
+  },
+  "supply_scope": "necessary semantic/source bounds; no proof-depth or family feasibility claim",
+  "new_semantic_supply": [
+    {
+      "query": "direction",
+      "source": "random-world",
+      "case": "no-entailed-answer",
+      "count": 11
+    },
+    {
+      "query": "direction",
+      "source": "random-world",
+      "case": "unique-entailed",
+      "count": 10
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "case": "inconsistent",
+      "count": 103
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "case": "multiple-entailed",
+      "count": 11
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "case": "no-entailed-answer",
+      "count": 56
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "case": "unique-entailed",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "case": "multiple-entailed",
+      "count": 27
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "case": "no-entailed-answer",
+      "count": 279
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "case": "unique-entailed",
+      "count": 68
+    }
+  ],
+  "automatic_refill_authorized": false,
+  "evaluation_changed": false,
+  "sealed": false,
+  "training_started": false
+}

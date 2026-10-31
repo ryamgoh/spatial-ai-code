@@ -1,0 +1,16 @@
+{
+  "status": "bounded-admission-complete-not-selected",
+  "attempted_slots": 2048,
+  "manifest_sha256": "eabb79f399786592895f1aa845d067439178df2feacc975837ea755e01c85a53",
+  "metadata_directory": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-unique-repair-6_9crqaf",
+  "records_sha256": "d29a059c3395f4cf60197880e6c7f4ddf87810a18c0f68d17c6adb2dca57d756",
+  "full_records_sha256": "ff9c35dc1b1be69d86df97297dda3fce11bf1f2fd84ac5917434c89bddfc566c",
+  "statuses": {
+    "preflight-rejected": 46,
+    "pre-admission-rejected": 1187,
+    "accepted": 815
+  },
+  "sealed": false,
+  "training_started": false,
+  "evaluation_changed": false
+}

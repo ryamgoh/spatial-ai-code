@@ -8,6 +8,7 @@ accepts only the serialized answer. No legacy parser behavior is changed.
 from __future__ import annotations
 
 import re
+import shlex
 from dataclasses import dataclass
 from itertools import combinations
 
@@ -37,15 +38,20 @@ class UnsupportedEvidence(ValueError):
     """The current explanation path does not support this evidence category."""
 
 
-def validate_problem(problem: SpatialProblem) -> None:
+def validate_problem(
+    problem: SpatialProblem, *, allow_multiword_names: bool = False
+) -> None:
     if not isinstance(problem.premise, And) or not all(
         isinstance(atom, RelationConstraint) and len(atom.allowed) == 1
         for atom in problem.premise.operands
     ):
         raise ValueError("composition-v1 requires a flat conjunction of exact atoms")
-    if any(
-        re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", obj) is None for obj in problem.objects
-    ):
+    name_pattern = (
+        r"[A-Za-z][A-Za-z0-9_]*(?: [A-Za-z][A-Za-z0-9_]*)*"
+        if allow_multiword_names
+        else r"[A-Za-z][A-Za-z0-9_]*"
+    )
+    if any(re.fullmatch(name_pattern, obj) is None for obj in problem.objects):
         raise ValueError("object names must be ASCII identifiers")
     query = problem.query
     if isinstance(query, DirectionQuery):
@@ -384,6 +390,16 @@ def render_prompt(
 
 def parse_prompt(text: str) -> tuple[SpatialProblem, tuple[Value, ...], AnswerMode]:
     """Parse only this version's complete canonical template, including E/F rules."""
+    problem, menu, mode = _parse_prompt_fields(text)
+    if render_prompt(problem, menu, mode) != text:
+        raise ValueError("prompt does not match the full composition-v1 template")
+    return problem, menu, mode
+
+
+def _parse_prompt_fields(
+    text: str, mode_type=AnswerMode, *, allow_multiword_names: bool = False
+):
+    """Shared structural decoder; callers must verify their full versioned template."""
     lines = text.splitlines()
 
     def field(prefix):
@@ -392,9 +408,12 @@ def parse_prompt(text: str) -> tuple[SpatialProblem, tuple[Value, ...], AnswerMo
             raise ValueError(f"expected one {prefix} field")
         return matches[0]
 
-    mode = AnswerMode(field("Contract: "))
+    mode = mode_type(field("Contract: "))
     objects = tuple(field("Objects: ").split(", "))
-    kind, target, reference = field("Query: ").split()
+    query_record = field("Query: ")
+    kind, target, reference = (
+        shlex.split(query_record) if allow_multiword_names else query_record.split()
+    )
     if kind == "direction":
         query = DirectionQuery(target, reference)
     elif kind in {"which", "count"}:
@@ -410,7 +429,12 @@ def parse_prompt(text: str) -> tuple[SpatialProblem, tuple[Value, ...], AnswerMo
     end = next(i for i, line in enumerate(lines) if line.startswith("Question: "))
     atoms = []
     for line in lines[start:end]:
-        match = re.fullmatch(r"(\w+) is to the (\w+) of (\w+)\.", line)
+        match = re.fullmatch(
+            r"(.+) is to the (\w+) of (.+)\."
+            if allow_multiword_names
+            else r"(\w+) is to the (\w+) of (\w+)\.",
+            line,
+        )
         if match is None:
             raise ValueError("invalid atomic sentence")
         subject, direction, reference = match.groups()
@@ -421,6 +445,4 @@ def parse_prompt(text: str) -> tuple[SpatialProblem, tuple[Value, ...], AnswerMo
     menu = tuple(field(f"{letter}. ") for letter in "ABCD")
     if isinstance(query, CountQuery):
         menu = tuple(int(value) for value in menu)
-    if render_prompt(problem, menu, mode) != text:
-        raise ValueError("prompt does not match the full composition-v1 template")
     return problem, menu, mode

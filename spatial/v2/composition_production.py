@@ -753,7 +753,16 @@ def stratum(entry, kind):
 
 
 def generate(
-    entries, policy, exclusions, tokenizer, solver, *, admission=None, keys=None
+    entries,
+    policy,
+    exclusions,
+    tokenizer,
+    solver,
+    *,
+    admission=None,
+    keys=None,
+    apply_quotas=True,
+    admission_ids=None,
 ):
     """Stream every scheduled outcome; never retry, top up, or move a rejected base."""
     keys = preflight(entries, exclusions) if keys is None else keys
@@ -792,13 +801,19 @@ def generate(
                 )
                 yield record
                 continue
-            query_key = query_profile(problem)["key"]
-            if query_key in seen:
+            query_key = query_profile(problem)["key"] if admission_ids is None else None
+            duplicate = (
+                query_key in seen
+                if admission_ids is None
+                else record["base_id"] not in admission_ids
+            )
+            if duplicate:
                 record.update(
                     status="duplicate", reason="canonical query already scheduled"
                 )
             else:
-                seen.add(query_key)
+                if query_key is not None:
+                    seen.add(query_key)
                 admitted = (
                     admit(entry, problem, policy, tokenizer, solver)
                     if admission is None
@@ -808,13 +823,19 @@ def generate(
                 if record["status"] == "accepted":
                     count_cell = None
                     if kind == "count" and entry.depth is not None:
-                        values = record["semantics"]["possible"]
+                        field = policy.get("answer_set_field", "possible")
+                        if field not in ("possible", "entailed"):
+                            raise ValueError("unknown Count answer-set field")
+                        values = record["semantics"][field]
                         if len(values) != 1 or type(values[0]) is not int:
                             raise ValueError(
                                 "controlled Count must have one verified integer value"
                             )
                         record["controlled_count_value"] = values[0]
                         count_cell = f"{cell}/{values[0]}"
+                    if not apply_quotas:
+                        yield record
+                        continue
                     if used[cell] >= targets.get(cell, 0):
                         record["status"] = "quota-excess"
                     elif source_used[source_cell] >= source_targets.get(source_cell, 0):

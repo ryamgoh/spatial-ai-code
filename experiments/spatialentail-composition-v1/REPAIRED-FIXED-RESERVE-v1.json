@@ -1,0 +1,27 @@
+{
+  "recipe_version": "all-scene-forest-v1",
+  "config_sha256": "c4beecdb71a6dad1e2cc25a6394848c72213156ff1f898dd61420a9c57f59804",
+  "exclusion_sha256": "a72b6bc765ff3cd8e1cb09a6e6bca5ddd421b5a135bc6ffe1aa07857f79870fb",
+  "selection_25_percent_arithmetic_conflicts": [
+    {
+      "split": "extrapolation-test",
+      "selection_bases": 400,
+      "proposed_multi_bases": 100,
+      "maximum_unique_substantive_bases": 300,
+      "unchanged_unique_substantive_minimum": 400
+    }
+  ],
+  "new_seeds": false,
+  "quota_relaxations": false,
+  "production_allocation_changed": false,
+  "replacement_generated": false,
+  "sealed": false,
+  "training_started": false,
+  "full_retention_tested": false,
+  "noncontrolled_supply_reverified": false,
+  "milp_run": false,
+  "status": "fixed-recipe-mapping-blocked",
+  "mapping_preflight": "failed",
+  "mapping_error": "related repaired construction family crosses splits",
+  "seconds": 216.30501420801738
+}

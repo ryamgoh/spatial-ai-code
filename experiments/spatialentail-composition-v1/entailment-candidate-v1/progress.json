@@ -1,0 +1,1 @@
+{"completed":20071,"elapsed_seconds":1608.39,"new_admissions_per_second":12.4789,"ordered_attempts":20065,"ordered_statuses":{"accepted":20059,"duplicate":5,"unsupported":1},"reused_checkpoints":0,"stage":"admission","stop_reason":null,"total":31239,"workers":8}

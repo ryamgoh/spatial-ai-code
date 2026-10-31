@@ -1,0 +1,296 @@
+{
+  "status": "combined-infeasible-under-current-unique-substantive-minima",
+  "config_sha256": "c4beecdb71a6dad1e2cc25a6394848c72213156ff1f898dd61420a9c57f59804",
+  "exclusion_sha256": "a72b6bc765ff3cd8e1cb09a6e6bca5ddd421b5a135bc6ffe1aa07857f79870fb",
+  "base_target": 10800,
+  "diagnostic_multi_selection_bases": 900,
+  "multi_target_denominator": "all 3600 Selection bases, including E/F cases",
+  "per_split_or_depth_multi_quota": false,
+  "g2_g3_g4_allocation_approved": false,
+  "new_seeds": false,
+  "numeric_quota_relaxations": false,
+  "approved_unique_decision_depth_revision": true,
+  "replacement_generated": false,
+  "sealed": false,
+  "training_started": false,
+  "milp_run": false,
+  "full_retention_passed": false,
+  "scheduled_stories": null,
+  "source_phase_reused": true,
+  "intermediate_metadata_directory": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatialentail-combined-2451btfy",
+  "source_metadata_path": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatialentail-combined-zmzz4qhq/noncontrolled.jsonl",
+  "source_metadata_sha256": "fc93620c2793ac2a92ca8ecc55d924c8f065ce7fb1a53674a59d315c5464aa2d",
+  "noncontrolled": {
+    "checked_slots": 7632,
+    "accepted_slots_before_dedup": 3928,
+    "statuses": {
+      "accepted": 3928,
+      "unsupported": 164,
+      "pre-admission-rejected": 3540
+    },
+    "status_by_source_query": [
+      {
+        "cell": "dev/count/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 42,
+          "unsupported": 1
+        }
+      },
+      {
+        "cell": "dev/count/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/count/targeted",
+        "statuses": {
+          "accepted": 40,
+          "unsupported": 20
+        }
+      },
+      {
+        "cell": "dev/direction/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 43
+        }
+      },
+      {
+        "cell": "dev/direction/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/direction/targeted",
+        "statuses": {
+          "accepted": 60
+        }
+      },
+      {
+        "cell": "dev/which/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 43
+        }
+      },
+      {
+        "cell": "dev/which/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/which/targeted",
+        "statuses": {
+          "accepted": 58,
+          "unsupported": 2
+        }
+      },
+      {
+        "cell": "in-range-test/count/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/count/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/count/targeted",
+        "statuses": {
+          "unsupported": 33,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/direction/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/direction/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/direction/targeted",
+        "statuses": {
+          "accepted": 119
+        }
+      },
+      {
+        "cell": "in-range-test/which/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/which/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/which/targeted",
+        "statuses": {
+          "unsupported": 10,
+          "accepted": 109
+        }
+      },
+      {
+        "cell": "train/count/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/count/random-world",
+        "statuses": {
+          "accepted": 348,
+          "pre-admission-rejected": 435,
+          "unsupported": 1
+        }
+      },
+      {
+        "cell": "train/count/targeted",
+        "statuses": {
+          "accepted": 212,
+          "unsupported": 87
+        }
+      },
+      {
+        "cell": "train/direction/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/direction/random-world",
+        "statuses": {
+          "accepted": 349,
+          "pre-admission-rejected": 435
+        }
+      },
+      {
+        "cell": "train/direction/targeted",
+        "statuses": {
+          "accepted": 299
+        }
+      },
+      {
+        "cell": "train/which/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/which/random-world",
+        "statuses": {
+          "accepted": 349,
+          "pre-admission-rejected": 435
+        }
+      },
+      {
+        "cell": "train/which/targeted",
+        "statuses": {
+          "accepted": 289,
+          "unsupported": 10
+        }
+      }
+    ],
+    "rejection_reasons": [
+      {
+        "reason": "ValueError: plain scenes require every object to occur in a premise",
+        "count": 3540
+      },
+      {
+        "reason": "UnsupportedEvidence: previously scoped distractor changes all-scene answers",
+        "count": 162
+      },
+      {
+        "reason": "UnsupportedEvidence: negative membership lacks axis exclusion",
+        "count": 2
+      }
+    ],
+    "max_target_tokens": {
+      "natural": 779,
+      "symbolic": 962
+    },
+    "multi_selection_supply_before_dedup": 196
+  },
+  "mandatory_noncontrolled_source_shortfalls": [],
+  "multi_selection_necessary_bound": {
+    "by_split": [
+      {
+        "split": "train",
+        "controlled_selection_quota": 1400,
+        "unique_substantive_minimum": 1400,
+        "optimistic_noncontrolled_substantive_supply": 2,
+        "optimistic_noncontrolled_multi_supply": 122,
+        "optimistic_total_multi_upper_bound": 124
+      },
+      {
+        "split": "dev",
+        "controlled_selection_quota": 280,
+        "unique_substantive_minimum": 280,
+        "optimistic_noncontrolled_substantive_supply": 0,
+        "optimistic_noncontrolled_multi_supply": 28,
+        "optimistic_total_multi_upper_bound": 28
+      },
+      {
+        "split": "in-range-test",
+        "controlled_selection_quota": 560,
+        "unique_substantive_minimum": 560,
+        "optimistic_noncontrolled_substantive_supply": 1,
+        "optimistic_noncontrolled_multi_supply": 45,
+        "optimistic_total_multi_upper_bound": 46
+      },
+      {
+        "split": "extrapolation-test",
+        "controlled_selection_quota": 400,
+        "unique_substantive_minimum": 0,
+        "optimistic_noncontrolled_substantive_supply": 0,
+        "optimistic_noncontrolled_multi_supply": 0,
+        "optimistic_total_multi_upper_bound": 400
+      }
+    ],
+    "overall_upper_bound": 598,
+    "target": 900,
+    "deduplication_or_other_coverage_rejections_applied": false,
+    "verification_failures_counted_optimistically": 0
+  },
+  "reason": "optimistic multi-Selection bound is below the overall 25% target",
+  "controlled_full_admission_run": false,
+  "milp_reason": "unnecessary: a necessary combined capacity bound fails",
+  "multi_25_percent_retention_tested": false,
+  "multi_25_percent_necessary_conditions_tested": true,
+  "seconds": 0.2434221249714028,
+  "software_sha256": {
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/check_combined_all_scene.py": "15a2caa7e20689600f8c0eebe9d53e818366ab112378b564c2a257d8589badf4",
+    "spatial/v2/entailment_retention.py": "8eb564a27ae45c0e1c2190113d828612b385d3aa16909f9364790d8c9f08dae4",
+    "spatial/v2/entailment_production.py": "3f0dae8c8dc0c738f61780c25c150fa0163fec4a0e19f1fca73ce4a692e849e6",
+    "spatial/v2/entailment_scene_recipes.py": "67321e21156b75718e788fc0e622656d0039156eac67c2d5a9ee1e28d19d9649",
+    "spatial/v2/entailment_dataset.py": "308c5b20734b6797df8056728e6c46f06ebb7eaf4d6701cb73c496764b04330b",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/audit_entailment_candidate.py": "98d980ec7cd507a785ccf3dbe5ab3144e9be824f203ad15d6dca059cf18024d6"
+  }
+}

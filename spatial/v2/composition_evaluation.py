@@ -26,12 +26,26 @@ from spatial.v2.composition_training import (
     verify_prepared,
     write_jsonl,
 )
+from spatial.v2.entailment_contracts import (
+    VERSION as ENTAILMENT_VERSION,
+)
+from spatial.v2.entailment_contracts import (
+    Contract,
+)
+from spatial.v2.entailment_contracts import (
+    parse_answer as parse_entailment_answer,
+)
 
 
 def allowed_answers(contract):
-    if contract == "single":
+    if contract in {"single", Contract.UNIQUE.value}:
         return list("ABCDEF")
-    if contract not in {"visible-possible", "all-possible"}:
+    if contract not in {
+        "visible-possible",
+        "all-possible",
+        Contract.LISTED.value,
+        Contract.EXHAUSTIVE.value,
+    }:
         raise ValueError("unknown contract")
     return ["".join(c) for n in range(1, 5) for c in combinations("ABCD", n)] + [
         "E",
@@ -41,7 +55,12 @@ def allowed_answers(contract):
 
 def parse_or_none(text, contract, stage):
     try:
-        return parse_answer(text, contract, stage=stage)
+        parser = (
+            parse_entailment_answer
+            if contract in {c.value for c in Contract}
+            else parse_answer
+        )
+        return parser(text, contract, stage=stage)
     except ValueError:
         return None
 
@@ -68,11 +87,50 @@ def adapter_hash(path):
     )
 
 
+def evaluation_contracts(rows):
+    from spatial.v2.entailment_unique_study import STUDY_SCOPE, validate_row
+
+    contracts = {row["contract"] for row in rows}
+    old_contracts = {"single", "visible-possible", "all-possible"}
+    new_contracts = {c.value for c in Contract}
+    scopes = {row.get("study_scope") for row in rows}
+    if scopes != {None}:
+        if scopes != {STUDY_SCOPE} or not rows:
+            raise ValueError("evaluation cannot mix or guess study scopes")
+        if len({r.get("prompt_version") for r in rows}) != 1:
+            raise ValueError("evaluation cannot mix prompt versions")
+        for row in rows:
+            validate_row(row)
+        return (Contract.UNIQUE.value,)
+    if contracts == new_contracts:
+        if any(row.get("interface") != ENTAILMENT_VERSION for row in rows):
+            raise ValueError("entailment evaluation requires its versioned interface")
+        from spatial.v2.entailment_scene_protocol import SCOPE, VERSION
+
+        protocols = {(r.get("prompt_version"), r.get("scope_policy")) for r in rows}
+        if len(protocols) != 1:
+            raise ValueError("evaluation cannot mix scoped and all-scene protocols")
+        if not protocols <= {(None, None), (VERSION, SCOPE)}:
+            raise ValueError("unknown evaluation prompt protocol")
+        return tuple(c.value for c in Contract)
+    elif contracts == old_contracts:
+        if any(row.get("interface") == ENTAILMENT_VERSION for row in rows):
+            raise ValueError("entailment interface cannot use possibility contracts")
+        return ("single", "visible-possible", "all-possible")
+    else:
+        raise ValueError("all three contracts from one semantic version are required")
+
+
 def score(rows, outputs):
     expected = {r["id"]: r for r in rows}
     found = {r["id"]: r for r in outputs}
-    if len(found) != len(outputs) or set(expected) != set(found):
+    if (
+        len(expected) != len(rows)
+        or len(found) != len(outputs)
+        or set(expected) != set(found)
+    ):
         raise ValueError("evaluation IDs must match the frozen split exactly")
+    contract_order = evaluation_contracts(rows)
     answers = {
         stage: {
             key: parse_or_none(
@@ -88,7 +146,7 @@ def score(rows, outputs):
             key: answers[stage][key] == row["answer"] for key, row in expected.items()
         }
         by_contract = {}
-        for contract in ("single", "visible-possible", "all-possible"):
+        for contract in contract_order:
             keys = [k for k, row in expected.items() if row["contract"] == contract]
             if not keys:
                 raise ValueError("every contract must be present")
@@ -96,9 +154,9 @@ def score(rows, outputs):
                 "correct": sum(correct[k] for k in keys),
                 "total": len(keys),
             }
-        macro = (
-            sum(Fraction(c["correct"], c["total"]) for c in by_contract.values()) / 3
-        )
+        macro = sum(
+            Fraction(c["correct"], c["total"]) for c in by_contract.values()
+        ) / len(contract_order)
         totals[f"stage{stage}"] = {
             "correct": sum(correct.values()),
             "total": len(correct),
@@ -122,6 +180,8 @@ def score(rows, outputs):
             "coverage",
             "recipe",
             "gold_answer_class",
+            "depth",
+            "entailed_count",
         ):
             groups = {}
             for key, row in expected.items():
@@ -137,6 +197,33 @@ def score(rows, outputs):
                 cell["correct"] += correct[key]
                 cell["total"] += 1
             totals[f"stage{stage}"]["slices"][field] = groups
+        if Contract.LISTED.value in contract_order:
+            option_cells = {
+                label: {"correct": 0, "total": 0}
+                for label in ("entailed", "contingent", "impossible")
+            }
+            for key, row in expected.items():
+                # Listed directly labels displayed claims. Unique/Exhaustive
+                # escapes do not expose a full claim classification.
+                if (
+                    row["contract"] != Contract.LISTED.value
+                    or row.get("semantic_case") == "inconsistent"
+                ):
+                    continue
+                predicted = answers[stage][key]
+                interpretable = predicted is not None and predicted != "E"
+                for letter in "ABCD":
+                    entailed = letter in row["entailed_menu_letters"]
+                    label = (
+                        "entailed"
+                        if entailed
+                        else row["negative_menu_categories"][letter]
+                    )
+                    option_cells[label]["total"] += 1
+                    option_cells[label]["correct"] += interpretable and (
+                        (letter in predicted) == entailed
+                    )
+            totals[f"stage{stage}"]["listed_option_classification"] = option_cells
     totals["generated_tokens"] = {
         f"stage{stage}": sum(len(r[f"stage{stage}"]["token_ids"]) for r in outputs)
         for stage in (1, 2)
@@ -193,7 +280,9 @@ def select_epoch(rows, runs, style, manifest_hash):
             raise ValueError("checkpoint selection requires matching dev provenance")
         scores = score(rows, run["outputs"])
         cells = scores["stage1"]["contracts"]
-        macro = sum(Fraction(c["correct"], c["total"]) for c in cells.values()) / 3
+        macro = sum(Fraction(c["correct"], c["total"]) for c in cells.values()) / len(
+            cells
+        )
         ranked.append((macro, -run["epoch"], run))
     selected = max(ranked, key=lambda item: item[:2])[2]
     return {
@@ -202,7 +291,11 @@ def select_epoch(rows, runs, style, manifest_hash):
         "adapter_sha256": selected["adapter_sha256"],
         "manifest_sha256": manifest_hash,
         "style": style,
-        "rule": "Stage-1 macro-contract dev accuracy; earliest epoch breaks ties",
+        "rule": (
+            "Unique Stage-1 dev view accuracy; earliest epoch breaks ties"
+            if evaluation_contracts(rows) == (Contract.UNIQUE.value,)
+            else "Stage-1 macro-contract dev accuracy; earliest epoch breaks ties"
+        ),
     }
 
 
@@ -259,11 +352,18 @@ def run_gpu(prepared, output, style, split, adapter=None, epoch=None, smoke=Fals
             raise ValueError(f"runtime tokenizer changed: {name}")
     tokenizer = AutoTokenizer.from_pretrained(snapshot, local_files_only=True)
     rows = [r for r in read_jsonl(prepared / "references.jsonl") if r["split"] == split]
+    contract_order = evaluation_contracts(rows)
     if smoke:
-        rows = [
-            next(r for r in rows if r["contract"] == contract)
-            for contract in ("single", "visible-possible", "all-possible")
-        ]
+        if contract_order == (Contract.UNIQUE.value,):
+            rows = [
+                next(r for r in rows if r["query_kind"] == kind)
+                for kind in ("direction", "which", "count")
+            ]
+        else:
+            rows = [
+                next(r for r in rows if r["contract"] == contract)
+                for contract in contract_order
+            ]
     engine = LLM(
         model=MODEL,
         revision=REVISION,

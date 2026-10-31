@@ -1,0 +1,30 @@
+{
+  "status": "references-rerendered-and-audited",
+  "manifest_sha256": "66344742f71bd6a4b091bcc35bc06ddb613a82581bdbbd1ed6050860ae96fa9e",
+  "spool": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-reference-v3-ae127pev",
+  "results_sha256": "3c234e66611dc58f3ecdf9bdd5f9ac6c3b32753d4b84da95ff9c74809622e190",
+  "statuses": {
+    "passed": 6000
+  },
+  "failures": [],
+  "tokens": {
+    "natural": {
+      "old_mean": 590.4731666666667,
+      "new_mean": 333.25033333333334,
+      "old_max": 1653,
+      "new_max": 1146
+    },
+    "symbolic": {
+      "old_mean": 640.9243333333334,
+      "new_mean": 386.8231666666667,
+      "old_max": 1825,
+      "new_max": 1301
+    }
+  },
+  "output": "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v3",
+  "preserved_inputs_unchanged": true,
+  "non_reference_content_unchanged": true,
+  "evidence_unchanged": true,
+  "exact_ambiguity_with_two_cases": 900,
+  "candidate_manifest_sha256": "2d1342306560426225b929bafe35f19dcd8e8e951e2128114c81007dc432e894"
+}

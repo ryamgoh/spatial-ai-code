@@ -1,0 +1,389 @@
+{
+  "status": "prototype-complete-not-a-training-release",
+  "attempts": 260,
+  "manifest_path": "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/ALL-CONTROLLED-PROTOTYPE-v1.manifest.json",
+  "manifest_sha256": "4a4dd8b4baff38f65fa634b9e9ba07646f33c57d8c6258392c9c1c721b2dc486",
+  "records_path": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-all-controlled-prototype-es4fmrhv/records.jsonl",
+  "records_sha256": "5bb4aec439bf027ba40c20357a5403b4afa2c7ab96c9a51e8db26932aa159c22",
+  "originals_unchanged": true,
+  "statuses": {
+    "accepted": 260
+  },
+  "case_counts": [
+    {
+      "query": "count",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "count",
+      "case": "listed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "count",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "count",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "direction",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "direction",
+      "case": "listed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "direction",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "direction",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "case": "inconsistent",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "case": "listed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "case": "multiple",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "case": "no-entailed",
+      "status": "accepted",
+      "count": 20
+    },
+    {
+      "query": "which",
+      "case": "unlisted",
+      "status": "accepted",
+      "count": 20
+    }
+  ],
+  "size_groups": [
+    {
+      "construction_span": 1,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          13,
+          15
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 1,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          16,
+          18
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 2,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          15,
+          20
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 2,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          18,
+          23
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 3,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          16,
+          19
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 3,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          19,
+          22
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 4,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          17,
+          21
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 4,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          20,
+          24
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 5,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          18,
+          23
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 5,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          21,
+          26
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 6,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          19,
+          22
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 6,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          22,
+          25
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 7,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          20,
+          24
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 7,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          23,
+          27
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 8,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          21,
+          26
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 8,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          24,
+          29
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 9,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          22,
+          26
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 9,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          25,
+          29
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 10,
+      "extra_size": 0,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          23,
+          28
+        ]
+      ],
+      "all_13_cases_matched": true
+    },
+    {
+      "construction_span": 10,
+      "extra_size": 3,
+      "completed_slots": 13,
+      "objects_and_premises": [
+        [
+          26,
+          31
+        ]
+      ],
+      "all_13_cases_matched": true
+    }
+  ],
+  "max_target_tokens": {
+    "natural": 2780,
+    "symbolic": 3000
+  },
+  "probes": [
+    {
+      "query": "direction",
+      "model": "size_only",
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.5,
+      "majority_accuracy": 0.5,
+      "families": 10
+    },
+    {
+      "query": "direction",
+      "model": "structural_counts",
+      "accuracy": 0.7,
+      "balanced_accuracy": 0.7,
+      "majority_accuracy": 0.5,
+      "families": 10
+    },
+    {
+      "query": "which",
+      "model": "size_only",
+      "accuracy": 0.45,
+      "balanced_accuracy": 0.5,
+      "majority_accuracy": 0.6,
+      "families": 10
+    },
+    {
+      "query": "which",
+      "model": "structural_counts",
+      "accuracy": 0.63,
+      "balanced_accuracy": 0.6416666666666666,
+      "majority_accuracy": 0.6,
+      "families": 10
+    },
+    {
+      "query": "count",
+      "model": "size_only",
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.5,
+      "majority_accuracy": 0.5,
+      "families": 10
+    },
+    {
+      "query": "count",
+      "model": "structural_counts",
+      "accuracy": 0.7125,
+      "balanced_accuracy": 0.7124999999999999,
+      "majority_accuracy": 0.5,
+      "families": 10
+    }
+  ],
+  "failures": []
+}

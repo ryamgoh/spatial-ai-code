@@ -1,0 +1,212 @@
+{
+  "status": "audited-unsealed-training-export",
+  "preflight": {
+    "counts": {
+      "attempts": 6045,
+      "duplicate_or_evaluation_query": 45
+    },
+    "shortages": []
+  },
+  "manifest_sha256": "34ea037103362d53bb770027eee2d4434854a63affa724ec2c48e0a0bf4f35f2",
+  "spool": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-controlled-training-bbz88psr",
+  "evaluation_bases": 4800,
+  "held_out_sha256": "c19250414a4f868b3519927fe237dc11c2b28f26d414eaa7472fa824def6c281",
+  "selected_constructions_sha256": "2f01490e0d6c24e0e311f06dbb46255dcc3d5050feb2d920bd433d721f6716b6",
+  "statuses": {
+    "accepted": 6000
+  },
+  "admissions_sha256": "7ad0fc66e80292d85e7c454ae86a8b3b813af835bb770a11d9e02ea0933df6c9",
+  "failures": [],
+  "preserved_inputs_unchanged": true,
+  "independent_audit": "passed",
+  "answer_counts": {
+    "direction": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "no-entailed-answer": 450,
+      "inconsistent": 150
+    },
+    "which": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "multiple-entailed": 300,
+      "no-entailed-answer": 225,
+      "inconsistent": 75
+    },
+    "count": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "no-entailed-answer": 450,
+      "inconsistent": 150
+    }
+  },
+  "size_counts": [
+    {
+      "query": "count",
+      "premises": 6,
+      "non-E": 12,
+      "E": 6
+    },
+    {
+      "query": "count",
+      "premises": 9,
+      "non-E": 11,
+      "E": 5
+    },
+    {
+      "query": "count",
+      "premises": 12,
+      "non-E": 89,
+      "E": 37
+    },
+    {
+      "query": "count",
+      "premises": 18,
+      "non-E": 126,
+      "E": 55
+    },
+    {
+      "query": "count",
+      "premises": 19,
+      "non-E": 154,
+      "E": 67
+    },
+    {
+      "query": "count",
+      "premises": 20,
+      "non-E": 322,
+      "E": 137
+    },
+    {
+      "query": "count",
+      "premises": 22,
+      "non-E": 196,
+      "E": 84
+    },
+    {
+      "query": "count",
+      "premises": 23,
+      "non-E": 266,
+      "E": 113
+    },
+    {
+      "query": "count",
+      "premises": 24,
+      "non-E": 224,
+      "E": 96
+    },
+    {
+      "query": "direction",
+      "premises": 6,
+      "non-E": 4,
+      "E": 6
+    },
+    {
+      "query": "direction",
+      "premises": 9,
+      "non-E": 9,
+      "E": 5
+    },
+    {
+      "query": "direction",
+      "premises": 12,
+      "non-E": 99,
+      "E": 37
+    },
+    {
+      "query": "direction",
+      "premises": 18,
+      "non-E": 126,
+      "E": 55
+    },
+    {
+      "query": "direction",
+      "premises": 19,
+      "non-E": 154,
+      "E": 67
+    },
+    {
+      "query": "direction",
+      "premises": 20,
+      "non-E": 322,
+      "E": 137
+    },
+    {
+      "query": "direction",
+      "premises": 22,
+      "non-E": 196,
+      "E": 84
+    },
+    {
+      "query": "direction",
+      "premises": 23,
+      "non-E": 266,
+      "E": 113
+    },
+    {
+      "query": "direction",
+      "premises": 24,
+      "non-E": 224,
+      "E": 96
+    },
+    {
+      "query": "which",
+      "premises": 6,
+      "non-E": 4,
+      "E": 6
+    },
+    {
+      "query": "which",
+      "premises": 9,
+      "non-E": 9,
+      "E": 5
+    },
+    {
+      "query": "which",
+      "premises": 12,
+      "non-E": 121,
+      "E": 37
+    },
+    {
+      "query": "which",
+      "premises": 18,
+      "non-E": 124,
+      "E": 54
+    },
+    {
+      "query": "which",
+      "premises": 19,
+      "non-E": 151,
+      "E": 66
+    },
+    {
+      "query": "which",
+      "premises": 20,
+      "non-E": 317,
+      "E": 139
+    },
+    {
+      "query": "which",
+      "premises": 22,
+      "non-E": 193,
+      "E": 83
+    },
+    {
+      "query": "which",
+      "premises": 23,
+      "non-E": 261,
+      "E": 114
+    },
+    {
+      "query": "which",
+      "premises": 24,
+      "non-E": 220,
+      "E": 96
+    }
+  ],
+  "max_target_tokens": {
+    "natural": 1653,
+    "symbolic": 1825
+  },
+  "output": "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v2"
+}

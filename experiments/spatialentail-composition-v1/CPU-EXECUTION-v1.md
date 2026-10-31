@@ -4,6 +4,34 @@ The original serial candidate is stopped. Its 554 completed records and original
 receipts remain untouched. This implementation prepares a new execution version;
 it does not submit a Slurm job, restart generation, seal data or authorize training.
 
+## Entailment-Only Routing
+
+The executor now selects its production implementation from the configuration
+schema. `entailment-production-v1` with interface `spatialentail-entailment-v1`
+uses entailment-only admission, coverage gates and exports; the historical
+`composition-production-v1` configuration retains possibility-based semantics.
+The launcher still invokes the same `composition_execution` module.
+
+The [new configuration draft](entailment-config-draft-v1.json) is not executable:
+it requires a frozen status and approved revised coverage before generation.
+Do not change those markers merely to bypass review. Source/evidence supply
+verification and external-adapter work remain outstanding.
+
+The new path shares ordered workers, quota accounting, hash-pinned checkpoints,
+exclusive output locking, progress, resume and early stopping. Checkpoint identity
+includes production schema and semantic interface. Old checkpoints cannot be
+resumed as entailment-only output.
+
+Atomic counterexamples use deterministic axis-graph rank assignments, fixing
+only required query relations with incremental SAT checks when necessary.
+The initial full-coordinate optimization alternative was rejected after it
+slowed the development workload. The graph path matches serial and one-/two-worker
+records on tested fixtures without restoring all-pairs canonicalization.
+See [the current migration checkpoint](ENTAILMENT-MIGRATION-STATUS-v2.md).
+
+The proof/evidence details and timing receipts below describe the historical
+possibility-based path unless explicitly labelled otherwise.
+
 ## What Changed
 
 `composition_solver_reuse.QuestionSolver` caches successful analyses and claim
@@ -123,6 +151,26 @@ Submit from the repository root. The launcher defaults to 16 CPUs, one node,
 one task, 2 GB per allocated CPU and a 24-hour limit. Adjust CPU, memory and
 wall-time requests to the actual partition policy and measurements.
 
+The launcher uses `uv --native-tls`, supported by older cluster installations
+as well as the current local version (where it is a deprecated alias).
+Job 1041432 failed before Python started because its installed `uv` rejected
+the newer `--system-certs` spelling. The replacement was checked locally with
+uv 0.8.22 and 0.12.17; this is not a completed server generation test.
+
+If downloading the tokenizer, use the Python API to avoid differences in how
+Hugging Face CLI versions parse multiple `--include` patterns:
+
+```sh
+TOKENIZER="$(uv --native-tls run --no-project --with huggingface-hub python -c \
+  'from huggingface_hub import snapshot_download; print(snapshot_download("Qwen/Qwen3.5-4B", revision="851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a", allow_patterns=["*.json", "*.jinja", "*.txt"]))')" &&
+export TOKENIZER
+```
+
+On login nodes with thread-creation limits, first export
+`UV_CONCURRENT_INSTALLS=1`, `UV_CONCURRENT_BUILDS=1`,
+`UV_CONCURRENT_DOWNLOADS=1`, `TOKIO_WORKER_THREADS=1`, and
+`RAYON_NUM_THREADS=1`. These setup limits do not change the admission worker count.
+
 Set these environment variables to server paths:
 
 ```sh
@@ -163,6 +211,9 @@ No Slurm job has been submitted as part of this implementation.
 
 ## Verification
 
+- Launcher compatibility: both generation and benchmark tests reproduce the
+  unsupported-flag error before the fix and pass afterward (2 tests). Shell
+  syntax validation also passes. No Slurm resubmission was performed locally.
 - Early-stopping v2 execution and production regression selection: 120 passed
   in 108.55 seconds. Includes each individual audit gate blocking success,
   exact split-size checks, bounded out-of-order work, successful early stop with

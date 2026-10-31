@@ -1,0 +1,2035 @@
+{
+  "status": "bounded-diagnostics-not-a-release",
+  "prompt_version": "plain-all-scene-entailment-v1",
+  "scope_policy": "all-nonreference-scene-objects-v1",
+  "sampling": "first train/extrapolation record per query/requested-depth/source; first eight external bases per query",
+  "input_sha256": {
+    "experiments/spatialentail-composition-v1/entailment-candidate-v5/attempts.jsonl": "0b529a6618633261da7f16864e76f71e858c3f3988aedfd56069aaadb13b2c2b",
+    "experiments/spatialentail-composition-v1/spatialmap-entailment-all-five-v3/references.jsonl": "ee46848cf34f00cdec7998c3f570c78b91d78075718ab68aa1dd9c8c38cfa4db"
+  },
+  "script_sha256": "9a32e43a24c5fabdc09887d3309182787615c9ba51fb6149e8bd4ffbb4a4c9ab",
+  "synthetic": [
+    {
+      "base_id": "production-b2758-s5-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 9,
+      "old_domain_size": 9,
+      "new_domain_size": 30,
+      "old_entailed": [
+        3
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 25,
+        "contingent": 5
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        30
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1197,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b416-s4-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 5,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Southwest"
+      ],
+      "new_entailed": [
+        "Southwest"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 5,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 468,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b416-s4-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 5,
+      "old_domain_size": 6,
+      "new_domain_size": 27,
+      "old_entailed": [
+        "Restaurant"
+      ],
+      "new_entailed": [
+        "Restaurant"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "contingent": 4,
+        "impossible": 22
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        26
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 2174,
+      "primary_answers": {
+        "unique-entailed": "B",
+        "listed-entailed": "B",
+        "exhaustive-entailed": "B"
+      }
+    },
+    {
+      "base_id": "production-b724-s1-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 7,
+      "old_domain_size": 8,
+      "new_domain_size": 26,
+      "old_entailed": [
+        2
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 23,
+        "contingent": 3
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        26
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1000,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b11-s7-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 1,
+      "old_domain_size": 8,
+      "new_domain_size": 14,
+      "old_entailed": [
+        0
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "contingent": 3,
+        "impossible": 11
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        14
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 563,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b534-s15-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 6,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "South"
+      ],
+      "new_entailed": [
+        "South"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 6,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 499,
+      "primary_answers": {
+        "unique-entailed": "B",
+        "listed-entailed": "B",
+        "exhaustive-entailed": "B"
+      }
+    },
+    {
+      "base_id": "production-b534-s15-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 6,
+      "old_domain_size": 7,
+      "new_domain_size": 28,
+      "old_entailed": [
+        "Supermarket"
+      ],
+      "new_entailed": [
+        "Police Station",
+        "Supermarket"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 2,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 22,
+        "contingent": 4
+      },
+      "unique_failure_depth": 6,
+      "independent_claim_counts": [
+        2,
+        26
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1237,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "AD",
+        "exhaustive-entailed": "AD"
+      }
+    },
+    {
+      "base_id": "production-b214-s0-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 3,
+      "old_domain_size": 9,
+      "new_domain_size": 16,
+      "old_entailed": [
+        1
+      ],
+      "new_entailed": [
+        1
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 3,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 15
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        15
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1384,
+      "primary_answers": {
+        "unique-entailed": "A",
+        "listed-entailed": "A",
+        "exhaustive-entailed": "A"
+      }
+    },
+    {
+      "base_id": "production-b328-s4-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 4,
+      "old_domain_size": 6,
+      "new_domain_size": 19,
+      "old_entailed": [
+        1
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 15,
+        "contingent": 4
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        19
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 746,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b2-s18-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 1,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Southeast"
+      ],
+      "new_entailed": [
+        "Southeast"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 1,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 310,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b2-s18-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 1,
+      "old_domain_size": 8,
+      "new_domain_size": 9,
+      "old_entailed": [
+        "Supermarket"
+      ],
+      "new_entailed": [
+        "Supermarket"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "deepest support does not change the entailed-answer set",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 8
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        8
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 379,
+      "primary_answers": {
+        "unique-entailed": "C",
+        "listed-entailed": "C",
+        "exhaustive-entailed": "C"
+      }
+    },
+    {
+      "base_id": "production-b2905-s118-direction",
+      "query_kind": "direction",
+      "source": "random-atoms",
+      "requested_depth": null,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "inconsistent: no entailment-depth descriptor",
+      "depth_matches_old": false,
+      "negative_categories": {},
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        0
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 202,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "E",
+        "exhaustive-entailed": "E"
+      }
+    },
+    {
+      "base_id": "production-b2905-s118-which",
+      "query_kind": "which",
+      "source": "random-atoms",
+      "requested_depth": null,
+      "old_domain_size": 5,
+      "new_domain_size": 5,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "inconsistent: no entailment-depth descriptor",
+      "depth_matches_old": false,
+      "negative_categories": {},
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        0
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 202,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "E",
+        "exhaustive-entailed": "E"
+      }
+    },
+    {
+      "base_id": "production-b2905-s118-count",
+      "query_kind": "count",
+      "source": "random-atoms",
+      "requested_depth": null,
+      "old_domain_size": 6,
+      "new_domain_size": 6,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "inconsistent: no entailment-depth descriptor",
+      "depth_matches_old": false,
+      "negative_categories": {},
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        0
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 202,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "E",
+        "exhaustive-entailed": "E"
+      }
+    },
+    {
+      "base_id": "production-b870-s5-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 8,
+      "old_domain_size": 9,
+      "new_domain_size": 26,
+      "old_entailed": [
+        4
+      ],
+      "new_entailed": [
+        5
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 8,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 25
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        25
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 2671,
+      "primary_answers": {
+        "unique-entailed": "B",
+        "listed-entailed": "B",
+        "exhaustive-entailed": "B"
+      }
+    },
+    {
+      "base_id": "production-b656-s25-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 7,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Northwest"
+      ],
+      "new_entailed": [
+        "Northwest"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 7,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 503,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b656-s25-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 7,
+      "old_domain_size": 6,
+      "new_domain_size": 25,
+      "old_entailed": [
+        "Bakery"
+      ],
+      "new_entailed": [
+        "Bakery"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 20,
+        "contingent": 4
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        24
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1279,
+      "primary_answers": {
+        "unique-entailed": "A",
+        "listed-entailed": "A",
+        "exhaustive-entailed": "A"
+      }
+    },
+    {
+      "base_id": "production-b2904-s624-direction",
+      "query_kind": "direction",
+      "source": "random-world",
+      "requested_depth": null,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "no entailed direction",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 5,
+        "contingent": 3
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        8
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 327,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b2904-s624-which",
+      "query_kind": "which",
+      "source": "random-world",
+      "requested_depth": null,
+      "old_domain_size": 6,
+      "new_domain_size": 6,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 2,
+        "contingent": 4
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 236,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b2904-s624-count",
+      "query_kind": "count",
+      "source": "random-world",
+      "requested_depth": null,
+      "old_domain_size": 7,
+      "new_domain_size": 7,
+      "old_entailed": [],
+      "new_entailed": [],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "contingent": 5,
+        "impossible": 2
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 302,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b299-s0-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 4,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Northwest"
+      ],
+      "new_entailed": [
+        "Northwest"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 4,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 413,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b299-s0-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 4,
+      "old_domain_size": 4,
+      "new_domain_size": 18,
+      "old_entailed": [
+        "Zoo"
+      ],
+      "new_entailed": [
+        "Zoo"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 12,
+        "contingent": 5
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        17
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 929,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b786-s11-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 8,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "West"
+      ],
+      "new_entailed": [
+        "West"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 8,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 533,
+      "primary_answers": {
+        "unique-entailed": "C",
+        "listed-entailed": "C",
+        "exhaustive-entailed": "C"
+      }
+    },
+    {
+      "base_id": "production-b786-s11-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 8,
+      "old_domain_size": 4,
+      "new_domain_size": 26,
+      "old_entailed": [
+        "Train Station"
+      ],
+      "new_entailed": [
+        "Bakery",
+        "Cafe",
+        "Gas Station",
+        "Gym",
+        "Hospital",
+        "Post Office",
+        "Theater",
+        "Train Station"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 2,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 15,
+        "contingent": 3
+      },
+      "unique_failure_depth": 2,
+      "independent_claim_counts": [
+        8,
+        18
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 673,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "ABCD",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b2679-s17-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 9,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "South"
+      ],
+      "new_entailed": [
+        "South"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 9,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 570,
+      "primary_answers": {
+        "unique-entailed": "B",
+        "listed-entailed": "B",
+        "exhaustive-entailed": "B"
+      }
+    },
+    {
+      "base_id": "production-b2679-s17-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 9,
+      "old_domain_size": 4,
+      "new_domain_size": 23,
+      "old_entailed": [
+        "Theater"
+      ],
+      "new_entailed": [
+        "Bank",
+        "Bookstore",
+        "City Hall",
+        "Clinic",
+        "Fire Station",
+        "Gym",
+        "High School",
+        "Restaurant",
+        "Theater",
+        "Zoo"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 2,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 9,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 13
+      },
+      "unique_failure_depth": 2,
+      "independent_claim_counts": [
+        10,
+        13
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 648,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "ABCD",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b2907-s32-direction",
+      "query_kind": "direction",
+      "source": "targeted",
+      "requested_depth": null,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Northeast"
+      ],
+      "new_entailed": [
+        "Northeast"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 2,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 351,
+      "primary_answers": {
+        "unique-entailed": "C",
+        "listed-entailed": "C",
+        "exhaustive-entailed": "C"
+      }
+    },
+    {
+      "base_id": "production-b2907-s32-which",
+      "query_kind": "which",
+      "source": "targeted",
+      "requested_depth": null,
+      "old_domain_size": 7,
+      "new_domain_size": 13,
+      "old_entailed": [
+        "Gym",
+        "High School",
+        "Theater"
+      ],
+      "new_entailed": [
+        "Gym",
+        "High School",
+        "Pharmacy",
+        "Theater"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 4,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 7,
+        "contingent": 2
+      },
+      "unique_failure_depth": 1,
+      "independent_claim_counts": [
+        4,
+        9
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 638,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "ABCD",
+        "exhaustive-entailed": "ABCD"
+      }
+    },
+    {
+      "base_id": "production-b2907-s32-count",
+      "query_kind": "count",
+      "source": "targeted",
+      "requested_depth": null,
+      "old_domain_size": 8,
+      "new_domain_size": 14,
+      "old_entailed": [
+        3
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 4,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 11,
+        "contingent": 3
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        14
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 567,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b593-s5-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 6,
+      "old_domain_size": 7,
+      "new_domain_size": 23,
+      "old_entailed": [
+        2
+      ],
+      "new_entailed": [
+        3
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 6,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 22
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        22
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 2333,
+      "primary_answers": {
+        "unique-entailed": "A",
+        "listed-entailed": "A",
+        "exhaustive-entailed": "A"
+      }
+    },
+    {
+      "base_id": "production-b2816-s0-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 10,
+      "old_domain_size": 7,
+      "new_domain_size": 29,
+      "old_entailed": [
+        0
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 4,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "contingent": 4,
+        "impossible": 25
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        29
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 1156,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b180-s9-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 3,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "Northwest"
+      ],
+      "new_entailed": [
+        "Northwest"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 3,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 398,
+      "primary_answers": {
+        "unique-entailed": "C",
+        "listed-entailed": "C",
+        "exhaustive-entailed": "C"
+      }
+    },
+    {
+      "base_id": "production-b180-s9-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 3,
+      "old_domain_size": 8,
+      "new_domain_size": 20,
+      "old_entailed": [
+        "Library"
+      ],
+      "new_entailed": [
+        "Library"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 16,
+        "contingent": 3
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        19
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 811,
+      "primary_answers": {
+        "unique-entailed": "D",
+        "listed-entailed": "D",
+        "exhaustive-entailed": "D"
+      }
+    },
+    {
+      "base_id": "production-b2798-s27-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 10,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "South"
+      ],
+      "new_entailed": [
+        "South"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 10,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 626,
+      "primary_answers": {
+        "unique-entailed": "B",
+        "listed-entailed": "B",
+        "exhaustive-entailed": "B"
+      }
+    },
+    {
+      "base_id": "production-b2798-s27-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 10,
+      "old_domain_size": 6,
+      "new_domain_size": 28,
+      "old_entailed": [
+        "Fire Station"
+      ],
+      "new_entailed": [
+        "Bank",
+        "Clinic",
+        "Fire Station",
+        "Grocery Store",
+        "Library",
+        "Museum",
+        "Pharmacy",
+        "Supermarket",
+        "Theater",
+        "Veterinary Clinic",
+        "Zoo"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 2,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 15,
+        "contingent": 2
+      },
+      "unique_failure_depth": 2,
+      "independent_claim_counts": [
+        11,
+        17
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 783,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "ABCD",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b132-s0-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 2,
+      "old_domain_size": 5,
+      "new_domain_size": 8,
+      "old_entailed": [
+        3
+      ],
+      "new_entailed": [
+        4
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 2,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 706,
+      "primary_answers": {
+        "unique-entailed": "A",
+        "listed-entailed": "A",
+        "exhaustive-entailed": "A"
+      }
+    },
+    {
+      "base_id": "production-b520-s0-count",
+      "query_kind": "count",
+      "source": "controlled",
+      "requested_depth": 5,
+      "old_domain_size": 7,
+      "new_domain_size": 18,
+      "old_entailed": [
+        4
+      ],
+      "new_entailed": [],
+      "entailed_changed": true,
+      "old_menu_label_changes": 3,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 14,
+        "contingent": 4
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        0,
+        18
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 713,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "F",
+        "exhaustive-entailed": "F"
+      }
+    },
+    {
+      "base_id": "production-b54-s16-direction",
+      "query_kind": "direction",
+      "source": "controlled",
+      "requested_depth": 2,
+      "old_domain_size": 8,
+      "new_domain_size": 8,
+      "old_entailed": [
+        "North"
+      ],
+      "new_entailed": [
+        "North"
+      ],
+      "entailed_changed": false,
+      "old_menu_label_changes": 0,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": 2,
+      "depth_matches_old": true,
+      "negative_categories": {
+        "impossible": 7
+      },
+      "unique_failure_depth": null,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 402,
+      "primary_answers": {
+        "unique-entailed": "A",
+        "listed-entailed": "A",
+        "exhaustive-entailed": "A"
+      }
+    },
+    {
+      "base_id": "production-b54-s16-which",
+      "query_kind": "which",
+      "source": "controlled",
+      "requested_depth": 2,
+      "old_domain_size": 7,
+      "new_domain_size": 14,
+      "old_entailed": [
+        "Gallery"
+      ],
+      "new_entailed": [
+        "Gallery",
+        "Veterinary Clinic"
+      ],
+      "entailed_changed": true,
+      "old_menu_label_changes": 2,
+      "context_irrelevance": "not replayed: retained v5 records omit context indices",
+      "new_depth": null,
+      "depth_reason": "negative membership lacks axis exclusion",
+      "depth_matches_old": false,
+      "negative_categories": {
+        "impossible": 10,
+        "contingent": 2
+      },
+      "unique_failure_depth": 2,
+      "independent_claim_counts": [
+        2,
+        12
+      ],
+      "reference_status": "independently-replayed",
+      "tokens_admitted": true,
+      "max_target_tokens": 662,
+      "primary_answers": {
+        "unique-entailed": "E",
+        "listed-entailed": "AB",
+        "exhaustive-entailed": "AB"
+      }
+    }
+  ],
+  "development_context_checks": [
+    {
+      "story_id": "sampled-forest-v1-3-d2-Northeast-v0-m2",
+      "query_kind": "DirectionQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    },
+    {
+      "story_id": "sampled-forest-v1-3-d2-Northeast-v0-m2",
+      "query_kind": "WhichQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    },
+    {
+      "story_id": "sampled-forest-v1-3-d2-Northeast-v0-m2",
+      "query_kind": "CountQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    },
+    {
+      "story_id": "sampled-forest-v1-7-d8-Northeast-v0-m0-axis-split",
+      "query_kind": "DirectionQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    },
+    {
+      "story_id": "sampled-forest-v1-7-d8-Northeast-v0-m0-axis-split",
+      "query_kind": "WhichQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    },
+    {
+      "story_id": "sampled-forest-v1-7-d8-Northeast-v0-m0-axis-split",
+      "query_kind": "CountQuery",
+      "status": "accepted",
+      "stage": "complete",
+      "reason": null
+    }
+  ],
+  "external": [
+    {
+      "base_id": "spatialmap.tqa.2000.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2001.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2002.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2003.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        8
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2004.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        8
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2005.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2006.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2007.0",
+      "query_kind": "direction",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        7
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2000.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        5
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2001.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        4
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2002.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        2,
+        3
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2003.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        2,
+        3
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2004.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        5
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2005.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        2,
+        3
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2006.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        2,
+        3
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2007.1",
+      "query_kind": "which",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        2,
+        3
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2000.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        5
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2001.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2002.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2003.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2004.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2005.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        5
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2006.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        1,
+        5
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    },
+    {
+      "base_id": "spatialmap.tqa.2007.2",
+      "query_kind": "count",
+      "entailed_changed": false,
+      "labels_changed": false,
+      "independent_claim_counts": [
+        0,
+        6
+      ],
+      "visible_alias_leak": false,
+      "tokens_admitted": true
+    }
+  ],
+  "plain_examples": {
+    "count": [
+      {
+        "id": "production-b2758-s5-count-m0-unique-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b2758-s5-count-m0",
+        "contract": "unique-entailed",
+        "menu": [
+          27,
+          12,
+          24,
+          15
+        ],
+        "prompt": "Consider a map with multiple objects:\nGym is to the Southeast of Post Office.\nGym is to the Northwest of Museum.\nCafe is to the Northwest of Gym.\nBakery is to the North of Police Station.\nRestaurant is to the Northwest of Bookstore.\nTrain Station is to the Southeast of Bank.\nTheater is to the Southeast of City Hall.\nBookstore is to the Southeast of Courthouse.\nFire Station is to the Southeast of Zoo.\nZoo is to the Southeast of Bakery.\nStadium is to the Northwest of Bank.\nVeterinary Clinic is to the Northwest of Cinema.\nGallery is to the Northwest of Stadium.\nPost Office is to the Southeast of Clinic.\nGym is to the Northwest of Hotel.\nHigh School is to the Southeast of Grocery Store.\nPark is to the Southeast of Library.\nRestaurant is to the Southeast of Clinic.\nTrain Station is to the Northwest of Veterinary Clinic.\nPharmacy is to the Northwest of Gallery.\nHospital is to the Northwest of Florist.\nGym is to the Northwest of City Hall.\nGas Station is to the East of Train Station.\nFlorist is to the Northwest of Supermarket.\nPharmacy is to the Southeast of Theater.\nHospital is to the Southeast of Bookstore.\nFire Station is to the Northwest of Post Office.\nZoo is to the Southeast of Supermarket.\nWhat exact number of objects southeast of Gym is guaranteed? Select E if no exact count is guaranteed, or F if that count is not listed.\nA. 27\nB. 12\nC. 24\nD. 15\nE. Cannot be determined\nF. None of the above",
+        "answer": "E",
+        "references": {
+          "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store, High School, Library, Park and Police Station are southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 12.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store and Library are north of Gym. High School is northeast of Gym. Police Station is southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 13.\n\nThe claim that exactly 0 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 1 eligible candidate qualifies is false in Case 1, so it is not entailed.\n\nThe claim that exactly 2 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 3 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 4 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 5 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 6 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 7 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 8 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 9 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 10 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 11 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 12 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 13 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 14 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 15 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 16 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 17 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 18 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 19 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 20 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 21 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 22 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 23 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 24 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 25 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 26 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 27 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 28 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 29 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E",
+          "symbolic": "Case 1 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). SW(Grocery Store,Gym) & SW(High School,Gym) & SW(Library,Gym) & SW(Park,Gym) & SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=12.\n\nCase 2 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Park,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). N(Grocery Store,Gym) & N(Library,Gym). NE(High School,Gym). SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=13.\n\nThe claim that count=0 is false in Case 1, so it is not entailed.\n\nThe claim that count=1 is false in Case 1, so it is not entailed.\n\nThe claim that count=2 is false in Case 1, so it is not entailed.\n\nThe claim that count=3 is false in Case 1, so it is not entailed.\n\nThe claim that count=4 is false in Case 1, so it is not entailed.\n\nThe claim that count=5 is false in Case 1, so it is not entailed.\n\nThe claim that count=6 is false in Case 1, so it is not entailed.\n\nThe claim that count=7 is false in Case 1, so it is not entailed.\n\nThe claim that count=8 is false in Case 1, so it is not entailed.\n\nThe claim that count=9 is false in Case 1, so it is not entailed.\n\nThe claim that count=10 is false in Case 1, so it is not entailed.\n\nThe claim that count=11 is false in Case 1, so it is not entailed.\n\nThe claim that count=12 is false in Case 2, so it is not entailed.\n\nThe claim that count=13 is false in Case 1, so it is not entailed.\n\nThe claim that count=14 is false in Case 1, so it is not entailed.\n\nThe claim that count=15 is false in Case 1, so it is not entailed.\n\nThe claim that count=16 is false in Case 1, so it is not entailed.\n\nThe claim that count=17 is false in Case 1, so it is not entailed.\n\nThe claim that count=18 is false in Case 1, so it is not entailed.\n\nThe claim that count=19 is false in Case 1, so it is not entailed.\n\nThe claim that count=20 is false in Case 1, so it is not entailed.\n\nThe claim that count=21 is false in Case 1, so it is not entailed.\n\nThe claim that count=22 is false in Case 1, so it is not entailed.\n\nThe claim that count=23 is false in Case 1, so it is not entailed.\n\nThe claim that count=24 is false in Case 1, so it is not entailed.\n\nThe claim that count=25 is false in Case 1, so it is not entailed.\n\nThe claim that count=26 is false in Case 1, so it is not entailed.\n\nThe claim that count=27 is false in Case 1, so it is not entailed.\n\nThe claim that count=28 is false in Case 1, so it is not entailed.\n\nThe claim that count=29 is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "contingent",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      },
+      {
+        "id": "production-b2758-s5-count-m0-listed-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b2758-s5-count-m0",
+        "contract": "listed-entailed",
+        "menu": [
+          27,
+          12,
+          24,
+          15
+        ],
+        "prompt": "Consider a map with multiple objects:\nGym is to the Southeast of Post Office.\nGym is to the Northwest of Museum.\nCafe is to the Northwest of Gym.\nBakery is to the North of Police Station.\nRestaurant is to the Northwest of Bookstore.\nTrain Station is to the Southeast of Bank.\nTheater is to the Southeast of City Hall.\nBookstore is to the Southeast of Courthouse.\nFire Station is to the Southeast of Zoo.\nZoo is to the Southeast of Bakery.\nStadium is to the Northwest of Bank.\nVeterinary Clinic is to the Northwest of Cinema.\nGallery is to the Northwest of Stadium.\nPost Office is to the Southeast of Clinic.\nGym is to the Northwest of Hotel.\nHigh School is to the Southeast of Grocery Store.\nPark is to the Southeast of Library.\nRestaurant is to the Southeast of Clinic.\nTrain Station is to the Northwest of Veterinary Clinic.\nPharmacy is to the Northwest of Gallery.\nHospital is to the Northwest of Florist.\nGym is to the Northwest of City Hall.\nGas Station is to the East of Train Station.\nFlorist is to the Northwest of Supermarket.\nPharmacy is to the Southeast of Theater.\nHospital is to the Southeast of Bookstore.\nFire Station is to the Northwest of Post Office.\nZoo is to the Southeast of Supermarket.\nWhich listed exact counts of objects southeast of Gym are guaranteed? Select all that apply, or F if none are guaranteed.\nA. 27\nB. 12\nC. 24\nD. 15\nE. Cannot be determined\nF. None of the above",
+        "answer": "F",
+        "references": {
+          "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store, High School, Library, Park and Police Station are southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 12.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store and Library are north of Gym. High School is northeast of Gym. Police Station is southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 13.\n\nThe claim that exactly 27 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 12 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 24 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 15 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nNo displayed answer is entailed.\n\nAnswer: F",
+          "symbolic": "Case 1 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). SW(Grocery Store,Gym) & SW(High School,Gym) & SW(Library,Gym) & SW(Park,Gym) & SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=12.\n\nCase 2 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Park,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). N(Grocery Store,Gym) & N(Library,Gym). NE(High School,Gym). SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=13.\n\nThe claim that count=27 is false in Case 1, so it is not entailed.\n\nThe claim that count=12 is false in Case 2, so it is not entailed.\n\nThe claim that count=24 is false in Case 1, so it is not entailed.\n\nThe claim that count=15 is false in Case 1, so it is not entailed.\n\nNo displayed answer is entailed.\n\nAnswer: F"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "contingent",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      },
+      {
+        "id": "production-b2758-s5-count-m0-exhaustive-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b2758-s5-count-m0",
+        "contract": "exhaustive-entailed",
+        "menu": [
+          27,
+          12,
+          24,
+          15
+        ],
+        "prompt": "Consider a map with multiple objects:\nGym is to the Southeast of Post Office.\nGym is to the Northwest of Museum.\nCafe is to the Northwest of Gym.\nBakery is to the North of Police Station.\nRestaurant is to the Northwest of Bookstore.\nTrain Station is to the Southeast of Bank.\nTheater is to the Southeast of City Hall.\nBookstore is to the Southeast of Courthouse.\nFire Station is to the Southeast of Zoo.\nZoo is to the Southeast of Bakery.\nStadium is to the Northwest of Bank.\nVeterinary Clinic is to the Northwest of Cinema.\nGallery is to the Northwest of Stadium.\nPost Office is to the Southeast of Clinic.\nGym is to the Northwest of Hotel.\nHigh School is to the Southeast of Grocery Store.\nPark is to the Southeast of Library.\nRestaurant is to the Southeast of Clinic.\nTrain Station is to the Northwest of Veterinary Clinic.\nPharmacy is to the Northwest of Gallery.\nHospital is to the Northwest of Florist.\nGym is to the Northwest of City Hall.\nGas Station is to the East of Train Station.\nFlorist is to the Northwest of Supermarket.\nPharmacy is to the Southeast of Theater.\nHospital is to the Southeast of Bookstore.\nFire Station is to the Northwest of Post Office.\nZoo is to the Southeast of Supermarket.\nWhich exact counts of objects southeast of Gym are guaranteed? Select the complete set, or F if any guaranteed count is missing from the options or there are none.\nA. 27\nB. 12\nC. 24\nD. 15\nE. Cannot be determined\nF. No complete entailed answer can be formed from A-D.",
+        "answer": "F",
+        "references": {
+          "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store, High School, Library, Park and Police Station are southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 12.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Clinic, Courthouse, Fire Station, Florist, Hospital, Post Office, Restaurant, Supermarket and Zoo are northwest of Gym. Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic are southeast of Gym. Grocery Store and Library are north of Gym. High School is northeast of Gym. Police Station is southwest of Gym. Only Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station and Veterinary Clinic qualify in this arrangement. This gives a count of 13.\n\nThe claim that exactly 0 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 1 eligible candidate qualifies is false in Case 1, so it is not entailed.\n\nThe claim that exactly 2 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 3 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 4 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 5 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 6 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 7 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 8 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 9 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 10 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 11 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 12 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 13 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 14 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 15 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 16 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 17 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 18 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 19 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 20 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 21 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 22 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 23 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 24 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 25 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 26 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 27 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 28 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 29 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: F",
+          "symbolic": "Case 1 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). SW(Grocery Store,Gym) & SW(High School,Gym) & SW(Library,Gym) & SW(Park,Gym) & SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=12.\n\nCase 2 (counterexample satisfying all premises): NW(Bakery,Gym) & NW(Bookstore,Gym) & NW(Cafe,Gym) & NW(Clinic,Gym) & NW(Courthouse,Gym) & NW(Fire Station,Gym) & NW(Florist,Gym) & NW(Hospital,Gym) & NW(Post Office,Gym) & NW(Restaurant,Gym) & NW(Supermarket,Gym) & NW(Zoo,Gym). SE(Bank,Gym) & SE(Cinema,Gym) & SE(City Hall,Gym) & SE(Gallery,Gym) & SE(Gas Station,Gym) & SE(Hotel,Gym) & SE(Museum,Gym) & SE(Park,Gym) & SE(Pharmacy,Gym) & SE(Stadium,Gym) & SE(Theater,Gym) & SE(Train Station,Gym) & SE(Veterinary Clinic,Gym). N(Grocery Store,Gym) & N(Library,Gym). NE(High School,Gym). SW(Police Station,Gym). Qualifying objects = {Bank, Cinema, City Hall, Gallery, Gas Station, Hotel, Museum, Park, Pharmacy, Stadium, Theater, Train Station, Veterinary Clinic}. count=13.\n\nThe claim that count=0 is false in Case 1, so it is not entailed.\n\nThe claim that count=1 is false in Case 1, so it is not entailed.\n\nThe claim that count=2 is false in Case 1, so it is not entailed.\n\nThe claim that count=3 is false in Case 1, so it is not entailed.\n\nThe claim that count=4 is false in Case 1, so it is not entailed.\n\nThe claim that count=5 is false in Case 1, so it is not entailed.\n\nThe claim that count=6 is false in Case 1, so it is not entailed.\n\nThe claim that count=7 is false in Case 1, so it is not entailed.\n\nThe claim that count=8 is false in Case 1, so it is not entailed.\n\nThe claim that count=9 is false in Case 1, so it is not entailed.\n\nThe claim that count=10 is false in Case 1, so it is not entailed.\n\nThe claim that count=11 is false in Case 1, so it is not entailed.\n\nThe claim that count=12 is false in Case 2, so it is not entailed.\n\nThe claim that count=13 is false in Case 1, so it is not entailed.\n\nThe claim that count=14 is false in Case 1, so it is not entailed.\n\nThe claim that count=15 is false in Case 1, so it is not entailed.\n\nThe claim that count=16 is false in Case 1, so it is not entailed.\n\nThe claim that count=17 is false in Case 1, so it is not entailed.\n\nThe claim that count=18 is false in Case 1, so it is not entailed.\n\nThe claim that count=19 is false in Case 1, so it is not entailed.\n\nThe claim that count=20 is false in Case 1, so it is not entailed.\n\nThe claim that count=21 is false in Case 1, so it is not entailed.\n\nThe claim that count=22 is false in Case 1, so it is not entailed.\n\nThe claim that count=23 is false in Case 1, so it is not entailed.\n\nThe claim that count=24 is false in Case 1, so it is not entailed.\n\nThe claim that count=25 is false in Case 1, so it is not entailed.\n\nThe claim that count=26 is false in Case 1, so it is not entailed.\n\nThe claim that count=27 is false in Case 1, so it is not entailed.\n\nThe claim that count=28 is false in Case 1, so it is not entailed.\n\nThe claim that count=29 is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: F"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "contingent",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      }
+    ],
+    "direction": [
+      {
+        "id": "production-b416-s4-direction-m0-unique-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-direction-m0",
+        "contract": "unique-entailed",
+        "menu": [
+          "Northwest",
+          "Southeast",
+          "East",
+          "Southwest"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhat single direction of Restaurant relative to Theater is guaranteed? Select E if no direction is guaranteed, or F if it is not listed.\nA. Northwest\nB. Southeast\nC. East\nD. Southwest\nE. Cannot be determined\nF. None of the above",
+        "answer": "D",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. From left to right, the order is Restaurant, Supermarket and Theater. From bottom to top, the order is Restaurant, Theater and Supermarket. So Restaurant is southwest of Theater.\n\nThe claim that Restaurant is north of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is northeast of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is east of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is southeast of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is south of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is west of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is northwest of Theater is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): x(Restaurant) < x(Supermarket) < x(Theater). y(Restaurant) < y(Theater) < y(Supermarket). => SW(Restaurant,Theater).\n\nThe claim that N(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that NE(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that E(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SE(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that S(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that W(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "impossible",
+          "C": "impossible"
+        }
+      },
+      {
+        "id": "production-b416-s4-direction-m0-listed-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-direction-m0",
+        "contract": "listed-entailed",
+        "menu": [
+          "Northwest",
+          "Southeast",
+          "East",
+          "Southwest"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhich listed directions of Restaurant relative to Theater are guaranteed? Select all that apply, or F if none are guaranteed.\nA. Northwest\nB. Southeast\nC. East\nD. Southwest\nE. Cannot be determined\nF. None of the above",
+        "answer": "D",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. From left to right, the order is Restaurant, Supermarket and Theater. From bottom to top, the order is Restaurant, Theater and Supermarket. So Restaurant is southwest of Theater.\n\nThe claim that Restaurant is northwest of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is southeast of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is east of Theater is false in Case 1, so it is not entailed.\n\nThe displayed entailed-answer set is {Southwest}.\n\nAnswer: D",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): x(Restaurant) < x(Supermarket) < x(Theater). y(Restaurant) < y(Theater) < y(Supermarket). => SW(Restaurant,Theater).\n\nThe claim that NW(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SE(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that E(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe displayed entailed-answer set is {Southwest}.\n\nAnswer: D"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "impossible",
+          "C": "impossible"
+        }
+      },
+      {
+        "id": "production-b416-s4-direction-m0-exhaustive-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-direction-m0",
+        "contract": "exhaustive-entailed",
+        "menu": [
+          "Northwest",
+          "Southeast",
+          "East",
+          "Southwest"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhich directions of Restaurant relative to Theater are guaranteed? Select the complete set, or F if any guaranteed direction is missing from the options or there are none.\nA. Northwest\nB. Southeast\nC. East\nD. Southwest\nE. Cannot be determined\nF. No complete entailed answer can be formed from A-D.",
+        "answer": "D",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. From left to right, the order is Restaurant, Supermarket and Theater. From bottom to top, the order is Restaurant, Theater and Supermarket. So Restaurant is southwest of Theater.\n\nThe claim that Restaurant is north of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is northeast of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is east of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is southeast of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is south of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is west of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is northwest of Theater is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): x(Restaurant) < x(Supermarket) < x(Theater). y(Restaurant) < y(Theater) < y(Supermarket). => SW(Restaurant,Theater).\n\nThe claim that N(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that NE(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that E(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SE(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that S(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that W(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Restaurant,Theater) is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "B": "impossible",
+          "C": "impossible"
+        }
+      }
+    ],
+    "which": [
+      {
+        "id": "production-b416-s4-which-m0-unique-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-which-m0",
+        "contract": "unique-entailed",
+        "menu": [
+          "University",
+          "Restaurant",
+          "Park",
+          "Stadium"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhich single object is guaranteed to be southwest of Theater? Select E if there is not exactly one such object in the scene, or F if that object is not listed.\nA. University\nB. Restaurant\nC. Park\nD. Stadium\nE. Cannot be determined\nF. None of the above",
+        "answer": "B",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Bakery is north of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Gym and Supermarket are northwest of Theater. Pharmacy, Restaurant and Stadium are southwest of Theater. Only Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Gym, Pharmacy, Restaurant and Stadium are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Supermarket is northwest of Theater. Only Bakery, Gym, Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 3: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Gym is north of Theater. Pharmacy, Restaurant and Stadium are southwest of Theater. Supermarket is northwest of Theater. Only Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 4: A counterexample arrangement satisfying all premises is the following. Bakery, Gym and Restaurant are southwest of Theater. Bookstore, Cafe, Courthouse, Hotel and Stadium are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Pharmacy is north of Theater. Supermarket is northwest of Theater. Only Bakery, Gym and Restaurant qualify in this arrangement.\n\nCase 5: A counterexample arrangement satisfying all premises is the following. Bakery, Gym and Restaurant are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Pharmacy and Supermarket are northwest of Theater. Stadium is north of Theater. Only Bakery, Gym and Restaurant qualify in this arrangement.\n\nThe claim that Bakery is southwest of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Bookstore is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Cafe is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Cinema is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that City Hall is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Clinic is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Courthouse is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Fire Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Florist is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Gas Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Grocery Store is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Gym is southwest of Theater is false in Case 3, so it is not entailed.\n\nThe claim that High School is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Hospital is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Hotel is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Library is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Park is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Pharmacy is southwest of Theater is false in Case 4, so it is not entailed.\n\nThe claim that Police Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Post Office is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Stadium is southwest of Theater is false in Case 5, so it is not entailed.\n\nThe claim that Supermarket is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Train Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that University is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Veterinary Clinic is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Zoo is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe complete entailed-answer set is {Restaurant}.\n\nAnswer: B",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): N(Bakery,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Gym,Theater) & NW(Supermarket,Theater). SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). Qualifying objects = {Pharmacy, Restaurant, Stadium}.\n\nCase 2 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Supermarket,Theater). Qualifying objects = {Bakery, Gym, Pharmacy, Restaurant, Stadium}.\n\nCase 3 (counterexample satisfying all premises): SE(Bakery,Theater) & SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). N(Gym,Theater). SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). NW(Supermarket,Theater). Qualifying objects = {Pharmacy, Restaurant, Stadium}.\n\nCase 4 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Restaurant,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater) & SE(Stadium,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). N(Pharmacy,Theater). NW(Supermarket,Theater). Qualifying objects = {Bakery, Gym, Restaurant}.\n\nCase 5 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Restaurant,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Pharmacy,Theater) & NW(Supermarket,Theater). N(Stadium,Theater). Qualifying objects = {Bakery, Gym, Restaurant}.\n\nThe claim that SW(Bakery,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SW(Bookstore,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Cafe,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Cinema,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(City Hall,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Clinic,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Courthouse,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Fire Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Florist,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Gas Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Grocery Store,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Gym,Theater) is false in Case 3, so it is not entailed.\n\nThe claim that SW(High School,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Hospital,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Hotel,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Library,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Park,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Pharmacy,Theater) is false in Case 4, so it is not entailed.\n\nThe claim that SW(Police Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Post Office,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Stadium,Theater) is false in Case 5, so it is not entailed.\n\nThe claim that SW(Supermarket,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Train Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(University,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Veterinary Clinic,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Zoo,Theater) is false in Case 2, so it is not entailed.\n\nThe complete entailed-answer set is {Restaurant}.\n\nAnswer: B"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      },
+      {
+        "id": "production-b416-s4-which-m0-listed-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-which-m0",
+        "contract": "listed-entailed",
+        "menu": [
+          "University",
+          "Restaurant",
+          "Park",
+          "Stadium"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhich listed objects are guaranteed to be southwest of Theater? Select all that apply, or F if none are guaranteed.\nA. University\nB. Restaurant\nC. Park\nD. Stadium\nE. Cannot be determined\nF. None of the above",
+        "answer": "B",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Bakery, Gym, Pharmacy, Restaurant and Stadium are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Supermarket is northwest of Theater. Only Bakery, Gym, Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Gym and Restaurant are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Pharmacy and Supermarket are northwest of Theater. Stadium is north of Theater. Only Bakery, Gym and Restaurant qualify in this arrangement.\n\nThe claim that University is southwest of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Park is southwest of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe displayed entailed-answer set is {Restaurant}.\n\nAnswer: B",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Supermarket,Theater). Qualifying objects = {Bakery, Gym, Pharmacy, Restaurant, Stadium}.\n\nCase 2 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Restaurant,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Pharmacy,Theater) & NW(Supermarket,Theater). N(Stadium,Theater). Qualifying objects = {Bakery, Gym, Restaurant}.\n\nThe claim that SW(University,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SW(Park,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SW(Stadium,Theater) is false in Case 2, so it is not entailed.\n\nThe displayed entailed-answer set is {Restaurant}.\n\nAnswer: B"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      },
+      {
+        "id": "production-b416-s4-which-m0-exhaustive-entailed",
+        "split": "scope-transition-diagnostics",
+        "interface": "spatialentail-entailment-v1",
+        "prompt_version": "plain-all-scene-entailment-v1",
+        "scope_policy": "all-nonreference-scene-objects-v1",
+        "reference_version": "self-contained-premise-keys-v1",
+        "bundle_id": "production-b416-s4-which-m0",
+        "contract": "exhaustive-entailed",
+        "menu": [
+          "University",
+          "Restaurant",
+          "Park",
+          "Stadium"
+        ],
+        "prompt": "Consider a map with multiple objects:\nFire Station is to the Northeast of Zoo.\nFire Station is to the Southwest of University.\nHotel is to the Southeast of Cafe.\nPharmacy is to the Northwest of Stadium.\nRestaurant is to the Southwest of Supermarket.\nHigh School is to the Northeast of Theater.\nPark is to the Northeast of Post Office.\nTheater is to the Southwest of Post Office.\nVeterinary Clinic is to the Northeast of Post Office.\nGrocery Store is to the Southwest of Library.\nClinic is to the Southwest of City Hall.\nCity Hall is to the Southwest of Hospital.\nCourthouse is to the Southeast of Hotel.\nTheater is to the Southeast of Supermarket.\nCourthouse is to the Northeast of Restaurant.\nFlorist is to the Southwest of Cinema.\nBookstore is to the Northwest of Cafe.\nCity Hall is to the Southwest of Zoo.\nGrocery Store is to the Northeast of Hospital.\nHigh School is to the Southwest of Florist.\nTrain Station is to the Northeast of Park.\nGym is to the Northwest of Bakery.\nPolice Station is to the Northeast of Train Station.\nBookstore is to the Southeast of Theater.\nTheater is to the Southwest of Clinic.\nGas Station is to the North of Grocery Store.\nWhich objects are guaranteed to be southwest of Theater? Select the complete set, or F if any guaranteed object is missing from the options or there are none.\nA. University\nB. Restaurant\nC. Park\nD. Stadium\nE. Cannot be determined\nF. No complete entailed answer can be formed from A-D.",
+        "answer": "B",
+        "references": {
+          "natural": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\nThe x-coordinates increase strictly along Restaurant, Supermarket and Theater (premise sources: P5 and P14). So Theater has a greater x-coordinate than Restaurant.\nThe y-coordinates increase strictly along Restaurant, Courthouse, Hotel, Cafe, Bookstore and Theater (premise sources: P15, P13, P3, P17 and P24). So Theater has a greater y-coordinate than Restaurant.\nTherefore, Restaurant is southwest of Theater in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Bakery is north of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Gym and Supermarket are northwest of Theater. Pharmacy, Restaurant and Stadium are southwest of Theater. Only Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Bakery, Gym, Pharmacy, Restaurant and Stadium are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Supermarket is northwest of Theater. Only Bakery, Gym, Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 3: A counterexample arrangement satisfying all premises is the following. Bakery, Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Gym is north of Theater. Pharmacy, Restaurant and Stadium are southwest of Theater. Supermarket is northwest of Theater. Only Pharmacy, Restaurant and Stadium qualify in this arrangement.\n\nCase 4: A counterexample arrangement satisfying all premises is the following. Bakery, Gym and Restaurant are southwest of Theater. Bookstore, Cafe, Courthouse, Hotel and Stadium are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Pharmacy is north of Theater. Supermarket is northwest of Theater. Only Bakery, Gym and Restaurant qualify in this arrangement.\n\nCase 5: A counterexample arrangement satisfying all premises is the following. Bakery, Gym and Restaurant are southwest of Theater. Bookstore, Cafe, Courthouse and Hotel are southeast of Theater. Cinema, City Hall, Clinic, Fire Station, Florist, Gas Station, Grocery Store, High School, Hospital, Library, Park, Police Station, Post Office, Train Station, University, Veterinary Clinic and Zoo are northeast of Theater. Pharmacy and Supermarket are northwest of Theater. Stadium is north of Theater. Only Bakery, Gym and Restaurant qualify in this arrangement.\n\nThe claim that Bakery is southwest of Theater is false in Case 1, so it is not entailed.\n\nThe claim that Bookstore is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Cafe is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Cinema is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that City Hall is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Clinic is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Courthouse is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Fire Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Florist is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Gas Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Grocery Store is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Gym is southwest of Theater is false in Case 3, so it is not entailed.\n\nThe claim that High School is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Hospital is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Hotel is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Library is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Park is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Pharmacy is southwest of Theater is false in Case 4, so it is not entailed.\n\nThe claim that Police Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Post Office is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Stadium is southwest of Theater is false in Case 5, so it is not entailed.\n\nThe claim that Supermarket is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Train Station is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that University is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Veterinary Clinic is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe claim that Zoo is southwest of Theater is false in Case 2, so it is not entailed.\n\nThe complete entailed-answer set is {Restaurant}.\n\nAnswer: B",
+          "symbolic": "Premises used (labels follow their order in the question):\nP3: Hotel is to the Southeast of Cafe.\nP5: Restaurant is to the Southwest of Supermarket.\nP13: Courthouse is to the Southeast of Hotel.\nP14: Theater is to the Southeast of Supermarket.\nP15: Courthouse is to the Northeast of Restaurant.\nP17: Bookstore is to the Northwest of Cafe.\nP24: Bookstore is to the Southeast of Theater.\n\n[P5, P14] x(Restaurant) < x(Supermarket) < x(Theater) => x(Restaurant) < x(Theater).\n[P15, P13, P3, P17, P24] y(Restaurant) < y(Courthouse) < y(Hotel) < y(Cafe) < y(Bookstore) < y(Theater) => y(Restaurant) < y(Theater).\nSW(Restaurant,Theater) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): N(Bakery,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Gym,Theater) & NW(Supermarket,Theater). SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). Qualifying objects = {Pharmacy, Restaurant, Stadium}.\n\nCase 2 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Supermarket,Theater). Qualifying objects = {Bakery, Gym, Pharmacy, Restaurant, Stadium}.\n\nCase 3 (counterexample satisfying all premises): SE(Bakery,Theater) & SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). N(Gym,Theater). SW(Pharmacy,Theater) & SW(Restaurant,Theater) & SW(Stadium,Theater). NW(Supermarket,Theater). Qualifying objects = {Pharmacy, Restaurant, Stadium}.\n\nCase 4 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Restaurant,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater) & SE(Stadium,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). N(Pharmacy,Theater). NW(Supermarket,Theater). Qualifying objects = {Bakery, Gym, Restaurant}.\n\nCase 5 (counterexample satisfying all premises): SW(Bakery,Theater) & SW(Gym,Theater) & SW(Restaurant,Theater). SE(Bookstore,Theater) & SE(Cafe,Theater) & SE(Courthouse,Theater) & SE(Hotel,Theater). NE(Cinema,Theater) & NE(City Hall,Theater) & NE(Clinic,Theater) & NE(Fire Station,Theater) & NE(Florist,Theater) & NE(Gas Station,Theater) & NE(Grocery Store,Theater) & NE(High School,Theater) & NE(Hospital,Theater) & NE(Library,Theater) & NE(Park,Theater) & NE(Police Station,Theater) & NE(Post Office,Theater) & NE(Train Station,Theater) & NE(University,Theater) & NE(Veterinary Clinic,Theater) & NE(Zoo,Theater). NW(Pharmacy,Theater) & NW(Supermarket,Theater). N(Stadium,Theater). Qualifying objects = {Bakery, Gym, Restaurant}.\n\nThe claim that SW(Bakery,Theater) is false in Case 1, so it is not entailed.\n\nThe claim that SW(Bookstore,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Cafe,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Cinema,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(City Hall,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Clinic,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Courthouse,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Fire Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Florist,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Gas Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Grocery Store,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Gym,Theater) is false in Case 3, so it is not entailed.\n\nThe claim that SW(High School,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Hospital,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Hotel,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Library,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Park,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Pharmacy,Theater) is false in Case 4, so it is not entailed.\n\nThe claim that SW(Police Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Post Office,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Stadium,Theater) is false in Case 5, so it is not entailed.\n\nThe claim that SW(Supermarket,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Train Station,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(University,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Veterinary Clinic,Theater) is false in Case 2, so it is not entailed.\n\nThe claim that SW(Zoo,Theater) is false in Case 2, so it is not entailed.\n\nThe complete entailed-answer set is {Restaurant}.\n\nAnswer: B"
+        },
+        "negative_menu_categories": {
+          "A": "impossible",
+          "C": "impossible",
+          "D": "contingent"
+        }
+      }
+    ]
+  },
+  "summary": {
+    "synthetic_bases": 39,
+    "by_query": {
+      "count": 13,
+      "direction": 13,
+      "which": 13
+    },
+    "changed_entailments_by_query": {
+      "count": 10,
+      "which": 6
+    },
+    "old_menu_label_changes": 46,
+    "depth_matches": 16,
+    "reference_status": {
+      "independently-replayed": 39
+    },
+    "count_without_invariant_total": 9,
+    "selection_sizes": {
+      "1": 5,
+      "2": 2,
+      "0": 2,
+      "8": 1,
+      "10": 1,
+      "4": 1,
+      "11": 1
+    },
+    "external_bases": 24,
+    "external_label_changes": 0
+  },
+  "not_covered": [
+    "quota feasibility",
+    "full manual prose review",
+    "full external regeneration",
+    "retained-v5 context-index replay"
+  ],
+  "replacement_generated": false,
+  "sealed": false,
+  "training_authorized": false
+}

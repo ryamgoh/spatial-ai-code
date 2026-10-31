@@ -1,0 +1,60 @@
+{
+  "source": "actual selected training base",
+  "base_id": "production-b5-s19-which",
+  "prompt_version": "plain-unique-system-rules-v1",
+  "independent_audit": "passed",
+  "premises_menus_labels_and_references_unchanged": true,
+  "messages": {
+    "natural": [
+      {
+        "role": "system",
+        "content": "Solve the spatial entailment problem using the stated assumptions and answer contract. Explain entailed claims with deductions and non-entailed claims with checked counterexample relationships in ordinary English. Do not treat a claim as entailed merely because it could hold. Cite premises by their 1-based sentence positions when needed. End with exactly one line 'Answer: <letters>' using the required letter format.\n\nNamed objects are distinct points on fixed global x/y axes. No two objects coincide; sharing one coordinate is allowed. Directions are exact coordinate comparisons: North means equal x and greater y; Northeast means greater x and greater y. There are no distances, unit steps, grid spacing, or map bounds. Unstated relations are unknown, not false. A valid arrangement satisfies every premise and these assumptions. A claim is entailed only when it holds in every valid arrangement. A claim that is merely compatible with the premises is not necessarily entailed. Under every contract, select E if no valid arrangement exists. For Which and Count, consider every object named in the premises except the reference object, independently of which options are displayed. Direction ranges over all eight exact directions. Count asks for an exact total, including zero; it is not the number of individually entailed members. Select its A-D option when exactly one answer value is entailed. Select F when that sole entailed value is not listed. Select E when no answer value is entailed, multiple answer values are entailed, or the premises are inconsistent. For Which, exactly one means one individually entailed object; another object that could qualify but is not guaranteed does not invalidate that sole entailment. When multiple objects are entailed, E indicates that there is no single answer, not uncertainty about those objects. End with exactly one line 'Answer: X', where X is one uppercase A-F letter."
+      },
+      {
+        "role": "user",
+        "content": "Consider a map with multiple objects:\nHospital is to the West of Police Station. Police Station is to the West of Restaurant. Clinic is to the West of Police Station. Pharmacy is to the East of Police Station. Supermarket is to the East of Police Station. Gallery is to the West of Supermarket. Clinic is to the West of Gallery. Police Station is to the West of Gallery.\n\nWhich object is west of Police Station?\nA. Clinic\nB. Pharmacy\nC. Gallery\nD. Hospital\nE. Cannot be determined\nF. None of the above"
+      }
+    ],
+    "symbolic": [
+      {
+        "role": "system",
+        "content": "Solve the spatial entailment problem using the stated assumptions and answer contract. Explain entailed claims with deductions and non-entailed claims with checked counterexample relationships using direction predicates and explicit x/y comparisons. Do not treat a claim as entailed merely because it could hold. Cite premises by their 1-based sentence positions when needed. End with exactly one line 'Answer: <letters>' using the required letter format.\n\nNamed objects are distinct points on fixed global x/y axes. No two objects coincide; sharing one coordinate is allowed. Directions are exact coordinate comparisons: North means equal x and greater y; Northeast means greater x and greater y. There are no distances, unit steps, grid spacing, or map bounds. Unstated relations are unknown, not false. A valid arrangement satisfies every premise and these assumptions. A claim is entailed only when it holds in every valid arrangement. A claim that is merely compatible with the premises is not necessarily entailed. Under every contract, select E if no valid arrangement exists. For Which and Count, consider every object named in the premises except the reference object, independently of which options are displayed. Direction ranges over all eight exact directions. Count asks for an exact total, including zero; it is not the number of individually entailed members. Select its A-D option when exactly one answer value is entailed. Select F when that sole entailed value is not listed. Select E when no answer value is entailed, multiple answer values are entailed, or the premises are inconsistent. For Which, exactly one means one individually entailed object; another object that could qualify but is not guaranteed does not invalidate that sole entailment. When multiple objects are entailed, E indicates that there is no single answer, not uncertainty about those objects. End with exactly one line 'Answer: X', where X is one uppercase A-F letter."
+      },
+      {
+        "role": "user",
+        "content": "Consider a map with multiple objects:\nHospital is to the West of Police Station. Police Station is to the West of Restaurant. Clinic is to the West of Police Station. Pharmacy is to the East of Police Station. Supermarket is to the East of Police Station. Gallery is to the West of Supermarket. Clinic is to the West of Gallery. Police Station is to the West of Gallery.\n\nWhich object is west of Police Station?\nA. Clinic\nB. Pharmacy\nC. Gallery\nD. Hospital\nE. Cannot be determined\nF. None of the above"
+      }
+    ]
+  },
+  "answer": "E",
+  "entailed": [
+    "Clinic",
+    "Hospital"
+  ],
+  "tokens": [
+    {
+      "id": "production-b5-s19-which-m0-unique-entailed",
+      "style": "natural",
+      "prompt_tokens": 509,
+      "target_tokens": 158,
+      "training_tokens": 669,
+      "supervised_tokens": 160,
+      "stage2_reserved_tokens": 4650,
+      "admitted": true
+    },
+    {
+      "id": "production-b5-s19-which-m0-unique-entailed",
+      "style": "symbolic",
+      "prompt_tokens": 514,
+      "target_tokens": 146,
+      "training_tokens": 662,
+      "supervised_tokens": 148,
+      "stage2_reserved_tokens": 4655,
+      "admitted": true
+    }
+  ],
+  "references": {
+    "natural": "Premises used (labels follow their order in the question):\nP1: Hospital is to the West of Police Station.\nP3: Clinic is to the West of Police Station.\n\nPolice Station has a greater x-coordinate than Clinic (premise sources: P3).\nClinic and Police Station share the same y-coordinate (premise sources: P3).\nTherefore, Clinic is west of Police Station in every valid arrangement.\n\nPolice Station has a greater x-coordinate than Hospital (premise sources: P1).\nHospital and Police Station share the same y-coordinate (premise sources: P1).\nTherefore, Hospital is west of Police Station in every valid arrangement.\n\nAt least two domain answers are entailed; Unique requires exactly one.\n\nAnswer: E",
+    "symbolic": "Premises used (labels follow their order in the question):\nP1: Hospital is to the West of Police Station.\nP3: Clinic is to the West of Police Station.\n\n[P3] x(Clinic) < x(Police Station).\n[P3] y(Clinic) = y(Police Station).\nW(Clinic,Police Station) in every valid arrangement.\n\n[P1] x(Hospital) < x(Police Station).\n[P1] y(Hospital) = y(Police Station).\nW(Hospital,Police Station) in every valid arrangement.\n\nAt least two domain answers are entailed; Unique requires exactly one.\n\nAnswer: E"
+  }
+}

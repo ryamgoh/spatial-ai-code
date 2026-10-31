@@ -1,0 +1,403 @@
+{
+  "status": "combined-diagnostic-retention-infeasible",
+  "config_sha256": "c4beecdb71a6dad1e2cc25a6394848c72213156ff1f898dd61420a9c57f59804",
+  "exclusion_sha256": "a72b6bc765ff3cd8e1cb09a6e6bca5ddd421b5a135bc6ffe1aa07857f79870fb",
+  "base_target": 10800,
+  "diagnostic_multi_selection_bases": 900,
+  "multi_target_denominator": "all 3600 Selection bases, including E/F cases",
+  "per_split_or_depth_multi_quota": false,
+  "g2_g3_g4_allocation_approved": false,
+  "new_seeds": false,
+  "numeric_quota_relaxations": false,
+  "approved_unique_decision_depth_revision": true,
+  "unique_decision_depth_revision_splits": [
+    "train",
+    "dev",
+    "in-range-test",
+    "extrapolation-test"
+  ],
+  "replacement_generated": false,
+  "sealed": false,
+  "training_started": false,
+  "milp_run": false,
+  "full_retention_passed": false,
+  "scheduled_stories": 18290,
+  "source_phase_reused": false,
+  "fresh_run": true,
+  "prompt_version": "plain-all-scene-entailment-v1",
+  "scope_policy": "all-nonreference-scene-objects-v1",
+  "controlled_recipe_version": "all-scene-forest-v3",
+  "intermediate_metadata_directory": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatialentail-combined-vpbudb5v",
+  "noncontrolled": {
+    "checked_slots": 7632,
+    "accepted_slots_before_dedup": 3928,
+    "statuses": {
+      "accepted": 3928,
+      "unsupported": 164,
+      "pre-admission-rejected": 3540
+    },
+    "status_by_source_query": [
+      {
+        "cell": "dev/count/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 42,
+          "unsupported": 1
+        }
+      },
+      {
+        "cell": "dev/count/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/count/targeted",
+        "statuses": {
+          "accepted": 40,
+          "unsupported": 20
+        }
+      },
+      {
+        "cell": "dev/direction/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 43
+        }
+      },
+      {
+        "cell": "dev/direction/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/direction/targeted",
+        "statuses": {
+          "accepted": 60
+        }
+      },
+      {
+        "cell": "dev/which/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 56,
+          "accepted": 43
+        }
+      },
+      {
+        "cell": "dev/which/random-world",
+        "statuses": {
+          "pre-admission-rejected": 81,
+          "accepted": 66
+        }
+      },
+      {
+        "cell": "dev/which/targeted",
+        "statuses": {
+          "accepted": 58,
+          "unsupported": 2
+        }
+      },
+      {
+        "cell": "in-range-test/count/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/count/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/count/targeted",
+        "statuses": {
+          "unsupported": 33,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/direction/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/direction/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/direction/targeted",
+        "statuses": {
+          "accepted": 119
+        }
+      },
+      {
+        "cell": "in-range-test/which/random-atoms",
+        "statuses": {
+          "pre-admission-rejected": 113,
+          "accepted": 86
+        }
+      },
+      {
+        "cell": "in-range-test/which/random-world",
+        "statuses": {
+          "pre-admission-rejected": 177,
+          "accepted": 130
+        }
+      },
+      {
+        "cell": "in-range-test/which/targeted",
+        "statuses": {
+          "unsupported": 10,
+          "accepted": 109
+        }
+      },
+      {
+        "cell": "train/count/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/count/random-world",
+        "statuses": {
+          "accepted": 348,
+          "pre-admission-rejected": 435,
+          "unsupported": 1
+        }
+      },
+      {
+        "cell": "train/count/targeted",
+        "statuses": {
+          "accepted": 212,
+          "unsupported": 87
+        }
+      },
+      {
+        "cell": "train/direction/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/direction/random-world",
+        "statuses": {
+          "accepted": 349,
+          "pre-admission-rejected": 435
+        }
+      },
+      {
+        "cell": "train/direction/targeted",
+        "statuses": {
+          "accepted": 299
+        }
+      },
+      {
+        "cell": "train/which/random-atoms",
+        "statuses": {
+          "accepted": 212,
+          "pre-admission-rejected": 318
+        }
+      },
+      {
+        "cell": "train/which/random-world",
+        "statuses": {
+          "accepted": 349,
+          "pre-admission-rejected": 435
+        }
+      },
+      {
+        "cell": "train/which/targeted",
+        "statuses": {
+          "accepted": 289,
+          "unsupported": 10
+        }
+      }
+    ],
+    "rejection_reasons": [
+      {
+        "reason": "ValueError: plain scenes require every object to occur in a premise",
+        "count": 3540
+      },
+      {
+        "reason": "UnsupportedEvidence: previously scoped distractor changes all-scene answers",
+        "count": 162
+      },
+      {
+        "reason": "UnsupportedEvidence: negative membership lacks axis exclusion",
+        "count": 2
+      }
+    ],
+    "max_target_tokens": {
+      "natural": 779,
+      "symbolic": 962
+    },
+    "multi_selection_supply_before_dedup": 196
+  },
+  "mandatory_noncontrolled_source_shortfalls": [],
+  "multi_selection_necessary_bound": {
+    "by_split": [
+      {
+        "split": "train",
+        "controlled_selection_quota": 1400,
+        "unique_substantive_minimum": 0,
+        "optimistic_noncontrolled_substantive_supply": 2,
+        "optimistic_noncontrolled_multi_supply": 122,
+        "optimistic_total_multi_upper_bound": 1524
+      },
+      {
+        "split": "dev",
+        "controlled_selection_quota": 280,
+        "unique_substantive_minimum": 0,
+        "optimistic_noncontrolled_substantive_supply": 0,
+        "optimistic_noncontrolled_multi_supply": 28,
+        "optimistic_total_multi_upper_bound": 308
+      },
+      {
+        "split": "in-range-test",
+        "controlled_selection_quota": 560,
+        "unique_substantive_minimum": 0,
+        "optimistic_noncontrolled_substantive_supply": 1,
+        "optimistic_noncontrolled_multi_supply": 45,
+        "optimistic_total_multi_upper_bound": 606
+      },
+      {
+        "split": "extrapolation-test",
+        "controlled_selection_quota": 400,
+        "unique_substantive_minimum": 0,
+        "optimistic_noncontrolled_substantive_supply": 0,
+        "optimistic_noncontrolled_multi_supply": 0,
+        "optimistic_total_multi_upper_bound": 400
+      }
+    ],
+    "overall_upper_bound": 2838,
+    "target": 900,
+    "deduplication_or_other_coverage_rejections_applied": false,
+    "verification_failures_counted_optimistically": 0
+  },
+  "controlled_mapping_slots": 15746,
+  "overlap_rejected_story_slots": 1261,
+  "controlled_phase_reused_slots": 0,
+  "controlled": {
+    "checked_slots": 21758,
+    "accepted_slots_before_dedup": 21758,
+    "statuses": {
+      "accepted": 21758
+    },
+    "status_by_source_query": [
+      {
+        "cell": "dev/count/controlled",
+        "statuses": {
+          "accepted": 720
+        }
+      },
+      {
+        "cell": "dev/direction/controlled",
+        "statuses": {
+          "accepted": 741
+        }
+      },
+      {
+        "cell": "dev/which/controlled",
+        "statuses": {
+          "accepted": 741
+        }
+      },
+      {
+        "cell": "extrapolation-test/count/controlled",
+        "statuses": {
+          "accepted": 1198
+        }
+      },
+      {
+        "cell": "extrapolation-test/direction/controlled",
+        "statuses": {
+          "accepted": 1197
+        }
+      },
+      {
+        "cell": "extrapolation-test/which/controlled",
+        "statuses": {
+          "accepted": 1197
+        }
+      },
+      {
+        "cell": "in-range-test/count/controlled",
+        "statuses": {
+          "accepted": 1461
+        }
+      },
+      {
+        "cell": "in-range-test/direction/controlled",
+        "statuses": {
+          "accepted": 1482
+        }
+      },
+      {
+        "cell": "in-range-test/which/controlled",
+        "statuses": {
+          "accepted": 1482
+        }
+      },
+      {
+        "cell": "train/count/controlled",
+        "statuses": {
+          "accepted": 3813
+        }
+      },
+      {
+        "cell": "train/direction/controlled",
+        "statuses": {
+          "accepted": 3863
+        }
+      },
+      {
+        "cell": "train/which/controlled",
+        "statuses": {
+          "accepted": 3863
+        }
+      }
+    ],
+    "rejection_reasons": [],
+    "max_target_tokens": {
+      "natural": 3037,
+      "symbolic": 3419
+    },
+    "multi_selection_supply_before_dedup": 3382
+  },
+  "distinct_verified_candidates": 25344,
+  "candidate_supply_checks": {
+    "quota_shortfalls": [
+      {
+        "kind": "count",
+        "cell": "dev/count/2/4",
+        "required": 7,
+        "verified_supply": 6
+      }
+    ],
+    "coverage_shortfalls": []
+  },
+  "multi_25_percent_retention_tested": true,
+  "milp_reason": "unnecessary: verified candidate supply gate fails",
+  "seconds": 2948.0637663749803,
+  "software_sha256": {
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/check_combined_all_scene.py": "b319b4b15caab60eeefb724d5bf7b321f47a761c3de867b8d48393eab367c6c6",
+    "spatial/v2/entailment_retention.py": "8eb564a27ae45c0e1c2190113d828612b385d3aa16909f9364790d8c9f08dae4",
+    "spatial/v2/entailment_production.py": "69f19c85f4df1e31f01c9c5d78367463bc63ef5b83427e5b72bcdda7513533c6",
+    "spatial/v2/entailment_scene_recipes.py": "67321e21156b75718e788fc0e622656d0039156eac67c2d5a9ee1e28d19d9649",
+    "spatial/v2/entailment_dataset.py": "308c5b20734b6797df8056728e6c46f06ebb7eaf4d6701cb73c496764b04330b",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/audit_entailment_candidate.py": "98d980ec7cd507a785ccf3dbe5ab3144e9be824f203ad15d6dca059cf18024d6"
+  }
+}

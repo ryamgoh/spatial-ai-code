@@ -1,0 +1,33 @@
+{
+  "candidate": "experiments/spatialentail-composition-v1/spatialmap-entailment-all-five-v1",
+  "status": "independent-evidence-and-mapping-replay-passed",
+  "verified_bases": 1500,
+  "verified_views": 5070,
+  "input_rows_checked": 10140,
+  "grammar_findings": 1283,
+  "grammar_example_ids": [
+    "spatialmap.tqa.2000.2-m0-exhaustive-entailed",
+    "spatialmap.tqa.2000.2-m0-unique-entailed",
+    "spatialmap.tqa.2001.2-m0-exhaustive-entailed",
+    "spatialmap.tqa.2001.2-m0-unique-entailed",
+    "spatialmap.tqa.2002.2-m0-exhaustive-entailed",
+    "spatialmap.tqa.2002.2-m0-listed-entailed",
+    "spatialmap.tqa.2002.2-m0-unique-entailed",
+    "spatialmap.tqa.2003.2-m0-exhaustive-entailed",
+    "spatialmap.tqa.2003.2-m0-listed-entailed",
+    "spatialmap.tqa.2003.2-m0-unique-entailed"
+  ],
+  "checks": [
+    "artifact hashes",
+    "positive axis proofs",
+    "joint fixed Count proofs",
+    "conflict paths",
+    "whole-scene negative counterexamples",
+    "independent contract mapping",
+    "final answer lines",
+    "no numeric-coordinate prose",
+    "input/reference separation"
+  ],
+  "sealed": false,
+  "training_authorized": false
+}

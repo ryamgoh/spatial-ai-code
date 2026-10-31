@@ -1,0 +1,22 @@
+{
+  "candidate": "experiments/spatialentail-composition-v1/spatialmap-entailment-all-five-v2",
+  "status": "independent-evidence-and-mapping-replay-passed",
+  "verified_bases": 1500,
+  "verified_views": 5070,
+  "input_rows_checked": 10140,
+  "grammar_findings": 0,
+  "grammar_example_ids": [],
+  "checks": [
+    "artifact hashes",
+    "positive axis proofs",
+    "joint fixed Count proofs",
+    "conflict paths",
+    "whole-scene negative counterexamples",
+    "independent contract mapping",
+    "final answer lines",
+    "no numeric-coordinate prose",
+    "input/reference separation"
+  ],
+  "sealed": false,
+  "training_authorized": false
+}

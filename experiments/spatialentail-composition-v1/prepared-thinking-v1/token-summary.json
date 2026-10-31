@@ -1,0 +1,38 @@
+{
+  "natural": {
+    "prompt_tokens": {
+      "max": 664,
+      "total": 3692323
+    },
+    "supervised_tokens": {
+      "max": 1105,
+      "total": 1930746
+    },
+    "training_tokens": {
+      "max": 1766,
+      "total": 5623069
+    },
+    "stage1_reserved_tokens": {
+      "max": 4760,
+      "total": 28268323
+    }
+  },
+  "symbolic": {
+    "prompt_tokens": {
+      "max": 669,
+      "total": 3722323
+    },
+    "supervised_tokens": {
+      "max": 1264,
+      "total": 2255405
+    },
+    "training_tokens": {
+      "max": 1930,
+      "total": 5977728
+    },
+    "stage1_reserved_tokens": {
+      "max": 4765,
+      "total": 28298323
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "spatialentail-active-model-v1",
+  "status": "selected-pending-tokenizer-and-trainer-validation",
+  "model_id": "Qwen/Qwen3-4B-Thinking-2507",
+  "revision": "768f209d9ea81521153ed38c47d515654e938aea",
+  "revision_source": "https://huggingface.co/api/models/Qwen/Qwen3-4B-Thinking-2507",
+  "selected_on": "2026-11-01",
+  "tokenizer_id": "Qwen/Qwen3-4B-Thinking-2507",
+  "tokenizer_revision": "768f209d9ea81521153ed38c47d515654e938aea",
+  "thinking_mode": "thinking-only",
+  "checkpoint_dtype": "bfloat16",
+  "chat_template_kwargs": {},
+  "token_limits_status": "pending-thinking-model-validation",
+  "context_length": 8192,
+  "stage1_max_new_tokens": 4096,
+  "stage2_max_new_tokens": 16,
+  "training_candidate": "unique-training-candidate-v3",
+  "arms": [
+    "natural",
+    "symbolic"
+  ],
+  "applies_to": [
+    "future-training",
+    "future-baselines",
+    "future-evaluation"
+  ],
+  "supersedes_model_id": "Qwen/Qwen3.5-4B",
+  "dataset_regeneration_required": false,
+  "tokenizer_revalidation_required": true,
+  "thinking_output_format_validation_required": true,
+  "assistant_loss_mask_validation_required": true,
+  "gpu_smoke_test_required": true,
+  "training_started": false
+}

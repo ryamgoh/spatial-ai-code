@@ -1,0 +1,114 @@
+{
+  "status": "passed",
+  "bases": 6000,
+  "examples_per_style": 6000,
+  "answers": {
+    "direction": {
+      "A-D": 1200,
+      "F": 200,
+      "E": 600
+    },
+    "which": {
+      "A-D": 1200,
+      "F": 200,
+      "E": 600
+    },
+    "count": {
+      "A-D": 1200,
+      "F": 200,
+      "E": 600
+    }
+  },
+  "depth_cohort_counts": {
+    "direction": {
+      "1": 112,
+      "2": 126,
+      "3": 140,
+      "4": 154,
+      "5": 182,
+      "6": 196,
+      "7": 224,
+      "8": 266
+    },
+    "which": {
+      "1": 112,
+      "2": 126,
+      "3": 140,
+      "4": 154,
+      "5": 182,
+      "6": 196,
+      "7": 224,
+      "8": 266
+    },
+    "count": {
+      "1": 112,
+      "2": 126,
+      "3": 140,
+      "4": 154,
+      "5": 182,
+      "6": 196,
+      "7": 224,
+      "8": 266
+    }
+  },
+  "size_diagnostic": [
+    {
+      "query": "count",
+      "range": "at-most-13",
+      "non-E": 112,
+      "E": 48,
+      "E_fraction": 0.3
+    },
+    {
+      "query": "count",
+      "range": "over-13",
+      "non-E": 1288,
+      "E": 552,
+      "E_fraction": 0.3
+    },
+    {
+      "query": "direction",
+      "range": "at-most-13",
+      "non-E": 112,
+      "E": 48,
+      "E_fraction": 0.3
+    },
+    {
+      "query": "direction",
+      "range": "over-13",
+      "non-E": 1288,
+      "E": 552,
+      "E_fraction": 0.3
+    },
+    {
+      "query": "which",
+      "range": "at-most-13",
+      "non-E": 134,
+      "E": 48,
+      "E_fraction": 0.26373626373626374
+    },
+    {
+      "query": "which",
+      "range": "over-13",
+      "non-E": 1266,
+      "E": 552,
+      "E_fraction": 0.30363036303630364
+    }
+  ],
+  "retired_phrase_counts": {
+    "every contract requires": 0,
+    "Unique requires": 0,
+    "No minimality claim": 0,
+    "complete entailed-answer set": 0
+  },
+  "max_target_tokens": {
+    "natural": 1653,
+    "symbolic": 1825
+  },
+  "input_payloads_unchanged": true,
+  "candidate_manifest_sha256": "2205ed6a961e9b676f4ec57ef94617c443c16c98c0a427ac4dda71c643def143",
+  "audit_source_sha256": "05df89ff33db9eefc19f9a9e99e7c26601a00c042fb722d5a9846775f209496a",
+  "spatial_verification": "Independent SMT/path/counterexample replay was performed for every admitted question in the build. This artifact audit verifies exact exported equality and provenance; it does not rerun SMT.",
+  "sealed": false,
+  "training_started": false
+}

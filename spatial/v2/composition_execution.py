@@ -38,6 +38,25 @@ VERSION = "composition-execution-v2"
 _worker = None
 
 
+def production_api(policy):
+    """Select versioned semantics while sharing ordered execution and checkpoints."""
+    if policy.get("schema") == "entailment-production-v1":
+        from spatial.v2 import entailment_production
+
+        return entailment_production
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        admit=admit,
+        plan=plan,
+        schedule=schedule,
+        generate=generate,
+        summarize=summarize,
+        has_shortfalls=has_shortfalls,
+        write_exports=write_exports,
+    )
+
+
 def encoded(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
@@ -75,7 +94,7 @@ def worker_admit(task):
     solver.clear()
     started = time.perf_counter()
     try:
-        result = admit(entry, problem, policy, tokenizer, solver)
+        result = production_api(policy).admit(entry, problem, policy, tokenizer, solver)
         rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         return (
             index,
@@ -183,7 +202,8 @@ class CompletionGate:
         self.retained[record["split"]] += 1
         if self.retained != Counter(self.policy["base_targets"]):
             return False
-        return not has_shortfalls(summarize(records, self.policy))
+        api = production_api(self.policy)
+        return not api.has_shortfalls(api.summarize(records, self.policy))
 
 
 @contextmanager
@@ -302,6 +322,8 @@ def input_identity(config_path, policy, exclusion_path, tokenizer):
     # Paths are relative identifiers so the same pinned run can move to HPC.
     return {
         "schema": VERSION,
+        "production_schema": policy.get("schema"),
+        "semantic_interface": policy.get("interface"),
         "config_sha256": artifact_digest(config_path),
         "policy": policy,
         "exclusions_sha256": artifact_digest(exclusion_path),
@@ -323,6 +345,11 @@ def input_identity(config_path, policy, exclusion_path, tokenizer):
                 "PyYAML",
                 "numpy",
             )
+            + (
+                ("scipy",)
+                if policy.get("retention") == "coverage-constrained-v1"
+                else ()
+            )
         },
         "python": list(sys.version_info[:3]),
     }
@@ -341,9 +368,25 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
             "use a fresh output path, or --resume for an existing execution"
         )
     policy = json.loads(config.read_text())
-    blockers = plan(policy)["blockers"]
+    api = production_api(policy)
+    blockers = api.plan(policy)["blockers"]
     if blockers:
         raise ValueError("; ".join(blockers))
+    frozen_sources = policy.get("frozen_sources_sha256")
+    if frozen_sources is not None and frozen_sources != {
+        p.name: artifact_digest(p) for p in sorted(Path(__file__).parent.glob("*.py"))
+    }:
+        raise ValueError(
+            "frozen generation software changed; compile a new configuration"
+        )
+    audit_spec = policy.get("support_audit")
+    if audit_spec is not None:
+        if artifact_digest(config.parent / audit_spec["path"]) != audit_spec["sha256"]:
+            raise ValueError("support-audit receipt changed")
+        if audit_spec["tokenizer_sha256"] != {
+            p.name: artifact_digest(p) for p in tokenizer.iterdir() if p.is_file()
+        }:
+            raise ValueError("runtime tokenizer differs from the support audit")
     exclusion_path = config.parent / policy["development_exclusions"]["path"]
     if artifact_digest(exclusion_path) != policy["development_exclusions"]["sha256"]:
         raise ValueError("development exclusion inventory hash mismatch")
@@ -397,7 +440,7 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
 
     try:
         progress(0, policy["attempt_budget"], "reconstructing-plan", force=True)
-        entries = schedule(policy)
+        entries = api.schedule(policy)
         if sum(len(e.query_kinds) for e in entries) != policy["attempt_budget"]:
             raise ValueError("fixed attempt budget mismatch")
         progress(0, policy["attempt_budget"], "structural-preflight", force=True)
@@ -415,7 +458,9 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
         )
         atomic_json(manifest_path, manifest)
         records = []
-        gate = CompletionGate(policy)
+        gate = api.make_gate(policy) if hasattr(api, "make_gate") else None
+        gate = gate if gate is not None else CompletionGate(policy)
+        constrained = hasattr(gate, "selected_ids")
         stop_reason = "attempt-budget-exhausted"
         activity = {}
         # Rebuild the ordered journal from immutable raw checkpoints on resume.
@@ -431,14 +476,19 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
             ) as lookup,
             (output / "attempts.jsonl.tmp").open("w") as stream,
         ):
-            for record in generate(
+            generation_options = {"admission": lookup, "keys": keys}
+            if constrained:
+                generation_options["admission_ids"] = {
+                    f"{entry.story.story_id}-{type(problem.query).__name__.removesuffix('Query').lower()}"
+                    for _, entry, problem in jobs
+                }
+            for record in api.generate(
                 entries,
                 policy,
                 exclusions,
                 None,
                 None,
-                admission=lookup,
-                keys=keys,
+                **generation_options,
             ):
                 records.append(summary_record(record))
                 statuses[record["status"]] += 1
@@ -447,6 +497,40 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
                 if gate.satisfied(record, records):
                     stop_reason = "requirements-satisfied"
                     break
+        if constrained:
+            selected_ids = (
+                gate.selected_ids
+                if gate.selected_ids is not None
+                else gate.diagnostic_ids()
+            )
+            for record in records:
+                if record["status"] == "accepted":
+                    record["admission_status"] = "accepted"
+                    if record["base_id"] not in selected_ids:
+                        record["status"] = "selection-excess"
+            statuses = Counter(record["status"] for record in records)
+            journal = output / "attempts.jsonl.tmp"
+            selected_journal = output / "attempts.selected.jsonl.tmp"
+            with journal.open() as source, selected_journal.open("w") as stream:
+                for line in source:
+                    record = json.loads(line)
+                    if record["status"] == "accepted":
+                        record["admission_status"] = "accepted"
+                        if record["base_id"] not in selected_ids:
+                            record["status"] = "selection-excess"
+                    stream.write(json.dumps(record) + "\n")
+            os.replace(selected_journal, journal)
+            atomic_json(
+                output / "retention.json",
+                {
+                    "policy": policy["retention"],
+                    "solver_calls": gate.solver_calls,
+                    "selection": "coverage-passing"
+                    if gate.selected_ids is not None
+                    else "diagnostic-quota-only",
+                    "selected_base_ids": sorted(selected_ids),
+                },
+            )
         if input_identity(config, policy, exclusion_path, tokenizer) != identity:
             raise ValueError("inputs changed during execution")
         os.replace(output / "attempts.jsonl.tmp", output / "attempts.jsonl")
@@ -457,8 +541,8 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
             activity["reused_checkpoints"],
             force=True,
         )
-        summary = summarize(records, policy)
-        if stop_reason == "requirements-satisfied" and has_shortfalls(summary):
+        summary = api.summarize(records, policy)
+        if stop_reason == "requirements-satisfied" and api.has_shortfalls(summary):
             raise ValueError("early-stop audit disagrees with final audit")
         stopping = {
             "stop_reason": stop_reason,
@@ -474,13 +558,13 @@ def _execute(config, output, tokenizer, workers, *, resume=False, progress_inter
         # Interrupted exports are rebuilt from checkpoints, never appended.
         with tempfile.TemporaryDirectory(prefix=".exports-", dir=output) as staging:
             with (output / "attempts.jsonl").open() as stream:
-                write_exports((json.loads(line) for line in stream), Path(staging))
+                api.write_exports((json.loads(line) for line in stream), Path(staging))
             for path in Path(staging).iterdir():
                 os.replace(path, output / path.name)
         manifest.update(
             status="completed-unsealed-candidate",
             acceptance="shortfalls"
-            if has_shortfalls(summary)
+            if api.has_shortfalls(summary)
             else "automated-checks-passed",
             statuses=dict(statuses),
             **stopping,

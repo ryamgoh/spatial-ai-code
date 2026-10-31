@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "scope": "all external bases, claims, views, legends and inputs",
+  "bases": 1500,
+  "stories": 500,
+  "views": 5070,
+  "positive_claims": 1023,
+  "counterexamples": 8477,
+  "input_rows": 10140,
+  "sealed": false,
+  "candidate_manifest_sha256": "74f4bace92d881797f11c5b07faffa103d5b9dedb68c13e6cdd2aa564e012486",
+  "artifact_sha256": {
+    "symbolic-inputs.jsonl": "f37dd71423ea59d5b30f6de3708f56c94d656652ab58ce121b6eb0158ed8582d",
+    "evidence.jsonl": "b5dbf52e7c303ae45d5970ef156b488b979be5d56868d461ba80488a3b6cd201",
+    "natural-inputs.jsonl": "5e93db00ad63cea40308095803d6edc0c3e6b9ee10909141256bacccd62046d5",
+    "references.jsonl": "ee46848cf34f00cdec7998c3f570c78b91d78075718ab68aa1dd9c8c38cfa4db"
+  },
+  "auditor_sha256": "1a6c478be943bae4bbeb98650c77f8f1af133830ed87806a6ab30ca6db7cba50",
+  "atomic_checker_sha256": "8286c138e7b2e25334bd18641035439f475feb5a79afbcec16ee836322a724a1",
+  "independent_of": [
+    "production solver",
+    "production contract encoder",
+    "production proof and counterexample replay"
+  ],
+  "normalization": "source adapter and prompt parsers; no label computation"
+}

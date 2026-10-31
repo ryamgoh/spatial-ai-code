@@ -50,7 +50,7 @@ esac
 echo "CPU workers=$workers allocated=$SLURM_CPUS_PER_TASK mode=${MODE:-generate}"
 lscpu || true
 exec srun --ntasks=1 --cpus-per-task="$SLURM_CPUS_PER_TASK" \
-    uv --system-certs run --python 3.12 --no-project \
+    uv --native-tls run --python 3.12 --no-project \
     --with 'z3-solver==4.16.0.0' --with 'transformers==5.16.1' \
-    --with 'tokenizers==0.23.3' --with jinja2 --with pyyaml \
+    --with 'tokenizers==0.23.3' --with 'scipy==1.18.1' --with jinja2 --with pyyaml \
     python -u -m "$module" "${args[@]}"

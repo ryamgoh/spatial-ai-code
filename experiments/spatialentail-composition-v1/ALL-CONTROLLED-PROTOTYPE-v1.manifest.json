@@ -1,0 +1,1605 @@
+{
+  "version": "all-controlled-prototype-v1",
+  "cap": 260,
+  "slots": [
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 1,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 2,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 3,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 4,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 5,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 6,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 7,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 8,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 9,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 0,
+      "kind": "count",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "direction",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "inconsistent"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "which",
+      "case": "multiple"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "listed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "unlisted"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "no-entailed"
+    },
+    {
+      "span": 10,
+      "extra_size": 3,
+      "kind": "count",
+      "case": "inconsistent"
+    }
+  ],
+  "source_sha256": {
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/run_all_controlled_prototype.py": "89f818b5bca12b669f6a3c92a056c5be71d6a08196505426d074f2d2531de63d",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/audit_entailment_candidate.py": "283515e2cfbf7ecb51e772e53874ed48afd8dfa4ece9041d973439549dd59007",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/audit_selected_explanation_depth.py": "8bbbe3d60cb070ae9008de41996a16d4a3c22177badca6a7415a115fcff63d0c",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/review_unique_pretraining.py": "b6b07ebd08fb748c656ed9b637cb2a0b8e7ee9a2b720fd435e49deef37f8f8a8",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_controlled_prototype.py": "12b4da6a1052e93fb044df60f0336aa9e87b96155a3f253370ee7339fc04f6b3",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/composition_scene_sampler.py": "00c028ddef90679188db162a795fcdfce2a28c76c722c24d6670f55a2f8c56e2",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_dataset.py": "0276d915be0be535ea7dfc9b9ed9a1f6d85d322341631d3ec7baf0d3e822f50b",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_evidence.py": "dabcd97e49c6b6b01397745e475ee505541d853d8104afcd137ad17288ea6164",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_contracts.py": "7acd1ad3b00e82d9ec632b84be1034108ca83abf12dec2eeab76d2241964160b",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_scene_protocol.py": "c3ea3e891f9cb834229ef9c18cb3547edd6631eef5fea553eae2a809b8b3bbb5",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/entailment_names.py": "7b6dc11f0243ea3b01c566f36f435df572bed1a97d08bb875596ec70992ffdf9",
+    "/Users/bytedance/Code/spatial-ai-code/spatial/v2/solver.py": "c4e2fa709a1cd66cd56b336f2222fb0b3003d22a8626f8b6cebcbffa84564f5f"
+  },
+  "original_sha256": {
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v1/evidence.jsonl": "3d2f7d88326a9c97ab7dc80acb80d956bb9bbc4f70e64d1254448dec080113df",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v1/manifest.json": "d3b93725dbafb0e920a3490fe5885d8378e8bdad9cb87f193656a7476e5fb42a",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v1/natural-training.jsonl": "62ad853534b0c523d7971d131159f847a1acd20c45d05b3fdabc8e7280952927",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v1/references.jsonl": "e531e8b4863e05fd34360952ff30379126004489eca1ef952e5f5ef732534ef4",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v1/symbolic-training.jsonl": "70e964bd110106212b4fcbaf7ab0cb81cf93eb0633737b0ef83b65ced4e6aa5e",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/spatialmap-unique-v1/evidence.jsonl": "b5dbf52e7c303ae45d5970ef156b488b979be5d56868d461ba80488a3b6cd201",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/spatialmap-unique-v1/manifest.json": "1c9384191caae9cca27d0f8a29dd758369632bb5b256e1a625aa01c8e183aa54",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/spatialmap-unique-v1/natural-inputs.jsonl": "c0a3ae4e3212903a62701691b8cf9a582507bc3b4984cd141c88354a5f7b923f",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/spatialmap-unique-v1/references.jsonl": "f6e4c4c786b1680dfa577528c1132449b9a86eebd13e7d69cde209c2b1c62016",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/spatialmap-unique-v1/symbolic-inputs.jsonl": "e3de577acf2aa300ad7ef8cc7d0dac866caf3b7a1b476f808d0a87c5c2831377",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/entailment-config-frozen-v1.json": "c4beecdb71a6dad1e2cc25a6394848c72213156ff1f898dd61420a9c57f59804",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-only-selection-v1/selection.json": "e0336924c93a238e1c21a6c33672d1b18ccb8daba0ec4a23e254d17fb33b7de6",
+    "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/UNIQUE-TRAINING-SELECTION-REPLAY-v1.json": "98fb71b3dac165ae0e070ed7d0417ae26d617f0fe78bc3dee5820321ecdccb81"
+  },
+  "tokenizer": "/Users/bytedance/.cache/huggingface/hub/models--Qwen--Qwen3.5-4B/snapshots/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "workers": 4,
+  "spool": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-all-controlled-prototype-es4fmrhv",
+  "no_refill": true,
+  "development_only": true,
+  "packages": {
+    "z3-solver": "4.16.0.0",
+    "transformers": "5.16.1",
+    "scikit-learn": "1.9.1"
+  }
+}

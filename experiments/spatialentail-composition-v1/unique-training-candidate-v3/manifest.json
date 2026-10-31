@@ -1,0 +1,44 @@
+{
+  "status": "audited-unsealed-all-controlled-training",
+  "bases": 6000,
+  "examples_per_style": 6000,
+  "sealed": false,
+  "training_started": false,
+  "preparation_manifest": "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/SPATIAL-PROSE-RERENDER-v3.manifest.json",
+  "preparation_sha256": "66344742f71bd6a4b091bcc35bc06ddb613a82581bdbbd1ed6050860ae96fa9e",
+  "payload_sha256": {
+    "evidence.jsonl": "bd4bc3051bc44c8e0dfec5c26c4e23dbdb3f7bc6e7872d92b8315150fb0d0cb5",
+    "references.jsonl": "66640c3ede0bb42482dc4f6191e18e2ed6b775c6b8a1333cabefb243c8c8a66c",
+    "natural-training.jsonl": "d308963e79c4fb91b0c4eb825006192059521fccd96233556f00048542ac4739",
+    "symbolic-training.jsonl": "7636ada869681b6384e66fd7c050a7bfbe143c8d47b69c42de80610708e94978"
+  },
+  "audit_summary": {
+    "status": "references-rerendered-and-audited",
+    "manifest_sha256": "66344742f71bd6a4b091bcc35bc06ddb613a82581bdbbd1ed6050860ae96fa9e",
+    "spool": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatial-reference-v3-ae127pev",
+    "results_sha256": "3c234e66611dc58f3ecdf9bdd5f9ac6c3b32753d4b84da95ff9c74809622e190",
+    "statuses": {
+      "passed": 6000
+    },
+    "failures": [],
+    "tokens": {
+      "natural": {
+        "old_mean": 590.4731666666667,
+        "new_mean": 333.25033333333334,
+        "old_max": 1653,
+        "new_max": 1146
+      },
+      "symbolic": {
+        "old_mean": 640.9243333333334,
+        "new_mean": 386.8231666666667,
+        "old_max": 1825,
+        "new_max": 1301
+      }
+    },
+    "output": "/Users/bytedance/Code/spatial-ai-code/experiments/spatialentail-composition-v1/unique-training-candidate-v3",
+    "preserved_inputs_unchanged": true,
+    "non_reference_content_unchanged": true,
+    "evidence_unchanged": true,
+    "exact_ambiguity_with_two_cases": 900
+  }
+}

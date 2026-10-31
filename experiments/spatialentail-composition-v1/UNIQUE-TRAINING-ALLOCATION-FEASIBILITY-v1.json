@@ -1,0 +1,2560 @@
+{
+  "status": "infeasible-under-retained-requirements",
+  "targets": {
+    "direction": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "no-entailed-answer": 450,
+      "inconsistent": 150
+    },
+    "which": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "no-entailed-answer": 225,
+      "inconsistent": 75,
+      "multiple-entailed": 300
+    },
+    "count": {
+      "A-D": 1200,
+      "unique-unlisted": 200,
+      "no-entailed-answer": 450,
+      "inconsistent": 150
+    }
+  },
+  "training_bases_available": 14050,
+  "source_census": [
+    {
+      "query": "direction",
+      "source": "controlled",
+      "bases": 3886,
+      "source_quota": 1400,
+      "eligible_bases": {
+        "A-D": 3886,
+        "unique-unlisted": 782,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      }
+    },
+    {
+      "query": "direction",
+      "source": "random-world",
+      "bases": 349,
+      "source_quota": 300,
+      "eligible_bases": {
+        "A-D": 181,
+        "unique-unlisted": 37,
+        "no-entailed-answer": 168,
+        "inconsistent": 0
+      }
+    },
+    {
+      "query": "direction",
+      "source": "random-atoms",
+      "bases": 212,
+      "source_quota": 200,
+      "eligible_bases": {
+        "A-D": 49,
+        "unique-unlisted": 9,
+        "no-entailed-answer": 47,
+        "inconsistent": 116
+      }
+    },
+    {
+      "query": "direction",
+      "source": "targeted",
+      "bases": 299,
+      "source_quota": 100,
+      "eligible_bases": {
+        "A-D": 199,
+        "unique-unlisted": 29,
+        "no-entailed-answer": 50,
+        "inconsistent": 50
+      }
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "bases": 3886,
+      "source_quota": 1400,
+      "eligible_bases": {
+        "A-D": 2099,
+        "unique-unlisted": 399,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 1787
+      }
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "bases": 349,
+      "source_quota": 300,
+      "eligible_bases": {
+        "A-D": 58,
+        "unique-unlisted": 10,
+        "no-entailed-answer": 270,
+        "inconsistent": 0,
+        "multiple-entailed": 21
+      }
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "bases": 212,
+      "source_quota": 200,
+      "eligible_bases": {
+        "A-D": 23,
+        "unique-unlisted": 3,
+        "no-entailed-answer": 65,
+        "inconsistent": 116,
+        "multiple-entailed": 8
+      }
+    },
+    {
+      "query": "which",
+      "source": "targeted",
+      "bases": 289,
+      "source_quota": 100,
+      "eligible_bases": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 125,
+        "inconsistent": 50,
+        "multiple-entailed": 114
+      }
+    },
+    {
+      "query": "count",
+      "source": "controlled",
+      "bases": 3796,
+      "source_quota": 1400,
+      "eligible_bases": {
+        "A-D": 3796,
+        "unique-unlisted": 749,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      }
+    },
+    {
+      "query": "count",
+      "source": "random-world",
+      "bases": 348,
+      "source_quota": 300,
+      "eligible_bases": {
+        "A-D": 76,
+        "unique-unlisted": 22,
+        "no-entailed-answer": 272,
+        "inconsistent": 0
+      }
+    },
+    {
+      "query": "count",
+      "source": "random-atoms",
+      "bases": 212,
+      "source_quota": 200,
+      "eligible_bases": {
+        "A-D": 32,
+        "unique-unlisted": 7,
+        "no-entailed-answer": 64,
+        "inconsistent": 116
+      }
+    },
+    {
+      "query": "count",
+      "source": "targeted",
+      "bases": 212,
+      "source_quota": 100,
+      "eligible_bases": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 162,
+        "inconsistent": 50
+      }
+    }
+  ],
+  "answer_subset_checks": [
+    {
+      "query": "direction",
+      "categories": [
+        "A-D"
+      ],
+      "required": 1200,
+      "raw": 4315,
+      "source": 1730,
+      "stratum": 1829,
+      "upper_bound": 1730,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "unique-unlisted"
+      ],
+      "required": 200,
+      "raw": 857,
+      "source": 857,
+      "stratum": 857,
+      "upper_bound": 857,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "no-entailed-answer"
+      ],
+      "required": 450,
+      "raw": 265,
+      "source": 265,
+      "stratum": 265,
+      "upper_bound": 265,
+      "shortfall": 185
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "inconsistent"
+      ],
+      "required": 150,
+      "raw": 166,
+      "source": 166,
+      "stratum": 166,
+      "upper_bound": 166,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "unique-unlisted"
+      ],
+      "required": 1400,
+      "raw": 4315,
+      "source": 1730,
+      "stratum": 1829,
+      "upper_bound": 1730,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "no-entailed-answer"
+      ],
+      "required": 1650,
+      "raw": 4580,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "inconsistent"
+      ],
+      "required": 1350,
+      "raw": 4481,
+      "source": 1846,
+      "stratum": 1995,
+      "upper_bound": 1846,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 650,
+      "raw": 1122,
+      "source": 1122,
+      "stratum": 1122,
+      "upper_bound": 1122,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 350,
+      "raw": 1023,
+      "source": 1023,
+      "stratum": 1023,
+      "upper_bound": 1023,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 600,
+      "raw": 431,
+      "source": 431,
+      "stratum": 431,
+      "upper_bound": 431,
+      "shortfall": 169
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 1850,
+      "raw": 4580,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 1550,
+      "raw": 4481,
+      "source": 1846,
+      "stratum": 1995,
+      "upper_bound": 1846,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 1800,
+      "raw": 4746,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 800,
+      "raw": 1288,
+      "source": 1259,
+      "stratum": 1288,
+      "upper_bound": 1259,
+      "shortfall": 0
+    },
+    {
+      "query": "direction",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 2000,
+      "raw": 4746,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D"
+      ],
+      "required": 1200,
+      "raw": 2180,
+      "source": 1481,
+      "stratum": 1481,
+      "upper_bound": 1481,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted"
+      ],
+      "required": 200,
+      "raw": 412,
+      "source": 412,
+      "stratum": 412,
+      "upper_bound": 412,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "no-entailed-answer"
+      ],
+      "required": 225,
+      "raw": 460,
+      "source": 435,
+      "stratum": 460,
+      "upper_bound": 435,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "inconsistent"
+      ],
+      "required": 75,
+      "raw": 166,
+      "source": 166,
+      "stratum": 166,
+      "upper_bound": 166,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "multiple-entailed"
+      ],
+      "required": 300,
+      "raw": 1930,
+      "source": 1529,
+      "stratum": 1543,
+      "upper_bound": 1529,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted"
+      ],
+      "required": 1400,
+      "raw": 2180,
+      "source": 1481,
+      "stratum": 1481,
+      "upper_bound": 1481,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "no-entailed-answer"
+      ],
+      "required": 1425,
+      "raw": 2640,
+      "source": 1888,
+      "stratum": 1941,
+      "upper_bound": 1888,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "inconsistent"
+      ],
+      "required": 1275,
+      "raw": 2346,
+      "source": 1647,
+      "stratum": 1647,
+      "upper_bound": 1647,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "multiple-entailed"
+      ],
+      "required": 1500,
+      "raw": 4110,
+      "source": 1610,
+      "stratum": 1624,
+      "upper_bound": 1610,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 425,
+      "raw": 872,
+      "source": 847,
+      "stratum": 872,
+      "upper_bound": 847,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 275,
+      "raw": 578,
+      "source": 578,
+      "stratum": 578,
+      "upper_bound": 578,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "multiple-entailed"
+      ],
+      "required": 500,
+      "raw": 2342,
+      "source": 1542,
+      "stratum": 1556,
+      "upper_bound": 1542,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 300,
+      "raw": 626,
+      "source": 551,
+      "stratum": 600,
+      "upper_bound": 551,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "no-entailed-answer",
+        "multiple-entailed"
+      ],
+      "required": 525,
+      "raw": 2390,
+      "source": 1864,
+      "stratum": 2000,
+      "upper_bound": 1864,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 375,
+      "raw": 2096,
+      "source": 1645,
+      "stratum": 1709,
+      "upper_bound": 1645,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 1625,
+      "raw": 2640,
+      "source": 1888,
+      "stratum": 1941,
+      "upper_bound": 1888,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 1475,
+      "raw": 2346,
+      "source": 1647,
+      "stratum": 1647,
+      "upper_bound": 1647,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "multiple-entailed"
+      ],
+      "required": 1700,
+      "raw": 4110,
+      "source": 1610,
+      "stratum": 1624,
+      "upper_bound": 1610,
+      "shortfall": 90
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 1500,
+      "raw": 2806,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "no-entailed-answer",
+        "multiple-entailed"
+      ],
+      "required": 1725,
+      "raw": 4570,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 1575,
+      "raw": 4276,
+      "source": 1726,
+      "stratum": 1790,
+      "upper_bound": 1726,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 500,
+      "raw": 1038,
+      "source": 963,
+      "stratum": 999,
+      "upper_bound": 963,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer",
+        "multiple-entailed"
+      ],
+      "required": 725,
+      "raw": 2802,
+      "source": 1876,
+      "stratum": 2000,
+      "upper_bound": 1876,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 575,
+      "raw": 2508,
+      "source": 1658,
+      "stratum": 1722,
+      "upper_bound": 1658,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 600,
+      "raw": 2556,
+      "source": 1980,
+      "stratum": 2000,
+      "upper_bound": 1980,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 1700,
+      "raw": 2806,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "multiple-entailed"
+      ],
+      "required": 1925,
+      "raw": 4570,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 29
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 1775,
+      "raw": 4276,
+      "source": 1726,
+      "stratum": 1790,
+      "upper_bound": 1726,
+      "shortfall": 49
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "no-entailed-answer",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 1800,
+      "raw": 4736,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 800,
+      "raw": 2968,
+      "source": 1992,
+      "stratum": 2000,
+      "upper_bound": 1992,
+      "shortfall": 0
+    },
+    {
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 2000,
+      "raw": 4736,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D"
+      ],
+      "required": 1200,
+      "raw": 3904,
+      "source": 1508,
+      "stratum": 1508,
+      "upper_bound": 1508,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "unique-unlisted"
+      ],
+      "required": 200,
+      "raw": 778,
+      "source": 778,
+      "stratum": 778,
+      "upper_bound": 778,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "no-entailed-answer"
+      ],
+      "required": 450,
+      "raw": 498,
+      "source": 436,
+      "stratum": 498,
+      "upper_bound": 436,
+      "shortfall": 14
+    },
+    {
+      "query": "count",
+      "categories": [
+        "inconsistent"
+      ],
+      "required": 150,
+      "raw": 166,
+      "source": 166,
+      "stratum": 166,
+      "upper_bound": 166,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "unique-unlisted"
+      ],
+      "required": 1400,
+      "raw": 3904,
+      "source": 1508,
+      "stratum": 1508,
+      "upper_bound": 1508,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "no-entailed-answer"
+      ],
+      "required": 1650,
+      "raw": 4402,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "inconsistent"
+      ],
+      "required": 1350,
+      "raw": 4070,
+      "source": 1674,
+      "stratum": 1674,
+      "upper_bound": 1674,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 650,
+      "raw": 1276,
+      "source": 1214,
+      "stratum": 1276,
+      "upper_bound": 1214,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 350,
+      "raw": 944,
+      "source": 944,
+      "stratum": 944,
+      "upper_bound": 944,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 600,
+      "raw": 664,
+      "source": 552,
+      "stratum": 600,
+      "upper_bound": 552,
+      "shortfall": 48
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer"
+      ],
+      "required": 1850,
+      "raw": 4402,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "inconsistent"
+      ],
+      "required": 1550,
+      "raw": 4070,
+      "source": 1674,
+      "stratum": 1674,
+      "upper_bound": 1674,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 1800,
+      "raw": 4568,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 800,
+      "raw": 1442,
+      "source": 1330,
+      "stratum": 1349,
+      "upper_bound": 1330,
+      "shortfall": 0
+    },
+    {
+      "query": "count",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 2000,
+      "raw": 4568,
+      "source": 2000,
+      "stratum": 2000,
+      "upper_bound": 2000,
+      "shortfall": 0
+    }
+  ],
+  "coverage_checks": [
+    {
+      "rule": {
+        "match": {
+          "depth": 2,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 38,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 126,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 126,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 3,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 42,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 140,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 140,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 4,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 47,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 154,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 154,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 5,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 55,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 182,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 182,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 6,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 59,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 196,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 196,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 7,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 68,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 224,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 224,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 8,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "direction",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 80,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 266,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 266,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "direction",
+          "semantic_case": "unique-entailed",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1400,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "direction",
+          "semantic_case": "no-entailed-answer",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 265,
+        "inconsistent": 0
+      },
+      "upper_bound": 265,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "direction",
+          "semantic_case": "inconsistent",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 150
+      },
+      "upper_bound": 150,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_contingent_negative": true,
+          "query_kind": "direction",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 254,
+        "inconsistent": 0
+      },
+      "upper_bound": 254,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_impossible_negative": true,
+          "query_kind": "direction",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 96,
+        "inconsistent": 0
+      },
+      "upper_bound": 1496,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "menu_role": "primary",
+          "query_kind": "direction",
+          "split": "train",
+          "substantive_depth_support": true
+        },
+        "minimum_bases": 1400,
+        "numeric_origin": "approved substantive depth minimum"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1200,
+      "shortfall": 200
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 2,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 38,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 126,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 126
+      },
+      "upper_bound": 126,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 3,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 42,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 140,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 140
+      },
+      "upper_bound": 140,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 4,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 47,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 154,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 154
+      },
+      "upper_bound": 154,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 5,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 55,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 182,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 182
+      },
+      "upper_bound": 182,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 6,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 59,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 196,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 196
+      },
+      "upper_bound": 196,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 7,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 68,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 224,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 224
+      },
+      "upper_bound": 224,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 8,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "which",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 80,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 266,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 266
+      },
+      "upper_bound": 266,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "which",
+          "semantic_case": "unique-entailed",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 0
+      },
+      "upper_bound": 1400,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "which",
+          "semantic_case": "no-entailed-answer",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 225,
+        "inconsistent": 0,
+        "multiple-entailed": 0
+      },
+      "upper_bound": 225,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "which",
+          "semantic_case": "inconsistent",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 75,
+        "multiple-entailed": 0
+      },
+      "upper_bound": 75,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "which",
+          "semantic_case": "multiple-entailed",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 300
+      },
+      "upper_bound": 300,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_contingent_negative": true,
+          "query_kind": "which",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 61,
+        "unique-unlisted": 10,
+        "no-entailed-answer": 225,
+        "inconsistent": 0,
+        "multiple-entailed": 32
+      },
+      "upper_bound": 328,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_impossible_negative": true,
+          "query_kind": "which",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 225,
+        "inconsistent": 0,
+        "multiple-entailed": 300
+      },
+      "upper_bound": 1881,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "menu_role": "primary",
+          "query_kind": "which",
+          "split": "train",
+          "decision_depth_support": true
+        },
+        "minimum_bases": 1400,
+        "numeric_origin": "approved Unique all-split decision-depth rule"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 300
+      },
+      "upper_bound": 1412,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "query_kind": "which",
+          "sole_entailed_with_contingent": true,
+          "split": "train"
+        },
+        "minimum_bases": 1,
+        "numeric_origin": "proposed presence gate for the revised Unique rule"
+      },
+      "category_capped_supply": {
+        "A-D": 63,
+        "unique-unlisted": 10,
+        "no-entailed-answer": 0,
+        "inconsistent": 0,
+        "multiple-entailed": 0
+      },
+      "upper_bound": 63,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 2,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 38,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 126,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 126,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 3,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 42,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 140,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 140,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 4,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 47,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 154,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 154,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 5,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 55,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 182,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 182,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 6,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 59,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 196,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 196,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 7,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 68,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 224,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 224,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "depth": 8,
+          "menu_role": "primary",
+          "nonhomogeneous_proof": true,
+          "query_kind": "count",
+          "source": "controlled",
+          "split": "train"
+        },
+        "minimum_bases": 80,
+        "numeric_origin": "approved nonhomogeneous proof percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 266,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 266,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "count",
+          "semantic_case": "unique-entailed",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1400,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "count",
+          "semantic_case": "no-entailed-answer",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 436,
+        "inconsistent": 0
+      },
+      "upper_bound": 436,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "query_kind": "count",
+          "semantic_case": "inconsistent",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "approved semantic minimum percentage"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 150
+      },
+      "upper_bound": 150,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_contingent_negative": true,
+          "query_kind": "count",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 0,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 428,
+        "inconsistent": 0
+      },
+      "upper_bound": 428,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "has_impossible_negative": true,
+          "query_kind": "count",
+          "split": "train"
+        },
+        "minimum_bases": 30,
+        "minimum_families": 10,
+        "numeric_origin": "same negative-evidence minimum in Unique view"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 200,
+        "no-entailed-answer": 414,
+        "inconsistent": 0
+      },
+      "upper_bound": 1814,
+      "shortfall": 0
+    },
+    {
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "menu_role": "primary",
+          "query_kind": "count",
+          "split": "train",
+          "substantive_depth_support": true
+        },
+        "minimum_bases": 1400,
+        "numeric_origin": "approved substantive depth minimum"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1200,
+      "shortfall": 200
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "answer-subset",
+      "query": "direction",
+      "categories": [
+        "no-entailed-answer"
+      ],
+      "required": 450,
+      "raw": 265,
+      "source": 265,
+      "stratum": 265,
+      "upper_bound": 265,
+      "shortfall": 185
+    },
+    {
+      "type": "answer-subset",
+      "query": "direction",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 600,
+      "raw": 431,
+      "source": 431,
+      "stratum": 431,
+      "upper_bound": 431,
+      "shortfall": 169
+    },
+    {
+      "type": "answer-subset",
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "multiple-entailed"
+      ],
+      "required": 1700,
+      "raw": 4110,
+      "source": 1610,
+      "stratum": 1624,
+      "upper_bound": 1610,
+      "shortfall": 90
+    },
+    {
+      "type": "answer-subset",
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "no-entailed-answer",
+        "multiple-entailed"
+      ],
+      "required": 1925,
+      "raw": 4570,
+      "source": 1896,
+      "stratum": 2000,
+      "upper_bound": 1896,
+      "shortfall": 29
+    },
+    {
+      "type": "answer-subset",
+      "query": "which",
+      "categories": [
+        "A-D",
+        "unique-unlisted",
+        "inconsistent",
+        "multiple-entailed"
+      ],
+      "required": 1775,
+      "raw": 4276,
+      "source": 1726,
+      "stratum": 1790,
+      "upper_bound": 1726,
+      "shortfall": 49
+    },
+    {
+      "type": "answer-subset",
+      "query": "count",
+      "categories": [
+        "no-entailed-answer"
+      ],
+      "required": 450,
+      "raw": 498,
+      "source": 436,
+      "stratum": 498,
+      "upper_bound": 436,
+      "shortfall": 14
+    },
+    {
+      "type": "answer-subset",
+      "query": "count",
+      "categories": [
+        "no-entailed-answer",
+        "inconsistent"
+      ],
+      "required": 600,
+      "raw": 664,
+      "source": 552,
+      "stratum": 600,
+      "upper_bound": 552,
+      "shortfall": 48
+    },
+    {
+      "type": "coverage",
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "menu_role": "primary",
+          "query_kind": "direction",
+          "split": "train",
+          "substantive_depth_support": true
+        },
+        "minimum_bases": 1400,
+        "numeric_origin": "approved substantive depth minimum"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1200,
+      "shortfall": 200
+    },
+    {
+      "type": "coverage",
+      "rule": {
+        "match": {
+          "contract": "unique-entailed",
+          "menu_role": "primary",
+          "query_kind": "count",
+          "split": "train",
+          "substantive_depth_support": true
+        },
+        "minimum_bases": 1400,
+        "numeric_origin": "approved substantive depth minimum"
+      },
+      "category_capped_supply": {
+        "A-D": 1200,
+        "unique-unlisted": 0,
+        "no-entailed-answer": 0,
+        "inconsistent": 0
+      },
+      "upper_bound": 1200,
+      "shortfall": 200
+    }
+  ],
+  "full_selection_attempted": false,
+  "limitations": [
+    "Bounds prove impossibility when violated, not feasibility when satisfied.",
+    "Count-value, family and all coverage constraints still require a full selection check if these bounds pass.",
+    "Historical prompt token counts do not certify a short-protocol export."
+  ],
+  "candidate_path": "/var/folders/g4/ccx77z2d60sgsjrt9ck_ppwr0000gn/T/spatialentail-depth-two-repair-cqmpl30t/candidates.jsonl",
+  "candidate_sha256": "a22dfb27f02199842de54e48cf4002c0c29e07de82a2453629df585e72d5e256",
+  "receipt_sha256": "417e5edfcbbe964e5843b451ba4973efaff3141c58c5d958bb09187a8061a693",
+  "config_sha256": "c4beecdb71a6dad1e2cc25a6394848c72213156ff1f898dd61420a9c57f59804",
+  "diagnostic_sha256": "a67d278fd9bde4ed3613bace324bab98509b7f62c5e1d2803b27d97dac77ec61",
+  "candidate_bases": 25848,
+  "inherited_training_coverage": [
+    {
+      "match": {
+        "depth": 2,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 38,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 3,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 42,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 4,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 47,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 5,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 55,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 6,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 59,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 7,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 68,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 8,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "direction",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 80,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 2,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 38,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 3,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 42,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 4,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 47,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 5,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 55,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 6,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 59,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 7,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 68,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 8,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "which",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 80,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 2,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 38,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 3,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 42,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 4,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 47,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 5,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 55,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 6,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 59,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 7,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 68,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "depth": 8,
+        "menu_role": "primary",
+        "nonhomogeneous_proof": true,
+        "query_kind": "count",
+        "source": "controlled",
+        "split": "train"
+      },
+      "minimum_bases": 80,
+      "numeric_origin": "approved nonhomogeneous proof percentage"
+    },
+    {
+      "match": {
+        "query_kind": "direction",
+        "semantic_case": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "direction",
+        "semantic_case": "no-entailed-answer",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "direction",
+        "semantic_case": "inconsistent",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_contingent_negative": true,
+        "query_kind": "direction",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_impossible_negative": true,
+        "query_kind": "direction",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "query_kind": "which",
+        "semantic_case": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "which",
+        "semantic_case": "no-entailed-answer",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "which",
+        "semantic_case": "inconsistent",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "which",
+        "semantic_case": "multiple-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_contingent_negative": true,
+        "query_kind": "which",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_impossible_negative": true,
+        "query_kind": "which",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "query_kind": "count",
+        "semantic_case": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "count",
+        "semantic_case": "no-entailed-answer",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "query_kind": "count",
+        "semantic_case": "inconsistent",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "approved semantic minimum percentage"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_contingent_negative": true,
+        "query_kind": "count",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "has_impossible_negative": true,
+        "query_kind": "count",
+        "split": "train"
+      },
+      "minimum_bases": 30,
+      "minimum_families": 10,
+      "numeric_origin": "same negative-evidence minimum in Unique view"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "menu_role": "primary",
+        "query_kind": "direction",
+        "split": "train",
+        "substantive_depth_support": true
+      },
+      "minimum_bases": 1400,
+      "numeric_origin": "approved substantive depth minimum"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "menu_role": "primary",
+        "query_kind": "which",
+        "split": "train",
+        "decision_depth_support": true
+      },
+      "minimum_bases": 1400,
+      "numeric_origin": "approved Unique all-split decision-depth rule"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "menu_role": "primary",
+        "query_kind": "count",
+        "split": "train",
+        "substantive_depth_support": true
+      },
+      "minimum_bases": 1400,
+      "numeric_origin": "approved substantive depth minimum"
+    },
+    {
+      "match": {
+        "contract": "unique-entailed",
+        "query_kind": "which",
+        "sole_entailed_with_contingent": true,
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "proposed presence gate for the revised Unique rule"
+    },
+    {
+      "match": {
+        "answer": "A",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    },
+    {
+      "match": {
+        "answer": "B",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    },
+    {
+      "match": {
+        "answer": "C",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    },
+    {
+      "match": {
+        "answer": "D",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    },
+    {
+      "match": {
+        "answer": "E",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    },
+    {
+      "match": {
+        "answer": "F",
+        "contract": "unique-entailed",
+        "split": "train"
+      },
+      "minimum_bases": 1,
+      "numeric_origin": "historical feasible literal-gold presence gate"
+    }
+  ],
+  "sealed": false,
+  "training_started": false,
+  "evaluation_changed": false,
+  "new_seeds_or_menus": false
+}

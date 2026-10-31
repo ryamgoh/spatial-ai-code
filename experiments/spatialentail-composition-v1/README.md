@@ -1,11 +1,181 @@
 # SpatialEntail Composition v1
 
-New experiment for atomic spatial reasoning, verified evidence, and matched
-Unique Answer, Listed Possibilities, and Exhaustive Possibilities contracts.
+Experiment for atomic spatial entailment, verified positive/negative evidence,
+and matched Natural/Symbolic supervision under the Unique entailment contract.
+
+## Active Unique-Only Study
+
+The user approved dropping Listed and Exhaustive from training and evaluation.
+Read [UNIQUE-ONLY-v1.md](UNIQUE-ONLY-v1.md) first; it supersedes mixed-contract
+requirements in older documents and runbooks. All three query types remain:
+Direction, Which, and Count.
+
+The active model for both arms and future baselines/evaluation is
+**Qwen/Qwen3-4B-Thinking-2507**, the standard BF16 thinking-only checkpoint,
+pinned in [active-model.json](active-model.json). No thinking-mode override is
+needed. The [thinking training package](prepared-thinking-v1/README.md) now has
+matched QLoRA configs and 6,000 pre-tokenized examples per arm. Native formatting,
+training token limits and explicit assistant loss masks passed for all 12,000
+examples. GPU checks will occur in the opening training steps, not a separate
+smoke-test job. Fixed-dev evaluation and Stage-2 thinking replay integration
+remain pending. Historical candidate token counts below use Qwen3.5-4B.
+
+The current [all-controlled training candidate](unique-training-candidate-v3/README.md)
+has **6,000 distinct questions and 6,000 examples per style**, with one selected
+menu per question. Each query has **1,200 A-D / 600 E / 200 F** and the approved
+E subtypes. All preserved numerical depth, Count-value, family and evidence
+requirements passed. The build used 6,045 construction attempts and independently
+admitted all 6,000 selected questions, without refill.
+
+The underlying v2 [published-file audit](CONTROLLED-TRAINING-EXPORT-AUDIT-v2.md)
+and the [v3 reference-only re-render audit](SPATIAL-PROSE-RERENDER-v3.md) passed.
+V3 preserves every question, menu, label, evidence record and depth field.
+It uses spatial Natural wording, shared Count chains, two-outcome ambiguity
+explanations and grouped Which rejections. Mean reference tokens are 333 Natural
+and 387 Symbolic. See [the actual examples](SPATIAL-PROSE-RERENDER-v3.examples.md).
+Direction/Count E shares are 30% both below and above the old 13-premise boundary;
+Which shares are 26.4% / 30.4%. This addresses that specific old size shortcut,
+not every potential structural bias. References use the cleaned, versioned
+renderer; all Which uniqueness obligations remain. The candidate is unsealed,
+and no GPU smoke test or training run has occurred. Do not use the legacy
+training commands below or in the old runbook to launch this new study.
+
+### Historical Candidate v1
+
+The following review and bounded-repair history describe the preserved v1
+candidate, not the current replacement.
+
+The [pre-training review](UNIQUE-PRETRAINING-REVIEW-v1.md) recommends holding the
+main SFT launch: a shallow size-only probe predicts E/non-E at 94.2% Direction
+and 94.7% Count accuracy, and reference prose has redundant exact-value
+rejection sections. This does not invalidate audited labels or quotas, but
+requires a quality decision before release. Data and evaluation remain unchanged.
+
+The [verified training candidate](unique-training-candidate-v1/README.md) now has
+**6,000 final examples per style**, from
+6,000 distinct questions with one selected menu each. Each query type has
+**1,200 A-D / 600 E / 200 F**. Within E, Direction and Count each target
+450 no-entailment and 150 inconsistent cases; Which targets 300 multiple-entailment,
+225 no-entailment and 75 inconsistent cases. Controlled training retains L1-L8
+with higher-depth weighting; evaluation retains uniform L1-L8 and equal L9/L10.
+See [the allocation and proof obligations](UNIQUE-ONLY-v1.md#approved-training-allocation-goal).
+The [full-pool bounds check](UNIQUE-TRAINING-ALLOCATION-FEASIBILITY-v1.md) found
+source-supply shortages and a conflict with the old 1,400 primary-A-D depth
+minimum. The user has now approved the
+[bounded repair](UNIQUE-TRAINING-REPAIR-PROPOSAL-v1.md): measure depth in selected
+explanations, including F, and admit at most 2,048 supplementary query slots.
+There is no automatic refill or guarantee of sufficient supply. This is not
+a dataset seal or training authorization; evaluation selections stay unchanged.
+
+The [first bounded batch completed](UNIQUE-TRAINING-REPAIR-RESULT-v1.md) with
+815 accepted additions, 1,187 missing-object rejections and 46 held-out overlap
+exclusions. The depth amendment is implemented. It left shortages that prompted
+a separately approved second batch.
+
+The [second batch has now completed](UNIQUE-TRAINING-SECOND-BATCH-RESULT-v1.md):
+585 accepted additions from 1,600 slots. Combined necessary supply bounds pass.
+All 15,450 eligible candidates subsequently completed evidence replay; exact
+one-menu selection and export passed. The
+[final audit](UNIQUE-TRAINING-EXPORT-AUDIT-v1.json) verifies all 6,000 exported
+questions and both style files, exact quotas, retained coverage and unchanged
+evaluation provenance. Both generation caps are exhausted, with no automatic refill.
+
+The preserved pre-rebalance v4 selection passed its Unique-only requirements:
+10,800 bases, 12,578 examples per style, including 6,942 training examples.
+See [selection and distributions](unique-only-selection-v1/README.md).
+No scenes or labels were regenerated, and no quotas or family rules were
+relaxed in that projection. Those training counts are historical, not the new
+target. The former multi-answer balancing target is historical.
+
+### Unchanged External Evaluation
+
+The [Unique external set](spatialmap-unique-v1/README.md) is generated and
+independently audited: 1,500 base questions from 500 scenes, 1,690 views per style
+including omission companions. It uses short questions with shared system rules.
+See the [synthetic wording preview](SHORT-QUESTION-PREVIEW-v1.md) for the same
+presentation on a selected training example.
+
+Full selected training references, evidence and matched chat examples are
+exported in `unique-training-candidate-v3/`. This is an unsealed candidate, not
+an authorized training launch. Manual prose review and separate release approval remain.
+Historical candidates and commands below must not be mistaken for the active
+Unique-only training dataset.
+
+## Approved Plain All-Scene Transition
+
+New Unique prompts use plain spatial premises, a short SpatialMap-style question,
+and options. The `plain-unique-system-rules-v1` system message carries the
+entailment definition and complete E/F rules; questions do not repeat them.
+Selection and Count include every named scene object except the reference.
+There are no visible `Eligible:` lists or technical query headers; shared
+assumptions are in the system message. External display uses original names
+without an alias legend.
+Scene sentences occupy one paragraph. External source introductions such as
+`Police Supply Store is in the map.` and original spellings are preserved;
+only whitespace is normalized. The question and options remain below the
+paragraph. Premise keys are defined only inside explanations.
+
+The versioned protocol and bounded checks are implemented. See
+[ALL-SCENE-TRANSITION-REVIEW-v1.md](ALL-SCENE-TRANSITION-REVIEW-v1.md).
+The old v5 scope cannot be changed by deleting its visible candidate list:
+labels, Count totals, depth and context relevance must be recomputed.
+Combined all-scene feasibility subsequently passed in the v4 diagnostic.
+The selected bases now have a validated Unique-only projection; no final
+training package, seal, or training run was produced.
+
+## Preserved Scoped Candidate
+
+The user approved an entailment-only study. Read
+[ENTAILMENT-ONLY-v1.md](ENTAILMENT-ONLY-v1.md) for the current semantics and
+escape rules. The historical possibility-based design below is superseded.
+Do not restart the old production allocation as though it implements the new
+contracts.
+
+The preserved scoped synthetic artifact is
+[`entailment-candidate-v5/`](entailment-candidate-v5/manifest.json):
+10,800 retained bases (6,000 train, 1,200 dev, 2,400 in-range, 1,200
+extrapolation), 38,523 views per style, and matched Natural/Symbolic explanations.
+Visible text uses the established 30-place vocabulary plus Courthouse, with
+one reversible naming map per story. All query and style variants share it.
+
+The [distribution report](ENTAILMENT-CANDIDATE-REVIEW-v5.md) and
+[full independent audit](SYNTHETIC-INDEPENDENT-AUDIT-v5.json) bind this named
+candidate. Its scoped quota/coverage gates pass; this does not establish
+all-scene feasibility. The audit replays 8,794 positive
+claims and 62,614 counterexamples and checks all 77,046 model-input rows.
+The final targeted review is recorded in
+[ENTAILMENT-FINAL-REVIEW-v5.md](ENTAILMENT-FINAL-REVIEW-v5.md).
+
+The preserved external artifact is
+[`spatialmap-entailment-all-five-v3/`](spatialmap-entailment-all-five-v3/manifest.json):
+1,500 bases from 500 stories, 5,070 views per style, original source names in a
+reversible legend, and all-five-object Selection eligibility.
+Its [independent audit](EXTERNAL-INDEPENDENT-AUDIT-v3.json) covers all claims,
+proofs, counterexamples, legends and model inputs. Corr SINGLE is unchanged.
+
+The positive explanation calculus supports axis paths and fixed-membership
+Count proofs. Unsupported derivations are excluded, not assigned guessed
+labels. A solver-only joint Count diagnostic covers changing memberships; it
+does not authorize Boolean-premise training examples or imply that the
+synthetic explanation calculus is complete for arbitrary Count entailments.
+
+The original `entailment-config-frozen-v1.json` and interrupted runs are
+preserved provenance, not instructions to resume with current changed code.
+The candidate's configuration records its current naming and software snapshot.
+It is not a newly sealed training package. Historical prepared packages below
+must not be used as the entailment-only dataset.
+
+No new dataset has been sealed and no model training has been launched.
+Sealing and training preparation require separate user approval.
 
 ## Working Documents
 
+- [Unique-only study](UNIQUE-ONLY-v1.md): latest approved research scope.
+- [Unique-only selection](unique-only-selection-v1/README.md): validated counts
+  and answer distributions for the unchanged selected bases.
 - [Main pivot](pivot_20261026.md): source of truth for research decisions.
+- [Entailment-only amendment](ENTAILMENT-ONLY-v1.md): active contract semantics,
+  positive/negative evidence requirements, overlap and migration gates.
 - [Evidence examples](research-analysis/PIVOT-EVIDENCE.md): worked examples and
   validation requirements supporting the pivot.
 - [Literature note](research-analysis/PIVOT-LITERATURE.md): primary-source
@@ -29,7 +199,7 @@ Unique Answer, Listed Possibilities, and Exhaustive Possibilities contracts.
 - [Training runbook](TRAINING-RUNBOOK.md): prior preparation counts and commands,
   on hold pending the amended dataset and user approval.
 
-## Current Status
+## Historical Possibility-Based Status
 
 The pivot now requires a depth-controlled replacement: train/dev/in-range test
 at depths 1-8, plus a separate extrapolation benchmark at depths 9-10.
@@ -242,13 +412,13 @@ correctness failures must still be surfaced and fixed, never hidden to preserve
 the schedule. This section is an execution guardrail, not a second specification.
 
 - Deliver the verified atomic spatial-composition dataset first, covering
-  Direction, Selection, and Count across all three answer contracts.
+  Direction, Selection, and Count under `unique-entailed` only.
 - Use the six-option interface and matched Natural/Symbolic explanations from
   shared verified evidence. Freeze remaining formats and sampling settings
   after feasibility checks and before training.
 - Keep story/family splits intact. SpatialMap is external evaluation only;
   preserve Corr SINGLE and version new contract views separately.
-- Train two matched mixed-contract adapters with one shared initial seed.
+- Train two matched Unique-only adapters with one shared initial seed.
   Evaluate both and the style-matched untuned baselines. Select checkpoints
   using synthetic Stage-1 development accuracy; report both evaluation stages.
 - Do not add Boolean-proof baselines, an answer-only arm, broad generalization
@@ -258,11 +428,10 @@ the schedule. This section is an execution guardrail, not a second specification
 - Follow the pivot's three-week boundary and protect the writing week.
   Negative or mixed training results do not invalidate the dataset contribution.
 
-The next work is resolving the measured depth/gold feasibility blockers,
-not production generation or GPU training. Follow the specification's user
-checkpoints before production and final sealing. GPU preflight comes after an
-approved replacement release; the earlier fixtures and seals do not establish
-readiness for the amended design.
+The combined feasibility blockers were cleared by v4. The Unique-only
+projection passes its remaining requirements, but full artifact generation
+and review still precede any sealing decision. GPU preflight follows an
+approved release; earlier fixtures and seals do not certify this study.
 
 ## Boundaries
 

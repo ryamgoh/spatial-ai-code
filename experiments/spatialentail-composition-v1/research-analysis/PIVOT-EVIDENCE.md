@@ -1,5 +1,14 @@
 # SpatialEntail: Evidence Examples and Dataset Quality Checks
 
+## Historical Contract Examples
+
+The possibility-based answer obligations and golds in this note are historical.
+They are not the active entailment-only supervision specification. Use
+[ENTAILMENT-ONLY-v1.md](../ENTAILMENT-ONLY-v1.md) for current contracts and
+[ENTAILMENT-FINAL-REVIEW-v5.md](../ENTAILMENT-FINAL-REVIEW-v5.md) for the
+reviewed named candidate. The underlying spatial examples remain useful
+diagnostics, but their old menu answers must not be copied into new data.
+
 Supporting note for [spatialentail-composition-v1](../README.md).
 The [main pivot](../pivot_20261026.md) is the source of truth for research
 decisions; this note provides worked evidence examples and supporting checks.

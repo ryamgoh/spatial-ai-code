@@ -1,0 +1,606 @@
+{
+  "status": "optimistic-bound-complete-not-reselected",
+  "fixed_rule": "premises <= 13 predicts E; premises >= 14 predicts non-E",
+  "pool_bases": 15450,
+  "method": "Distinct-base census across the entire replayed pool. Cap short controlled non-E supply by exact depth quotas and, for Count, exact depth/value quotas. Cap long E supply by noncontrolled source quotas. Ignore family, negative coverage, menu availability and E-subtype coupling, so these are optimistic error upper bounds, not attainable selections or joint optima.",
+  "results": [
+    {
+      "query": "direction",
+      "current_rule_errors": 116,
+      "current_rule_accuracy": 0.942,
+      "short_controlled_nonE_upper_bound": 151,
+      "long_noncontrolled_E_upper_bound": 78,
+      "rule_errors_upper_bound": 229,
+      "rule_accuracy_lower_bound_after_any_allowed_reselection": 0.8855,
+      "controlled_cells": [
+        {
+          "stratum": "train/direction/1",
+          "count_value": null,
+          "quota": 112,
+          "short_nonE_supply": 177,
+          "optimistic_selected": 112
+        },
+        {
+          "stratum": "train/direction/2",
+          "count_value": null,
+          "quota": 126,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/direction/3",
+          "count_value": null,
+          "quota": 140,
+          "short_nonE_supply": 33,
+          "optimistic_selected": 33
+        },
+        {
+          "stratum": "train/direction/4",
+          "count_value": null,
+          "quota": 154,
+          "short_nonE_supply": 6,
+          "optimistic_selected": 6
+        },
+        {
+          "stratum": "train/direction/5",
+          "count_value": null,
+          "quota": 182,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/direction/6",
+          "count_value": null,
+          "quota": 196,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/direction/7",
+          "count_value": null,
+          "quota": 224,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/direction/8",
+          "count_value": null,
+          "quota": 266,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        }
+      ],
+      "long_E_by_source": {
+        "random-atoms": {
+          "quota": 200,
+          "long_E_supply": 0
+        },
+        "random-world": {
+          "quota": 300,
+          "long_E_supply": 0
+        },
+        "targeted": {
+          "quota": 100,
+          "long_E_supply": 78
+        }
+      }
+    },
+    {
+      "query": "count",
+      "current_rule_errors": 106,
+      "current_rule_accuracy": 0.947,
+      "short_controlled_nonE_upper_bound": 147,
+      "long_noncontrolled_E_upper_bound": 73,
+      "rule_errors_upper_bound": 220,
+      "rule_accuracy_lower_bound_after_any_allowed_reselection": 0.89,
+      "controlled_cells": [
+        {
+          "stratum": "train/count/1",
+          "count_value": 0,
+          "quota": 23,
+          "short_nonE_supply": 37,
+          "optimistic_selected": 23
+        },
+        {
+          "stratum": "train/count/1",
+          "count_value": 1,
+          "quota": 23,
+          "short_nonE_supply": 27,
+          "optimistic_selected": 23
+        },
+        {
+          "stratum": "train/count/1",
+          "count_value": 2,
+          "quota": 22,
+          "short_nonE_supply": 37,
+          "optimistic_selected": 22
+        },
+        {
+          "stratum": "train/count/1",
+          "count_value": 3,
+          "quota": 22,
+          "short_nonE_supply": 45,
+          "optimistic_selected": 22
+        },
+        {
+          "stratum": "train/count/1",
+          "count_value": 4,
+          "quota": 22,
+          "short_nonE_supply": 37,
+          "optimistic_selected": 22
+        },
+        {
+          "stratum": "train/count/2",
+          "count_value": 0,
+          "quota": 26,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/2",
+          "count_value": 1,
+          "quota": 25,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/2",
+          "count_value": 2,
+          "quota": 25,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/2",
+          "count_value": 3,
+          "quota": 25,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/2",
+          "count_value": 4,
+          "quota": 25,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/3",
+          "count_value": 0,
+          "quota": 28,
+          "short_nonE_supply": 6,
+          "optimistic_selected": 6
+        },
+        {
+          "stratum": "train/count/3",
+          "count_value": 1,
+          "quota": 28,
+          "short_nonE_supply": 10,
+          "optimistic_selected": 10
+        },
+        {
+          "stratum": "train/count/3",
+          "count_value": 2,
+          "quota": 28,
+          "short_nonE_supply": 9,
+          "optimistic_selected": 9
+        },
+        {
+          "stratum": "train/count/3",
+          "count_value": 3,
+          "quota": 28,
+          "short_nonE_supply": 5,
+          "optimistic_selected": 5
+        },
+        {
+          "stratum": "train/count/3",
+          "count_value": 4,
+          "quota": 28,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/4",
+          "count_value": 0,
+          "quota": 31,
+          "short_nonE_supply": 1,
+          "optimistic_selected": 1
+        },
+        {
+          "stratum": "train/count/4",
+          "count_value": 1,
+          "quota": 31,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/4",
+          "count_value": 2,
+          "quota": 31,
+          "short_nonE_supply": 2,
+          "optimistic_selected": 2
+        },
+        {
+          "stratum": "train/count/4",
+          "count_value": 3,
+          "quota": 31,
+          "short_nonE_supply": 1,
+          "optimistic_selected": 1
+        },
+        {
+          "stratum": "train/count/4",
+          "count_value": 4,
+          "quota": 30,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/5",
+          "count_value": 0,
+          "quota": 37,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/5",
+          "count_value": 1,
+          "quota": 37,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/5",
+          "count_value": 2,
+          "quota": 36,
+          "short_nonE_supply": 1,
+          "optimistic_selected": 1
+        },
+        {
+          "stratum": "train/count/5",
+          "count_value": 3,
+          "quota": 36,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/5",
+          "count_value": 4,
+          "quota": 36,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/6",
+          "count_value": 0,
+          "quota": 40,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/6",
+          "count_value": 1,
+          "quota": 39,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/6",
+          "count_value": 2,
+          "quota": 39,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/6",
+          "count_value": 3,
+          "quota": 39,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/6",
+          "count_value": 4,
+          "quota": 39,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/7",
+          "count_value": 0,
+          "quota": 45,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/7",
+          "count_value": 1,
+          "quota": 45,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/7",
+          "count_value": 2,
+          "quota": 45,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/7",
+          "count_value": 3,
+          "quota": 45,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/7",
+          "count_value": 4,
+          "quota": 44,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/8",
+          "count_value": 0,
+          "quota": 54,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/8",
+          "count_value": 1,
+          "quota": 53,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/8",
+          "count_value": 2,
+          "quota": 53,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/8",
+          "count_value": 3,
+          "quota": 53,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        },
+        {
+          "stratum": "train/count/8",
+          "count_value": 4,
+          "quota": 53,
+          "short_nonE_supply": 0,
+          "optimistic_selected": 0
+        }
+      ],
+      "long_E_by_source": {
+        "random-atoms": {
+          "quota": 200,
+          "long_E_supply": 0
+        },
+        "random-world": {
+          "quota": 300,
+          "long_E_supply": 0
+        },
+        "targeted": {
+          "quota": 100,
+          "long_E_supply": 73
+        }
+      }
+    }
+  ],
+  "source_length_supply": [
+    {
+      "query": "count",
+      "source": "controlled",
+      "category": "nonE",
+      "bases": 3796,
+      "min_premises": 6,
+      "max_premises": 32,
+      "short": 218,
+      "long": 3578
+    },
+    {
+      "query": "count",
+      "source": "random-atoms",
+      "category": "E",
+      "bases": 252,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 252,
+      "long": 0
+    },
+    {
+      "query": "count",
+      "source": "random-atoms",
+      "category": "nonE",
+      "bases": 48,
+      "min_premises": 4,
+      "max_premises": 9,
+      "short": 48,
+      "long": 0
+    },
+    {
+      "query": "count",
+      "source": "random-world",
+      "category": "E",
+      "bases": 332,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 332,
+      "long": 0
+    },
+    {
+      "query": "count",
+      "source": "random-world",
+      "category": "nonE",
+      "bases": 95,
+      "min_premises": 4,
+      "max_premises": 9,
+      "short": 95,
+      "long": 0
+    },
+    {
+      "query": "count",
+      "source": "targeted",
+      "category": "E",
+      "bases": 212,
+      "min_premises": 6,
+      "max_premises": 20,
+      "short": 139,
+      "long": 73
+    },
+    {
+      "query": "direction",
+      "source": "controlled",
+      "category": "nonE",
+      "bases": 3886,
+      "min_premises": 6,
+      "max_premises": 32,
+      "short": 216,
+      "long": 3670
+    },
+    {
+      "query": "direction",
+      "source": "random-atoms",
+      "category": "E",
+      "bases": 219,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 219,
+      "long": 0
+    },
+    {
+      "query": "direction",
+      "source": "random-atoms",
+      "category": "nonE",
+      "bases": 64,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 64,
+      "long": 0
+    },
+    {
+      "query": "direction",
+      "source": "random-world",
+      "category": "E",
+      "bases": 308,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 308,
+      "long": 0
+    },
+    {
+      "query": "direction",
+      "source": "random-world",
+      "category": "nonE",
+      "bases": 330,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 330,
+      "long": 0
+    },
+    {
+      "query": "direction",
+      "source": "targeted",
+      "category": "E",
+      "bases": 164,
+      "min_premises": 8,
+      "max_premises": 20,
+      "short": 86,
+      "long": 78
+    },
+    {
+      "query": "direction",
+      "source": "targeted",
+      "category": "nonE",
+      "bases": 199,
+      "min_premises": 6,
+      "max_premises": 18,
+      "short": 164,
+      "long": 35
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "category": "E",
+      "bases": 1787,
+      "min_premises": 6,
+      "max_premises": 32,
+      "short": 108,
+      "long": 1679
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "category": "nonE",
+      "bases": 2099,
+      "min_premises": 6,
+      "max_premises": 32,
+      "short": 108,
+      "long": 1991
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "E",
+      "bases": 453,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 453,
+      "long": 0
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "nonE",
+      "bases": 49,
+      "min_premises": 3,
+      "max_premises": 8,
+      "short": 49,
+      "long": 0
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "E",
+      "bases": 721,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 721,
+      "long": 0
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "nonE",
+      "bases": 147,
+      "min_premises": 3,
+      "max_premises": 9,
+      "short": 147,
+      "long": 0
+    },
+    {
+      "query": "which",
+      "source": "targeted",
+      "category": "E",
+      "bases": 289,
+      "min_premises": 6,
+      "max_premises": 20,
+      "short": 207,
+      "long": 82
+    }
+  ],
+  "which_note": "Which has both E and non-E controlled cases. The Direction/Count forced-source argument does not apply; no constrained optimum is claimed for Which.",
+  "limitations": "Fixed-rule accuracy, not SFT or full A-F accuracy. Reselecting against this threshold could expose other shortcuts. These bounds already show this one shortcut cannot be removed under all existing constraints.",
+  "selection_sha256": "98fb71b3dac165ae0e070ed7d0417ae26d617f0fe78bc3dee5820321ecdccb81",
+  "full_pool_sha256": "6f0a75e401446d53a9966633cc61760e93302adef464bfe4a61edf6681ab07f0",
+  "candidate_manifest_sha256": "d3b93725dbafb0e920a3490fe5885d8378e8bdad9cb87f193656a7476e5fb42a",
+  "diagnostic_sha256": "7bded6bfa934ecba7dfc360b459801c4c480fce8db6b6b04b4b7f884f2fb19d1",
+  "dataset_changed": false,
+  "new_generation": false,
+  "quota_changes": false,
+  "evaluation_used": false
+}

@@ -30,11 +30,14 @@ class QuestionSolver(SpatialSolverV2):
     def _remember(self, key, value):
         # Unknown/timeouts must remain errors, not reusable semantic conclusions.
         if value.error is None:
-            self._results[key] = deepcopy(value)
-            self._results.move_to_end(key)
-            while len(self._results) > self._limit:
-                self._results.popitem(last=False)
+            self._store(key, value)
         return value
+
+    def _store(self, key, value):
+        self._results[key] = deepcopy(value)
+        self._results.move_to_end(key)
+        while len(self._results) > self._limit:
+            self._results.popitem(last=False)
 
     def analyze(self, problem, *, include_witnesses=True):
         key = ("analysis", problem, include_witnesses)
@@ -43,6 +46,21 @@ class QuestionSolver(SpatialSolverV2):
         return self._remember(
             key, super().analyze(problem, include_witnesses=include_witnesses)
         )
+
+    def analyze_entailment(self, problem):
+        key = ("entailment-analysis", problem)
+        if key in self._results:
+            return deepcopy(self._results[key])
+        return self._remember(key, super().analyze_entailment(problem))
+
+    def negative_categories(self, problem):
+        key = ("negative-categories", problem)
+        if key in self._results:
+            return deepcopy(self._results[key])
+        # Exceptions propagate and are not cached.
+        value = super().negative_categories(problem)
+        self._store(key, value)
+        return value
 
     def assess(self, problem, claim):
         key = ("claim", problem, claim)

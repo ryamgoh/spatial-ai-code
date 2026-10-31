@@ -1,0 +1,650 @@
+{
+  "status": "diagnostic-complete-not-training-release",
+  "candidate_manifest_sha256": "d3b93725dbafb0e920a3490fe5885d8378e8bdad9cb87f193656a7476e5fb42a",
+  "diagnostic_sha256": "b6b07ebd08fb748c656ed9b637cb2a0b8e7ee9a2b720fd435e49deef37f8f8a8",
+  "sklearn_version": "1.9.1",
+  "method": "Five family-and-story-group-held-out folds within training, fixed seeds, two prespecified shallow tree baselines predicting E versus non-E. No evaluation data, IDs, source labels, depth metadata, menus, proof text, semantic metadata or solver outputs used as features. Labels used as targets only.",
+  "limitations": "This measures a shortcut opportunity, not SFT model behavior or full A-F accuracy. Family/story grouping is not proof of complete structural independence. No evaluation set or GPU model was used.",
+  "prose_phrase_counts": [
+    {
+      "style": "natural",
+      "phrase": "No minimality claim is made",
+      "rows": 375
+    },
+    {
+      "style": "natural",
+      "phrase": "The complete entailed-answer set",
+      "rows": 3600
+    },
+    {
+      "style": "natural",
+      "phrase": "Unique requires exactly one",
+      "rows": 300
+    },
+    {
+      "style": "natural",
+      "phrase": "every contract requires E",
+      "rows": 375
+    },
+    {
+      "style": "symbolic",
+      "phrase": "No minimality claim is made",
+      "rows": 375
+    },
+    {
+      "style": "symbolic",
+      "phrase": "The complete entailed-answer set",
+      "rows": 3600
+    },
+    {
+      "style": "symbolic",
+      "phrase": "Unique requires exactly one",
+      "rows": 300
+    },
+    {
+      "style": "symbolic",
+      "phrase": "every contract requires E",
+      "rows": 375
+    }
+  ],
+  "redundant_exact_value_sections": [
+    {
+      "query": "count",
+      "style": "natural",
+      "metric": "negative_claim_lines",
+      "count": 21201
+    },
+    {
+      "query": "count",
+      "style": "natural",
+      "metric": "rows",
+      "count": 1200
+    },
+    {
+      "query": "count",
+      "style": "symbolic",
+      "metric": "negative_claim_lines",
+      "count": 21201
+    },
+    {
+      "query": "count",
+      "style": "symbolic",
+      "metric": "rows",
+      "count": 1200
+    },
+    {
+      "query": "direction",
+      "style": "natural",
+      "metric": "negative_claim_lines",
+      "count": 8400
+    },
+    {
+      "query": "direction",
+      "style": "natural",
+      "metric": "rows",
+      "count": 1200
+    },
+    {
+      "query": "direction",
+      "style": "symbolic",
+      "metric": "negative_claim_lines",
+      "count": 8400
+    },
+    {
+      "query": "direction",
+      "style": "symbolic",
+      "metric": "rows",
+      "count": 1200
+    }
+  ],
+  "source_answer_counts": [
+    {
+      "query": "count",
+      "source": "controlled",
+      "category": "A-D",
+      "count": 1200
+    },
+    {
+      "query": "count",
+      "source": "controlled",
+      "category": "unique-unlisted",
+      "count": 200
+    },
+    {
+      "query": "count",
+      "source": "random-atoms",
+      "category": "inconsistent",
+      "count": 128
+    },
+    {
+      "query": "count",
+      "source": "random-atoms",
+      "category": "no-entailed-answer",
+      "count": 72
+    },
+    {
+      "query": "count",
+      "source": "random-world",
+      "category": "no-entailed-answer",
+      "count": 300
+    },
+    {
+      "query": "count",
+      "source": "targeted",
+      "category": "inconsistent",
+      "count": 22
+    },
+    {
+      "query": "count",
+      "source": "targeted",
+      "category": "no-entailed-answer",
+      "count": 78
+    },
+    {
+      "query": "direction",
+      "source": "controlled",
+      "category": "A-D",
+      "count": 1200
+    },
+    {
+      "query": "direction",
+      "source": "controlled",
+      "category": "unique-unlisted",
+      "count": 200
+    },
+    {
+      "query": "direction",
+      "source": "random-atoms",
+      "category": "inconsistent",
+      "count": 136
+    },
+    {
+      "query": "direction",
+      "source": "random-atoms",
+      "category": "no-entailed-answer",
+      "count": 64
+    },
+    {
+      "query": "direction",
+      "source": "random-world",
+      "category": "no-entailed-answer",
+      "count": 300
+    },
+    {
+      "query": "direction",
+      "source": "targeted",
+      "category": "inconsistent",
+      "count": 14
+    },
+    {
+      "query": "direction",
+      "source": "targeted",
+      "category": "no-entailed-answer",
+      "count": 86
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "category": "A-D",
+      "count": 1048
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "category": "multiple-entailed",
+      "count": 168
+    },
+    {
+      "query": "which",
+      "source": "controlled",
+      "category": "unique-unlisted",
+      "count": 184
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "A-D",
+      "count": 45
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "inconsistent",
+      "count": 75
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "multiple-entailed",
+      "count": 11
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "no-entailed-answer",
+      "count": 65
+    },
+    {
+      "query": "which",
+      "source": "random-atoms",
+      "category": "unique-unlisted",
+      "count": 4
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "A-D",
+      "count": 107
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "multiple-entailed",
+      "count": 21
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "no-entailed-answer",
+      "count": 160
+    },
+    {
+      "query": "which",
+      "source": "random-world",
+      "category": "unique-unlisted",
+      "count": 12
+    },
+    {
+      "query": "which",
+      "source": "targeted",
+      "category": "multiple-entailed",
+      "count": 100
+    }
+  ],
+  "shortcut_results": [
+    {
+      "query": "direction",
+      "model": "size_only_depth_1",
+      "examples": 2000,
+      "accuracy": 0.942,
+      "balanced_accuracy": 0.9385714285714286,
+      "confusion_matrix_nonE_E": [
+        [
+          1326,
+          74
+        ],
+        [
+          42,
+          558
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        }
+      ]
+    },
+    {
+      "query": "direction",
+      "model": "structural_counts_depth_3",
+      "examples": 2000,
+      "accuracy": 0.959,
+      "balanced_accuracy": 0.9611904761904762,
+      "confusion_matrix_nonE_E": [
+        [
+          1338,
+          62
+        ],
+        [
+          20,
+          580
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 5.50\n|   |   |--- max_degree <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  5.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- distinct_pairs <= 16.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  16.50\n|   |   |--- premises <= 19.50\n|   |   |   |--- class: 0\n|   |   |--- premises >  19.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 5.50\n|   |   |--- max_degree <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  5.50\n|   |   |--- objects <= 8.50\n|   |   |   |--- class: 0\n|   |   |--- objects >  8.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- premises <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- premises >  16.50\n|   |   |--- premises <= 18.50\n|   |   |   |--- class: 0\n|   |   |--- premises >  18.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 5.50\n|   |   |--- max_degree <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  5.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- distinct_pairs <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  16.50\n|   |   |--- distinct_pairs <= 18.50\n|   |   |   |--- class: 0\n|   |   |--- distinct_pairs >  18.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 5.50\n|   |   |--- max_degree <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  5.50\n|   |   |--- objects <= 9.50\n|   |   |   |--- class: 0\n|   |   |--- objects >  9.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- premises <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- premises >  16.50\n|   |   |--- NW <= 0.50\n|   |   |   |--- class: 0\n|   |   |--- NW >  0.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 6.50\n|   |   |--- max_degree <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  6.50\n|   |   |--- class: 0\n|--- premises >  13.50\n|   |--- premises <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- premises >  16.50\n|   |   |--- distinct_pairs <= 17.50\n|   |   |   |--- class: 0\n|   |   |--- distinct_pairs >  17.50\n|   |   |   |--- class: 0\n"
+        }
+      ]
+    },
+    {
+      "query": "which",
+      "model": "size_only_depth_1",
+      "examples": 2000,
+      "accuracy": 0.793,
+      "balanced_accuracy": 0.7697619047619048,
+      "confusion_matrix_nonE_E": [
+        [
+          1159,
+          241
+        ],
+        [
+          173,
+          427
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- premises <= 14.50\n|   |--- class: 1\n|--- premises >  14.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        }
+      ]
+    },
+    {
+      "query": "which",
+      "model": "structural_counts_depth_3",
+      "examples": 2000,
+      "accuracy": 0.8085,
+      "balanced_accuracy": 0.7779761904761905,
+      "confusion_matrix_nonE_E": [
+        [
+          1196,
+          204
+        ],
+        [
+          179,
+          421
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 7.50\n|   |   |--- leaf_objects <= 5.50\n|   |   |   |--- class: 1\n|   |   |--- leaf_objects >  5.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  7.50\n|   |   |--- class: 0\n|--- premises >  13.50\n|   |--- objects <= 15.50\n|   |   |--- leaf_objects <= 0.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  0.50\n|   |   |   |--- class: 0\n|   |--- objects >  15.50\n|   |   |--- leaf_objects <= 4.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  4.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- premises <= 14.50\n|   |--- premises <= 11.50\n|   |   |--- distinct_pairs <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- distinct_pairs >  4.50\n|   |   |   |--- class: 1\n|   |--- premises >  11.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|--- premises >  14.50\n|   |--- leaf_objects <= 4.50\n|   |   |--- max_degree <= 9.50\n|   |   |   |--- class: 0\n|   |   |--- max_degree >  9.50\n|   |   |   |--- class: 0\n|   |--- leaf_objects >  4.50\n|   |   |--- SW <= 7.50\n|   |   |   |--- class: 0\n|   |   |--- SW >  7.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- premises <= 13.50\n|   |--- distinct_pairs <= 11.50\n|   |   |--- objects <= 7.50\n|   |   |   |--- class: 1\n|   |   |--- objects >  7.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  11.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- objects <= 15.50\n|   |   |--- leaf_objects <= 0.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  0.50\n|   |   |   |--- class: 0\n|   |--- objects >  15.50\n|   |   |--- leaf_objects <= 4.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  4.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- premises <= 11.50\n|   |   |--- premises <= 5.50\n|   |   |   |--- class: 1\n|   |   |--- premises >  5.50\n|   |   |   |--- class: 1\n|   |--- premises >  11.50\n|   |   |--- objects <= 10.50\n|   |   |   |--- class: 0\n|   |   |--- objects >  10.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- objects <= 15.50\n|   |   |--- max_degree <= 9.50\n|   |   |   |--- class: 0\n|   |   |--- max_degree >  9.50\n|   |   |   |--- class: 0\n|   |--- objects >  15.50\n|   |   |--- leaf_objects <= 4.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  4.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- leaf_objects <= 5.50\n|   |   |--- max_degree <= 5.50\n|   |   |   |--- class: 1\n|   |   |--- max_degree >  5.50\n|   |   |   |--- class: 0\n|   |--- leaf_objects >  5.50\n|   |   |--- class: 1\n|--- premises >  13.50\n|   |--- objects <= 15.50\n|   |   |--- max_degree <= 9.50\n|   |   |   |--- class: 0\n|   |   |--- max_degree >  9.50\n|   |   |   |--- class: 0\n|   |--- objects >  15.50\n|   |   |--- leaf_objects <= 4.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  4.50\n|   |   |   |--- class: 0\n"
+        }
+      ]
+    },
+    {
+      "query": "count",
+      "model": "size_only_depth_1",
+      "examples": 2000,
+      "accuracy": 0.947,
+      "balanced_accuracy": 0.9478571428571428,
+      "confusion_matrix_nonE_E": [
+        [
+          1324,
+          76
+        ],
+        [
+          30,
+          570
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- class: 1\n|--- premises >  13.50\n|   |--- class: 0\n"
+        }
+      ]
+    },
+    {
+      "query": "count",
+      "model": "structural_counts_depth_3",
+      "examples": 2000,
+      "accuracy": 0.959,
+      "balanced_accuracy": 0.955,
+      "confusion_matrix_nonE_E": [
+        [
+          1351,
+          49
+        ],
+        [
+          33,
+          567
+        ]
+      ],
+      "always_nonE_accuracy": 0.7,
+      "always_nonE_balanced_accuracy": 0.5,
+      "folds": [
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 4.50\n|   |   |--- premises <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- premises >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  4.50\n|   |   |--- leaf_objects <= 1.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  1.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- distinct_pairs <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  16.50\n|   |   |--- distinct_pairs <= 17.50\n|   |   |   |--- class: 0\n|   |   |--- distinct_pairs >  17.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1601,
+          "test": 399,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 4.50\n|   |   |--- class: 1\n|   |--- max_degree >  4.50\n|   |   |--- leaf_objects <= 4.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  4.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- premises <= 15.50\n|   |   |--- leaf_objects <= 1.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  1.50\n|   |   |   |--- class: 1\n|   |--- premises >  15.50\n|   |   |--- leaf_objects <= 5.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  5.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1599,
+          "test": 401,
+          "rule": "|--- distinct_pairs <= 13.50\n|   |--- max_degree <= 4.50\n|   |   |--- class: 1\n|   |--- max_degree >  4.50\n|   |   |--- leaf_objects <= 3.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  3.50\n|   |   |   |--- class: 1\n|--- distinct_pairs >  13.50\n|   |--- distinct_pairs <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  16.50\n|   |   |--- S <= 8.50\n|   |   |   |--- class: 0\n|   |   |--- S >  8.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- premises <= 13.50\n|   |--- max_degree <= 4.50\n|   |   |--- premises <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- premises >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  4.50\n|   |   |--- objects <= 10.50\n|   |   |   |--- class: 0\n|   |   |--- objects >  10.50\n|   |   |   |--- class: 1\n|--- premises >  13.50\n|   |--- distinct_pairs <= 16.50\n|   |   |--- leaf_objects <= 2.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  2.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  16.50\n|   |   |--- distinct_pairs <= 17.50\n|   |   |   |--- class: 0\n|   |   |--- distinct_pairs >  17.50\n|   |   |   |--- class: 0\n"
+        },
+        {
+          "train": 1600,
+          "test": 400,
+          "rule": "|--- distinct_pairs <= 13.50\n|   |--- max_degree <= 4.50\n|   |   |--- premises <= 4.50\n|   |   |   |--- class: 1\n|   |   |--- premises >  4.50\n|   |   |   |--- class: 1\n|   |--- max_degree >  4.50\n|   |   |--- objects <= 10.50\n|   |   |   |--- class: 0\n|   |   |--- objects >  10.50\n|   |   |   |--- class: 1\n|--- distinct_pairs >  13.50\n|   |--- distinct_pairs <= 15.50\n|   |   |--- leaf_objects <= 1.50\n|   |   |   |--- class: 0\n|   |   |--- leaf_objects >  1.50\n|   |   |   |--- class: 1\n|   |--- distinct_pairs >  15.50\n|   |   |--- distinct_pairs <= 17.50\n|   |   |   |--- class: 0\n|   |   |--- distinct_pairs >  17.50\n|   |   |   |--- class: 0\n"
+        }
+      ]
+    }
+  ],
+  "sample_references": {
+    "direction/inconsistent": {
+      "id": "production-b2905-s118-direction-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nCinema is to the South of Pharmacy. Cinema is to the North of Park. Park is to the South of Veterinary Clinic. Courthouse is to the West of Park. High School is to the Northwest of Cinema. Veterinary Clinic is to the Northwest of Pharmacy.\n\nIn which direction is Veterinary Clinic relative to Cinema?\nA. Southeast\nB. North\nC. East\nD. Northeast\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nFrom P6, Veterinary Clinic's x-coordinate is less than Pharmacy's x-coordinate.\nFrom P1, Pharmacy's x-coordinate is equal to Cinema's x-coordinate.\nFrom P2, Cinema's x-coordinate is equal to Park's x-coordinate.\nFrom P3, Park's x-coordinate is equal to Veterinary Clinic's x-coordinate.\nComposing this path gives Veterinary Clinic's x-coordinate less than Veterinary Clinic's x-coordinate.\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nP6: x(Veterinary Clinic) < x(Pharmacy)\nP1: x(Pharmacy) = x(Cinema)\nP2: x(Cinema) = x(Park)\nP3: x(Park) = x(Veterinary Clinic)\nTransitivity: x(Veterinary Clinic) < x(Veterinary Clinic)\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E"
+      }
+    },
+    "which/inconsistent": {
+      "id": "production-b2905-s118-which-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nCinema is to the South of Pharmacy. Cinema is to the North of Park. Park is to the South of Veterinary Clinic. Courthouse is to the West of Park. High School is to the Northwest of Cinema. Veterinary Clinic is to the Northwest of Pharmacy.\n\nWhich object is southeast of Cinema?\nA. Veterinary Clinic\nB. Pharmacy\nC. Park\nD. High School\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nFrom P6, Veterinary Clinic's x-coordinate is less than Pharmacy's x-coordinate.\nFrom P1, Pharmacy's x-coordinate is equal to Cinema's x-coordinate.\nFrom P2, Cinema's x-coordinate is equal to Park's x-coordinate.\nFrom P3, Park's x-coordinate is equal to Veterinary Clinic's x-coordinate.\nComposing this path gives Veterinary Clinic's x-coordinate less than Veterinary Clinic's x-coordinate.\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nP6: x(Veterinary Clinic) < x(Pharmacy)\nP1: x(Pharmacy) = x(Cinema)\nP2: x(Cinema) = x(Park)\nP3: x(Park) = x(Veterinary Clinic)\nTransitivity: x(Veterinary Clinic) < x(Veterinary Clinic)\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E"
+      }
+    },
+    "count/inconsistent": {
+      "id": "production-b2905-s118-count-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nCinema is to the South of Pharmacy. Cinema is to the North of Park. Park is to the South of Veterinary Clinic. Courthouse is to the West of Park. High School is to the Northwest of Cinema. Veterinary Clinic is to the Northwest of Pharmacy.\n\nHow many objects are southeast of Cinema?\nA. 1\nB. 2\nC. 0\nD. 3\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nFrom P6, Veterinary Clinic's x-coordinate is less than Pharmacy's x-coordinate.\nFrom P1, Pharmacy's x-coordinate is equal to Cinema's x-coordinate.\nFrom P2, Cinema's x-coordinate is equal to Park's x-coordinate.\nFrom P3, Park's x-coordinate is equal to Veterinary Clinic's x-coordinate.\nComposing this path gives Veterinary Clinic's x-coordinate less than Veterinary Clinic's x-coordinate.\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: Cinema is to the South of Pharmacy.\nP2: Cinema is to the North of Park.\nP3: Park is to the South of Veterinary Clinic.\nP6: Veterinary Clinic is to the Northwest of Pharmacy.\n\nP6: x(Veterinary Clinic) < x(Pharmacy)\nP1: x(Pharmacy) = x(Cinema)\nP2: x(Cinema) = x(Park)\nP3: x(Park) = x(Veterinary Clinic)\nTransitivity: x(Veterinary Clinic) < x(Veterinary Clinic)\nA strict order cannot be less than itself: contradiction.\nConflicting premises: P1, P2, P3, P6. No minimality claim is made.\n\nThe premises are inconsistent; every contract requires E.\n\nAnswer: E"
+      }
+    },
+    "direction/no-entailed-answer": {
+      "id": "production-b2904-s624-direction-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nPark is to the Southeast of Restaurant. Stadium is to the South of Fire Station. Police Station is to the East of Supermarket. Park is to the Northeast of Police Station. Stadium is to the Southeast of Restaurant. Clinic is to the Southwest of Fire Station. Supermarket is to the West of Stadium. Fire Station is to the Northeast of Supermarket.\n\nIn which direction is Stadium relative to Clinic?\nA. Southeast\nB. South\nC. East\nD. North\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Clinic lies to the left of Fire Station and Stadium. Fire Station and Stadium share the same horizontal position. From bottom to top, the order is Clinic, Stadium and Fire Station. So Stadium is northeast of Clinic.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Clinic lies to the left of Fire Station and Stadium. Fire Station and Stadium share the same horizontal position. Clinic and Stadium lie below Fire Station. Clinic and Stadium share the same height. So Stadium is east of Clinic.\n\nThe claim that Stadium is north of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is northeast of Clinic is false in Case 2, so it is not entailed.\n\nThe claim that Stadium is east of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is southeast of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is south of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is southwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is west of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is northwest of Clinic is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E",
+        "symbolic": "Case 1 (counterexample satisfying all premises): x(Clinic) < x(Fire Station) = x(Stadium). y(Clinic) < y(Stadium) < y(Fire Station). => NE(Stadium,Clinic).\n\nCase 2 (counterexample satisfying all premises): x(Clinic) < x(Fire Station) = x(Stadium). y(Clinic) = y(Stadium) < y(Fire Station). => E(Stadium,Clinic).\n\nThe claim that N(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NE(Stadium,Clinic) is false in Case 2, so it is not entailed.\n\nThe claim that E(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that SE(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that S(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that SW(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that W(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E"
+      }
+    },
+    "which/no-entailed-answer": {
+      "id": "production-b2904-s624-which-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nPark is to the Southeast of Restaurant. Stadium is to the South of Fire Station. Police Station is to the East of Supermarket. Park is to the Northeast of Police Station. Stadium is to the Southeast of Restaurant. Clinic is to the Southwest of Fire Station. Supermarket is to the West of Stadium. Fire Station is to the Northeast of Supermarket.\n\nWhich object is northwest of Clinic?\nA. Restaurant\nB. Supermarket\nC. Fire Station\nD. Police Station\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Fire Station, Park, Police Station, Restaurant, Stadium and Supermarket are northeast of Clinic. No eligible object qualifies in this arrangement.\n\nThe claim that Fire Station is northwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Park is northwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Police Station is northwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Restaurant is northwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Stadium is northwest of Clinic is false in Case 1, so it is not entailed.\n\nThe claim that Supermarket is northwest of Clinic is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E",
+        "symbolic": "Case 1 (counterexample satisfying all premises): NE(Fire Station,Clinic) & NE(Park,Clinic) & NE(Police Station,Clinic) & NE(Restaurant,Clinic) & NE(Stadium,Clinic) & NE(Supermarket,Clinic). Qualifying objects = {}.\n\nThe claim that NW(Fire Station,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Park,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Police Station,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Restaurant,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Stadium,Clinic) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Supermarket,Clinic) is false in Case 1, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E"
+      }
+    },
+    "count/no-entailed-answer": {
+      "id": "production-b2904-s624-count-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nPark is to the Southeast of Restaurant. Stadium is to the South of Fire Station. Police Station is to the East of Supermarket. Park is to the Northeast of Police Station. Stadium is to the Southeast of Restaurant. Clinic is to the Southwest of Fire Station. Supermarket is to the West of Stadium. Fire Station is to the Northeast of Supermarket.\n\nHow many objects are northwest of Clinic?\nA. 0\nB. 4\nC. 3\nD. 2\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Case 1: A counterexample arrangement satisfying all premises is the following. Fire Station is northeast of Clinic. Park is north of Clinic. Police Station and Supermarket are southwest of Clinic. Restaurant is northwest of Clinic. Stadium is southeast of Clinic. Only Restaurant qualifies in this arrangement. This gives a count of 1.\n\nCase 2: A counterexample arrangement satisfying all premises is the following. Fire Station, Park, Police Station, Restaurant, Stadium and Supermarket are northeast of Clinic. No eligible object qualifies in this arrangement. This gives a count of 0.\n\nThe claim that exactly 0 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 1 eligible candidate qualifies is false in Case 2, so it is not entailed.\n\nThe claim that exactly 2 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 3 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 4 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 5 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nThe claim that exactly 6 eligible candidates qualify is false in Case 2, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E",
+        "symbolic": "Case 1 (counterexample satisfying all premises): NE(Fire Station,Clinic). N(Park,Clinic). SW(Police Station,Clinic) & SW(Supermarket,Clinic). NW(Restaurant,Clinic). SE(Stadium,Clinic). Qualifying objects = {Restaurant}. count=1.\n\nCase 2 (counterexample satisfying all premises): NE(Fire Station,Clinic) & NE(Park,Clinic) & NE(Police Station,Clinic) & NE(Restaurant,Clinic) & NE(Stadium,Clinic) & NE(Supermarket,Clinic). Qualifying objects = {}. count=0.\n\nThe claim that count=0 is false in Case 1, so it is not entailed.\n\nThe claim that count=1 is false in Case 2, so it is not entailed.\n\nThe claim that count=2 is false in Case 2, so it is not entailed.\n\nThe claim that count=3 is false in Case 2, so it is not entailed.\n\nThe claim that count=4 is false in Case 2, so it is not entailed.\n\nThe claim that count=5 is false in Case 2, so it is not entailed.\n\nThe claim that count=6 is false in Case 2, so it is not entailed.\n\nNo domain answer is entailed.\n\nAnswer: E"
+      }
+    },
+    "which/multiple-entailed": {
+      "id": "production-b2907-s32-which-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nUniversity is to the Southwest of Bank. Fire Station is to the Southwest of Stadium. Bank is to the Northeast of Stadium. Bank is to the Southwest of Theater. High School is to the Northeast of Bank. Veterinary Clinic is to the Northeast of Gas Station. Bank is to the Northeast of Train Station. University is to the Southwest of Train Station. Post Office is to the West of Florist. Bank is to the Northeast of Veterinary Clinic. Gas Station is to the Northwest of City Hall. Pharmacy is to the Southwest of Gym. Pharmacy is to the Northeast of Bank.\n\nWhich object is northeast of Bank?\nA. Pharmacy\nB. Theater\nC. Gym\nD. High School\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP5: High School is to the Northeast of Bank.\nP12: Pharmacy is to the Southwest of Gym.\nP13: Pharmacy is to the Northeast of Bank.\n\nThe x-coordinates increase strictly along Bank, Pharmacy and Gym (premise sources: P13 and P12). So Gym has a greater x-coordinate than Bank.\nThe y-coordinates increase strictly along Bank, Pharmacy and Gym (premise sources: P13 and P12). So Gym has a greater y-coordinate than Bank.\nTherefore, Gym is northeast of Bank in every valid arrangement.\n\nHigh School has a greater x-coordinate than Bank (premise sources: P5).\nHigh School has a greater y-coordinate than Bank (premise sources: P5).\nTherefore, High School is northeast of Bank in every valid arrangement.\n\nAt least two domain answers are entailed; Unique requires exactly one.\n\nAnswer: E",
+        "symbolic": "Premises used (labels follow their order in the question):\nP5: High School is to the Northeast of Bank.\nP12: Pharmacy is to the Southwest of Gym.\nP13: Pharmacy is to the Northeast of Bank.\n\n[P13, P12] x(Bank) < x(Pharmacy) < x(Gym) => x(Bank) < x(Gym).\n[P13, P12] y(Bank) < y(Pharmacy) < y(Gym) => y(Bank) < y(Gym).\nNE(Gym,Bank) in every valid arrangement.\n\n[P5] x(Bank) < x(High School).\n[P5] y(Bank) < y(High School).\nNE(High School,Bank) in every valid arrangement.\n\nAt least two domain answers are entailed; Unique requires exactly one.\n\nAnswer: E"
+      }
+    },
+    "which/unique-unlisted": {
+      "id": "production-b2904-s345-which-m1-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nVeterinary Clinic is to the Northeast of Fire Station. Library is to the West of Veterinary Clinic. Grocery Store is to the Northwest of Museum. Library is to the North of Supermarket. Library is to the Northeast of Fire Station. Grocery Store is to the West of Hotel.\n\nWhich object is north of Supermarket?\nA. Hotel\nB. Fire Station\nC. Grocery Store\nD. Veterinary Clinic\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP4: Library is to the North of Supermarket.\n\nSupermarket and Library share the same x-coordinate (premise sources: P4).\nLibrary has a greater y-coordinate than Supermarket (premise sources: P4).\nTherefore, Library is north of Supermarket in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Fire Station, Grocery Store and Hotel are southwest of Supermarket. Library is north of Supermarket. Museum is southeast of Supermarket. Veterinary Clinic is northeast of Supermarket. Only Library qualifies in this arrangement.\n\nThe claim that Fire Station is north of Supermarket is false in Case 1, so it is not entailed.\n\nThe claim that Grocery Store is north of Supermarket is false in Case 1, so it is not entailed.\n\nThe claim that Hotel is north of Supermarket is false in Case 1, so it is not entailed.\n\nThe claim that Museum is north of Supermarket is false in Case 1, so it is not entailed.\n\nThe claim that Veterinary Clinic is north of Supermarket is false in Case 1, so it is not entailed.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F",
+        "symbolic": "Premises used (labels follow their order in the question):\nP4: Library is to the North of Supermarket.\n\n[P4] x(Supermarket) = x(Library).\n[P4] y(Supermarket) < y(Library).\nN(Library,Supermarket) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): SW(Fire Station,Supermarket) & SW(Grocery Store,Supermarket) & SW(Hotel,Supermarket). N(Library,Supermarket). SE(Museum,Supermarket). NE(Veterinary Clinic,Supermarket). Qualifying objects = {Library}.\n\nThe claim that N(Fire Station,Supermarket) is false in Case 1, so it is not entailed.\n\nThe claim that N(Grocery Store,Supermarket) is false in Case 1, so it is not entailed.\n\nThe claim that N(Hotel,Supermarket) is false in Case 1, so it is not entailed.\n\nThe claim that N(Museum,Supermarket) is false in Case 1, so it is not entailed.\n\nThe claim that N(Veterinary Clinic,Supermarket) is false in Case 1, so it is not entailed.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F"
+      }
+    },
+    "which/A-D": {
+      "id": "production-b2905-s518-which-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nCity Hall is to the Southwest of Gas Station. Gas Station is to the North of Zoo. Cafe is to the West of Bakery. City Hall is to the West of Cafe. Gas Station is to the Southwest of Library. Zoo is to the West of Bakery. Train Station is to the Southwest of Zoo.\n\nWhich object is east of Zoo?\nA. Library\nB. Bakery\nC. Cafe\nD. Gas Station\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP6: Zoo is to the West of Bakery.\n\nBakery has a greater x-coordinate than Zoo (premise sources: P6).\nBakery and Zoo share the same y-coordinate (premise sources: P6).\nTherefore, Bakery is east of Zoo in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Bakery is east of Zoo. Cafe and City Hall are west of Zoo. Gas Station is north of Zoo. Library is northeast of Zoo. Train Station is southwest of Zoo. Only Bakery qualifies in this arrangement.\n\nThe claim that Cafe is east of Zoo is false in Case 1, so it is not entailed.\n\nThe claim that City Hall is east of Zoo is false in Case 1, so it is not entailed.\n\nThe claim that Gas Station is east of Zoo is false in Case 1, so it is not entailed.\n\nThe claim that Library is east of Zoo is false in Case 1, so it is not entailed.\n\nThe claim that Train Station is east of Zoo is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Bakery}.\n\nAnswer: B",
+        "symbolic": "Premises used (labels follow their order in the question):\nP6: Zoo is to the West of Bakery.\n\n[P6] x(Zoo) < x(Bakery).\n[P6] y(Bakery) = y(Zoo).\nE(Bakery,Zoo) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): E(Bakery,Zoo). W(Cafe,Zoo) & W(City Hall,Zoo). N(Gas Station,Zoo). NE(Library,Zoo). SW(Train Station,Zoo). Qualifying objects = {Bakery}.\n\nThe claim that E(Cafe,Zoo) is false in Case 1, so it is not entailed.\n\nThe claim that E(City Hall,Zoo) is false in Case 1, so it is not entailed.\n\nThe claim that E(Gas Station,Zoo) is false in Case 1, so it is not entailed.\n\nThe claim that E(Library,Zoo) is false in Case 1, so it is not entailed.\n\nThe claim that E(Train Station,Zoo) is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Bakery}.\n\nAnswer: B"
+      }
+    },
+    "direction/A-D": {
+      "id": "production-b416-s4-direction-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nLibrary is to the Southwest of Veterinary Clinic. Clinic is to the Southwest of Police Station. Park is to the Southwest of Gym. Cafe is to the Southwest of University. Park is to the Northwest of Stadium. Hospital is to the Northeast of Train Station. Theater is to the Northeast of Stadium. Hotel is to the Northeast of Cafe. Hotel is to the Southwest of Bakery. Clinic is to the Southwest of Park. Stadium is to the Southwest of Grocery Store. Police Station is to the Northeast of Supermarket. Stadium is to the Northwest of Post Office. Restaurant is to the Northwest of Police Station. Train Station is to the Northeast of Theater. Zoo is to the Northwest of Restaurant. University is to the Southwest of High School. Park is to the Northeast of Supermarket. Post Office is to the Northwest of Zoo. Grocery Store is to the Southwest of Bookstore. Hospital is to the Southwest of Pharmacy. Gym is to the Northeast of Stadium. Bookstore is to the Southwest of Cafe. Train Station is to the Southwest of Library.\n\nIn which direction is Clinic relative to Stadium?\nA. Northwest\nB. Southeast\nC. East\nD. Southwest\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP2: Clinic is to the Southwest of Police Station.\nP5: Park is to the Northwest of Stadium.\nP10: Clinic is to the Southwest of Park.\nP13: Stadium is to the Northwest of Post Office.\nP14: Restaurant is to the Northwest of Police Station.\nP16: Zoo is to the Northwest of Restaurant.\nP19: Post Office is to the Northwest of Zoo.\n\nThe x-coordinates increase strictly along Clinic, Park and Stadium (premise sources: P10 and P5). So Stadium has a greater x-coordinate than Clinic.\nThe y-coordinates increase strictly along Clinic, Police Station, Restaurant, Zoo, Post Office and Stadium (premise sources: P2, P14, P16, P19 and P13). So Stadium has a greater y-coordinate than Clinic.\nTherefore, Clinic is southwest of Stadium in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. From left to right, the order is Clinic, Park and Stadium. From bottom to top, the order is Clinic, Stadium and Park. So Clinic is southwest of Stadium.\n\nThe claim that Clinic is north of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is northeast of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is east of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is southeast of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is south of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is west of Stadium is false in Case 1, so it is not entailed.\n\nThe claim that Clinic is northwest of Stadium is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D",
+        "symbolic": "Premises used (labels follow their order in the question):\nP2: Clinic is to the Southwest of Police Station.\nP5: Park is to the Northwest of Stadium.\nP10: Clinic is to the Southwest of Park.\nP13: Stadium is to the Northwest of Post Office.\nP14: Restaurant is to the Northwest of Police Station.\nP16: Zoo is to the Northwest of Restaurant.\nP19: Post Office is to the Northwest of Zoo.\n\n[P10, P5] x(Clinic) < x(Park) < x(Stadium) => x(Clinic) < x(Stadium).\n[P2, P14, P16, P19, P13] y(Clinic) < y(Police Station) < y(Restaurant) < y(Zoo) < y(Post Office) < y(Stadium) => y(Clinic) < y(Stadium).\nSW(Clinic,Stadium) in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): x(Clinic) < x(Park) < x(Stadium). y(Clinic) < y(Stadium) < y(Park). => SW(Clinic,Stadium).\n\nThe claim that N(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that NE(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that E(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that SE(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that S(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that W(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe claim that NW(Clinic,Stadium) is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {Southwest}.\n\nAnswer: D"
+      }
+    },
+    "count/A-D": {
+      "id": "production-b724-s1-count-m0-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nFlorist is to the Southwest of Gallery. Library is to the Northeast of Hotel. Bookstore is to the Southwest of Courthouse. Train Station is to the Northeast of Park. Zoo is to the Northeast of Park. Grocery Store is to the Northeast of Hospital. Hospital is to the Southwest of Pharmacy. Theater is to the Southwest of Hotel. Bakery is to the Northeast of Supermarket. Hospital is to the Northeast of Supermarket. Cinema is to the Southwest of Bakery. Veterinary Clinic is to the Northeast of Theater. City Hall is to the Northwest of Courthouse. Cinema is to the Northeast of Pharmacy. Gallery is to the Southwest of Museum. Zoo is to the Southwest of Theater. Veterinary Clinic is to the Southwest of University. Supermarket is to the Northeast of Zoo. Police Station is to the Southwest of Clinic. Cafe is to the Southeast of Gym. Restaurant is to the Southeast of Gas Station. Grocery Store is to the Southwest of Florist. Cafe is to the Northwest of City Hall. Train Station is to the Northeast of Clinic. Bookstore is to the Southwest of Clinic. Police Station is to the Southwest of Courthouse. Park is to the Southeast of Clinic. Gas Station is to the Southeast of Park. Gym is to the Southeast of Restaurant.\n\nHow many objects are southwest of Park?\nA. 11\nB. 2\nC. 21\nD. 9\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: Florist is to the Southwest of Gallery.\nP2: Library is to the Northeast of Hotel.\nP3: Bookstore is to the Southwest of Courthouse.\nP4: Train Station is to the Northeast of Park.\nP5: Zoo is to the Northeast of Park.\nP6: Grocery Store is to the Northeast of Hospital.\nP7: Hospital is to the Southwest of Pharmacy.\nP8: Theater is to the Southwest of Hotel.\nP9: Bakery is to the Northeast of Supermarket.\nP10: Hospital is to the Northeast of Supermarket.\nP12: Veterinary Clinic is to the Northeast of Theater.\nP13: City Hall is to the Northwest of Courthouse.\nP14: Cinema is to the Northeast of Pharmacy.\nP15: Gallery is to the Southwest of Museum.\nP16: Zoo is to the Southwest of Theater.\nP17: Veterinary Clinic is to the Southwest of University.\nP18: Supermarket is to the Northeast of Zoo.\nP19: Police Station is to the Southwest of Clinic.\nP20: Cafe is to the Southeast of Gym.\nP21: Restaurant is to the Southeast of Gas Station.\nP22: Grocery Store is to the Southwest of Florist.\nP23: Cafe is to the Northwest of City Hall.\nP25: Bookstore is to the Southwest of Clinic.\nP26: Police Station is to the Southwest of Courthouse.\nP27: Park is to the Southeast of Clinic.\nP28: Gas Station is to the Southeast of Park.\nP29: Gym is to the Southeast of Restaurant.\n\nThe x-coordinates increase strictly along Park, Zoo, Supermarket and Bakery (premise sources: P5, P18 and P9). So Bakery has a greater x-coordinate than Park.\nBakery never qualifies for the queried relation.\nThe x-coordinates increase strictly along Bookstore, Clinic and Park (premise sources: P25 and P27). So Park has a greater x-coordinate than Bookstore.\nThe y-coordinates increase strictly along Bookstore, Courthouse, City Hall, Cafe, Gym, Restaurant, Gas Station and Park (premise sources: P3, P13, P23, P20, P29, P21 and P28). So Park has a greater y-coordinate than Bookstore.\nBookstore always qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Gas Station, Restaurant, Gym and Cafe (premise sources: P28, P21, P29 and P20). So Cafe has a greater x-coordinate than Park.\nCafe never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital, Pharmacy and Cinema (premise sources: P5, P18, P10, P7 and P14). So Cinema has a greater x-coordinate than Park.\nCinema never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Gas Station, Restaurant, Gym, Cafe and City Hall (premise sources: P28, P21, P29, P20 and P23). So City Hall has a greater x-coordinate than Park.\nCity Hall never qualifies for the queried relation.\nClinic has a greater y-coordinate than Park (premise sources: P27).\nClinic never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Gas Station, Restaurant, Gym, Cafe, City Hall and Courthouse (premise sources: P28, P21, P29, P20, P23 and P13). So Courthouse has a greater x-coordinate than Park.\nCourthouse never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital, Grocery Store and Florist (premise sources: P5, P18, P10, P6 and P22). So Florist has a greater x-coordinate than Park.\nFlorist never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital, Grocery Store, Florist and Gallery (premise sources: P5, P18, P10, P6, P22 and P1). So Gallery has a greater x-coordinate than Park.\nGallery never qualifies for the queried relation.\nGas Station has a greater x-coordinate than Park (premise sources: P28).\nGas Station never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital and Grocery Store (premise sources: P5, P18, P10 and P6). So Grocery Store has a greater x-coordinate than Park.\nGrocery Store never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Gas Station, Restaurant and Gym (premise sources: P28, P21 and P29). So Gym has a greater x-coordinate than Park.\nGym never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket and Hospital (premise sources: P5, P18 and P10). So Hospital has a greater x-coordinate than Park.\nHospital never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Theater and Hotel (premise sources: P5, P16 and P8). So Hotel has a greater x-coordinate than Park.\nHotel never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Theater, Hotel and Library (premise sources: P5, P16, P8 and P2). So Library has a greater x-coordinate than Park.\nLibrary never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital, Grocery Store, Florist, Gallery and Museum (premise sources: P5, P18, P10, P6, P22, P1 and P15). So Museum has a greater x-coordinate than Park.\nMuseum never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Supermarket, Hospital and Pharmacy (premise sources: P5, P18, P10 and P7). So Pharmacy has a greater x-coordinate than Park.\nPharmacy never qualifies for the queried relation.\nThe x-coordinates increase strictly along Police Station, Clinic and Park (premise sources: P19 and P27). So Park has a greater x-coordinate than Police Station.\nThe y-coordinates increase strictly along Police Station, Courthouse, City Hall, Cafe, Gym, Restaurant, Gas Station and Park (premise sources: P26, P13, P23, P20, P29, P21 and P28). So Park has a greater y-coordinate than Police Station.\nPolice Station always qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Gas Station and Restaurant (premise sources: P28 and P21). So Restaurant has a greater x-coordinate than Park.\nRestaurant never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo and Supermarket (premise sources: P5 and P18). So Supermarket has a greater x-coordinate than Park.\nSupermarket never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo and Theater (premise sources: P5 and P16). So Theater has a greater x-coordinate than Park.\nTheater never qualifies for the queried relation.\nTrain Station has a greater x-coordinate than Park (premise sources: P4).\nTrain Station never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Theater, Veterinary Clinic and University (premise sources: P5, P16, P12 and P17). So University has a greater x-coordinate than Park.\nUniversity never qualifies for the queried relation.\nThe x-coordinates increase strictly along Park, Zoo, Theater and Veterinary Clinic (premise sources: P5, P16 and P12). So Veterinary Clinic has a greater x-coordinate than Park.\nVeterinary Clinic never qualifies for the queried relation.\nZoo has a greater x-coordinate than Park (premise sources: P5).\nZoo never qualifies for the queried relation.\nThe qualifying candidates are fixed: Bookstore and Police Station. Exactly 2 qualify in every valid arrangement.\n\nCase 1: A counterexample arrangement satisfying all premises is the following. Bakery, Cinema, Florist, Gallery, Grocery Store, Hospital, Hotel, Library, Museum, Pharmacy, Supermarket, Theater, Train Station, University, Veterinary Clinic and Zoo are northeast of Park. Bookstore and Police Station are southwest of Park. Cafe, City Hall, Courthouse, Gas Station, Gym and Restaurant are southeast of Park. Clinic is northwest of Park. Only Bookstore and Police Station qualify in this arrangement. This gives a count of 2.\n\nThe claim that exactly 0 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 1 eligible candidate qualifies is false in Case 1, so it is not entailed.\n\nThe claim that exactly 3 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 4 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 5 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 6 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 7 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 8 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 9 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 10 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 11 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 12 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 13 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 14 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 15 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 16 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 17 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 18 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 19 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 20 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 21 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 22 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 23 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 24 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe claim that exactly 25 eligible candidates qualify is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {2}.\n\nAnswer: B",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: Florist is to the Southwest of Gallery.\nP2: Library is to the Northeast of Hotel.\nP3: Bookstore is to the Southwest of Courthouse.\nP4: Train Station is to the Northeast of Park.\nP5: Zoo is to the Northeast of Park.\nP6: Grocery Store is to the Northeast of Hospital.\nP7: Hospital is to the Southwest of Pharmacy.\nP8: Theater is to the Southwest of Hotel.\nP9: Bakery is to the Northeast of Supermarket.\nP10: Hospital is to the Northeast of Supermarket.\nP12: Veterinary Clinic is to the Northeast of Theater.\nP13: City Hall is to the Northwest of Courthouse.\nP14: Cinema is to the Northeast of Pharmacy.\nP15: Gallery is to the Southwest of Museum.\nP16: Zoo is to the Southwest of Theater.\nP17: Veterinary Clinic is to the Southwest of University.\nP18: Supermarket is to the Northeast of Zoo.\nP19: Police Station is to the Southwest of Clinic.\nP20: Cafe is to the Southeast of Gym.\nP21: Restaurant is to the Southeast of Gas Station.\nP22: Grocery Store is to the Southwest of Florist.\nP23: Cafe is to the Northwest of City Hall.\nP25: Bookstore is to the Southwest of Clinic.\nP26: Police Station is to the Southwest of Courthouse.\nP27: Park is to the Southeast of Clinic.\nP28: Gas Station is to the Southeast of Park.\nP29: Gym is to the Southeast of Restaurant.\n\n[P5, P18, P9] x(Park) < x(Zoo) < x(Supermarket) < x(Bakery) => x(Park) < x(Bakery).\nNOT SW(Bakery,Park) in every valid arrangement.\n[P25, P27] x(Bookstore) < x(Clinic) < x(Park) => x(Bookstore) < x(Park).\n[P3, P13, P23, P20, P29, P21, P28] y(Bookstore) < y(Courthouse) < y(City Hall) < y(Cafe) < y(Gym) < y(Restaurant) < y(Gas Station) < y(Park) => y(Bookstore) < y(Park).\nSW(Bookstore,Park) in every valid arrangement.\n[P28, P21, P29, P20] x(Park) < x(Gas Station) < x(Restaurant) < x(Gym) < x(Cafe) => x(Park) < x(Cafe).\nNOT SW(Cafe,Park) in every valid arrangement.\n[P5, P18, P10, P7, P14] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Pharmacy) < x(Cinema) => x(Park) < x(Cinema).\nNOT SW(Cinema,Park) in every valid arrangement.\n[P28, P21, P29, P20, P23] x(Park) < x(Gas Station) < x(Restaurant) < x(Gym) < x(Cafe) < x(City Hall) => x(Park) < x(City Hall).\nNOT SW(City Hall,Park) in every valid arrangement.\n[P27] y(Park) < y(Clinic).\nNOT SW(Clinic,Park) in every valid arrangement.\n[P28, P21, P29, P20, P23, P13] x(Park) < x(Gas Station) < x(Restaurant) < x(Gym) < x(Cafe) < x(City Hall) < x(Courthouse) => x(Park) < x(Courthouse).\nNOT SW(Courthouse,Park) in every valid arrangement.\n[P5, P18, P10, P6, P22] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Grocery Store) < x(Florist) => x(Park) < x(Florist).\nNOT SW(Florist,Park) in every valid arrangement.\n[P5, P18, P10, P6, P22, P1] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Grocery Store) < x(Florist) < x(Gallery) => x(Park) < x(Gallery).\nNOT SW(Gallery,Park) in every valid arrangement.\n[P28] x(Park) < x(Gas Station).\nNOT SW(Gas Station,Park) in every valid arrangement.\n[P5, P18, P10, P6] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Grocery Store) => x(Park) < x(Grocery Store).\nNOT SW(Grocery Store,Park) in every valid arrangement.\n[P28, P21, P29] x(Park) < x(Gas Station) < x(Restaurant) < x(Gym) => x(Park) < x(Gym).\nNOT SW(Gym,Park) in every valid arrangement.\n[P5, P18, P10] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) => x(Park) < x(Hospital).\nNOT SW(Hospital,Park) in every valid arrangement.\n[P5, P16, P8] x(Park) < x(Zoo) < x(Theater) < x(Hotel) => x(Park) < x(Hotel).\nNOT SW(Hotel,Park) in every valid arrangement.\n[P5, P16, P8, P2] x(Park) < x(Zoo) < x(Theater) < x(Hotel) < x(Library) => x(Park) < x(Library).\nNOT SW(Library,Park) in every valid arrangement.\n[P5, P18, P10, P6, P22, P1, P15] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Grocery Store) < x(Florist) < x(Gallery) < x(Museum) => x(Park) < x(Museum).\nNOT SW(Museum,Park) in every valid arrangement.\n[P5, P18, P10, P7] x(Park) < x(Zoo) < x(Supermarket) < x(Hospital) < x(Pharmacy) => x(Park) < x(Pharmacy).\nNOT SW(Pharmacy,Park) in every valid arrangement.\n[P19, P27] x(Police Station) < x(Clinic) < x(Park) => x(Police Station) < x(Park).\n[P26, P13, P23, P20, P29, P21, P28] y(Police Station) < y(Courthouse) < y(City Hall) < y(Cafe) < y(Gym) < y(Restaurant) < y(Gas Station) < y(Park) => y(Police Station) < y(Park).\nSW(Police Station,Park) in every valid arrangement.\n[P28, P21] x(Park) < x(Gas Station) < x(Restaurant) => x(Park) < x(Restaurant).\nNOT SW(Restaurant,Park) in every valid arrangement.\n[P5, P18] x(Park) < x(Zoo) < x(Supermarket) => x(Park) < x(Supermarket).\nNOT SW(Supermarket,Park) in every valid arrangement.\n[P5, P16] x(Park) < x(Zoo) < x(Theater) => x(Park) < x(Theater).\nNOT SW(Theater,Park) in every valid arrangement.\n[P4] x(Park) < x(Train Station).\nNOT SW(Train Station,Park) in every valid arrangement.\n[P5, P16, P12, P17] x(Park) < x(Zoo) < x(Theater) < x(Veterinary Clinic) < x(University) => x(Park) < x(University).\nNOT SW(University,Park) in every valid arrangement.\n[P5, P16, P12] x(Park) < x(Zoo) < x(Theater) < x(Veterinary Clinic) => x(Park) < x(Veterinary Clinic).\nNOT SW(Veterinary Clinic,Park) in every valid arrangement.\n[P5] x(Park) < x(Zoo).\nNOT SW(Zoo,Park) in every valid arrangement.\nFixed qualifying set={Bookstore, Police Station}; count=2 in every valid arrangement.\n\nCase 1 (counterexample satisfying all premises): NE(Bakery,Park) & NE(Cinema,Park) & NE(Florist,Park) & NE(Gallery,Park) & NE(Grocery Store,Park) & NE(Hospital,Park) & NE(Hotel,Park) & NE(Library,Park) & NE(Museum,Park) & NE(Pharmacy,Park) & NE(Supermarket,Park) & NE(Theater,Park) & NE(Train Station,Park) & NE(University,Park) & NE(Veterinary Clinic,Park) & NE(Zoo,Park). SW(Bookstore,Park) & SW(Police Station,Park). SE(Cafe,Park) & SE(City Hall,Park) & SE(Courthouse,Park) & SE(Gas Station,Park) & SE(Gym,Park) & SE(Restaurant,Park). NW(Clinic,Park). Qualifying objects = {Bookstore, Police Station}. count=2.\n\nThe claim that count=0 is false in Case 1, so it is not entailed.\n\nThe claim that count=1 is false in Case 1, so it is not entailed.\n\nThe claim that count=3 is false in Case 1, so it is not entailed.\n\nThe claim that count=4 is false in Case 1, so it is not entailed.\n\nThe claim that count=5 is false in Case 1, so it is not entailed.\n\nThe claim that count=6 is false in Case 1, so it is not entailed.\n\nThe claim that count=7 is false in Case 1, so it is not entailed.\n\nThe claim that count=8 is false in Case 1, so it is not entailed.\n\nThe claim that count=9 is false in Case 1, so it is not entailed.\n\nThe claim that count=10 is false in Case 1, so it is not entailed.\n\nThe claim that count=11 is false in Case 1, so it is not entailed.\n\nThe claim that count=12 is false in Case 1, so it is not entailed.\n\nThe claim that count=13 is false in Case 1, so it is not entailed.\n\nThe claim that count=14 is false in Case 1, so it is not entailed.\n\nThe claim that count=15 is false in Case 1, so it is not entailed.\n\nThe claim that count=16 is false in Case 1, so it is not entailed.\n\nThe claim that count=17 is false in Case 1, so it is not entailed.\n\nThe claim that count=18 is false in Case 1, so it is not entailed.\n\nThe claim that count=19 is false in Case 1, so it is not entailed.\n\nThe claim that count=20 is false in Case 1, so it is not entailed.\n\nThe claim that count=21 is false in Case 1, so it is not entailed.\n\nThe claim that count=22 is false in Case 1, so it is not entailed.\n\nThe claim that count=23 is false in Case 1, so it is not entailed.\n\nThe claim that count=24 is false in Case 1, so it is not entailed.\n\nThe claim that count=25 is false in Case 1, so it is not entailed.\n\nThe complete entailed-answer set is {2}.\n\nAnswer: B"
+      }
+    },
+    "direction/unique-unlisted": {
+      "id": "production-b534-s15-direction-m1-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nFlorist is to the Southeast of Bank. Library is to the North of Hotel. Courthouse is to the Northeast of Supermarket. Restaurant is to the North of Gas Station. Veterinary Clinic is to the Northeast of Courthouse. Grocery Store is to the North of City Hall. Stadium is to the North of University. Zoo is to the North of Stadium. Gas Station is to the North of Clinic. Post Office is to the North of Pharmacy. Hotel is to the North of University. Stadium is to the South of High School. Zoo is to the South of Bookstore. Pharmacy is to the Northeast of Hospital. Hospital is to the Northeast of Veterinary Clinic. Grocery Store is to the South of Post Office. Gym is to the North of Clinic. Theater is to the North of Gym. Restaurant is to the North of Gallery. Pharmacy is to the South of Grocery Store. Cinema is to the North of Stadium. Clinic is to the North of Library. City Hall is to the Southeast of Bank. Grocery Store is to the North of Florist. Bookstore is to the South of Gallery. University is to the North of Pharmacy. Bank is to the Southwest of Supermarket.\n\nIn which direction is Florist relative to Pharmacy?\nA. West\nB. Northeast\nC. Southwest\nD. Northwest\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: Florist is to the Southeast of Bank.\nP3: Courthouse is to the Northeast of Supermarket.\nP5: Veterinary Clinic is to the Northeast of Courthouse.\nP14: Pharmacy is to the Northeast of Hospital.\nP15: Hospital is to the Northeast of Veterinary Clinic.\nP20: Pharmacy is to the South of Grocery Store.\nP24: Grocery Store is to the North of Florist.\nP27: Bank is to the Southwest of Supermarket.\n\nFlorist, Grocery Store and Pharmacy share the same x-coordinate (premise sources: P24 and P20).\nThe y-coordinates increase strictly along Florist, Bank, Supermarket, Courthouse, Veterinary Clinic, Hospital and Pharmacy (premise sources: P1, P27, P3, P5, P15 and P14). So Pharmacy has a greater y-coordinate than Florist.\nTherefore, Florist is south of Pharmacy in every valid arrangement.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: Florist is to the Southeast of Bank.\nP3: Courthouse is to the Northeast of Supermarket.\nP5: Veterinary Clinic is to the Northeast of Courthouse.\nP14: Pharmacy is to the Northeast of Hospital.\nP15: Hospital is to the Northeast of Veterinary Clinic.\nP20: Pharmacy is to the South of Grocery Store.\nP24: Grocery Store is to the North of Florist.\nP27: Bank is to the Southwest of Supermarket.\n\n[P24, P20] x(Florist) = x(Grocery Store) = x(Pharmacy) => x(Florist) = x(Pharmacy).\n[P1, P27, P3, P5, P15, P14] y(Florist) < y(Bank) < y(Supermarket) < y(Courthouse) < y(Veterinary Clinic) < y(Hospital) < y(Pharmacy) => y(Florist) < y(Pharmacy).\nS(Florist,Pharmacy) in every valid arrangement.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F"
+      }
+    },
+    "count/unique-unlisted": {
+      "id": "production-b214-s0-count-m1-unique-entailed",
+      "prompt": "Consider a map with multiple objects:\nCity Hall is to the Northeast of High School. City Hall is to the Southwest of Hotel. Fire Station is to the Northeast of City Hall. Museum is to the Northeast of High School. High School is to the Southwest of Train Station. High School is to the Southeast of Pharmacy. High School is to the Southwest of Cafe. High School is to the Southwest of Grocery Store. Cinema is to the Northwest of Clinic. Clinic is to the Northeast of Florist. Supermarket is to the Northeast of High School. Pharmacy is to the Southwest of Train Station. Cinema is to the Southeast of High School. Florist is to the Southwest of Pharmacy. Fire Station is to the Southwest of Courthouse. Supermarket is to the Southwest of Theater. Gas Station is to the Northeast of Fire Station.\n\nHow many objects are southwest of High School?\nA. 7\nB. 10\nC. 15\nD. 4\nE. Cannot be determined\nF. None of the above",
+      "references": {
+        "natural": "Premises used (labels follow their order in the question):\nP1: City Hall is to the Northeast of High School.\nP2: City Hall is to the Southwest of Hotel.\nP3: Fire Station is to the Northeast of City Hall.\nP4: Museum is to the Northeast of High School.\nP5: High School is to the Southwest of Train Station.\nP6: High School is to the Southeast of Pharmacy.\nP7: High School is to the Southwest of Cafe.\nP8: High School is to the Southwest of Grocery Store.\nP9: Cinema is to the Northwest of Clinic.\nP10: Clinic is to the Northeast of Florist.\nP11: Supermarket is to the Northeast of High School.\nP13: Cinema is to the Southeast of High School.\nP14: Florist is to the Southwest of Pharmacy.\nP15: Fire Station is to the Southwest of Courthouse.\nP16: Supermarket is to the Southwest of Theater.\nP17: Gas Station is to the Northeast of Fire Station.\n\nCafe has a greater x-coordinate than High School (premise sources: P7).\nCafe never qualifies for the queried relation.\nCinema has a greater x-coordinate than High School (premise sources: P13).\nCinema never qualifies for the queried relation.\nCity Hall has a greater x-coordinate than High School (premise sources: P1).\nCity Hall never qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, Cinema and Clinic (premise sources: P13 and P9). So Clinic has a greater x-coordinate than High School.\nClinic never qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, City Hall, Fire Station and Courthouse (premise sources: P1, P3 and P15). So Courthouse has a greater x-coordinate than High School.\nCourthouse never qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, City Hall and Fire Station (premise sources: P1 and P3). So Fire Station has a greater x-coordinate than High School.\nFire Station never qualifies for the queried relation.\nThe x-coordinates increase strictly along Florist, Pharmacy and High School (premise sources: P14 and P6). So High School has a greater x-coordinate than Florist.\nThe y-coordinates increase strictly along Florist, Clinic, Cinema and High School (premise sources: P10, P9 and P13). So High School has a greater y-coordinate than Florist.\nFlorist always qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, City Hall, Fire Station and Gas Station (premise sources: P1, P3 and P17). So Gas Station has a greater x-coordinate than High School.\nGas Station never qualifies for the queried relation.\nGrocery Store has a greater x-coordinate than High School (premise sources: P8).\nGrocery Store never qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, City Hall and Hotel (premise sources: P1 and P2). So Hotel has a greater x-coordinate than High School.\nHotel never qualifies for the queried relation.\nMuseum has a greater x-coordinate than High School (premise sources: P4).\nMuseum never qualifies for the queried relation.\nPharmacy has a greater y-coordinate than High School (premise sources: P6).\nPharmacy never qualifies for the queried relation.\nSupermarket has a greater x-coordinate than High School (premise sources: P11).\nSupermarket never qualifies for the queried relation.\nThe x-coordinates increase strictly along High School, Supermarket and Theater (premise sources: P11 and P16). So Theater has a greater x-coordinate than High School.\nTheater never qualifies for the queried relation.\nTrain Station has a greater x-coordinate than High School (premise sources: P5).\nTrain Station never qualifies for the queried relation.\nThe qualifying candidates are fixed: Florist. Exactly 1 qualifies in every valid arrangement.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F",
+        "symbolic": "Premises used (labels follow their order in the question):\nP1: City Hall is to the Northeast of High School.\nP2: City Hall is to the Southwest of Hotel.\nP3: Fire Station is to the Northeast of City Hall.\nP4: Museum is to the Northeast of High School.\nP5: High School is to the Southwest of Train Station.\nP6: High School is to the Southeast of Pharmacy.\nP7: High School is to the Southwest of Cafe.\nP8: High School is to the Southwest of Grocery Store.\nP9: Cinema is to the Northwest of Clinic.\nP10: Clinic is to the Northeast of Florist.\nP11: Supermarket is to the Northeast of High School.\nP13: Cinema is to the Southeast of High School.\nP14: Florist is to the Southwest of Pharmacy.\nP15: Fire Station is to the Southwest of Courthouse.\nP16: Supermarket is to the Southwest of Theater.\nP17: Gas Station is to the Northeast of Fire Station.\n\n[P7] x(High School) < x(Cafe).\nNOT SW(Cafe,High School) in every valid arrangement.\n[P13] x(High School) < x(Cinema).\nNOT SW(Cinema,High School) in every valid arrangement.\n[P1] x(High School) < x(City Hall).\nNOT SW(City Hall,High School) in every valid arrangement.\n[P13, P9] x(High School) < x(Cinema) < x(Clinic) => x(High School) < x(Clinic).\nNOT SW(Clinic,High School) in every valid arrangement.\n[P1, P3, P15] x(High School) < x(City Hall) < x(Fire Station) < x(Courthouse) => x(High School) < x(Courthouse).\nNOT SW(Courthouse,High School) in every valid arrangement.\n[P1, P3] x(High School) < x(City Hall) < x(Fire Station) => x(High School) < x(Fire Station).\nNOT SW(Fire Station,High School) in every valid arrangement.\n[P14, P6] x(Florist) < x(Pharmacy) < x(High School) => x(Florist) < x(High School).\n[P10, P9, P13] y(Florist) < y(Clinic) < y(Cinema) < y(High School) => y(Florist) < y(High School).\nSW(Florist,High School) in every valid arrangement.\n[P1, P3, P17] x(High School) < x(City Hall) < x(Fire Station) < x(Gas Station) => x(High School) < x(Gas Station).\nNOT SW(Gas Station,High School) in every valid arrangement.\n[P8] x(High School) < x(Grocery Store).\nNOT SW(Grocery Store,High School) in every valid arrangement.\n[P1, P2] x(High School) < x(City Hall) < x(Hotel) => x(High School) < x(Hotel).\nNOT SW(Hotel,High School) in every valid arrangement.\n[P4] x(High School) < x(Museum).\nNOT SW(Museum,High School) in every valid arrangement.\n[P6] y(High School) < y(Pharmacy).\nNOT SW(Pharmacy,High School) in every valid arrangement.\n[P11] x(High School) < x(Supermarket).\nNOT SW(Supermarket,High School) in every valid arrangement.\n[P11, P16] x(High School) < x(Supermarket) < x(Theater) => x(High School) < x(Theater).\nNOT SW(Theater,High School) in every valid arrangement.\n[P5] x(High School) < x(Train Station).\nNOT SW(Train Station,High School) in every valid arrangement.\nFixed qualifying set={Florist}; count=1 in every valid arrangement.\n\nThe sole entailed answer is unlisted.\n\nAnswer: F"
+      }
+    }
+  },
+  "dataset_modified": false,
+  "training_started": false
+}
