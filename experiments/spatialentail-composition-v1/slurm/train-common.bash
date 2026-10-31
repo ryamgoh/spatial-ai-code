@@ -8,6 +8,15 @@ case "${1:-}" in
 esac
 cd "$SLURM_SUBMIT_DIR"
 source slurm/lib/pin-srun-cpus.sh
+# Use the same credential loader as randomized-v2 SFT jobs.
+source experiments/15-v2-ablation/jobs/common.bash
+export WANDB_REQUIRED=1
+load_wandb_credentials
+export WANDB_RUN_GROUP="${WANDB_RUN_GROUP:-spatialentail-composition-v1}"
+export WANDB_JOB_TYPE="$style"
+export WANDB_RESUME=allow
+export WANDB_MODE=online
+unset WANDB_DISABLED
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 export AXOLOTL_DO_NOT_TRACK=1

@@ -173,6 +173,7 @@ def tokenize(tokenizer, source, answer, model):
 
 def training_config(model, style, prefix):
     require(style in STYLES, "unknown style")
+    run_key = hashlib.sha256(prefix.encode()).hexdigest()[:12]
     return {
         "base_model": model["model_id"],
         "revision_of_model": model["revision"],
@@ -233,7 +234,11 @@ def training_config(model, style, prefix):
         "data_seed": 42,
         "dataset_num_proc": 1,
         "dataloader_num_workers": 0,
-        "use_wandb": False,
+        "use_wandb": True,
+        "wandb_project": "spatialentail-composition-v1-sft",
+        "wandb_mode": "online",
+        "wandb_name": f"qwen3-4b-thinking-{style}-seed-42-{run_key}",
+        "wandb_run_id": f"composition-{run_key}-{style}-42",
     }
 
 
@@ -241,7 +246,10 @@ def matched_configs(configs):
     normalized = []
     for style in STYLES:
         config = dict(configs[style])
-        for key in ("output_dir", "datasets", "dataset_prepared_path"):
+        for key in (
+            "output_dir", "datasets", "dataset_prepared_path",
+            "wandb_name", "wandb_run_id",
+        ):
             config.pop(key)
         normalized.append(config)
     require(normalized[0] == normalized[1], "training arms have different settings")

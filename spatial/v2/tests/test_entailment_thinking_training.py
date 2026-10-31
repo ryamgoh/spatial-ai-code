@@ -149,6 +149,13 @@ def test_configs_matched_and_no_random_dev_split(model):
         assert not any("linear_attn" in s for s in config["lora_target_modules"])
         assert not config["sample_packing"]
         assert not config["logging_nan_inf_filter"]
+        assert config["use_wandb"] is True
+        assert config["wandb_project"] == "spatialentail-composition-v1-sft"
+        assert config["wandb_mode"] == "online"
+    assert configs["natural"]["wandb_run_id"] != configs["symbolic"]["wandb_run_id"]
+    assert configs["natural"]["wandb_run_id"] != training_config(
+        model, "natural", "another-run"
+    )["wandb_run_id"]
     configs["symbolic"]["learning_rate"] *= 2
     with pytest.raises(ValueError, match="different settings"):
         matched_configs(configs)

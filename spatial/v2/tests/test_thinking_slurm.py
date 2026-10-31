@@ -111,11 +111,69 @@ def test_partitions_gpu_types_and_shell_syntax():
     assert "--gres" not in cpu
     assert "sync --frozen" in cpu
     assert "generate_and_prepare.py" in cpu
+    assert "#SBATCH --mail-type=END,FAIL,TIME_LIMIT\n" in cpu
+    assert "#SBATCH --mail-user=e0958116@u.nus.edu" in cpu
     for style in ("natural", "symbolic"):
         script = (SCRIPTS / f"train-{style}.sh").read_text()
         assert "#SBATCH --partition=gpu-long" in script
         assert "#SBATCH --gres=gpu:h100-47:1" in script
         assert f"train-common.bash {style}" in script
+        assert "#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90" in script
+        assert "#SBATCH --mail-user=e0958116@u.nus.edu" in script
     common = (SCRIPTS / "train-common.bash").read_text()
     assert common.index("verify --output") < common.index("finetune/finetune.py")
     assert "--no-sync" in common
+    assert common.index("load_wandb_credentials") < common.index("srun uv")
+    assert "export WANDB_REQUIRED=1" in common
+    assert "export WANDB_MODE=online" in common
+    assert "export WANDB_RESUME=allow" in common
+
+
+@pytest.mark.parametrize("credentials", ["missing", "environment", "file"])
+def test_training_requires_randomized_v2_credentials(tmp_path, credentials):
+    helper = Path("experiments/15-v2-ablation/jobs/common.bash")
+    (tmp_path / helper).parent.mkdir(parents=True)
+    shutil.copyfile(ROOT / helper, tmp_path / helper)
+    (tmp_path / "slurm/lib").mkdir(parents=True)
+    (tmp_path / "slurm/lib/pin-srun-cpus.sh").write_text("# no allocation in test\n")
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    mock = binary / "srun"
+    mock.write_text(
+        "#!/bin/bash\n"
+        '[[ "$WANDB_MODE" == online && "$WANDB_REQUIRED" == 1 ]] || exit 9\n'
+        '[[ "$WANDB_JOB_TYPE" == natural && -n "$WANDB_API_KEY" ]] || exit 9\n'
+        'printf "%s\\n" "$*" >> "$SRUN_LOG"\n'
+    )
+    mock.chmod(0o755)
+    log = tmp_path / "srun.log"
+    env = {
+        key: value for key, value in os.environ.items()
+        if not key.startswith("WANDB_")
+    }
+    env.update(
+        SLURM_SUBMIT_DIR=str(tmp_path),
+        PREPARED="run/prepared",
+        XDG_CONFIG_HOME=str(tmp_path / "config"),
+        PATH=f"{binary}:{env['PATH']}",
+        SRUN_LOG=str(log),
+        WANDB_DISABLED="true",
+        WANDB_MODE="offline",
+    )
+    if credentials == "environment":
+        env["WANDB_API_KEY"] = "test-only-not-a-real-key"
+    elif credentials == "file":
+        config = tmp_path / "config/spatialentail"
+        config.mkdir(parents=True)
+        (config / "wandb.env").write_text("WANDB_API_KEY=test-only-not-a-real-key\n")
+    result = subprocess.run(
+        ["bash", str(SCRIPTS / "train-common.bash"), "natural"],
+        env=env, capture_output=True, text=True, check=False,
+    )
+    if credentials == "missing":
+        assert result.returncode != 0
+        assert "Missing WANDB_API_KEY" in result.stderr
+        assert not log.exists()
+    else:
+        assert result.returncode == 0, result.stderr
+        assert len(log.read_text().splitlines()) == 3

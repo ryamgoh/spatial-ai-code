@@ -50,6 +50,27 @@ output directories are rejected rather than overwritten or implicitly resumed.
 Check memory, finite loss and gradient norms during opening steps; no separate
 GPU smoke-test job is submitted.
 
+## Monitoring
+
+Monitoring follows randomized-v2. Both SFT arms log online to W&B project
+`spatialentail-composition-v1-sft`, with separate run IDs per arm and submission.
+The default run group is `spatialentail-composition-v1`; `WANDB_RUN_GROUP` can
+override it. The shared randomized-v2 credential loader accepts `WANDB_API_KEY`
+from the environment or `${XDG_CONFIG_HOME:-$HOME/.config}/spatialentail/wandb.env`
+(or `WANDB_ENV_FILE`). Keep the credential file private, with mode 600.
+Missing credentials fail the GPU job before training; there is no silent
+offline fallback. Credentials are never stored in generated training configs.
+
+All three jobs send Slurm email to `e0958116@u.nus.edu`. CPU events are
+`END,FAIL,TIME_LIMIT`; GPU events are
+`BEGIN,END,FAIL,TIME_LIMIT,TIME_LIMIT_90`, matching randomized-v2.
+Email delivery depends on the cluster's Slurm mail service. W&B connectivity
+and email delivery have not been tested from this local machine.
+
+These settings apply to newly generated server-run configs. Historical prepared
+packages retain their original configs and audit hashes; do not launch those
+old configs expecting the new monitoring settings.
+
 This workflow trains and saves both epoch checkpoints. Fixed-dev evaluation,
 checkpoint selection and Stage-2 thinking replay are not launched by these scripts.
 No actual Slurm or GPU execution has been tested locally.

@@ -7,6 +7,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=24:00:00
+#SBATCH --mail-type=END,FAIL,TIME_LIMIT
+#SBATCH --mail-user=e0958116@u.nus.edu
 #SBATCH --output=experiments/spatialentail-composition-v1/logs/%x-%j.out
 #SBATCH --error=experiments/spatialentail-composition-v1/logs/%x-%j.err
 
