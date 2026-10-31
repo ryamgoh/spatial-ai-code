@@ -1,5 +1,21 @@
 # SpatialEntail Training Preparation
 
+## Server Generation and Training
+
+From the server repository root, after pulling the current launcher code:
+
+```bash
+bash experiments/spatialentail-composition-v1/slurm/submit.sh
+```
+
+This submits CPU generation/auditing/preparation on `normal`, then independent
+Natural and Symbolic jobs on `gpu-long` with one `h100-47` GPU each. Both use
+`afterok` on the CPU job. No dataset transfer is needed. See
+[the three-job workflow](slurm/README.md) for outputs and failure handling.
+This server path creates new run-local candidates and prepared packages.
+The historical local `prepared-thinking-v1` retains its original source hashes;
+it is not the package used by this launcher after the preparation code extension.
+
 ## Status and Scope
 
 **Active model: Qwen/Qwen3-4B-Thinking-2507 (BF16, thinking-only)**, selected in

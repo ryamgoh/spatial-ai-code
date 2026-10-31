@@ -10,6 +10,11 @@ Read [UNIQUE-ONLY-v1.md](UNIQUE-ONLY-v1.md) first; it supersedes mixed-contract
 requirements in older documents and runbooks. All three query types remain:
 Direction, Which, and Count.
 
+For server-side generation followed by both training arms, use
+`bash experiments/spatialentail-composition-v1/slurm/submit.sh` from the
+repository root. [The Slurm workflow](slurm/README.md) submits one `normal`
+CPU job and two dependent `h100-47` GPU jobs. No dataset transfer is required.
+
 The active model for both arms and future baselines/evaluation is
 **Qwen/Qwen3-4B-Thinking-2507**, the standard BF16 thinking-only checkpoint,
 pinned in [active-model.json](active-model.json). No thinking-mode override is

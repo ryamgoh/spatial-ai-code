@@ -299,7 +299,7 @@ def load_source(candidate):
     return refs, source, manifest
 
 
-def prepare(active_path, output):
+def prepare(active_path, output, *, candidate=None):
     require(not output.exists(), "refusing to overwrite prepared output")
     model = json.loads(active_path.read_text())
     validate_model(model)
@@ -307,7 +307,11 @@ def prepare(active_path, output):
         all(version(name) == expected for name, expected in TOKENIZER_VERSIONS.items()),
         "use the pinned Transformers/tokenizers/Jinja2 versions",
     )
-    candidate = EXPERIMENT / model["training_candidate"]
+    candidate = (
+        EXPERIMENT / model["training_candidate"]
+        if candidate is None
+        else Path(candidate).resolve()
+    )
     refs, source, source_manifest = load_source(candidate)
     from huggingface_hub import snapshot_download
     from transformers import AutoTokenizer
@@ -339,6 +343,15 @@ def prepare(active_path, output):
         *(candidate / name for name in source_manifest["payload_sha256"]),
         EXPERIMENT / "unique-only-selection-v1/selection.json",
     ]
+    generation_manifest = candidate / "generation.json"
+    if generation_manifest.exists():
+        protected_paths.append(generation_manifest)
+        generation = json.loads(generation_manifest.read_text())
+        for name, expected in generation["inputs_sha256"].items():
+            require(
+                digest(ROOT / name) == expected, f"generation input changed: {name}"
+            )
+            protected_paths.append(ROOT / name)
     protected = {str(p.relative_to(ROOT)): digest(p) for p in protected_paths}
     with tempfile.TemporaryDirectory(
         prefix="spatial-thinking-preparation-"

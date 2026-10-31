@@ -293,3 +293,4 @@ telemetry-id
 **/telemetry-id
 **/.uv-sync.lock
 **/wandb/
+/spatialentail-v3-data.tar.gz
