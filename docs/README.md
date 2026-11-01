@@ -4,8 +4,8 @@
 
 For the active study, start with
 [SpatialEntail Composition v1](../experiments/spatialentail-composition-v1/README.md)
-and its [authoritative pivot](../experiments/spatialentail-composition-v1/pivot_20261026.md).
-The pivot supersedes earlier research plans, training arms, benchmark campaigns,
+and its [Unique-only specification](../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md).
+That specification supersedes earlier research plans, training arms, benchmark campaigns,
 and prompt contracts for new-study work. It is a specification, not evidence
 that those changes have already been implemented.
 
@@ -52,7 +52,7 @@ historical run records.
 
 Use shared implementation references for software contracts, experiment artifacts
 for executed runs, the report draft for its narrative, and archived audits for historical
-evidence. The composition pivot governs intended new-study behavior; existing
+evidence. The Unique-only specification governs intended current-study behavior; existing
 software contracts describe current behavior until explicitly migrated and
 tested. Preserve legacy behavior for historical callers. Research plans and
 documentation edits do not establish implementation completion.

@@ -1,21 +1,21 @@
 # Spatial AI experiments
 
 This repository contains the data generation, fine-tuning, and evaluation code
-for the SpatialEval experiments. Training uses Axolotl; evaluation uses
-LM Evaluation Harness with a custom one- or two-stage vLLM backend.
+for the SpatialEntail experiments. Training uses Axolotl; current evaluation
+uses a two-stage batched vLLM runner. Historical evaluations use LM Evaluation Harness.
 
 ## Current study
 
 Start with [SpatialEntail Composition v1](experiments/spatialentail-composition-v1/README.md)
-and its [authoritative pivot](experiments/spatialentail-composition-v1/pivot_20261026.md).
+and its [Unique-only specification](experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md).
 The primary contribution is a verified atomic spatial-composition dataset;
 the supporting experiment compares matched Natural and Symbolic supervision.
 Earlier experiments remain for provenance, not as required new-study baselines.
 
-The composition study currently has planning and executable evidence fixtures,
-not a released dataset or completed training run. The launch commands below
-illustrate existing infrastructure and historical experiments; they are not
-composition-study launch instructions.
+The current workflow generates 6,000 training questions, trains matched Natural
+and Symbolic adapters, selects saved epochs on dev, and evaluates internal and
+external benchmarks. Use the [current Slurm instructions](experiments/spatialentail-composition-v1/slurm/README.md).
+The examples below describe historical infrastructure, not current launch commands.
 
 ## Repository map
 
@@ -26,7 +26,7 @@ composition-study launch instructions.
 | fyp-report/ | Buildable Typst dissertation project and official format reference |
 | [docs/](docs/README.md) | Indexed implementation contracts, research plans, audits, and notes |
 | finetune/ | Axolotl training, model merging, and reward functions |
-| eval/ | Evaluation backend and dataset cleaners |
+| eval/ | Historical harness backends and dataset cleaners |
 | experiments/<id>/ | One experiment's configs, notes, scripts, logs, and results |
 | experiments/<id>/slurm/ | Slurm launchers for that experiment |
 | experiments/tasks/ | Shared LM Evaluation Harness task definitions |

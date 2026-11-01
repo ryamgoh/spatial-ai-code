@@ -2,18 +2,26 @@
 
 The active research direction is
 [Composition v1](../../experiments/spatialentail-composition-v1/README.md),
-governed by its [pivot](../../experiments/spatialentail-composition-v1/pivot_20261026.md).
+governed by its [Unique-only specification](../../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md).
 
 ## Active Generation
 
-`generation.py` now constructs only atomic pairwise premises. Its policy has
-no Boolean-shape, mixed-rule composition, or legacy possibility-skeleton
-controls, and the generator has no randomized-proof entry point.
-`generate_all.py` exposes the corresponding atomic-only workload CLI.
+Current entry points:
 
-This is a cleanup of the existing V2 generator, not completion of the pivot.
-Six-option menus, matched predicate-and-axis supervision, story-family release
-gates, and the new evaluation protocol still require implementation.
+| Module | Responsibility |
+|---|---|
+| `entailment_generator.py` | SceneRequest / build_scene interface |
+| `entailment_scene_protocol.py` | All-scene questions and system rules |
+| `entailment_dataset.py`, `entailment_evidence.py` | Verified labels and paired explanations |
+| `entailment_thinking_training.py` | Native Qwen3 thinking serialization and training preparation |
+| `entailment_evaluation.py` | Batched two-stage inference, dev selection and resumable results |
+| `composition_depth.py` | Supporting atomic-axis path depth |
+
+Server generation and internal evaluation preparation are driven by
+`experiments/spatialentail-composition-v1/generate_and_prepare.py` and
+`prepare_evaluation.py`. Use that experiment's Slurm instructions.
+The generic `generate_all.py` CLI is not the current study's dataset launcher.
+Retired repair, reserve-assembly, and migration diagnostics have been removed.
 
 ## Shared Infrastructure
 

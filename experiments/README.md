@@ -7,7 +7,7 @@ and result.
 ## Active research direction
 
 [`spatialentail-composition-v1`](spatialentail-composition-v1/README.md) is the
-active study. Its [pivot](spatialentail-composition-v1/pivot_20261026.md) governs
+active study. Its [Unique-only specification](spatialentail-composition-v1/UNIQUE-ONLY-v1.md) governs
 new dataset, training, and evaluation work. New experiment-specific artifacts
 belong there; shared implementation stays in the existing shared packages.
 

@@ -4,7 +4,7 @@
 
 The active study is
 [`spatialentail-composition-v1`](experiments/spatialentail-composition-v1/README.md).
-Read its [pivot](experiments/spatialentail-composition-v1/pivot_20261026.md)
+Read its [Unique-only specification](experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md)
 before planning or changing research code. It is the source of truth for the
 new study; the vocabulary below records earlier designs and does not override it.
 
@@ -23,7 +23,7 @@ explicit versioning, not retroactive changes to old experiments.
 The following terms describe earlier SpatialEntail problems, evidence, and
 experimental dimensions. Old benchmark sizes, capability lenses, and optional
 Symbolic supervision are not requirements for the composition study. Use the
-pivot's descriptors and matched explanation requirements for new work.
+Unique-only specification's descriptors and matched explanation requirements for new work.
 
 ## Language
 
