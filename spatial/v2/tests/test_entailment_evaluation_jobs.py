@@ -151,3 +151,25 @@ def test_fixed_internal_reconstruction_and_admission():
             r["prompt_version"] == "plain-unique-system-rules-v1"
             for r in record["rows"]
         )
+
+
+def test_preparation_worker_count_validation():
+    import argparse
+    import importlib
+    import sys
+
+    sys.path.insert(0, str(evaluation.EXPERIMENT))
+    materializer = importlib.import_module("prepare_evaluation")
+    assert materializer.positive_workers("128") == 128
+    for value in ("0", "-1"):
+        with pytest.raises(argparse.ArgumentTypeError, match="at least 1"):
+            materializer.positive_workers(value)
+
+
+def test_preparation_workers_follow_slurm_allocation():
+    script = evaluation.EXPERIMENT / "slurm/prepare-evaluation.sh"
+    text = script.read_text()
+    assert '--workers "${SLURM_CPUS_PER_TASK:?' in text
+    for variable in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+        assert f"export {variable}=1" in text
+    subprocess.run(["bash", "-n", str(script)], check=True)

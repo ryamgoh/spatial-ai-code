@@ -28,6 +28,16 @@ benchmark once (CPU only):
 sbatch experiments/spatialentail-composition-v1/slurm/prepare-evaluation.sh
 ```
 
+Preparation uses one worker per allocated CPU. For a larger allocation, for example:
+
+```bash
+sbatch --cpus-per-task=32 --mem=128G experiments/spatialentail-composition-v1/slurm/prepare-evaluation.sh
+```
+
+Each worker loads its own tokenizer and solver; increase memory with workers.
+Scaling to 128 workers is supported but has not been benchmarked. Inventory
+reconstruction and final output writing remain serial.
+
 After it finishes successfully, evaluate both epochs and select on dev:
 
 ```bash
@@ -51,5 +61,18 @@ If several exist, set `PREPARED` to the intended directory; it refuses to guess.
 Epochs come from `trainer_state.json`, not checkpoint filenames. Internal data
 must exactly reconstruct the 4,800 fixed exclusion query fingerprints.
 The external `spatialmap-unique-v1` payload must already exist on the server.
-Missing/old-scoped data, changed adapter hashes and existing results are rejected.
-Actual H200 inference remains untested locally; no jobs were submitted.
+Missing/old-scoped data and changed adapter hashes are rejected.
+Generation batches default to 16; set `EVAL_BATCH_SIZE` to override.
+Each stage shows vLLM progress bars in stderr; stdout reports batch progress,
+throughput, ETA, and final accuracy/token summaries.
+
+Completed matching results are reused. New partial results resume only with
+matching benchmark/model/adapter hashes, runtime versions, and batch settings.
+Legacy partial files have no provenance receipt and cannot safely resume.
+Cancel affected evaluation jobs before updating the server checkout. Move only
+legacy `*.partial.jsonl` files aside (those without a corresponding
+`*.resume.json`), then resubmit. Keep completed JSON results, selection files,
+adapters, and evaluation data. Do not change batch settings mid-resume.
+Batching may change numerical outputs; execution settings and the resumed
+example count are recorded. Local tests use a mocked engine; actual GPU
+throughput and completion within three hours require server verification.

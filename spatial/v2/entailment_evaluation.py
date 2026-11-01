@@ -1,7 +1,9 @@
 """Evaluate saved Qwen3 thinking adapters; reuse existing two-stage scoring."""
 
 import argparse
+import fcntl
 import json
+import time
 from fractions import Fraction
 from importlib.metadata import version
 from pathlib import Path
@@ -134,6 +136,10 @@ def choose(runs):
     for key in ("style", "benchmark_sha256", "model", "revision", "limits"):
         require(runs[0][key] == runs[1][key], f"dev provenance differs: {key}")
     require(
+        runs[0].get("execution") == runs[1].get("execution"),
+        "dev execution settings differ",
+    )
+    require(
         all(r["split"] == "dev" and r["adapter"] for r in runs),
         "selection uses adapter dev results only",
     )
@@ -146,55 +152,196 @@ def choose(runs):
     )
 
 
+def print_summary(result):
+    label = f"{result['style']}/{result['split']}/epoch-{result['epoch']}"
+    for stage in ("stage1", "stage2"):
+        scores = result["scores"][stage]
+        tokens = sum(len(r[stage]["token_ids"]) for r in result["outputs"])
+        accuracy = scores["correct"] / scores["total"]
+        print(
+            f"{label} {stage}: {scores['correct']}/{scores['total']} correct "
+            f"({accuracy:.2%}); generated tokens={tokens}; "
+            f"mean={tokens / scores['total']:.1f}",
+            flush=True,
+        )
+
+
 def run(
-    engine, tokenizer, rows, directory, output, style, split, adapter, epoch, limits
+    engine,
+    tokenizer,
+    rows,
+    directory,
+    output,
+    style,
+    split,
+    adapter,
+    epoch,
+    limits,
+    batch_size=16,
 ):
-    require(
-        not output.exists() and not output.with_suffix(".partial.jsonl").exists(),
-        f"existing results: {output}",
-    )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    # A second submission must not append to the same result journal.
+    with output.with_suffix(".lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise ValueError(f"evaluation already running: {output}") from error
+        return run_locked(
+            engine,
+            tokenizer,
+            rows,
+            directory,
+            output,
+            style,
+            split,
+            adapter,
+            epoch,
+            limits,
+            batch_size,
+        )
+
+
+def run_locked(
+    engine,
+    tokenizer,
+    rows,
+    directory,
+    output,
+    style,
+    split,
+    adapter,
+    epoch,
+    limits,
+    batch_size=16,
+):
+    require(batch_size > 0, "batch size must be positive")
     from vllm import SamplingParams
     from vllm.lora.request import LoRARequest
     from vllm.sampling_params import StructuredOutputsParams
 
     fingerprint = adapter_hash(adapter) if adapter else None
     benchmark_hash = digest(directory / "references.jsonl")
+    provenance = {
+        "model": MODEL,
+        "revision": REVISION,
+        "style": style,
+        "split": split,
+        "adapter": str(adapter) if adapter else None,
+        "adapter_sha256": fingerprint,
+        "epoch": epoch,
+        "limits": limits,
+        "benchmark_sha256": benchmark_hash,
+    }
+    if output.exists():
+        result = json.loads(output.read_text())
+        require(
+            all(result.get(k) == v for k, v in provenance.items()),
+            "completed result provenance mismatch",
+        )
+        require(
+            [r["id"] for r in result["outputs"]] == [r["id"] for r in rows],
+            "completed result IDs differ",
+        )
+        require(
+            result["scores"] == score(rows, result["outputs"]),
+            "completed result scores differ",
+        )
+        print(f"Already completed: {output}", flush=True)
+        print_summary(result)
+        return result
+    execution = {
+        "runner": "batched-token-replay-v1",
+        "batch_size": batch_size,
+        "temperature": 0,
+        "seed": 42,
+        "runtime_versions": {n: version(n) for n in ("torch", "vllm", "transformers")},
+    }
+    metadata = {**provenance, "execution": execution}
+    partial = output.with_suffix(".partial.jsonl")
+    receipt = output.with_suffix(".resume.json")
+    if receipt.exists():
+        require(
+            json.loads(receipt.read_text()) == metadata,
+            "resume provenance/execution mismatch; do not mix runs",
+        )
+    else:
+        require(
+            not partial.exists(),
+            f"Legacy partial result cannot be resumed safely; move aside: {partial}",
+        )
+        write_json(receipt, metadata)
     request = LoRARequest(style, epoch or 1, str(adapter)) if adapter else None
     records = []
-    output.parent.mkdir(parents=True, exist_ok=True)
-    with output.with_suffix(".partial.jsonl").open("x") as journal:
-        for row in rows:
-            prefix = tokenizer.apply_chat_template(
-                messages(row, style), tokenize=False, add_generation_prompt=True
+    if partial.exists():
+        # SIGTERM can interrupt the final write. Only drop an unterminated tail.
+        with partial.open("rb+") as journal:
+            while line := journal.readline():
+                if not line.endswith(b"\n"):
+                    journal.truncate(journal.tell() - len(line))
+                    break
+                records.append(json.loads(line))
+        require(
+            [r["id"] for r in records] == [r["id"] for r in rows[: len(records)]],
+            "partial result IDs/order differ",
+        )
+    label = f"{style}/{split}/{'untuned' if epoch is None else f'epoch-{epoch}'}"
+    print(
+        f"{label}: {len(records)}/{len(rows)} completed; batch_size={batch_size}",
+        flush=True,
+    )
+    started = time.monotonic()
+    initial_count = len(records)
+    with partial.open("a") as journal:
+        for offset in range(len(records), len(rows), batch_size):
+            batch = rows[offset : offset + batch_size]
+            prompts = []
+            for row in batch:
+                prefix = tokenizer.apply_chat_template(
+                    messages(row, style), tokenize=False, add_generation_prompt=True
+                )
+                ids = tokenizer.encode(prefix, add_special_tokens=False)
+                require(
+                    len(ids) + limits["stage1"] <= limits["context"], "Stage-1 overflow"
+                )
+                prompts.append(ids)
+            print(
+                f"{label}: Stage 1, examples {offset + 1}-{offset + len(batch)}/{len(rows)}",
+                flush=True,
             )
-            ids = tokenizer.encode(prefix, add_special_tokens=False)
-            require(
-                len(ids) + limits["stage1"] <= limits["context"], "Stage-1 overflow"
-            )
-            first = engine.generate(
-                [{"prompt_token_ids": ids}],
+            first_outputs = engine.generate(
+                [{"prompt_token_ids": ids} for ids in prompts],
                 SamplingParams(
                     temperature=0,
                     max_tokens=limits["stage1"],
                     stop_token_ids=[tokenizer.eos_token_id],
                 ),
                 lora_request=request,
-                use_tqdm=False,
-            )[0].outputs[0]
-            first_ids = list(first.token_ids)
-            replay = (
-                ids
-                + first_ids
-                + tokenizer.encode(
-                    stage2_suffix(tokenizer, first_ids), add_special_tokens=False
+                use_tqdm=True,
+            )
+            require(len(first_outputs) == len(batch), "Stage-1 output count mismatch")
+            firsts = [o.outputs[0] for o in first_outputs]
+            replays = []
+            for ids, first in zip(prompts, firsts, strict=True):
+                first_ids = list(first.token_ids)
+                replay = (
+                    ids
+                    + first_ids
+                    + tokenizer.encode(
+                        stage2_suffix(tokenizer, first_ids),
+                        add_special_tokens=False,
+                    )
                 )
+                require(
+                    len(replay) + limits["stage2"] <= limits["context"],
+                    "Stage-2 overflow; no truncation",
+                )
+                replays.append(replay)
+            print(
+                f"{label}: Stage 2, examples {offset + 1}-{offset + len(batch)}/{len(rows)}",
+                flush=True,
             )
-            require(
-                len(replay) + limits["stage2"] <= limits["context"],
-                "Stage-2 overflow; no truncation",
-            )
-            second = engine.generate(
-                [{"prompt_token_ids": replay}],
+            second_outputs = engine.generate(
+                [{"prompt_token_ids": replay} for replay in replays],
                 SamplingParams(
                     temperature=0,
                     max_tokens=limits["stage2"],
@@ -202,35 +349,48 @@ def run(
                     stop_token_ids=[tokenizer.eos_token_id],
                 ),
                 lora_request=request,
-                use_tqdm=False,
-            )[0].outputs[0]
-            raw = tokenizer.decode(first_ids, skip_special_tokens=False)
-            final = raw.split("</think>", 1)[1] if "</think>" in raw else ""
-            final = final.removesuffix("<|im_end|>").strip()
-            record = {
-                "id": row["id"],
-                "stage1": {
-                    "text": final,
-                    "raw_text": raw,
-                    "token_ids": first_ids,
-                    "input_tokens": len(ids),
-                    "finish_reason": first.finish_reason,
-                },
-                "stage2": {
-                    "text": second.text,
-                    "token_ids": list(second.token_ids),
-                    "input_tokens": len(replay),
-                    "finish_reason": second.finish_reason,
-                },
-            }
-            records.append(record)
-            journal.write(json.dumps(record) + "\n")
-            journal.flush()
-            if len(records) % 100 == 0:
-                print(
-                    f"{style}/{split}/epoch-{epoch}: {len(records)}/{len(rows)}",
-                    flush=True,
-                )
+                use_tqdm=True,
+            )
+            require(len(second_outputs) == len(batch), "Stage-2 output count mismatch")
+            for row, ids, first, replay, second_output in zip(
+                batch,
+                prompts,
+                firsts,
+                replays,
+                second_outputs,
+                strict=True,
+            ):
+                second = second_output.outputs[0]
+                first_ids = list(first.token_ids)
+                raw = tokenizer.decode(first_ids, skip_special_tokens=False)
+                final = raw.split("</think>", 1)[1] if "</think>" in raw else ""
+                final = final.removesuffix("<|im_end|>").strip()
+                record = {
+                    "id": row["id"],
+                    "stage1": {
+                        "text": final,
+                        "raw_text": raw,
+                        "token_ids": first_ids,
+                        "input_tokens": len(ids),
+                        "finish_reason": first.finish_reason,
+                    },
+                    "stage2": {
+                        "text": second.text,
+                        "token_ids": list(second.token_ids),
+                        "input_tokens": len(replay),
+                        "finish_reason": second.finish_reason,
+                    },
+                }
+                records.append(record)
+                journal.write(json.dumps(record) + "\n")
+                journal.flush()
+            elapsed = time.monotonic() - started
+            rate = (len(records) - initial_count) / max(elapsed, 0.001)
+            print(
+                f"{label}: {len(records)}/{len(rows)} completed; "
+                f"{rate:.2f} examples/s; ETA {(len(rows) - len(records)) / rate / 60:.1f} min",
+                flush=True,
+            )
     result = {
         "model": MODEL,
         "revision": REVISION,
@@ -244,6 +404,8 @@ def run(
         "outputs": records,
         "scores": score(rows, records),
         "runtime_versions": {n: version(n) for n in ("torch", "vllm", "transformers")},
+        "execution": execution,
+        "resumed_from_examples": initial_count,
     }
     require(not adapter or adapter_hash(adapter) == fingerprint, "adapter changed")
     require(
@@ -251,6 +413,7 @@ def run(
         "benchmark changed",
     )
     write_json(output, result)
+    print_summary(result)
     return result
 
 
@@ -260,11 +423,13 @@ def main():
     parser.add_argument("--style", required=True, choices=("natural", "symbolic"))
     parser.add_argument("--prepared", type=Path)
     parser.add_argument("--benchmark", type=Path, required=True)
+    parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument(
         "--split",
         choices=("dev", "in-range-test", "extrapolation-test", "external-test"),
     )
     args = parser.parse_args()
+    require(args.batch_size > 0, "batch size must be positive")
     prepared = discover(args.prepared)
     split = "dev" if args.mode == "dev" else args.split
     require(
@@ -332,6 +497,7 @@ def main():
             adapter,
             epoch,
             limits,
+            batch_size=args.batch_size,
         )
         for epoch, adapter in adapters.items()
     ]

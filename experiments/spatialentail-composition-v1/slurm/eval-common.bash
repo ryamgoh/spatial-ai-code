@@ -3,7 +3,7 @@ set -euo pipefail
 : "${STYLE:?Set STYLE=natural or STYLE=symbolic}"
 EXP=experiments/spatialentail-composition-v1
 mode=$1
-args=("$mode" --style "$STYLE")
+args=("$mode" --style "$STYLE" --batch-size "${EVAL_BATCH_SIZE:-16}")
 if [[ -n "${PREPARED:-}" ]]; then
     args+=(--prepared "$PREPARED")
 fi

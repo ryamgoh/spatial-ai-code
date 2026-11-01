@@ -86,11 +86,19 @@ def admit(job):
     return record
 
 
+def positive_workers(value):
+    workers = int(value)
+    if workers < 1:
+        raise argparse.ArgumentTypeError("workers must be at least 1")
+    return workers
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output", type=Path, default=EXPERIMENT / "evaluation-internal"
     )
+    parser.add_argument("--workers", type=positive_workers, default=4)
     args = parser.parse_args()
     require(not args.output.exists(), "evaluation output already exists")
     policy, jobs = fixed_jobs()
@@ -102,10 +110,11 @@ def main():
         allow_patterns=["tokenizer*", "chat_template.jinja", "config.json"],
     )
     args.output.mkdir()
+    print(f"Auditing 4800 internal evaluation bases with {args.workers} workers", flush=True)
     counts = Counter()
     with (
         get_context("spawn").Pool(
-            4, initializer=initialize, initargs=(snapshot, policy)
+            args.workers, initializer=initialize, initargs=(snapshot, policy)
         ) as pool,
         (args.output / "references.jsonl").open("x") as references,
         (args.output / "evidence.jsonl").open("x") as evidence,

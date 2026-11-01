@@ -17,7 +17,11 @@ cd "$SLURM_SUBMIT_DIR"
 source slurm/lib/pin-srun-cpus.sh
 export PYTHONPATH="$SLURM_SUBMIT_DIR${PYTHONPATH:+:$PYTHONPATH}"
 export TOKENIZERS_PARALLELISM=false
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
 exec srun uv --native-tls run --python 3.12 --no-project \
     --with transformers==5.16.1 --with tokenizers==0.23.1 \
     --with z3-solver==4.16.0.0 --with scipy==1.18.1 --with pyyaml \
-    python experiments/spatialentail-composition-v1/prepare_evaluation.py
+    python experiments/spatialentail-composition-v1/prepare_evaluation.py \
+    --workers "${SLURM_CPUS_PER_TASK:?Missing allocated CPU count}"
