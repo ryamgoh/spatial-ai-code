@@ -99,6 +99,9 @@ and unsets `SLURM_TRES_PER_TASK`. Changing `--cpus-per-task` is then
 enough; do not add a matching `export`.
 
 Partitions: **`gpu` max 3 hours**; **`gpu-long` max 3 days**.
+This includes all H200 requests: on `gpu`, set `--time` no higher than
+`03:00:00`; longer GPU jobs must use `gpu-long` with a maximum of `3-00:00:00`.
+GPU type does not change the partition's wall-time limit.
 
 Submit launchers with `sbatch <launcher>` from the repository root. Each
 experiment tracks `logs/.gitkeep` and writes its jobs to
