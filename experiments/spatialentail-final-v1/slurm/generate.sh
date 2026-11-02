@@ -27,9 +27,9 @@ WORKERS=${FINAL_GENERATION_WORKERS:-${SLURM_CPUS_PER_TASK:-1}}
     echo "Workers must fit SLURM_CPUS_PER_TASK." >&2; exit 2;
 }
 echo "Generation only: mode=$FINAL_GENERATION_MODE workers=$WORKERS output=$FINAL_RUN_DIR"
-srun uv --system-certs run --python 3.12 --no-project \
+srun uv --native-tls run --python 3.12 --no-project \
     --script "$FINAL_EXPERIMENT_DIR/generate.py" build \
     --run-dir "$FINAL_RUN_DIR" --mode "$FINAL_GENERATION_MODE" --workers "$WORKERS"
-srun uv --system-certs run --python 3.12 --no-project \
+srun uv --native-tls run --python 3.12 --no-project \
     --script "$FINAL_EXPERIMENT_DIR/generate.py" verify --run-dir "$FINAL_RUN_DIR"
 echo "Candidate generation finished. No training job was submitted."

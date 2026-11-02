@@ -799,6 +799,53 @@ def test_worker_count_follows_allocation(cpus, override, expected):
         assert result.stdout == expected
 
 
+def test_generation_worker_uses_backward_compatible_tls_flag(tmp_path):
+    bins = tmp_path / "bin"
+    bins.mkdir()
+    capture = tmp_path / "calls"
+    for name, body in (
+        ("srun", '#!/bin/bash\nexec "$@"\n'),
+        (
+            "uv",
+            "#!/bin/bash\n"
+            'if [[ "$1" != "--native-tls" ]]; then\n'
+            "  echo \"error: unexpected argument '$1' found\" >&2\n"
+            "  exit 2\n"
+            "fi\n"
+            'printf "%s\\n" "$*" >> "$CAPTURE"\n',
+        ),
+    ):
+        path = bins / name
+        path.write_text(body)
+        path.chmod(0o755)
+    result = subprocess.run(
+        ["bash", str(EXP / "slurm/generate.sh")],
+        env={
+            **os.environ,
+            "PATH": f"{bins}:{os.environ['PATH']}",
+            "CAPTURE": str(capture),
+            "FINAL_RUN_DIR": str(tmp_path / "artifacts"),
+            "FINAL_EXPERIMENT_DIR": str(EXP),
+            "FINAL_GENERATION_MODE": "full",
+            "FINAL_GENERATION_WORKERS": "64",
+            "SLURM_JOB_ID": "123",
+            "SLURM_TRES_PER_TASK": "cpu=64",
+            "SLURM_SRUN_CPUS_PINNED": "",
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    calls = capture.read_text().splitlines()
+    assert len(calls) == 2
+    assert all(
+        line.startswith("--native-tls run --python 3.12 --no-project") for line in calls
+    )
+    assert " build " in calls[0] and " verify " in calls[1]
+    assert "--workers 64" in calls[0]
+
+
 def test_submitter_records_one_job_and_paths(tmp_path):
     root = tmp_path / "repo with spaces"
     exp = root / "experiments/spatialentail-final-v1"

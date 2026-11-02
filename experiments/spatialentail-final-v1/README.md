@@ -87,6 +87,8 @@ generation environment, and never calls the old training submitter.
 CPU dependencies are declared once in `generate.py`'s PEP 723 script metadata.
 `uv run --no-project --script` uses a separate cached script environment,
 preserving Z3 4.16.0.0 without resolving against the GPU training stack.
+The launcher uses `--native-tls` for the system certificate store, compatible
+with server uv 0.9.30. That version does not recognize `--system-certs`.
 There is no separate requirements file and no root dependency change.
 The existing cluster email address is retained in `slurm/generate.sh`.
 Adjust its resource directives for your cluster if needed.
@@ -178,7 +180,7 @@ The source export's old `evaluation_prompt` wrapper is not used.
 Use the printed artifact path:
 
 ```bash
-uv --system-certs run --python 3.12 --no-project \
+uv --native-tls run --python 3.12 --no-project \
   --script experiments/spatialentail-final-v1/generate.py verify \
   --run-dir /absolute/path/to/artifacts
 ```
