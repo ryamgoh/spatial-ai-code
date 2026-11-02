@@ -16,16 +16,16 @@ from spatial.v2.composition_pilot import renamed_problem, story_key
 from spatial.v2.composition_selection_expansion import make_story
 from spatial.v2.composition_training import REVISION
 from spatial.v2.solver import Direction, SpatialSolverV2
+from spatial.v2.tests import composition_policy
 
 ROOT = Path(__file__).resolve().parents[3]
-CONFIG = ROOT / "experiments/spatialentail-composition-v1/production-config-v1.json"
 EMPTY_EXCLUSIONS = {"family_ids": [], "story_keys": []}
 
 
 @pytest.fixture
 def policy():
     policy = {
-        **json.loads(CONFIG.read_text()),
+        **composition_policy(),
         "paired_omission_percent": 0,
         "coverage_minima": [
             {
@@ -98,8 +98,10 @@ def test_draft_plan_does_not_construct_stories(policy, monkeypatch):
 
 def test_draft_cli_cannot_generate(tmp_path, monkeypatch):
     output = tmp_path / "must-not-exist"
+    config = tmp_path / "draft.json"
+    config.write_text(json.dumps(composition_policy()))
     monkeypatch.setattr(
-        "sys.argv", ["production", "--config", str(CONFIG), "--output", str(output)]
+        "sys.argv", ["production", "--config", str(config), "--output", str(output)]
     )
     with pytest.raises(SystemExit) as exc:
         production.main()
@@ -432,7 +434,7 @@ def test_plan_reports_extra_views_without_claiming_exact_pair_count(policy):
 def test_family_minima_are_required_not_implicitly_approved(policy):
     policy["depth_family_minima"] = None
     assert any("family" in b for b in production.plan(policy)["blockers"])
-    approved = json.loads(CONFIG.read_text())
+    approved = composition_policy()
     assert approved["status"] == "numeric-approved"
     assert approved["depth_family_minima"]["train/which/2"] == 50
 
@@ -849,7 +851,7 @@ def test_ambiguous_semantic_base_keeps_matched_control(policy, token_stub, kind)
 
 
 def test_approved_source_and_family_allocations():
-    policy = json.loads(CONFIG.read_text())
+    policy = composition_policy()
     result = production.plan(policy)
     expected = {
         "train": (4200, 900, 600, 300),

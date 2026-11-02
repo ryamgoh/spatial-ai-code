@@ -1,23 +1,18 @@
 """Coverage migration retains sizes and exposes structurally inapplicable gates."""
 
 import json
-from pathlib import Path
 
 import pytest
 
 from spatial.v2.composition_production import plan
 from spatial.v2.entailment_contracts import Contract
 from spatial.v2.entailment_coverage import derive
+from spatial.v2.tests import composition_policy
 
 
 @pytest.fixture
 def approved():
-    root = Path(__file__).resolve().parents[3]
-    path = (
-        root
-        / "experiments/spatialentail-composition-v1/production-allocation-v1/execution-config-v1.json"
-    )
-    return json.loads(path.read_text())
+    return composition_policy(coverage=True)
 
 
 def test_preserve_sizes_and_numeric_origins_without_freezing(approved):
