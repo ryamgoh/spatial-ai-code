@@ -80,8 +80,9 @@ From the repository root, submit generation for all four exported datasets:
 bash experiments/spatialentail-final-v1/slurm/submit-generation.sh full
 ```
 
-This submits **one CPU job** on `normal`: 64 CPUs, 128 GB RAM, 24 hours, with
-64 generation workers by default (following `SLURM_CPUS_PER_TASK`).
+This submits **one CPU job** on `normal`: 128 CPUs, 128 GB RAM, 24 hours, with
+128 workers for preflight construction and then synthetic admission by default
+(following `SLURM_CPUS_PER_TASK`).
 It requests no GPU, installs only the small CPU
 generation environment, and never calls the old training submitter.
 CPU dependencies are declared once in `generate.py`'s PEP 723 script metadata.
@@ -108,9 +109,15 @@ Each submission prints its job ID and artifact path. Monitor it with
 `squeue -j JOB_ID` and the `generation-JOB_ID.out` / `.err` files in the printed
 run directory. Slurm email delivery itself has not been verified.
 `FINAL_GENERATION_WORKERS` can override the worker count within the CPU allocation.
-Synthetic admission uses these workers; preflight, external preparation and
-export readback remain serial. Peak memory and throughput at 64 workers have
-not yet been measured on the server.
+Preflight construction and synthetic admission use separate, sequential worker
+pools, not 256 concurrent workers. Preflight keeps at most one pending candidate
+per allocated worker and returns only canonical keys and metadata to the
+coordinator. The coordinator processes slots in the original order, makes all
+exclusion/ownership decisions, and requests retries only on conflicts. The five
+attempts and final-attempt training-only duplicate rule are unchanged.
+External preparation, journal/export writes and final export readback remain
+serial. Peak memory and throughput at 128 workers have not yet been measured
+on the server.
 
 The job needs network access for Python dependencies and one pinned tokenizer
 snapshot; it does not download model weights. Package/Hugging Face caches stay
@@ -341,7 +348,12 @@ are not an additive unique-test total.
 | Unified benchmark export | 726 tests passed | Merged files exactly concatenate the two former subgroup exports |
 | SFT/evaluation integration | 785 tests passed; optional plugin test passed separately | CPU PEFT reload, masks, selection, launch guards; not full GPU training |
 | W&B naming fix | 22 tests passed; one optional Axolotl test skipped | Eight distinct IDs across two campaigns; shared group within each campaign |
-| Latest end-to-end smoke | 176 synthetic + 3 external passed | Build, exports and separate manifest verification |
+| SFT integration smoke | 176 synthetic + 3 external passed | Build, exports and separate manifest verification |
+| Dependency-preservation smoke | 176 synthetic + 3 external passed | Fresh build and separate verification after the depth fix |
+| Dependency-preservation replay | 10,800 selected seeds passed | Reconstruction, exact sizes and applicable depth checks; not full admission/export |
+| Dependency-fix regressions | 7,543 generator/admission + 43 independent audit/token tests passed | Includes the failing scheduled seed, tied-proof rejection and 4,800 size endpoints |
+| Parallel preflight | 101 workflow/audit tests passed | Real 2/4-process equivalence with retries; reversed completion order, queue bounds and failures |
+| Parallel preflight smoke | 176 synthetic + 3 external passed with four workers | Data, construction/admission journals and preflight receipt byte-identical to serial preflight; separate verification passed |
 
 The successful size trial observed all 250 declared level/size pairs, including
 43 scenes with six objects and nine premises. It selected 10,767 first candidates,
@@ -353,7 +365,24 @@ pending. Earlier template endpoint limits were implementation restrictions,
 not mathematical impossibility. Sorted dependency-witness selection fixed a
 trial cross-process reproducibility failure.
 
-The latest smoke is `/tmp/spatialentail-final-sft-integration-smoke/`: 44 train,
+The server admission failure `depth mismatch: 2 vs None` was reproduced locally
+on the selected in-range L2 Count-zero slot 35. An added relation preserved the
+answer and shortest length but introduced a tied proof bypassing the protected
+dependency edge. Augmentation now preserves that edge in every shortest proof
+of at least one deepest obligation, including solver-fallback proposals.
+The admission requirement is unchanged. This fix can change constructed scenes:
+retain the failed run for diagnosis and submit a fresh generation run after
+updating the shared source; do not resume or reuse partial exports.
+The fresh smoke at `/tmp/spatialentail-final-depth-dependency-smoke/` passed
+full admission, native exports and separate manifest verification with pinned
+Z3 4.16.0.0.
+
+The parallel-preflight smoke is
+`/tmp/spatialentail-final-parallel-preflight-smoke/`. Its comparison against the
+preceding dependency-fix smoke checks output equivalence, not a 128-worker
+server speedup or a new full-corpus admission run.
+
+The SFT integration smoke was `/tmp/spatialentail-final-sft-integration-smoke/`: 44 train,
 44 dev, 88 SFT-Bench (44 per subgroup), and three external questions. Its 30 data
 files matched the preceding unified-benchmark smoke. Four SFT configuration
 previews were prepared without training, and the launch verifier rejected their

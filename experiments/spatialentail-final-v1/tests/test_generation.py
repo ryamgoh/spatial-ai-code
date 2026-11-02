@@ -123,7 +123,7 @@ def test_native_admission_rejects_invalid_budgets(
     monkeypatch.setattr(workflow, "source_inputs", lambda *_: [])
     monkeypatch.setattr(workflow, "save_tokenizer", lambda *_: "unused")
     monkeypatch.setattr(workflow, "initialize", lambda *_: None)
-    monkeypatch.setattr(workflow, "preflight", lambda *_: [job])
+    monkeypatch.setattr(workflow, "preflight", lambda *_, **__: [job])
     pool = SimpleNamespace(map=lambda *_: iter([rejected]))
     monkeypatch.setattr(shared, "ProcessPoolExecutor", lambda **_: nullcontext(pool))
     run = tmp_path / "failed-run"
@@ -146,6 +146,20 @@ def make_job(api, slot):
         "anchor_key": family,
         "direction": direction.value,
     }
+
+
+def test_depth_two_zero_count_preserves_admission_dependency(api, tokens):
+    slot = next(
+        s
+        for s in policy.schedule()
+        if (s.split, s.kind, s.level, s.case, s.index)
+        == ("in-range-test", "count", 2, "A-D", 35)
+    )
+    assert slot.count_value == 0
+    result = api.generate_one(make_job(api, slot))
+    assert result["status"] == "passed", result
+    assert result["record"]["measurement"]["depth"] == 2
+    assert result["record"]["semantics"]["entailed"] == [0]
 
 
 def test_full_schedule_exact_and_deterministic():
@@ -384,7 +398,58 @@ def test_recorded_l1_collisions_have_distinct_contexts(api, left, right):
     assert shared.identities(a)["scene_key"] != shared.identities(b)["scene_key"]
 
 
-def test_five_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
+@pytest.fixture
+def reversed_construction_pool(api, monkeypatch):
+    """Complete queued work backwards, but expose failures only on result()."""
+    from concurrent.futures import Future
+
+    pools = []
+
+    class Pending(Future):
+        def result(self):
+            for future, fn, args in reversed(self.pool.calls):
+                if not future.done():
+                    try:
+                        future.set_result(fn(*args))
+                    except ValueError as exc:
+                        future.set_exception(exc)
+                    self.pool.finished.append(args)
+            self.pool.unconsumed -= 1
+            return super().result()
+
+    class Pool:
+        def __init__(self, **kwargs):
+            assert kwargs["mp_context"].get_start_method() == "spawn"
+            self.calls = []
+            self.finished = []
+            self.unconsumed = self.maximum = 0
+            self.closed = False
+            pools.append(self)
+
+        def submit(self, fn, *args):
+            future = Pending()
+            future.pool = self
+            self.calls.append((future, fn, args))
+            self.unconsumed += 1
+            self.maximum = max(self.maximum, self.unconsumed)
+            return future
+
+        def shutdown(self, *, wait, cancel_futures):
+            assert wait and cancel_futures
+            self.closed = True
+            for future, _, _ in self.calls:
+                if not future.done():
+                    future.cancel()
+
+    monkeypatch.setattr(shared, "_WORKER", api)
+    monkeypatch.setattr(shared, "ProcessPoolExecutor", Pool)
+    return pools
+
+
+@pytest.mark.parametrize("workers", (1, 3))
+def test_five_attempts_then_fail_no_refill(
+    api, monkeypatch, tmp_path, reversed_construction_pool, workers
+):
     (tmp_path / "audit").mkdir()
     slot = policy.schedule()[0]
     calls = []
@@ -404,14 +469,15 @@ def test_five_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
 
     monkeypatch.setattr(inventory, "conflict", conflict)
     with pytest.raises(ValueError, match="no refill"):
-        api.preflight([slot], inventory, tmp_path)
+        api.preflight([slot], inventory, tmp_path, workers=workers)
     assert len(calls) == 5
     assert len(shared.read_jsonl(tmp_path / "audit/constructions.jsonl")) == 5
 
 
 @pytest.mark.parametrize("success_alternative", (3, 4))
+@pytest.mark.parametrize("workers", (1, 3))
 def test_later_retry_selects_only_a_nonconflicting_candidate(
-    api, monkeypatch, tmp_path, success_alternative
+    api, monkeypatch, tmp_path, success_alternative, reversed_construction_pool, workers
 ):
     (tmp_path / "audit").mkdir()
     slot = policy.schedule()[0]
@@ -432,7 +498,7 @@ def test_later_retry_selects_only_a_nonconflicting_candidate(
     )
     inventory = shared.Inventory()
     inventory.add({"query_key": "same", "scene_key": "same"}, "external-test")
-    jobs = api.preflight([slot], inventory, tmp_path)
+    jobs = api.preflight([slot], inventory, tmp_path, workers=workers)
     assert calls == list(range(success_alternative + 1))
     assert len(jobs) == 1
     assert jobs[0]["alternative"] == success_alternative
@@ -443,8 +509,9 @@ def test_later_retry_selects_only_a_nonconflicting_candidate(
 @pytest.mark.parametrize(
     "split", ("train", "dev", "in-range-test", "extrapolation-test")
 )
+@pytest.mark.parametrize("workers", (1, 3))
 def test_duplicate_fallback_is_fifth_attempt_and_training_only(
-    api, monkeypatch, tmp_path, split
+    api, monkeypatch, tmp_path, split, reversed_construction_pool, workers
 ):
     (tmp_path / "audit").mkdir()
     slot = next(s for s in policy.schedule() if s.split == split)
@@ -460,14 +527,107 @@ def test_duplicate_fallback_is_fifth_attempt_and_training_only(
     monkeypatch.setattr(api, "construct", construct)
     monkeypatch.setattr(shared, "identities", lambda p: keys)
     if split == "train":
-        jobs = api.preflight([slot], inventory, tmp_path)
+        jobs = api.preflight([slot], inventory, tmp_path, workers=workers)
         assert jobs[0]["training_duplicate"] is True
         assert jobs[0]["alternative"] == 4
         assert len(inventory.query_splits) == 1
     else:
         with pytest.raises(ValueError, match="no refill"):
-            api.preflight([slot], inventory, tmp_path)
+            api.preflight([slot], inventory, tmp_path, workers=workers)
     assert calls == list(range(5))
+
+
+@pytest.mark.parametrize("failure_index", (None, 2))
+def test_parallel_preflight_is_ordered_bounded_and_fail_closed(
+    api, monkeypatch, tmp_path, reversed_construction_pool, failure_index
+):
+    slots = policy.schedule()[:7]
+
+    def construct(slot, alternative):
+        if slot.index == failure_index:
+            raise ValueError("construction failed")
+        return (
+            None,
+            (slot.index, alternative),
+            f"family-{slot.index}",
+            shared.Direction.NORTH,
+        )
+
+    def keys(pair):
+        index, alternative = pair
+        return {
+            "query_key": "shared" if index < 2 and alternative == 0 else str(pair),
+            "scene_key": f"scene-{pair}",
+        }
+
+    monkeypatch.setattr(api, "construct", construct)
+    monkeypatch.setattr(shared, "identities", keys)
+    outcomes = []
+    for workers in (1, 3):
+        run = tmp_path / str(workers)
+        (run / "audit").mkdir(parents=True)
+        inventory = shared.Inventory()
+        if failure_index is None:
+            jobs = api.preflight(slots, inventory, run, workers=workers)
+            assert [j["alternative"] for j in jobs] == [0, 1, 0, 0, 0, 0, 0]
+        else:
+            with pytest.raises(ValueError, match="construction failed"):
+                api.preflight(slots, inventory, run, workers=workers)
+            jobs = None
+            assert not (run / "audit/preflight.json").exists()
+        outcomes.append(
+            (jobs, (run / "audit/constructions.jsonl").read_bytes(), vars(inventory))
+        )
+    assert outcomes[0] == outcomes[1]
+    (pool,) = reversed_construction_pool
+    assert pool.maximum <= 3
+    assert pool.closed
+    assert pool.finished[0][0] == slots[2]
+    assert [(s.index, a) for _, _, (s, a) in pool.calls if a] == [(1, 1)]
+
+
+@pytest.mark.parametrize("workers", (2, 4))
+def test_real_parallel_preflight_matches_serial(api, tmp_path, workers):
+    selected = {}
+    for slot in policy.schedule():
+        if slot.split == "in-range-test" and slot.level == 1:
+            selected.setdefault((slot.kind, slot.case), slot)
+        if slot.split == "extrapolation-test" and slot.level == 10:
+            selected.setdefault((slot.kind, "deep"), slot)
+    slots = list(selected.values())
+    blocked = api.construct_candidate(slots[0], 0)
+    runs = []
+    for count in (1, workers):
+        run = tmp_path / str(count)
+        (run / "audit").mkdir(parents=True)
+        inventory = shared.Inventory()
+        inventory.add(
+            {k: blocked[k] for k in ("query_key", "scene_key")}, "external-test"
+        )
+        jobs = api.preflight(slots, inventory, run, workers=count)
+        assert jobs[0]["alternative"] == 1
+        runs.append(
+            (
+                jobs,
+                (run / "audit/constructions.jsonl").read_bytes(),
+                (run / "audit/preflight.json").read_bytes(),
+                vars(inventory),
+            )
+        )
+    assert runs[0] == runs[1]
+
+
+def test_construction_worker_needs_no_tokenizer(api, monkeypatch):
+    monkeypatch.setattr(shared, "_WORKER", None)
+    monkeypatch.setattr(
+        shared.GenerationWorkflow,
+        "initialize",
+        lambda *_: pytest.fail("preflight must not load a tokenizer"),
+    )
+    shared.initialize_worker(api.config)
+    assert shared._WORKER.tokenizer is None
+    slot = policy.schedule()[0]
+    assert shared.construct_worker(slot, 0) == api.construct_candidate(slot, 0)
 
 
 @pytest.mark.parametrize("overlap", ("query", "scene", "family"))
@@ -759,7 +919,7 @@ def test_launcher_is_cpu_generation_only():
     assert launch.count("sbatch --parsable") == 1
     assert "--dependency" not in launch
     assert "--partition=normal" in worker
-    assert "#SBATCH --cpus-per-task=64" in worker
+    assert "#SBATCH --cpus-per-task=128" in worker
     assert "#SBATCH --mem=128G" in worker
     assert "--gres" not in worker
     assert "uv sync" not in worker
@@ -773,7 +933,7 @@ def test_launcher_is_cpu_generation_only():
 
 @pytest.mark.parametrize(
     ("cpus", "override", "expected"),
-    [("64", "", "64"), ("16", "", "16"), ("64", "8", "8"), ("64", "65", None)],
+    [("128", "", "128"), ("16", "", "16"), ("128", "8", "8"), ("128", "129", None)],
 )
 def test_worker_count_follows_allocation(cpus, override, expected):
     script = (EXP / "slurm/generate.sh").read_text()
@@ -807,12 +967,14 @@ def test_generation_worker_uses_backward_compatible_tls_flag(tmp_path):
         ("srun", '#!/bin/bash\nexec "$@"\n'),
         (
             "uv",
-            "#!/bin/bash\n"
-            'if [[ "$1" != "--native-tls" ]]; then\n'
-            "  echo \"error: unexpected argument '$1' found\" >&2\n"
-            "  exit 2\n"
-            "fi\n"
-            'printf "%s\\n" "$*" >> "$CAPTURE"\n',
+            (
+                "#!/bin/bash\n"
+                'if [[ "$1" != "--native-tls" ]]; then\n'
+                "  echo \"error: unexpected argument '$1' found\" >&2\n"
+                "  exit 2\n"
+                "fi\n"
+                'printf "%s\\n" "$*" >> "$CAPTURE"\n'
+            ),
         ),
     ):
         path = bins / name
@@ -827,9 +989,9 @@ def test_generation_worker_uses_backward_compatible_tls_flag(tmp_path):
             "FINAL_RUN_DIR": str(tmp_path / "artifacts"),
             "FINAL_EXPERIMENT_DIR": str(EXP),
             "FINAL_GENERATION_MODE": "full",
-            "FINAL_GENERATION_WORKERS": "64",
+            "FINAL_GENERATION_WORKERS": "",
             "SLURM_JOB_ID": "123",
-            "SLURM_TRES_PER_TASK": "cpu=64",
+            "SLURM_TRES_PER_TASK": "cpu=128",
             "SLURM_SRUN_CPUS_PINNED": "",
         },
         capture_output=True,
@@ -843,7 +1005,7 @@ def test_generation_worker_uses_backward_compatible_tls_flag(tmp_path):
         line.startswith("--native-tls run --python 3.12 --no-project") for line in calls
     )
     assert " build " in calls[0] and " verify " in calls[1]
-    assert "--workers 64" in calls[0]
+    assert "--workers 128" in calls[0]
 
 
 def test_submitter_records_one_job_and_paths(tmp_path):

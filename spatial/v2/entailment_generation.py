@@ -84,10 +84,16 @@ class GenerationConfig:
 _WORKER = None
 
 
-def initialize_worker(config, tokenizer_path):
+def initialize_worker(config, tokenizer_path=None):
     global _WORKER
     _WORKER = GenerationWorkflow(config)
-    _WORKER.initialize(tokenizer_path)
+    if tokenizer_path is not None:
+        _WORKER.initialize(tokenizer_path)
+
+
+def construct_worker(slot, alternative):
+    require(_WORKER is not None, "construction worker was not initialized")
+    return _WORKER.construct_candidate(slot, alternative)
 
 
 def generate_worker(job):
@@ -465,16 +471,48 @@ class GenerationWorkflow:
         )
         return (story, problem, family, direction)
 
-    def preflight(self, slots, inventory, run):
+    def construct_candidate(self, slot, alternative):
+        _, problem, family, direction = self.construct(slot, alternative)
+        return {
+            **identities(problem),
+            "anchor_key": family,
+            "direction": direction.value,
+        }
+
+    def preflight(self, slots, inventory, run, *, workers=1):
+        require(type(workers) is int and workers > 0, "workers must be positive")
         (jobs, reasons) = ([], Counter())
-        with (run / "audit/constructions.jsonl").open("x") as journal:
-            for slot in slots:
+        with ExitStack() as stack:
+            journal = stack.enter_context((run / "audit/constructions.jsonl").open("x"))
+            pool = None
+            pending = {}
+            if workers > 1 and slots:
+                pool = ProcessPoolExecutor(
+                    max_workers=min(workers, len(slots)),
+                    mp_context=multiprocessing.get_context("spawn"),
+                    initializer=initialize_worker,
+                    initargs=(self.config,),
+                )
+                stack.callback(pool.shutdown, wait=True, cancel_futures=True)
+                pending = {
+                    index: pool.submit(construct_worker, slot, 0)
+                    for index, slot in enumerate(slots[:workers])
+                }
+            for index, slot in enumerate(slots):
                 selected = None
                 for alternative in range(
                     self.config.policy["construction_candidates_per_slot"]
                 ):
-                    (_, problem, family, direction) = self.construct(slot, alternative)
-                    keys = identities(problem)
+                    if pool is None:
+                        candidate = self.construct_candidate(slot, alternative)
+                    elif alternative == 0:
+                        candidate = pending.pop(index).result()
+                    else:
+                        candidate = pool.submit(
+                            construct_worker, slot, alternative
+                        ).result()
+                    keys = {k: candidate[k] for k in ("query_key", "scene_key")}
+                    family = candidate["anchor_key"]
                     reason = inventory.conflict(keys, slot.split, family)
                     duplicate = (
                         reason == "duplicate-query"
@@ -511,7 +549,7 @@ class GenerationWorkflow:
                             "alternative": alternative,
                             **keys,
                             "anchor_key": family,
-                            "direction": direction.value,
+                            "direction": candidate["direction"],
                             "training_duplicate": duplicate,
                         }
                         jobs.append(selected)
@@ -520,6 +558,13 @@ class GenerationWorkflow:
                     selected is not None,
                     f"distinct supply exhausted for {slot.identity(0)}; no refill",
                 )
+                # Refill only after ordered acceptance; retries never mutate
+                # ownership ahead of an earlier slot, regardless of finish order.
+                following = index + workers
+                if pool is not None and following < len(slots):
+                    pending[following] = pool.submit(
+                        construct_worker, slots[following], 0
+                    )
                 if len(jobs) % 100 == 0:
                     print(f"Preflight {len(jobs)}/{len(slots)}", flush=True)
         atomic_json(
@@ -1170,7 +1215,7 @@ class GenerationWorkflow:
                     ),
                 },
             )
-            jobs = self.preflight(slots, inventory, run)
+            jobs = self.preflight(slots, inventory, run, workers=args.workers)
             records = []
             export_splits = self.config.policy.get("export_splits", {})
             with ExitStack() as stack:

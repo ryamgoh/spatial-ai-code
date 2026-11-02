@@ -370,6 +370,42 @@ def test_explicit_size_smaller_than_core_is_not_increased():
         )
 
 
+def test_tied_shortest_exclusion_cannot_bypass_protected_dependency():
+    from spatial.v2 import entailment_generator as generator
+    from spatial.v2.composition_pilot import renamed_problem
+    from spatial.v2.solver import And, CountQuery, SpatialProblem, direction_constraint
+
+    request = SceneRequest(2, Direction.SOUTHEAST, "count", "sole", 0)
+    objects, atoms, _ = generator._flexible_core(request, False)
+    problem = SpatialProblem(
+        tuple(objects),
+        And(tuple(atoms)),
+        CountQuery(
+            frozenset({request.direction}), "O", tuple(o for o in objects if o != "O")
+        ),
+    )
+    measurement = measure_depth(problem)
+    assert generator._preserves_dependency(problem, measurement)
+    bypass = replace(
+        problem,
+        premise=And((*atoms, direction_constraint("C0", "C4", Direction.SOUTHWEST))),
+    )
+    assert generator._preserves_depth(bypass, request)
+    assert not generator._preserves_dependency(bypass, measurement)
+    for candidate in (bypass, renamed_problem(bypass)[0]):
+        solver = QuestionSolver()
+        assert (
+            generator._augmentation_worlds(
+                candidate,
+                generator.analyze(candidate, solver=solver),
+                request,
+                False,
+                solver,
+            )
+            is None
+        )
+
+
 def test_explicit_construction_propagates_inconclusive_solver(monkeypatch):
     from types import SimpleNamespace
 

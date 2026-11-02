@@ -326,8 +326,36 @@ def _preserves_depth(problem, request):
     )
 
 
+def _preserves_dependency(problem, measurement):
+    if measurement is None:
+        return True
+    removed = measurement["removed_premise_index"]
+    reduced = replace(
+        problem,
+        premise=And(
+            tuple(a for i, a in enumerate(problem.premise.operands) if i != removed)
+        ),
+    )
+    for support in measurement["memberships"]:
+        if (
+            support["depth"] != measurement["depth"]
+            or removed not in support["premise_indices"]
+        ):
+            continue
+        try:
+            alternative = membership_support(
+                reduced, support["candidate"], support["qualifies"]
+            )
+        except UnsupportedEvidence:
+            return True
+        if alternative["depth"] > measurement["depth"]:
+            return True
+    return False
+
+
 def _augmentation_worlds(problem, semantics, request, contingent, solver):
     worlds = list(semantics.counterexamples.values())
+    measurement = None
     if contingent:
         claim = solver.assess(problem, membership_constraint("C1", problem.query))
         if claim.error:
@@ -344,7 +372,9 @@ def _augmentation_worlds(problem, semantics, request, contingent, solver):
             measurement = measure_depth(problem, solver=solver)
         except UnsupportedEvidence:
             return None
-        if measurement["depth"] != request.span:
+        if measurement["depth"] != request.span or not _preserves_dependency(
+            problem, measurement
+        ):
             return None
         removed = measurement["removed_premise_index"]
         reduced = replace(
@@ -363,7 +393,7 @@ def _augmentation_worlds(problem, semantics, request, contingent, solver):
         if not changed:
             raise VerificationError("depth dependency witness is missing")
         worlds.append(after.counterexamples[changed[0]])
-    return worlds
+    return worlds, measurement
 
 
 def _checked_scene(request, identity, family, rng, size_pair, contingent, limit):
@@ -414,9 +444,10 @@ def _checked_scene(request, identity, family, rng, size_pair, contingent, limit)
         raise VerificationError(
             "explicit-size core differs from requested semantics/depth"
         )
-    worlds = _augmentation_worlds(problem, semantics, request, contingent, solver)
-    if worlds is None:
+    preservation = _augmentation_worlds(problem, semantics, request, contingent, solver)
+    if preservation is None:
         raise UnsupportedEvidence("explicit-size core lacks required evidence")
+    worlds, dependency = preservation
     if not worlds:
         # An inconsistent core stays inconsistent under added constraints.
         worlds = [{o: (i, rng.randrange(1000)) for i, o in enumerate(objects)}]
@@ -432,7 +463,11 @@ def _checked_scene(request, identity, family, rng, size_pair, contingent, limit)
         if len(atoms) == p:
             break
         candidate = replace(problem, premise=And((*atoms, atom)))
-        if _preserves_depth(candidate, request):
+        # A necessary edge must stay on every shortest proof of at least one
+        # deepest obligation; a tied bypass can otherwise defeat admission.
+        if _preserves_depth(candidate, request) and _preserves_dependency(
+            candidate, dependency
+        ):
             atoms.append(atom)
             problem = candidate
     if len(atoms) < p:

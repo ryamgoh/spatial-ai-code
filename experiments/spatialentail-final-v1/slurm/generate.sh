@@ -3,7 +3,7 @@
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=64
+#SBATCH --cpus-per-task=128
 #SBATCH --mem=128G
 #SBATCH --time=24:00:00
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT
