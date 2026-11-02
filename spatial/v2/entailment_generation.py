@@ -1354,10 +1354,80 @@ def main(config, argv=None):
     check = commands.add_parser("verify")
     check.add_argument("--run-dir", type=Path, required=True)
     check.add_argument("--require-training-ready", action="store_true")
+    release = commands.add_parser("release")
+    release.add_argument("--run-dir", type=Path, required=True)
+    release.add_argument("--evidence", type=Path, required=True)
+    release.add_argument("--generation-revision", required=True)
+    release_check = commands.add_parser("verify-release")
+    release_check.add_argument("--run-dir", type=Path, required=True)
+    release_check.add_argument("--release", type=Path, required=True)
+    release_audit = commands.add_parser("audit-release")
+    release_audit.add_argument("--run-dir", type=Path, required=True)
+    release_audit.add_argument("--evidence", type=Path, required=True)
+    release_audit.add_argument("--generation-revision", required=True)
+    release_audit.add_argument("--workers", type=int, default=4)
     args = parser.parse_args(argv)
-    workflow = GenerationWorkflow(config)
-    if args.command == "verify":
-        result = workflow.verify(
+    if args.command == "audit-release":
+        from spatial.v2.entailment_release import verify_candidate
+        from spatial.v2.entailment_release_checks import (
+            data_profile,
+            diagnose,
+            replay_candidate,
+        )
+
+        artifacts, evidence = args.run_dir.resolve(), args.evidence.resolve()
+        require(
+            not evidence.is_relative_to(artifacts), "evidence must be outside candidate"
+        )
+        require(1 <= args.workers <= (os.cpu_count() or 1), "invalid worker count")
+        verify_candidate(
+            artifacts, config.root, config.manifest_schema, args.generation_revision
+        )
+        require(
+            not any(
+                (evidence / name).exists()
+                for name in ("diagnostics.json", "replay.json", "profile.json")
+            ),
+            "audit evidence exists; use a fresh directory",
+        )
+        evidence.mkdir(parents=True, exist_ok=True)
+        atomic_json(evidence / "diagnostics.json", diagnose(artifacts))
+        atomic_json(evidence / "profile.json", data_profile(artifacts))
+        atomic_json(evidence / "replay.json", replay_candidate(artifacts, args.workers))
+        verify_candidate(
+            artifacts, config.root, config.manifest_schema, args.generation_revision
+        )
+        print(
+            json.dumps(
+                {
+                    "status": "automated-checks-complete",
+                    "paired_review": "still-required",
+                }
+            )
+        )
+    elif args.command in ("release", "verify-release"):
+        from spatial.v2.entailment_release import seal_release, verify_release
+
+        if args.command == "release":
+            receipt = seal_release(
+                config, args.run_dir, args.evidence, args.generation_revision
+            )
+        else:
+            receipt = args.release
+            verify_release(
+                args.run_dir, receipt, root=config.root, schema=config.manifest_schema
+            )
+        print(
+            json.dumps(
+                {
+                    "status": "data-ready",
+                    "release": str(receipt),
+                    "runtime_checks": "required-inside-SFT",
+                }
+            )
+        )
+    elif args.command == "verify":
+        result = GenerationWorkflow(config).verify(
             args.run_dir.resolve(), require_training_ready=args.require_training_ready
         )
         print(
@@ -1367,4 +1437,4 @@ def main(config, argv=None):
         )
     else:
         require(1 <= args.workers <= (os.cpu_count() or 1), "invalid worker count")
-        workflow.generate(args)
+        GenerationWorkflow(config).generate(args)

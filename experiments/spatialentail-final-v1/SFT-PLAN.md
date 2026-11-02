@@ -1,10 +1,10 @@
 # SFT Plan
 
-**Status: CPU generation, four-run SFT launchers, epoch Dev callback and final
-evaluation entry points implemented; no training-ready release or validated
-server training run yet.** This document owns the scientific requirements.
+**Status: full server candidate verified, receipt-backed data release and four-run
+SFT handoff implemented; actual GPU training/evaluation remain unvalidated.**
+This document owns the scientific requirements.
 See [README.md](README.md) for generation commands, artifact layout and tested
-scope. Full server generation and remaining release/runtime checks are pending.
+scope. Candidate-specific review evidence is recorded there; GPU runtime checks remain pending.
 
 ## 1. Objective And Boundaries
 
@@ -476,6 +476,16 @@ tokenizer/template, environment lock and audit receipts by SHA-256.
 Keep evidence separate from model-facing inputs. Both arms consume one sealed
 release. The training jobs must never regenerate or repair data.
 
+The receipt-backed implementation leaves the original candidate manifest and
+`training_ready: false` unchanged. A separate `spatialentail-data-release-v1`
+receipt binds that manifest, its original full Git revision, paired-review IDs,
+independent replay, fixed train-only nuisance probes and token profiles.
+Generation-source bytes are verified from the original commit; current training
+sources and receipt hashes are frozen separately in each SFT campaign.
+Unreviewed candidates, changed evidence, unknown pending checks and diagnostic
+triggers cannot be promoted. G5 checks remain mandatory inside SFT and are not
+required to have run before a training job can start.
+
 ## 6. Matched Training Recipe
 
 Preserve the actual intended recipe, rather than replacing it with generic SFT
@@ -621,22 +631,21 @@ checkout for each run; never pull into it.
 
 ### Remaining Specifications
 
-- Full-corpus construction supply, new test identities and coverage feasibility.
-  Slot tables and the contingent rate are executable; actual generated data
-  still needs the full campaign.
-- Full-run SpatialMap-TQA-Corr source-preservation and label audit.
-- Reproducible shortcut probes: nuisance features, classifier, family-grouped
-  splits, seed, metrics and investigation trigger. Counts alone are insufficient.
+- The full server candidate, external source preservation, independent labels,
+  paired review and nuisance probes are complete for manifest `30d1eab73e3a...`.
+  See the README and its hash-bound receipts for exact scope and limitations.
+  The fixed nuisance protocol uses five family-grouped Train folds (seed 42),
+  depth-3 trees with minimum leaf size 30, and a 10-point lift investigation
+  trigger. Dev/test never train or tune these probes. It does not prove the
+  absence of all shortcuts or replace final model evaluation.
 - Primary final comparisons and paired uncertainty procedure, including cluster
   identities, confidence level, bootstrap seed and replicate count. Compare
   tuned arms with their style-matched untuned baselines and each other, keeping
   split results separate. These analysis details must be fixed before results.
 - Full server validation of the pinned environment, actual Axolotl loader,
   CUDA model checks, epoch Dev generation, checkpoint reload and Stage-2 runtime.
-- Data-release promotion that binds completed review and diagnostic receipts.
-  Current launchers intentionally reject candidates; do not manually flip flags.
-  Separate completed data-release checks from GPU checks performed inside the
-  SFT job before its first optimizer update, avoiding circular launch prerequisites.
+- Actual server execution of the receipt-backed handoff and G5 runtime checks.
+  Launchers require an explicit release receipt; candidate flags are not edited.
 
 ### SFT Implementation
 
@@ -644,8 +653,9 @@ checkout for each run; never pull into it.
 matched configurations referencing the same frozen artifacts, not regenerated
 or copied datasets. Campaign receipts bind configs, seeds, release identity,
 source files and the unchanged GPU dependency lock. Preparation can preview a
-smoke artifact; training and final evaluation require a full validated release.
-No implicit resume, latest-run discovery, or automatic release promotion exists.
+smoke artifact under its matching source checkout; training and final evaluation
+require an explicit full data-release receipt. No implicit resume, latest-run
+discovery, or unchecked automatic promotion exists.
 
 `entailment_sft_plugin.py` uses the pinned Axolotl extension interface.
 It explicitly forwards data seed, loss-only teacher-forced evaluation and
@@ -674,8 +684,10 @@ artifacts), not a sealed training release. It checks new labels/evidence,
 one-menu allocation, overlap, native tokens and export integrity. Ambiguity and
 inconsistency have verified semantics, not a claim of increasing difficulty
 across construction levels. No semantic-difficulty scaling gate is required.
-Shortcut probes, paired-example review, release promotion and server
-trainer/evaluation validation remain pending; `training_ready` remains false.
+The original manifest retains `training_ready: false` and its historical pending
+checks. Candidate-specific completion is attested by the separate release
+receipt, not by modifying the generation artifact. Server trainer/evaluation
+validation remains pending.
 
 Generation does not submit training, install the GPU environment, modify
 historical payloads, or claim that local tests certify server execution. A later
@@ -684,9 +696,9 @@ successful CPU exit status alone is not sufficient.
 
 ## 9. Exit Criteria
 
-Ready means: complete policy preserved, zero unresolved semantic/evidence/
-overlap/mask failures, reviewed paired examples, sealed train and fixed-dev
-payloads, enforced loader and launch checks, and a tested evaluation/selection
-path. Runtime validity is established only by G5 and checkpoint reload evidence.
-Until then the verdict remains **not ready to train**, regardless of whether
-unit tests pass or generation exits successfully.
+Ready to launch means: complete policy preserved, zero unresolved semantic/
+evidence/overlap/mask failures, attributed paired review, completed diagnostics,
+sealed train and fixed-dev payloads, an explicit valid data-release receipt,
+and enforced loader and launch checks. G5 runs inside the submitted SFT job.
+Successful training and runtime validity are established only by the actual G5
+and checkpoint-reload evidence; a data-ready receipt does not claim those passed.

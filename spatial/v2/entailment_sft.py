@@ -12,13 +12,13 @@ import yaml
 
 from spatial.v2.composition_evaluation import adapter_hash, parse_or_none, score
 from spatial.v2.entailment_generation import GenerationWorkflow, digest, read_jsonl
+from spatial.v2.entailment_release import COUNTS, verify_release
 from spatial.v2.entailment_thinking_training import require, training_config
 from spatial.v2.serialization import atomic_json
 
 STYLES = ("natural", "symbolic")
 SEEDS = (42, 43)
 SCHEMA = "spatialentail-sft-campaign-v1"
-COUNTS = {"train": 6000, "dev": 1200, "sft-bench": 3600, "external-test": 1500}
 AXOLOTL_REVISION = "7d775808d0ff71f21f553bd7d761631d7fb089e6"
 
 
@@ -87,11 +87,20 @@ def config_for(model, artifacts, directory, style, seed):
     return config
 
 
-def prepare(generation_config, artifacts, output):
+def prepare(generation_config, artifacts, output, *, release=None):
     artifacts, output = artifacts.resolve(), output.resolve()
     require(not output.exists() and output.parent.is_dir(), "use a fresh campaign path")
     workflow = GenerationWorkflow(generation_config)
-    manifest = workflow.verify(artifacts)
+    if release is None:
+        manifest = workflow.verify(artifacts)
+    else:
+        release = release.resolve()
+        manifest = verify_release(
+            artifacts,
+            release,
+            root=generation_config.root,
+            schema=generation_config.manifest_schema,
+        )
     # Preview configurations are useful for smoke artifacts, but cannot be launched.
     model = manifest["model"]
     sources = {
@@ -116,6 +125,8 @@ def prepare(generation_config, artifacts, output):
                 "generation_schema": generation_config.manifest_schema,
                 "generation_sources": manifest["source_sha256"],
                 "generation_manifest_sha256": digest(artifacts / "manifest.json"),
+                "release": str(release) if release is not None else None,
+                "release_sha256": digest(release) if release is not None else None,
             }
             atomic_json(directory / "run.json", metadata)
             (directory / "config.yaml").write_text(
@@ -171,21 +182,23 @@ def verify_run(directory, *, require_ready=True):
         == campaign["generation_manifest_sha256"],
         "data release changed",
     )
-    sources = {name: digest(root / name) for name in meta["generation_sources"]}
-    manifest = GenerationWorkflow.verify_saved(
-        artifacts,
-        sources,
-        meta["generation_schema"],
-        require_training_ready=require_ready,
-    )
-    require(manifest["model"] == meta["model"], "model differs from data release")
-    if require_ready:
+    if meta.get("release") is not None:
+        receipt = Path(meta["release"])
         require(
-            manifest["mode"] == "full"
-            and manifest["split_counts"] == COUNTS
-            and not manifest["pending_release_checks"],
-            "full validated release required; smoke/unfinished candidates cannot train",
+            digest(receipt) == meta["release_sha256"], "data release receipt changed"
         )
+        manifest = verify_release(
+            artifacts, receipt, root=root, schema=meta["generation_schema"]
+        )
+    else:
+        require(
+            not require_ready, "candidate is not a training release: provide --release"
+        )
+        sources = {name: digest(root / name) for name in meta["generation_sources"]}
+        manifest = GenerationWorkflow.verify_saved(
+            artifacts, sources, meta["generation_schema"]
+        )
+    require(manifest["model"] == meta["model"], "model differs from data release")
     actual = yaml.safe_load((directory / "config.yaml").read_text())
     require(
         actual
@@ -402,6 +415,7 @@ def main(generation_config):
     prep = commands.add_parser("prepare")
     prep.add_argument("--artifacts", required=True, type=Path)
     prep.add_argument("--output", required=True, type=Path)
+    prep.add_argument("--release", type=Path)
     for name in ("verify", "train", "evaluate"):
         command = commands.add_parser(name)
         command.add_argument("--run", required=True, type=Path)
@@ -415,7 +429,7 @@ def main(generation_config):
             command.add_argument("--batch-size", type=int, default=16)
     args = parser.parse_args()
     if args.command == "prepare":
-        prepare(generation_config, args.artifacts, args.output)
+        prepare(generation_config, args.artifacts, args.output, release=args.release)
         print(f"Prepared four configurations at {args.output}; no jobs submitted.")
     elif args.command == "verify":
         if args.selected:

@@ -3,24 +3,25 @@
 set -euo pipefail
 EXP=$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")
 ROOT=$(dirname "$(dirname "$EXP")")
-ARTIFACTS=$(realpath "${1:?Usage: bash submit-training.sh /absolute/artifacts}")
+ARTIFACTS=$(realpath "${1:?Usage: bash submit-training.sh /absolute/artifacts /absolute/release.json}")
+RELEASE=$(realpath "${2:?Provide the validated release.json receipt}")
 command -v sbatch >/dev/null
 command -v uv >/dev/null
 mkdir -p "$EXP/runs"
 SUBMISSION=$(mktemp -d "$EXP/runs/sft-XXXXXXXX")
 CAMPAIGN="$SUBMISSION/campaign"
 uv run --project "$ROOT" --frozen --no-sync python "$EXP/sft.py" prepare \
-    --artifacts "$ARTIFACTS" --output "$CAMPAIGN"
-for style in natural symbolic; do
-    for seed in 42 43; do
+    --artifacts "$ARTIFACTS" --release "$RELEASE" --output "$CAMPAIGN"
+for seed in 42 43; do
+    for style in natural symbolic; do
         uv run --project "$ROOT" --frozen --no-sync python "$EXP/sft.py" verify \
             --run "$CAMPAIGN/$style-seed-$seed"
     done
 done
-printf 'artifacts=%s\ncampaign=%s\n' "$ARTIFACTS" "$CAMPAIGN" > "$SUBMISSION/jobs.txt"
+printf 'artifacts=%s\nrelease=%s\ncampaign=%s\n' "$ARTIFACTS" "$RELEASE" "$CAMPAIGN" > "$SUBMISSION/jobs.txt"
 trap 'echo "Submission stopped; existing jobs were not cancelled. See '"$SUBMISSION"'/jobs.txt" >&2' ERR
-for style in natural symbolic; do
-    for seed in 42 43; do
+for seed in 42 43; do
+    for style in natural symbolic; do
         key="$style-seed-$seed"
         result=$(sbatch --parsable --chdir="$ROOT" --export=ALL \
             --output="$SUBMISSION/$key-%j.out" --error="$SUBMISSION/$key-%j.err" \

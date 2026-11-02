@@ -7,8 +7,9 @@ The current planning target is
 restart of the intended composition SFT study. Read its
 [SFT plan](experiments/spatialentail-final-v1/SFT-PLAN.md) before implementation.
 The folder now has CPU-only generation, four-run SFT launchers, in-epoch Dev
-evaluation and selected/untuned final-evaluation entry points. It does not yet
-have a training-ready release or a validated server SFT/evaluation run.
+evaluation and selected/untuned final-evaluation entry points. The full server
+candidate has been verified and the receipt-backed data-release handoff is
+implemented; actual GPU SFT/evaluation remain unvalidated.
 The agreed scope needs no manual reapproval; validation remains required.
 
 The planned training matrix is Natural/Symbolic crossed with seeds 42/43:
@@ -21,7 +22,14 @@ The Axolotl plugin checks loader/collator/model settings before optimizer update
 evaluates Dev loss and generated Stage-1 accuracy each epoch, and verifies PEFT
 checkpoint reload. Separate evaluation jobs reuse the existing two-stage vLLM
 runner; lm-eval-harness task registration remains pending. Current candidates
-cannot pass the launch gate; release promotion/review and GPU validation remain.
+cannot pass the launch gate without an explicit data-release receipt.
+`entailment_release.py` binds attributed review, fixed Train-only nuisance probes,
+complete independent replay and token profiles to the unchanged candidate
+manifest and original Git commit. Generation-source verification uses that
+commit; current training sources are frozen separately in the campaign.
+Never toggle candidate readiness flags or regenerate good data merely because
+SFT implementation files changed. The submitter now requires artifacts and
+release.json paths. G5 checks remain mandatory inside SFT, not before submission.
 
 Final-v1 admission policy `pinned-training-tokenizer-v1` uses only the pinned
 Qwen3-4B-Thinking-2507 tokenizer for admission and exports. Its native-thinking
@@ -88,9 +96,11 @@ answer; the full Count semantics/domain is unchanged. This removes the
 demonstrated large-number distractor cue without changing quotas or scene
 seeds. Historical defaults and external menus are unchanged. Review sampling
 now covers split/query/levels, contingent cases, Count values and longest
-examples, with an explicit selected-not-reviewed receipt. Actual review remains
-pending. Direction/variant seed coupling is unchanged: it is a coverage
-limitation, not a demonstrated correctness defect.
+examples, with an explicit selected-not-reviewed receipt. Manifest
+`30d1eab73e3a...` has attributed AI-assisted review of 149 paired examples and
+automated replay of all 12,300 records; do not describe this as human sign-off
+or manual reading of all 303 selected examples. Direction/variant seed coupling
+is unchanged: it is a coverage limitation, not a demonstrated correctness defect.
 
 Every applicable semantic case must span every assigned construction level
 (1-8 in-range; 9-10 extrapolation), including inconsistent and no-entailment

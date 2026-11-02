@@ -1,8 +1,8 @@
 # SpatialEntail Final v1
 
-**Status: generation, four-run SFT launchers and selected-model evaluation
-entry points implemented. Full data-release and GPU runtime validation remain
-pending. No Slurm jobs have been submitted by this implementation.**
+**Status: full server candidate verified; receipt-backed data release and four-run
+SFT handoff implemented. Actual GPU training/evaluation remain unvalidated.
+No training jobs have been submitted by this implementation.**
 
 A clean restart of the composition study: matched Natural and Symbolic SFT
 on Qwen3-4B-Thinking-2507, using the Unique-entailed answer contract.
@@ -227,12 +227,67 @@ Ambiguity and inconsistency require checked evidence and coverage across levels,
 not increasing difficulty; their `verified_depth` stays null. Semantic-cohort
 records use `semantic_complexity_status: verified-semantics-no-depth-claim`.
 Positive support length is still checked, including semantic-cohort sole Which.
-Shortcut probes, paired-example review and actual trainer/GPU checks remain explicit
-`pending_release_checks`; `training_ready` remains false.
+The original candidate retains its historical `pending_release_checks` and
+`training_ready: false`. Completed data checks are recorded separately below;
+actual trainer/GPU checks run inside SFT.
 Adding `--require-training-ready` to verification rejects these candidates.
 `afterok` on the CPU job alone is not a sufficient training gate.
 Generation-only submission still never starts SFT. The SFT entry points below
 do not promote candidates or bypass readiness checks.
+
+## Data Release
+
+The server candidate from `generation-full-OO5CGrnn` has manifest SHA-256
+`30d1eab73e3a59d55678640ac92b296947c9c3163e1b58e28215c5d67a331598`.
+Its 48 payload files and 84 generation-source files match the original commit
+`21227fe07888f249c126b7c995a54ce09963007d`. The uploaded archive was unpacked
+and checked locally without changing its manifest, payloads or readiness flags.
+
+Candidate-specific evidence is in
+[`release-evidence/30d1eab73e3a/`](release-evidence/30d1eab73e3a/):
+full 12,300-record independent replay, fixed train-only nuisance diagnostics,
+token/distribution profiles, and an attributed AI-assisted review of 149 paired
+examples (130 case samples, ten contingent-Which levels, seven longest pairs,
+the repaired Count slot and an L10 multiple-Which case). This is not human sign-off
+or a claim that all 303 selected samples were manually read.
+
+The diagnostic policy uses five family-grouped folds, seed 42, depth-3 decision
+trees and minimum leaf size 30. Lengths, names/mention counts, menus, and their
+combination are tested separately; no reference explanations or hidden labels
+enter the features. A 10-percentage-point lift over the query-specific majority
+baseline triggers investigation. None triggered: six-way accuracy was
+26.75-29.7% versus 30%; A-D/E/F class accuracy was 58.2-60.15% versus 60%.
+These probes do not establish the absence of every possible shortcut.
+
+The actual receipt and all four local SFT configuration previews passed the
+launch verifier. Targeted release/SFT/workflow/audit tests: 136 passed, one
+optional Axolotl-import test skipped. No GPU training was run.
+Train sequence maxima are 1,478 Natural / 1,637 Symbolic tokens, below 8,192.
+Mean supervised target lengths are 257.112 / 296.985 tokens respectively;
+Symbolic is longer here, so do not claim reference-token savings.
+
+Verify the portable receipt against the unchanged server artifacts:
+
+```bash
+uv --native-tls run --python 3.12 --no-project \
+  --script experiments/spatialentail-final-v1/generate.py verify-release \
+  --run-dir /absolute/artifacts \
+  --release experiments/spatialentail-final-v1/release-evidence/30d1eab73e3a/release.json
+```
+
+`release.json` binds the original manifest/commit and the evidence hashes.
+Generation sources are checked against that Git commit; current training code is
+separately frozen in each campaign. Updating the SFT handoff does not require
+regenerating good data or rewriting an old manifest. Keep the original commit
+available in Git. Candidate-only `verify` still expects its original checkout.
+
+For a future candidate, `generate.py audit-release --run-dir ... --evidence ...
+--generation-revision FULL_COMMIT --workers N` produces automated evidence in a
+fresh directory outside the candidate. Run it through the same uv script command
+with `--with scikit-learn==1.7.2` before `--script`. An attributed `review.json`
+is still required; automated checks never manufacture a manual review.
+Then `generate.py release --run-dir ... --evidence ...
+--generation-revision FULL_COMMIT` checks and seals those receipts.
 
 ## SFT And Evaluation
 
@@ -244,12 +299,15 @@ The training submitter prepares and checks all four configurations before its
 first `sbatch` call:
 
 ```bash
-bash experiments/spatialentail-final-v1/slurm/submit-training.sh /absolute/artifacts
+bash experiments/spatialentail-final-v1/slurm/submit-training.sh \
+  /absolute/artifacts \
+  experiments/spatialentail-final-v1/release-evidence/30d1eab73e3a/release.json
 ```
 
 It submits four independent one-GPU jobs, with separate configs, caches, W&B
-IDs and output directories: `natural-seed-42`, `natural-seed-43`,
-`symbolic-seed-42`, `symbolic-seed-43`. Defaults are the existing cluster's
+IDs and output directories, submitted in seed-paired order: `natural-seed-42`,
+`symbolic-seed-42`, `natural-seed-43`, `symbolic-seed-43`. Slurm determines actual
+start order; no dependencies are added between jobs. Defaults are the existing cluster's
 `gpu-long` partition and one `h100-47` GPU, eight CPUs, 64 GB RAM, 24 hours.
 These resource/time defaults have not been measured with epoch Dev generation.
 
@@ -257,13 +315,14 @@ W&B uses `sft-<campaign-path-hash>-<style>-seed-<seed>` for run names/IDs,
 with the shared `sft-<campaign-path-hash>` group set by the Python launcher.
 The hash uses the resolved campaign path, so separate submissions do not reuse
 the generic `campaign` ID. Existing prepared configurations are not rewritten;
-prepare a fresh campaign against artifacts verified with the current source.
+prepare a fresh campaign with its verified data-release receipt.
 
-**Current candidates will be rejected before any job is submitted.** Launch
-requires a full validated release, `training_ready: true`, no pending release
-checks, complete counts and matching source/payload hashes. Release promotion,
-paired-example review and remaining shortcut checks are not implemented by
-this submitter; do not manually flip the readiness flag to bypass them.
+**Candidates without a valid release receipt are rejected before submission.**
+Launch requires complete counts, matching original source/payload hashes,
+completed review/replay/probe evidence and a hash-bound release receipt. The
+candidate's own `training_ready` field stays false. GPU/loader/collator and live
+epoch checks are mandatory runtime checks, not circular pre-submission gates.
+Do not manually flip either candidate or release flags.
 
 To inspect four configurations without training, including for smoke data:
 
@@ -404,6 +463,6 @@ not a demonstrated wrong-label or harmful-shortcut bug.
 No Slurm, full CUDA training, online W&B initialization or final model evaluation
 was run locally. The pinned Axolotl collator source passed a mixed-length CPU
 probe, but the complete loader/model path still needs server validation.
-Release promotion, paired-example review and remaining shortcut/uncertainty
-work are listed in the [SFT plan](SFT-PLAN.md); no readiness claim follows from
-the test counts alone.
+The data-release evidence above completes the candidate-specific review and
+shortcut checks. Remaining GPU/runtime and uncertainty work is listed in the
+[SFT plan](SFT-PLAN.md); data readiness is not a claim of successful training.

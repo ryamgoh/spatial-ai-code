@@ -467,6 +467,13 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
     (exp / "slurm" / script).write_text((EXP / "slurm" / script).read_text())
     argument = tmp_path / "artifacts or campaign"
     argument.mkdir()
+    receipt = tmp_path / "release.json"
+    receipt.write_text("{}\n")
+    arguments = (
+        [str(argument), str(receipt)]
+        if script == "submit-training.sh"
+        else [str(argument)]
+    )
     bins = tmp_path / "bin"
     bins.mkdir()
     calls = tmp_path / "calls"
@@ -478,12 +485,21 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
         file.chmod(0o755)
     env = {**os.environ, "PATH": f"{bins}:{os.environ['PATH']}", "CALLS": str(calls)}
     subprocess.run(
-        ["bash", str(exp / "slurm" / script), str(argument)], env=env, check=True
+        ["bash", str(exp / "slurm" / script), *arguments], env=env, check=True
     )
-    assert len(calls.read_text().splitlines()) == count
+    submitted = calls.read_text().splitlines()
+    assert len(submitted) == count
+    if script == "submit-training.sh":
+        assert [line.rsplit("/", 1)[-1] for line in submitted] == [
+            "natural-seed-42",
+            "symbolic-seed-42",
+            "natural-seed-43",
+            "symbolic-seed-43",
+        ]
+        assert all("--dependency" not in line for line in submitted)
     calls.unlink()
     result = subprocess.run(
-        ["bash", str(exp / "slurm" / script), str(argument)],
+        ["bash", str(exp / "slurm" / script), *arguments],
         env={**env, "FAIL_VERIFY": "1"},
         check=False,
     )
