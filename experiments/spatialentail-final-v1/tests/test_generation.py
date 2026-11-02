@@ -920,6 +920,20 @@ def test_workers_email_on_start_end_failure_and_time_limit(script):
     assert "#SBATCH --mail-user=e0958116@u.nus.edu" in worker.splitlines()
 
 
+@pytest.mark.parametrize(
+    "script,partition,gpu,time",
+    [
+        ("evaluate.sh", "gpu", "h200-141", "03:00:00"),
+        ("train.sh", "gpu-long", "h100-47", "24:00:00"),
+    ],
+)
+def test_gpu_workers_match_cluster_partition_limits(script, partition, gpu, time):
+    lines = (EXP / "slurm" / script).read_text().splitlines()
+    assert f"#SBATCH --partition={partition}" in lines
+    assert f"#SBATCH --gres=gpu:{gpu}:1" in lines
+    assert f"#SBATCH --time={time}" in lines
+
+
 def test_launcher_is_cpu_generation_only():
     launch = (EXP / "slurm/submit-generation.sh").read_text()
     worker = (EXP / "slurm/generate.sh").read_text()

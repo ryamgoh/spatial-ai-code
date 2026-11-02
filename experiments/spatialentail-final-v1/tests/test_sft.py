@@ -171,6 +171,105 @@ def test_real_axolotl_plugin_forwards_nondefault_trainer_arguments(tmp_path):
         assert not args.logging_nan_inf_filter
 
 
+@pytest.fixture
+def model_audit_input(tmp_path, monkeypatch):
+    from transformers import TrainingArguments, TrainerState
+
+    config = sft.config_for(
+        policy.MODEL, tmp_path / "artifacts", tmp_path / "run", "natural", 42
+    )
+    args = TrainingArguments(
+        output_dir=str(tmp_path),
+        use_cpu=True,
+        report_to="none",
+        seed=42,
+        data_seed=42,
+        num_train_epochs=2,
+        per_device_train_batch_size=1,
+        per_device_eval_batch_size=1,
+        gradient_accumulation_steps=8,
+        learning_rate=5e-5,
+        max_grad_norm=0.05,
+        warmup_steps=75,
+        bf16=True,
+        gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
+        save_only_model=True,
+        logging_nan_inf_filter=False,
+        optim="paged_adamw_8bit",
+        lr_scheduler_type="cosine",
+        eval_strategy="epoch",
+        save_strategy="epoch",
+    )
+    # Exercise the real arguments API without requiring a CUDA model locally.
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "device_count", lambda: 1)
+    parameters = [
+        (
+            f"model.layers.0.{target}.lora_{matrix}.default.weight",
+            SimpleNamespace(
+                requires_grad=True, device=torch.device("cuda"), numel=lambda: 64
+            ),
+        )
+        for target in config["lora_target_modules"]
+        for matrix in ("A", "B")
+    ]
+    model = SimpleNamespace(
+        config=SimpleNamespace(
+            _commit_hash=policy.MODEL["revision"],
+            _attn_implementation="sdpa",
+            num_hidden_layers=1,
+            quantization_config=SimpleNamespace(
+                to_dict=lambda: dict(config["bnb_config_kwargs"])
+            ),
+        ),
+        is_loaded_in_4bit=True,
+        peft_config={
+            "default": SimpleNamespace(
+                r=64,
+                lora_alpha=128,
+                lora_dropout=0,
+                bias="none",
+                target_modules=config["lora_target_modules"],
+            )
+        },
+        named_parameters=lambda: iter(parameters),
+    )
+    trainer = SimpleNamespace(
+        args=args, model=model, state=TrainerState(max_steps=1500)
+    )
+    return trainer, {"seed": 42, "model": policy.MODEL}, config
+
+
+@pytest.mark.parametrize("warmup", [75, 0.05])
+def test_model_audit_accepts_pinned_trainer_arguments(model_audit_input, warmup):
+    trainer, meta, config = model_audit_input
+    trainer.args.warmup_steps = warmup
+    assert not hasattr(trainer.args, "warmup_ratio")
+    assert not hasattr(trainer.args, "group_by_length")
+    result = runtime.audit_model(trainer, meta, config)
+    assert result["trainable_tensors"] == len(config["lora_target_modules"]) * 2
+
+
+@pytest.mark.parametrize(
+    "name,value,message",
+    [
+        ("warmup_steps", 0, "warmup steps"),
+        ("warmup_steps", 74, "warmup steps"),
+        ("warmup_steps", 76, "warmup steps"),
+        ("warmup_steps", 0.1, "warmup steps"),
+        ("train_sampling_strategy", "group_by_length", "train_sampling_strategy"),
+        ("train_sampling_strategy", "sequential", "train_sampling_strategy"),
+        ("data_seed", 43, "data_seed"),
+    ],
+)
+def test_model_audit_rejects_changed_recipe(model_audit_input, name, value, message):
+    trainer, meta, config = model_audit_input
+    setattr(trainer.args, name, value)
+    with pytest.raises(ValueError, match=message):
+        runtime.audit_model(trainer, meta, config)
+
+
 def test_prepare_does_not_authorize_smoke_or_overwrite(campaign):
     for style in sft.STYLES:
         for seed in sft.SEEDS:

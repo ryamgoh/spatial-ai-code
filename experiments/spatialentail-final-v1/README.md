@@ -315,6 +315,12 @@ start order; no dependencies are added between jobs. Defaults are the existing c
 `gpu-long` partition and one `h100-47` GPU, eight CPUs, 64 GB RAM, 24 hours.
 These resource/time defaults have not been measured with epoch Dev generation.
 
+The runtime audit checks the pinned Transformers v5 effective settings:
+`get_warmup_steps(1500) == 75` and `train_sampling_strategy == "random"`.
+Axolotl converts the YAML `warmup_ratio` into `warmup_steps`; the trainer no
+longer exposes `warmup_ratio` or `group_by_length`. Regression tests use real
+Transformers arguments with mocked GPU/model details, not a full CUDA run.
+
 Training and evaluation workers use the repository working directory set by
 the submitters' `sbatch --chdir`, not their own script path: Slurm copies worker
 scripts into its spool directory. Direct `sbatch` calls must also set
@@ -364,7 +370,9 @@ bash experiments/spatialentail-final-v1/slurm/submit-evaluation.sh /absolute/cam
 This checks all selections first, then submits eight tuned evaluations
 (four adapters times two benchmarks), plus four untuned evaluations (two styles
 times two benchmarks). Untuned baselines do not need repetition by training seed.
-Defaults are one `h200-141` GPU on `gpu`, eight CPUs, 64 GB RAM and 12 hours.
+Defaults are one `h200-141` GPU on `gpu`, eight CPUs, 64 GB RAM and 3 hours,
+matching the cluster's `gpu` partition limit. Full evaluation runtime within
+that limit has not yet been measured.
 The existing raw-token Stage-1/Stage-2 replay runner is reused. Each result has
 a `.summary.json` with release identity, training seed, subgroup and separate
 construction-level/verified-depth slices. Cross-seed statistical reporting and

@@ -148,7 +148,6 @@ def audit_model(trainer, meta, config):
         "adam_beta2": 0.999,
         "adam_epsilon": 1e-8,
         "max_grad_norm": 0.05,
-        "warmup_ratio": 0.05,
         "bf16": True,
         "fp16": False,
         "gradient_checkpointing": True,
@@ -156,13 +155,19 @@ def audit_model(trainer, meta, config):
         "load_best_model_at_end": False,
         "save_only_model": True,
         "logging_nan_inf_filter": False,
-        "group_by_length": False,
+        "train_sampling_strategy": "random",
     }
     for name, expected in expected_args.items():
         require(
             getattr(args, name) == expected,
             f"effective trainer setting differs: {name}",
         )
+    # Axolotl resolves its YAML warmup ratio into Transformers v5 warmup_steps.
+    require(
+        args.get_warmup_steps(trainer.state.max_steps)
+        == math.ceil(trainer.state.max_steps * config["warmup_ratio"]),
+        "effective trainer setting differs: warmup steps",
+    )
     for name, expected in (
         ("optim", "paged_adamw_8bit"),
         ("lr_scheduler_type", "cosine"),
