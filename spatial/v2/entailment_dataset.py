@@ -308,7 +308,9 @@ def build_attempt(
     prompt_version=None,
     display_names=None,
     count_menu_values=None,
+    measure_tokens=token_measurement,
 ):
+    """Admit checked evidence using the caller's training-format token guard."""
     if prompt_version not in (None, *PLAIN_VERSIONS):
         raise ValueError("unknown spatial prompt protocol")
     plain = prompt_version in PLAIN_VERSIONS
@@ -506,7 +508,7 @@ def build_attempt(
                     )
                 rows.append(row)
                 tokens.extend(
-                    token_measurement(tokenizer, row, style)
+                    measure_tokens(tokenizer, row, style)
                     for style in row["references"]
                 )
         record.update(

@@ -6,9 +6,28 @@ The current planning target is
 [`spatialentail-final-v1`](experiments/spatialentail-final-v1/README.md), a clean
 restart of the intended composition SFT study. Read its
 [SFT plan](experiments/spatialentail-final-v1/SFT-PLAN.md) before implementation.
-The folder now has a CPU-only generation workflow and run-local candidate
-exports. It does not yet have a training-ready release or final-v1 SFT launcher.
+The folder now has CPU-only generation, four-run SFT launchers, in-epoch Dev
+evaluation and selected/untuned final-evaluation entry points. It does not yet
+have a training-ready release or a validated server SFT/evaluation run.
 The agreed scope needs no manual reapproval; validation remains required.
+
+The planned training matrix is Natural/Symbolic crossed with seeds 42/43:
+four fresh adapters on the same frozen dataset (generation seed 42). Dev is
+evaluation-only during each run; select each run's epoch independently, not a
+winning seed. Evaluate all four selected adapters on unified SFT-Bench and
+1,500-question SpatialMap-TQA-Corr with original A-D plus shared Unique E/F.
+`sft.py` prepares hash-bound configurations without copying/regenerating data.
+The Axolotl plugin checks loader/collator/model settings before optimizer updates,
+evaluates Dev loss and generated Stage-1 accuracy each epoch, and verifies PEFT
+checkpoint reload. Separate evaluation jobs reuse the existing two-stage vLLM
+runner; lm-eval-harness task registration remains pending. Current candidates
+cannot pass the launch gate; release promotion/review and GPU validation remain.
+
+Final-v1 admission policy `pinned-training-tokenizer-v1` uses only the pinned
+Qwen3-4B-Thinking-2507 tokenizer for admission and exports. Its native-thinking
+template and token budgets are checked at admission and after menu rebinding.
+The inherited Qwen3.5 tokenizer and non-thinking admission format are removed
+from this workflow; historical generation defaults and artifacts stay unchanged.
 
 The inherited scientific requirements are recorded in
 [`spatialentail-composition-v1`](experiments/spatialentail-composition-v1/README.md).
@@ -34,7 +53,10 @@ are superseded by the joint level/semantic-case policy below.
 
 SFT-Bench contains only the in-range test and extrapolation test, excluding
 train and dev. SFT-Bench and SpatialMap-TQA-Corr evaluate the selected model
-after training.
+after training. Final-v1 exports one 3,600-question `data/sft-bench/` dataset;
+reference rows retain `split: in-range-test` or `split: extrapolation-test`
+for breakdowns from one evaluation run. Construction quotas and exclusion
+checks remain separate. Train/dev/external exports are unchanged.
 
 The latest final-v1 distribution policy is
 `matched-controlled-uniform-levels-v2`: train, dev, in-range test
@@ -43,6 +65,22 @@ same query-specific E-subtype proportions. Each question has one menu;
 SFT-Bench is exactly 2,400 + 1,200 examples, not augmented menu views.
 New test inventories and exclusion fingerprints are required; never relabel
 old questions to fill quotas or use model results to select new test questions.
+
+Construction now uses `explicit-size-checked-augmentation-v1`. At level L,
+sample N objects uniformly from 2L+4 through 2L+8, then sample P-N uniformly
+from 2 through 6. This reaches the explicit premise bounds 2L+6 through 2L+14
+with 25 compatible pairs per level, not independent size ranges. Preserve the
+successful trial's size-seed namespace. Core-first augmentation uses checked
+counterexamples, contingent and proof-dependency witnesses, shortest-support
+checks, and at most 512 solver fallback proposals. Multiple-answer Which has
+exactly two entailed members; Count retains a depth-bearing membership obligation
+without requiring every positive member to have a long proof. Existing full
+semantic/evidence/token audits remain mandatory. Historical defaults are unchanged.
+Five attempts are allowed per slot. Only the final attempt may accept a training-only canonical
+query repeat if query, scene and family remain disjoint from held-out splits.
+Record repeats and canonical frequencies; 6,000 training examples no longer
+means 6,000 distinct canonical questions. Dev/test stay canonically unique.
+No solver/evidence/token failure can be bypassed by this duplicate policy.
 
 Final-v1 synthetic Count menus now use `synthetic-count-options-0-4-v1`: four
 distinct options from 0-4 for every answer case. F omits the sole entailed

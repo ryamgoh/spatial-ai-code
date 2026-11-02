@@ -6,6 +6,7 @@ import json
 import multiprocessing
 import os
 import platform
+import random
 import shutil
 import traceback
 from collections import Counter, defaultdict
@@ -16,6 +17,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 from spatial.v2.composition_balance import query_profile
+from spatial.v2.composition_feasibility import stable_int
 from spatial.v2.composition_pilot import story_key
 from spatial.v2.composition_solver_reuse import QuestionSolver
 from spatial.v2.composition_training import messages
@@ -43,7 +45,11 @@ from spatial.v2.entailment_external import (
     verify_source_export,
     verify_view,
 )
-from spatial.v2.entailment_generator import SceneRequest, build_scene
+from spatial.v2.entailment_generator import (
+    EXPLICIT_SIZE_VERSION,
+    SceneRequest,
+    build_scene,
+)
 from spatial.v2.entailment_readable_v3 import make_plan
 from spatial.v2.entailment_retention import matches
 from spatial.v2.entailment_saved import load_evidence
@@ -78,10 +84,10 @@ class GenerationConfig:
 _WORKER = None
 
 
-def initialize_worker(config, admission_path, active_path):
+def initialize_worker(config, tokenizer_path):
     global _WORKER
     _WORKER = GenerationWorkflow(config)
-    _WORKER.initialize(admission_path, active_path)
+    _WORKER.initialize(tokenizer_path)
 
 
 def generate_worker(job):
@@ -113,27 +119,60 @@ def identities(problem):
 
 class Inventory:
     def __init__(self):
-        self.queries = set()
+        self.query_splits = {}
         self.scenes = {}
         self.families = {}
 
     def conflict(self, keys, split, family=None):
-        if keys["query_key"] in self.queries:
+        if (
+            keys["query_key"] in self.query_splits
+            and self.query_splits[keys["query_key"]] != split
+        ):
             return "duplicate-query"
         if keys["scene_key"] in self.scenes and self.scenes[keys["scene_key"]] != split:
             return "cross-split-scene"
         if family in self.families and self.families[family] != split:
             return "cross-split-family"
+        if keys["query_key"] in self.query_splits:
+            return "duplicate-query"
         return None
 
-    def add(self, keys, split, family=None, *, allow_external_duplicate=False):
+    def training_duplicate_allowed(self, keys, split, family=None):
+        return (
+            split == "train"
+            and self.query_splits.get(keys["query_key"]) == "train"
+            and self.scenes.get(keys["scene_key"], "train") == "train"
+            and self.families.get(family, "train") == "train"
+        )
+
+    def add(
+        self,
+        keys,
+        split,
+        family=None,
+        *,
+        allow_external_duplicate=False,
+        allow_training_duplicate=False,
+    ):
         reason = self.conflict(keys, split, family)
         require(
             reason is None
-            or (allow_external_duplicate and reason == "duplicate-query"),
+            or (
+                allow_external_duplicate
+                and split == "external-test"
+                and reason == "duplicate-query"
+                and self.query_splits.get(keys["query_key"]) == split
+                and self.scenes.get(keys["scene_key"], split) == split
+                and self.families.get(family, split) == split
+            )
+            or (
+                allow_training_duplicate
+                and reason == "duplicate-query"
+                and self.training_duplicate_allowed(keys, split, family)
+            ),
             f"inventory conflict: {reason}",
         )
-        self.queries.add(keys["query_key"])
+        self.query_splits[keys["query_key"]] = split
         self.scenes[keys["scene_key"]] = split
         if family is not None:
             self.families[family] = split
@@ -326,7 +365,7 @@ def select_review_records(records):
 class GenerationWorkflow:
     def __init__(self, config):
         self.config = config
-        self.tokenizers = None
+        self.tokenizer = None
 
     def fingerprints(self):
         paths = [
@@ -336,47 +375,64 @@ class GenerationWorkflow:
         ]
         return {p.relative_to(self.config.root).as_posix(): digest(p) for p in paths}
 
-    def initialize(self, admission_path, active_path):
+    def initialize(self, tokenizer_path):
         from transformers import AutoTokenizer
 
-        self.tokenizers = tuple(
-            AutoTokenizer.from_pretrained(path, local_files_only=True)
-            for path in (admission_path, active_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_path, local_files_only=True
         )
 
-    def save_tokenizers(self, run):
+    def save_tokenizer(self, run):
         from huggingface_hub import snapshot_download
 
-        paths = []
-        for name, model, revision in (
-            (
-                "admission",
-                self.config.policy["historical_admission_tokenizer"]["model_id"],
-                self.config.policy["historical_admission_tokenizer"]["revision"],
+        require(
+            self.config.policy.get("admission_tokenizer_policy")
+            == "pinned-training-tokenizer-v1",
+            "unsupported admission tokenizer policy",
+        )
+        model = self.config.policy["model"]
+        target = run / "tokenizers" / "active"
+        snapshot_download(
+            model["model_id"],
+            revision=model["revision"],
+            local_dir=target,
+            allow_patterns=[
+                "tokenizer.json",
+                "tokenizer_config.json",
+                "chat_template.jinja",
+                "vocab.json",
+                "merges.txt",
+                "special_tokens_map.json",
+                "config.json",
+            ],
+        )
+        return str(target)
+
+    def sample_size(self, slot, alternative):
+        size_policy = self.config.policy.get("size_policy")
+        if size_policy is None:
+            return None
+        require(
+            self.config.policy["scene_policy_version"] == EXPLICIT_SIZE_VERSION
+            and size_policy["version"] == "linear-coupled-sizes-v1",
+            "unknown explicit size policy",
+        )
+        bounds = size_policy["levels"][str(slot.level)]
+        low, high = size_policy["premises_minus_objects"]
+        pairs = [
+            (n, n + extra)
+            for n in range(bounds["objects"][0], bounds["objects"][1] + 1)
+            for extra in range(low, high + 1)
+        ]
+        require(
+            pairs
+            and all(
+                bounds["premises"][0] <= p <= bounds["premises"][1] for _, p in pairs
             ),
-            (
-                "active",
-                self.config.policy["model"]["model_id"],
-                self.config.policy["model"]["revision"],
-            ),
-        ):
-            target = run / "tokenizers" / name
-            snapshot_download(
-                model,
-                revision=revision,
-                local_dir=target,
-                allow_patterns=[
-                    "tokenizer.json",
-                    "tokenizer_config.json",
-                    "chat_template.jinja",
-                    "vocab.json",
-                    "merges.txt",
-                    "special_tokens_map.json",
-                    "config.json",
-                ],
-            )
-            paths.append(str(target))
-        return paths
+            "size table disagrees with coupled sampling",
+        )
+        seed = stable_int(f"{size_policy['seed_namespace']}/{slot.seed(alternative)}")
+        return random.Random(seed).choice(pairs)
 
     def construct(self, slot, alternative):
         seed = slot.seed(alternative)
@@ -401,6 +457,11 @@ class GenerationWorkflow:
             family=f"{self.config.family_prefix}/{family}",
             structure_seed=seed,
             contingent=slot.contingent,
+            varied_context=self.config.policy.get("varied_context", False),
+            size_pair=self.sample_size(slot, alternative),
+            augmentation_limit=self.config.policy.get(
+                "augmentation_candidate_limit", 512
+            ),
         )
         return (story, problem, family, direction)
 
@@ -415,25 +476,43 @@ class GenerationWorkflow:
                     (_, problem, family, direction) = self.construct(slot, alternative)
                     keys = identities(problem)
                     reason = inventory.conflict(keys, slot.split, family)
-                    reasons[reason or "selected"] += 1
+                    duplicate = (
+                        reason == "duplicate-query"
+                        and alternative
+                        == self.config.policy["construction_candidates_per_slot"] - 1
+                        and self.config.policy.get("training_duplicate_policy")
+                        == "last-attempt-within-train-only-v1"
+                        and inventory.training_duplicate_allowed(
+                            keys, slot.split, family
+                        )
+                    )
+                    status = (
+                        "selected-training-duplicate"
+                        if duplicate
+                        else reason or "selected"
+                    )
+                    reasons[status] += 1
                     append_json(
                         journal,
                         {
                             "slot_id": slot.identity(0),
                             "alternative": alternative,
-                            "status": reason or "selected",
+                            "status": status,
                             **keys,
                             "anchor_key": family,
                         },
                     )
-                    if reason is None:
-                        inventory.add(keys, slot.split, family)
+                    if reason is None or duplicate:
+                        inventory.add(
+                            keys, slot.split, family, allow_training_duplicate=duplicate
+                        )
                         selected = {
                             "slot": asdict(slot),
                             "alternative": alternative,
                             **keys,
                             "anchor_key": family,
                             "direction": direction.value,
+                            "training_duplicate": duplicate,
                         }
                         jobs.append(selected)
                         break
@@ -477,10 +556,28 @@ class GenerationWorkflow:
             "stage2_reserved_tokens": reserved,
         }
 
+    def admission_tokens(self, tokenizer, row, style):
+        """Apply the same native-thinking checks used by final token exports."""
+        result = {"id": row["id"], "style": style}
+        try:
+            result.update(self.prompt_budget(tokenizer, row, style))
+            source = [
+                *messages(row, style),
+                {"role": "assistant", "content": row["references"][style]},
+            ]
+            _, _, stats = tokenize(
+                tokenizer, source, row["answer"], self.config.policy["model"]
+            )
+            result.update(stats, admitted=True)
+        except ValueError as exc:
+            result.update(admitted=False, reason=str(exc))
+        return result
+
     def generate_one(self, job):
         slot = self.config.slot_type(**job["slot"])
+        token_rejections = []
         try:
-            (admission, active) = self.tokenizers
+            active = self.tokenizer
             (story, problem, family, direction) = self.construct(
                 slot, job["alternative"]
             )
@@ -493,16 +590,25 @@ class GenerationWorkflow:
                 story,
                 problem,
                 slot.requested_depth,
-                admission,
+                active,
                 omission_percent=100 if slot.case == "F" else 0,
                 prompt_version=SHORT_VERSION,
                 count_menu_values=self.config.policy.get("synthetic_count_menu_values")
                 if slot.kind == "count"
                 else None,
+                measure_tokens=self.admission_tokens,
             )
+            token_rejections = [
+                t for t in record.get("tokens", ()) if not t["admitted"]
+            ]
+            rejection_reason = record.get("reason", record["status"])
+            if token_rejections:
+                rejection_reason += ": " + "; ".join(
+                    f"{t['style']}: {t['reason']}" for t in token_rejections
+                )
             require(
                 record["status"] == "accepted",
-                f"admission {record['stage']}: {record.get('reason', record['status'])}",
+                f"admission {record['stage']}: {rejection_reason}",
             )
             rows = [
                 r for r in record["rows"] if (r["answer"] == "F") == (slot.case == "F")
@@ -530,6 +636,15 @@ class GenerationWorkflow:
                 require(
                     evidence.semantics.entailed == {slot.count_value},
                     "Count target changed",
+                )
+            if (
+                slot.case == "multiple"
+                and "multiple_which_entailed_objects" in self.config.policy
+            ):
+                require(
+                    len(evidence.semantics.entailed)
+                    == self.config.policy["multiple_which_entailed_objects"],
+                    "Which multiplicity changed",
                 )
             if slot.contingent:
                 require(
@@ -566,6 +681,7 @@ class GenerationWorkflow:
                 **{k: job[k] for k in ("query_key", "scene_key", "anchor_key")},
                 slot=asdict(slot),
                 alternative=job["alternative"],
+                training_duplicate=job.get("training_duplicate", False),
             )
             if slot.cohort == "semantic":
                 row["depth"] = None
@@ -588,6 +704,13 @@ class GenerationWorkflow:
                     row["selected_explanation_depth_support"],
                     "selected explanation lacks required depth",
                 )
+            size_pair = self.sample_size(slot, job["alternative"])
+            if size_pair is not None:
+                require(
+                    (len(problem.objects), len(problem.premise.operands)) == size_pair,
+                    "constructed scene differs from requested size",
+                )
+                record["requested_size"] = dict(zip(("objects", "premises"), size_pair))
             record["tokens"] = []
             (tokenized, chats) = ({}, {})
             for style in ("natural", "symbolic"):
@@ -620,13 +743,14 @@ class GenerationWorkflow:
                 "slot": asdict(slot),
                 "reason": f"{type(exc).__name__}: {exc}",
                 "traceback": traceback.format_exc(),
+                **({"token_rejections": token_rejections} if token_rejections else {}),
             }
 
     def external_one(self, source):
         """Keep source A-D menus; recompute Unique labels without trusting Corr gold."""
         import z3
 
-        active = self.tokenizers[1]
+        active = self.tokenizer
         record = build_views(
             source, SelectionScope.ALL, omission_percent=0, prompt_version=SHORT_VERSION
         )
@@ -734,7 +858,31 @@ class GenerationWorkflow:
         inventory = Inventory()
         for r, slot in zip(records, slots):
             require(r["slot"] == asdict(slot), "record has wrong slot")
-            inventory.add(r, slot.split, r["anchor_key"])
+            duplicate = r.get("training_duplicate", False)
+            if duplicate:
+                require(
+                    self.config.policy.get("training_duplicate_policy")
+                    == "last-attempt-within-train-only-v1"
+                    and r["alternative"]
+                    == self.config.policy["construction_candidates_per_slot"] - 1
+                    and inventory.training_duplicate_allowed(
+                        r, slot.split, r["anchor_key"]
+                    ),
+                    "invalid training duplicate fallback",
+                )
+            size_pair = self.sample_size(slot, r["alternative"])
+            if size_pair is not None:
+                requested = dict(zip(("objects", "premises"), size_pair))
+                require(
+                    r["requested_size"] == requested
+                    and all(
+                        r["graph"][key] == value for key, value in requested.items()
+                    ),
+                    "inventory scene size differs from policy",
+                )
+            inventory.add(
+                r, slot.split, r["anchor_key"], allow_training_duplicate=duplicate
+            )
         groups = defaultdict(list)
         for r in records:
             groups[r["split"], r["query_kind"]].append(r)
@@ -788,6 +936,22 @@ class GenerationWorkflow:
             "mode": mode,
             "records": len(records),
             "split_counts": dict(Counter(r["split"] for r in records)),
+            "scene_size_counts": dict(
+                Counter(
+                    f"{r['split']}/{r['query_kind']}/{r['construction_level']}/"
+                    f"{r['case']}/{r['graph']['objects']}/{r['graph']['premises']}"
+                    for r in records
+                )
+            ),
+            "training_duplicates_accepted": sum(
+                r.get("training_duplicate", False) for r in records
+            ),
+            "canonical_query_frequencies": {
+                split: dict(
+                    Counter(r["query_key"] for r in records if r["split"] == split)
+                )
+                for split in self.config.policy["split_bases"]
+            },
             "cases": dict(
                 Counter(f"{r['split']}/{r['query_kind']}/{r['case']}" for r in records)
             ),
@@ -801,20 +965,32 @@ class GenerationWorkflow:
 
     def audit_exports(self, run, expected_counts):
         """Read published JSONL back, including gold-free inputs and mask sidecars."""
+        export_splits = self.config.policy.get("export_splits", {})
+        groups = defaultdict(dict)
         for split, count in expected_counts.items():
+            groups[export_splits.get(split, split)][split] = count
+        for split, subsets in groups.items():
+            count = sum(subsets.values())
             directory = run / "data" / split
             rows = read_jsonl(directory / "references.jsonl")
             require(
                 len(rows) == len({r["id"] for r in rows}) == count,
                 f"export count/identity mismatch: {split}",
             )
-            require(all(r["split"] == split for r in rows), "export crossed splits")
+            require(
+                Counter(r["split"] for r in rows) == subsets,
+                "export subgroup counts differ",
+            )
             evidence = read_jsonl(directory / "evidence.jsonl")
             require(len(evidence) == count, "evidence count differs")
             for row, record in zip(rows, evidence, strict=True):
                 require(
                     record["rows"] == [row], "evidence and reference exports differ"
                 )
+                if split != "external-test":
+                    require(
+                        record["split"] == row["split"], "evidence subgroup differs"
+                    )
             for style in ("natural", "symbolic"):
                 inputs = read_jsonl(directory / f"{style}-inputs.jsonl")
                 require(
@@ -840,7 +1016,7 @@ class GenerationWorkflow:
                         {"role": "assistant", "content": row["references"][style]},
                     ]
                     (expected, native, _) = tokenize(
-                        self.tokenizers[1],
+                        self.tokenizer,
                         source,
                         row["answer"],
                         self.config.policy["model"],
@@ -859,9 +1035,13 @@ class GenerationWorkflow:
                     )
         return {
             "status": "passed",
-            "split_counts": expected_counts,
+            "split_counts": {
+                split: sum(subsets.values()) for split, subsets in groups.items()
+            },
+            "generation_split_counts": expected_counts,
             "checks": [
                 "export-readback",
+                "subgroup-counts",
                 "gold-free-inputs",
                 "native-mask-replay",
                 "paired-order",
@@ -870,11 +1050,19 @@ class GenerationWorkflow:
         }
 
     def verify(self, run, *, require_training_ready=False):
+        return self.verify_saved(
+            run,
+            self.fingerprints(),
+            self.config.manifest_schema,
+            require_training_ready=require_training_ready,
+        )
+
+    @staticmethod
+    def verify_saved(run, fingerprints, schema, *, require_training_ready=False):
+        """Verify a frozen package against an explicitly supplied source inventory."""
         manifest = json.loads((run / "manifest.json").read_text())
         receipt = json.loads((run / "generation.json").read_text())
-        require(
-            manifest["schema"] == self.config.manifest_schema, "wrong manifest schema"
-        )
+        require(manifest["schema"] == schema, "wrong manifest schema")
         require(
             manifest["status"] in ("candidate-audited", "smoke-passed"),
             "generation did not finish successfully",
@@ -896,7 +1084,7 @@ class GenerationWorkflow:
             "payload inventory changed",
         )
         require(
-            manifest["source_sha256"] == self.fingerprints(),
+            manifest["source_sha256"] == fingerprints,
             "generation code/input policy changed",
         )
         if require_training_ready:
@@ -928,8 +1116,8 @@ class GenerationWorkflow:
             policy["selected_slots"] = [asdict(s) for s in slots]
             atomic_json(run / "inputs/generation-policy.json", policy)
             sources = self.source_inputs(args, run)
-            paths = self.save_tokenizers(run)
-            self.initialize(*paths)
+            tokenizer_path = self.save_tokenizer(run)
+            self.initialize(tokenizer_path)
             inventory = Inventory()
             external = []
             for source in sources:
@@ -984,10 +1172,14 @@ class GenerationWorkflow:
             )
             jobs = self.preflight(slots, inventory, run)
             records = []
+            export_splits = self.config.policy.get("export_splits", {})
             with ExitStack() as stack:
                 handles = {
                     split: open_split(stack, run, split)
-                    for split in self.config.policy["split_bases"]
+                    for split in dict.fromkeys(
+                        export_splits.get(s, s)
+                        for s in self.config.policy["split_bases"]
+                    )
                 }
                 journal = stack.enter_context(
                     (run / "audit/admissions.jsonl").open("x")
@@ -997,7 +1189,7 @@ class GenerationWorkflow:
                         max_workers=args.workers,
                         mp_context=multiprocessing.get_context("spawn"),
                         initializer=initialize_worker,
-                        initargs=(self.config, *paths),
+                        initargs=(self.config, tokenizer_path),
                     )
                 )
                 for offset in range(0, len(jobs), args.workers):
@@ -1023,7 +1215,10 @@ class GenerationWorkflow:
                             f"generation stopped, no refill: {result.get('reason')}",
                         )
                         record = result["record"]
-                        write_synthetic(handles[record["split"]], result)
+                        destination = export_splits.get(
+                            record["split"], record["split"]
+                        )
+                        write_synthetic(handles[destination], result)
                         records.append(record)
                         if len(records) % 50 == 0:
                             print(
@@ -1033,7 +1228,8 @@ class GenerationWorkflow:
             summary = self.audit_inventory(records, slots, args.mode)
             atomic_json(run / "audit/summary.json", summary)
             counts = {**summary["split_counts"], "external-test": len(external)}
-            atomic_json(run / "audit/exports.json", self.audit_exports(run, counts))
+            export_audit = self.audit_exports(run, counts)
+            atomic_json(run / "audit/exports.json", export_audit)
             samples, selection = select_review_records(records)
             with (run / "audit/review-samples.jsonl").open("x") as stream:
                 for record in samples:
@@ -1056,7 +1252,8 @@ class GenerationWorkflow:
                     "python": platform.python_version(),
                     **{name: version(name) for name in DEPENDENCIES},
                 },
-                "split_counts": counts,
+                "split_counts": export_audit["split_counts"],
+                "generation_split_counts": counts,
                 "tokenization": "native-thinking-pretokenized-v1",
                 "training_order": "file-order; same IDs in both styles",
             }

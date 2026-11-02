@@ -110,7 +110,7 @@ def evaluation_contracts(rows):
         raise ValueError("all three contracts from one semantic version are required")
 
 
-def score(rows, outputs):
+def score(rows, outputs, *, extra_slice_fields=()):
     expected = {r["id"]: r for r in rows}
     found = {r["id"]: r for r in outputs}
     if (
@@ -171,6 +171,7 @@ def score(rows, outputs):
             "gold_answer_class",
             "depth",
             "entailed_count",
+            *extra_slice_fields,
         ):
             groups = {}
             for key, row in expected.items():

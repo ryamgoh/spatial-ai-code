@@ -3,9 +3,16 @@
 import random
 from dataclasses import dataclass, replace
 from functools import lru_cache
+from itertools import combinations
 
+from spatial.v2.composition_contracts import UnsupportedEvidence, VerificationError
+from spatial.v2.composition_depth import membership_support
 from spatial.v2.composition_feasibility import stable_int
 from spatial.v2.composition_pilot import Story
+from spatial.v2.composition_solver_reuse import QuestionSolver
+from spatial.v2.difficulty import derive_axis_proof
+from spatial.v2.entailment_contracts import analyze
+from spatial.v2.entailment_dataset import measure_depth
 from spatial.v2.entailment_names import NAMES, rename_structure, story_name_map
 from spatial.v2.entailment_scene_protocol import all_scene_problem
 from spatial.v2.solver import (
@@ -14,9 +21,11 @@ from spatial.v2.solver import (
     direction_between,
     direction_constraint,
     direction_signs,
+    membership_constraint,
 )
 
 VERSION = "controlled-entailment-generator-v1"
+EXPLICIT_SIZE_VERSION = "explicit-size-checked-augmentation-v1"
 _KINDS = ("direction", "which", "count")
 _CASES = ("sole", "no-entailed", "multiple", "inconsistent")
 _DIRECTIONS = tuple(Direction)
@@ -226,23 +235,257 @@ def _contextual(request):
     return objects, atoms, target
 
 
+def _contextual_core_sizes(span, direction):
+    for kind in _KINDS:
+        for case in _CASES:
+            if case == "multiple" and kind != "which":
+                continue
+            for count in range(5) if kind == "count" else (1,):
+                for variant in (0, 1):
+                    request = SceneRequest(span, direction, kind, case, count, variant)
+                    objects, atoms, _ = _contextual(request)
+                    yield request, len(objects), len(atoms)
+
+
 @lru_cache(maxsize=80)
 def _contextual_size(span, direction):
     # Include every supported answer case in the common size budget.
-    cores = [
-        _contextual(SceneRequest(span, direction, kind, case, count, variant))
-        for kind in _KINDS
-        for case in _CASES
-        if case != "multiple" or kind == "which"
-        for count in (range(5) if kind == "count" else (1,))
-        for variant in (0, 1)
-    ]
-    objects = max(len(names) for names, _, _ in cores) + 4
-    premises = objects + max(len(atoms) - len(names) for names, atoms, _ in cores)
+    cores = list(_contextual_core_sizes(span, direction))
+    objects = max(n for _, n, _ in cores) + 4
+    premises = objects + max(a - n for _, n, a in cores)
     return objects, premises
 
 
-def build_scene(request, *, identity, family, structure_seed=None, contingent=False):
+@lru_cache(maxsize=240)
+def _context_premise_capacity(span, direction, object_target):
+    """Common feasible ceiling, including the sole-Which contingent variant."""
+    capacities = []
+    for request, objects, atoms in _contextual_core_sizes(span, direction):
+        for contingent in (
+            (False, True)
+            if request.kind == "which" and request.case == "sole"
+            else (False,)
+        ):
+            contexts = object_target - objects - 2 * contingent
+            capacities.append(atoms + 2 * contingent + contexts * (contexts + 1) // 2)
+    return min(capacities)
+
+
+def _flexible_core(request, contingent):
+    if request.case in ("no-entailed", "inconsistent"):
+        return _compact(request)
+    matches = (
+        2
+        if request.case == "multiple"
+        else request.count_value
+        if request.kind == "count"
+        else 1
+    )
+    links, support = _support(request, matches)
+    objects = ["O", *(f"C{i}" for i in range(5)), *links]
+    atoms = list(support)
+    for i in range(1, 5):
+        if request.case == "multiple" and i == 1:
+            atoms.extend(replace(a, subject="C1") for a in support if a.subject == "C0")
+        else:
+            atoms.append(
+                direction_constraint(
+                    f"C{i}",
+                    "O",
+                    request.direction if i < matches else _opposite(request.direction),
+                )
+            )
+    if contingent:
+        diagonal = _DIRECTIONS[(_DIRECTIONS.index(request.direction) // 2) * 2 + 1]
+        atoms = [
+            a for a in atoms if not (a.reference == "O" and a.subject in ("C1", "C2"))
+        ]
+        atoms.extend(
+            (
+                direction_constraint("C1", "C2", diagonal),
+                direction_constraint("O", "C2", diagonal),
+            )
+        )
+    return objects, atoms, "C0"
+
+
+def _preserves_depth(problem, request):
+    if request.case in ("no-entailed", "inconsistent"):
+        return True
+    if request.kind == "count":
+        return (
+            membership_support(problem, "C0", request.count_value > 0)["depth"]
+            == request.span
+        )
+    members = ("C0", "C1") if request.case == "multiple" else ("C0",)
+    return all(
+        (proof := derive_axis_proof(problem, node, "O", request.direction)) is not None
+        and max(len(proof.x.premise_indices), len(proof.y.premise_indices))
+        == request.span
+        for node in members
+    )
+
+
+def _augmentation_worlds(problem, semantics, request, contingent, solver):
+    worlds = list(semantics.counterexamples.values())
+    if contingent:
+        claim = solver.assess(problem, membership_constraint("C1", problem.query))
+        if claim.error:
+            raise VerificationError(f"inconclusive contingent analysis: {claim.error}")
+        if not claim.possible or claim.entailed:
+            return None
+        worlds.append(claim.witness)
+    if (
+        request.kind != "direction"
+        and request.case in ("sole", "multiple")
+        and not contingent
+    ):
+        try:
+            measurement = measure_depth(problem, solver=solver)
+        except UnsupportedEvidence:
+            return None
+        if measurement["depth"] != request.span:
+            return None
+        removed = measurement["removed_premise_index"]
+        reduced = replace(
+            problem,
+            premise=And(
+                tuple(
+                    atom
+                    for i, atom in enumerate(problem.premise.operands)
+                    if i != removed
+                )
+            ),
+        )
+        after = analyze(reduced, solver=solver)
+        # Keep a witness that this core edge remains necessary, not just long.
+        changed = sorted(semantics.entailed - after.entailed)
+        if not changed:
+            raise VerificationError("depth dependency witness is missing")
+        worlds.append(after.counterexamples[changed[0]])
+    return worlds
+
+
+def _checked_scene(request, identity, family, rng, size_pair, contingent, limit):
+    n, p = size_pair
+    objects, atoms, target = _flexible_core(request, contingent)
+    if n < len(objects):
+        raise ValueError("requested objects smaller than semantic core")
+    sx, sy = direction_signs(request.direction)
+    axis, sign = (0, sx) if sx else (1, sy)
+    context = [f"Context{i}" for i in range(n - len(objects))]
+    for node in context:
+        xy = [rng.randint(-20, 20), rng.randint(-20, 20)]
+        xy[axis] = -sign * rng.randint(1, 20)
+        atoms.append(
+            direction_constraint(node, "O", direction_between(tuple(xy), (0, 0)))
+        )
+    objects += context
+    if len(atoms) > p:
+        raise ValueError("requested premises smaller than semantic core")
+    story = Story(
+        identity,
+        family,
+        EXPLICIT_SIZE_VERSION,
+        tuple(objects),
+        And(tuple(atoms)),
+        target,
+        "O",
+        tuple(f"C{i}" for i in range(5)),
+        request.direction,
+        (),
+    )
+    problem = all_scene_problem(story.problems()[_KINDS.index(request.kind)])
+    solver = QuestionSolver()
+    semantics = analyze(problem, solver=solver)
+    if (
+        semantics.consistent != (request.case != "inconsistent")
+        or request.case == "sole"
+        and len(semantics.entailed) != 1
+        or request.case == "sole"
+        and request.kind == "count"
+        and semantics.entailed != {request.count_value}
+        or request.case == "multiple"
+        and len(semantics.entailed) != 2
+        or request.case == "no-entailed"
+        and semantics.entailed
+        or not _preserves_depth(problem, request)
+    ):
+        raise VerificationError(
+            "explicit-size core differs from requested semantics/depth"
+        )
+    worlds = _augmentation_worlds(problem, semantics, request, contingent, solver)
+    if worlds is None:
+        raise UnsupportedEvidence("explicit-size core lacks required evidence")
+    if not worlds:
+        # An inconsistent core stays inconsistent under added constraints.
+        worlds = [{o: (i, rng.randrange(1000)) for i, o in enumerate(objects)}]
+    existing = {frozenset((a.subject, a.reference)) for a in atoms}
+    additions = []
+    for a, b in combinations(objects, 2):
+        if frozenset((a, b)) not in existing:
+            directions = {direction_between(w[a], w[b]) for w in worlds}
+            if len(directions) == 1:
+                additions.append(direction_constraint(a, b, directions.pop()))
+    rng.shuffle(additions)
+    for atom in additions:
+        if len(atoms) == p:
+            break
+        candidate = replace(problem, premise=And((*atoms, atom)))
+        if _preserves_depth(candidate, request):
+            atoms.append(atom)
+            problem = candidate
+    if len(atoms) < p:
+        # Fixed witness layouts are sufficient, not necessary: allow fresh worlds.
+        used = {frozenset((a.subject, a.reference)) for a in atoms}
+        proposals = [
+            direction_constraint(a, b, d)
+            for a, b in combinations(objects, 2)
+            if frozenset((a, b)) not in used
+            for d in _DIRECTIONS
+        ]
+        rng.shuffle(proposals)
+        for atom in proposals[:limit]:
+            if len(atoms) == p:
+                break
+            key = frozenset((atom.subject, atom.reference))
+            if key in used:
+                continue
+            candidate = replace(problem, premise=And((*atoms, atom)))
+            if not _preserves_depth(candidate, request):
+                continue
+            actual = analyze(candidate, solver=solver)
+            if (actual.consistent, actual.entailed) != (
+                semantics.consistent,
+                semantics.entailed,
+            ):
+                continue
+            if (
+                _augmentation_worlds(candidate, actual, request, contingent, solver)
+                is None
+            ):
+                continue
+            atoms.append(atom)
+            used.add(key)
+            problem = candidate
+    if len(atoms) != p:
+        raise ValueError(
+            f"augmentation exhausted: requested {size_pair}, built {len(atoms)} premises"
+        )
+    return _present_scene(replace(story, premise=And(tuple(atoms))), rng, request.kind)
+
+
+def build_scene(
+    request,
+    *,
+    identity,
+    family,
+    structure_seed=None,
+    contingent=False,
+    varied_context=False,
+    size_pair=None,
+    augmentation_limit=512,
+):
     """Return an unverified (Story, all-scene SpatialProblem), without file I/O.
 
     Identity seeds presentation; neither it nor ``family`` certifies uniqueness.
@@ -263,11 +506,54 @@ def build_scene(request, *, identity, family, structure_seed=None, contingent=Fa
         contingent and (request.kind != "which" or request.case != "sole")
     ):
         raise ValueError("contingent context is supported only for sole Which")
+    if type(varied_context) is not bool or (
+        varied_context and (request.size != "contextual" or structure_seed is None)
+    ):
+        raise ValueError("varied context requires a seeded contextual scene")
+    if size_pair is not None:
+        if (
+            request.size != "contextual"
+            or structure_seed is None
+            or varied_context
+            or not isinstance(size_pair, (tuple, list))
+            or len(size_pair) != 2
+            or any(type(v) is not int for v in size_pair)
+            or not 6 <= size_pair[0] <= len(NAMES)
+            or not 1 <= size_pair[1] <= size_pair[0] * (size_pair[0] - 1) // 2
+            or type(augmentation_limit) is not int
+            or augmentation_limit < 0
+        ):
+            raise ValueError("invalid explicit-size construction request")
+        return _checked_scene(
+            request,
+            identity,
+            family,
+            random.Random(structure_seed),
+            tuple(size_pair),
+            contingent,
+            augmentation_limit,
+        )
     if request.size == "contextual":
         objects, atoms, target = _contextual(request)
         object_target, premise_target = _contextual_size(
             request.span, request.direction
         )
+        if varied_context:
+            # Separate size randomness from relation/presentation randomness.
+            # The same size law applies to every semantic case at each level.
+            size_rng = random.Random(stable_int(f"context-size-v1/{structure_seed}"))
+            extra_objects = size_rng.randint(0, min(2, len(NAMES) - object_target))
+            object_target += extra_objects
+            premise_target += extra_objects
+            spare = (
+                _context_premise_capacity(
+                    request.span, request.direction, object_target
+                )
+                - premise_target
+            )
+            if spare < 0:
+                raise ValueError("context size cannot fit every semantic case")
+            premise_target += size_rng.randint(min(2, spare), min(4, spare))
     else:
         objects, atoms, target = _compact(request)
         object_target = premise_target = 9 if request.size == "compact-extra" else 6
@@ -344,17 +630,12 @@ def build_scene(request, *, identity, family, structure_seed=None, contingent=Fa
     atoms.extend(
         direction_constraint(a, b, context_relation(a, b)) for a, b in pairs[:missing]
     )
-    atoms = [
-        direction_constraint(a.reference, a.subject, _opposite(next(iter(a.allowed))))
-        if rng.getrandbits(1)
-        else a
-        for a in atoms
-    ]
-    rng.shuffle(atoms)
     story = Story(
         identity,
         family,
-        VERSION
+        "controlled-entailment-varied-context-v1"
+        if varied_context
+        else VERSION
         if structure_seed is None and not contingent
         else "controlled-entailment-generator-v2",
         (*objects, *contexts),
@@ -365,5 +646,18 @@ def build_scene(request, *, identity, family, structure_seed=None, contingent=Fa
         request.direction,
         (),
     )
+    return _present_scene(story, rng, request.kind)
+
+
+def _present_scene(story, rng, kind):
+    atoms = [
+        direction_constraint(a.reference, a.subject, _opposite(next(iter(a.allowed))))
+        if rng.getrandbits(1)
+        else a
+        for a in story.premise.operands
+    ]
+    rng.shuffle(atoms)
+    story = replace(story, premise=And(tuple(atoms)))
+    identity = story.story_id
     story = rename_structure(story, story_name_map(story.objects, identity))
-    return story, all_scene_problem(story.problems()[_KINDS.index(request.kind)])
+    return story, all_scene_problem(story.problems()[_KINDS.index(kind)])

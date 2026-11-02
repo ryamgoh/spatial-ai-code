@@ -16,10 +16,15 @@ MODEL = {
     "stage1_max_new_tokens": 4096,
     "stage2_max_new_tokens": 16,
 }
-ADMISSION_MODEL = "Qwen/Qwen3.5-4B"
-ADMISSION_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
-ALTERNATIVES = 3
+ALTERNATIVES = 5
 SEED = 42
+SIZE_TABLE = {
+    str(level): {
+        "objects": [2 * level + 4, 2 * level + 8],
+        "premises": [2 * level + 6, 2 * level + 14],
+    }
+    for level in range(1, 11)
+}
 
 
 def require(condition, message):
@@ -214,18 +219,30 @@ def policy_manifest():
         "version": VERSION,
         "seed": SEED,
         "split_bases": SPLITS,
+        "export_splits": {
+            "in-range-test": "sft-bench",
+            "extrapolation-test": "sft-bench",
+        },
         "external_bases": 1500,
         "external_scenes": 500,
         "menus_per_base": 1,
         "menu_policy_version": "synthetic-count-options-0-4-v1",
         "synthetic_count_menu_values": list(range(5)),
+        "scene_policy_version": "explicit-size-checked-augmentation-v1",
+        "size_policy": {
+            "version": "linear-coupled-sizes-v1",
+            # Preserve the sampling stream used by the successful feasibility run.
+            "seed_namespace": "flexible-core-checked-augmentation-probe-v1/size",
+            "levels": SIZE_TABLE,
+            "premises_minus_objects": [2, 6],
+        },
+        "augmentation_candidate_limit": 512,
+        "multiple_which_entailed_objects": 2,
+        "training_duplicate_policy": "last-attempt-within-train-only-v1",
         "construction_candidates_per_slot": ALTERNATIVES,
         "which_contingent_fraction": "2/100",
         "model": MODEL,
-        "historical_admission_tokenizer": {
-            "model_id": ADMISSION_MODEL,
-            "revision": ADMISSION_REVISION,
-        },
+        "admission_tokenizer_policy": "pinned-training-tokenizer-v1",
         "level_case_tables": {
             split: {
                 kind: dict(

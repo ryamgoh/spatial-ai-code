@@ -18,7 +18,8 @@ import generation_policy as policy
 
 from spatial.v2 import entailment_generation as shared
 
-POLICY_BASELINE_SHA = "c405773afe4d97fef2df7dd00f60024b6baf1a9c0117e8353eba99efaa8620ef"
+# Historical allocation baseline with the retired admission tokenizer removed.
+POLICY_BASELINE_SHA = "8def543b64fcf3d634521ad81aa616b1f2729c821b4d09100a9ad155ea1e2f51"
 
 
 @pytest.fixture(scope="module")
@@ -30,15 +31,110 @@ def api():
 def tokens(api):
     from transformers import AutoTokenizer
 
-    pair = tuple(
-        AutoTokenizer.from_pretrained(model, revision=rev, local_files_only=True)
-        for model, rev in (
-            (policy.ADMISSION_MODEL, policy.ADMISSION_REVISION),
-            (policy.MODEL["model_id"], policy.MODEL["revision"]),
-        )
+    tokenizer = AutoTokenizer.from_pretrained(
+        policy.MODEL["model_id"],
+        revision=policy.MODEL["revision"],
+        local_files_only=True,
     )
-    api.tokenizers = pair
-    return pair
+    api.tokenizer = tokenizer
+    return tokenizer
+
+
+def test_single_pinned_tokenizer_snapshot_and_worker(tmp_path, monkeypatch):
+    from unittest.mock import Mock
+
+    download = Mock()
+    tokenizer = object()
+    load = Mock(return_value=tokenizer)
+    monkeypatch.setattr("huggingface_hub.snapshot_download", download)
+    monkeypatch.setattr("transformers.AutoTokenizer.from_pretrained", load)
+    monkeypatch.setattr(shared, "_WORKER", None)
+    config = policy.workflow_config()
+    workflow = shared.GenerationWorkflow(config)
+    path = workflow.save_tokenizer(tmp_path)
+    assert path == str(tmp_path / "tokenizers/active")
+    download.assert_called_once()
+    assert download.call_args.args == (policy.MODEL["model_id"],)
+    assert download.call_args.kwargs["revision"] == policy.MODEL["revision"]
+    assert download.call_args.kwargs["local_dir"] == Path(path)
+    assert "historical_admission_tokenizer" not in config.policy
+    workflow.initialize(path)
+    shared.initialize_worker(config, path)
+    assert workflow.tokenizer is tokenizer
+    assert shared._WORKER.tokenizer is tokenizer
+    assert load.call_count == 2
+    load.assert_called_with(path, local_files_only=True)
+
+
+def test_admission_uses_training_tokenizer(api, tokens, monkeypatch):
+    build = shared.build_attempt
+    seen = []
+
+    def capture(story, problem, depth, tokenizer, **kwargs):
+        seen.append(tokenizer)
+        assert kwargs["measure_tokens"] == api.admission_tokens
+        return build(story, problem, depth, tokenizer, **kwargs)
+
+    monkeypatch.setattr(shared, "build_attempt", capture)
+    slot = next(s for s in policy.schedule() if s.split == "train")
+    result = api.generate_one(make_job(api, slot))
+    assert result["status"] == "passed", result
+    assert seen == [tokens]
+    assert api.tokenizer is tokens
+
+
+@pytest.mark.parametrize(
+    "limits,reason",
+    [
+        ({"context_length": 1}, "Stage-2 context reserve exceeded"),
+        ({"stage1_max_new_tokens": 1}, "supervised target exceeds Stage-1 cap"),
+        ({"stage2_max_new_tokens": 8192}, "Stage-2 context reserve exceeded"),
+    ],
+)
+def test_native_admission_rejects_invalid_budgets(
+    api, tokens, limits, reason, monkeypatch, tmp_path
+):
+    import json
+    from contextlib import nullcontext
+    from types import SimpleNamespace
+
+    config = replace(api.config, policy=deepcopy(api.config.policy))
+    config.policy["model"].update(limits)
+    workflow = shared.GenerationWorkflow(config)
+    workflow.tokenizer = tokens
+    slot = next(s for s in policy.schedule() if s.split == "train")
+    job = make_job(api, slot)
+    valid = api.generate_one(job)
+    assert valid["status"] == "passed", valid
+    row = valid["record"]["rows"][0]
+    for style in ("natural", "symbolic"):
+        measurement = workflow.admission_tokens(tokens, row, style)
+        assert measurement["admitted"] is False
+        assert reason in measurement["reason"]
+    rejected = workflow.generate_one(job)
+    assert rejected["status"] == "failed"
+    assert "token-rejected" in rejected["reason"]
+    assert reason in rejected["reason"]
+    failures = rejected["token_rejections"]
+    assert {t["style"] for t in failures} == {"natural", "symbolic"}
+    assert all(t["id"] == row["id"] and reason in t["reason"] for t in failures)
+    assert all(t["admitted"] is False for t in failures)
+    # Exercise the real journal/receipt path with the already-computed rejection.
+    monkeypatch.setattr(workflow, "source_inputs", lambda *_: [])
+    monkeypatch.setattr(workflow, "save_tokenizer", lambda *_: "unused")
+    monkeypatch.setattr(workflow, "initialize", lambda *_: None)
+    monkeypatch.setattr(workflow, "preflight", lambda *_: [job])
+    pool = SimpleNamespace(map=lambda *_: iter([rejected]))
+    monkeypatch.setattr(shared, "ProcessPoolExecutor", lambda **_: nullcontext(pool))
+    run = tmp_path / "failed-run"
+    with pytest.raises(ValueError, match="token-rejected"):
+        workflow.generate(SimpleNamespace(run_dir=run, mode="full", workers=1))
+    (entry,) = shared.read_jsonl(run / "audit/admissions.jsonl")
+    assert entry["token_rejections"] == failures
+    receipt = json.loads((run / "generation.json").read_text())
+    assert receipt["status"] == "failed"
+    assert reason in receipt["reason"]
+    assert not (run / "manifest.json").exists()
 
 
 def make_job(api, slot):
@@ -57,7 +153,10 @@ def test_full_schedule_exact_and_deterministic():
     assert slots == policy.schedule()
     assert len(slots) == 10800
     assert Counter(s.split for s in slots) == policy.SPLITS
-    assert len({s.identity(a) for s in slots for a in range(3)}) == 32400
+    assert policy.ALTERNATIVES == 5
+    assert (
+        len({s.identity(a) for s in slots for a in range(policy.ALTERNATIVES)}) == 54000
+    )
     for split, total in policy.SPLITS.items():
         for kind in policy.KINDS:
             rows = [s for s in slots if (s.split, s.kind) == (split, kind)]
@@ -147,6 +246,14 @@ def test_every_planned_logic_cell_passes_real_admission(api, tokens, slot):
     assert row["construction_level"] == slot.level
     assert row["verified_depth"] == slot.requested_depth
     assert record["independent_audit"] == "passed"
+    assert api.sample_size(slot, 0) == (
+        len(problem.objects),
+        len(problem.premise.operands),
+    )
+    assert record["requested_size"] == {
+        "objects": len(problem.objects),
+        "premises": len(problem.premise.operands),
+    }
     assert record["semantic_complexity_status"] == (
         "verified-semantics-no-depth-claim"
         if slot.cohort == "semantic"
@@ -177,7 +284,7 @@ def test_every_planned_logic_cell_passes_real_admission(api, tokens, slot):
         assert row["answer"] == "E"
         if slot.case == "multiple":
             assert slot.kind == "which"
-            assert len(semantics.entailed) >= 2
+            assert len(semantics.entailed) == 2
             assert row["selected_explanation_depth"] == slot.level
         else:
             assert not semantics.entailed
@@ -257,7 +364,27 @@ def test_inventory_canonical_exclusions(api):
     )
 
 
-def test_three_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
+@pytest.mark.parametrize(
+    "left,right",
+    [
+        (
+            "final-v1-train-direction-l01-A-D-0004-a0",
+            "final-v1-in-range-test-direction-l01-F-0003-a0",
+        ),
+        (
+            "final-v1-dev-direction-l01-A-D-0000-a0",
+            "final-v1-in-range-test-which-l01-A-D-0013-a0",
+        ),
+    ],
+)
+def test_recorded_l1_collisions_have_distinct_contexts(api, left, right):
+    slots = {s.identity(0): s for s in policy.schedule()}
+    a = api.construct(slots[left], 0)[1]
+    b = api.construct(slots[right], 0)[1]
+    assert shared.identities(a)["scene_key"] != shared.identities(b)["scene_key"]
+
+
+def test_five_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
     (tmp_path / "audit").mkdir()
     slot = policy.schedule()[0]
     calls = []
@@ -278,8 +405,136 @@ def test_three_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
     monkeypatch.setattr(inventory, "conflict", conflict)
     with pytest.raises(ValueError, match="no refill"):
         api.preflight([slot], inventory, tmp_path)
-    assert len(calls) == 3
-    assert len(shared.read_jsonl(tmp_path / "audit/constructions.jsonl")) == 3
+    assert len(calls) == 5
+    assert len(shared.read_jsonl(tmp_path / "audit/constructions.jsonl")) == 5
+
+
+@pytest.mark.parametrize("success_alternative", (3, 4))
+def test_later_retry_selects_only_a_nonconflicting_candidate(
+    api, monkeypatch, tmp_path, success_alternative
+):
+    (tmp_path / "audit").mkdir()
+    slot = policy.schedule()[0]
+    calls = []
+
+    def construct(s, alternative):
+        calls.append(alternative)
+        return None, alternative, "family", shared.Direction.NORTH
+
+    monkeypatch.setattr(api, "construct", construct)
+    monkeypatch.setattr(
+        shared,
+        "identities",
+        lambda a: {
+            "query_key": "new" if a == success_alternative else "same",
+            "scene_key": "new" if a == success_alternative else "same",
+        },
+    )
+    inventory = shared.Inventory()
+    inventory.add({"query_key": "same", "scene_key": "same"}, "external-test")
+    jobs = api.preflight([slot], inventory, tmp_path)
+    assert calls == list(range(success_alternative + 1))
+    assert len(jobs) == 1
+    assert jobs[0]["alternative"] == success_alternative
+    assert jobs[0]["query_key"] == "new"
+    assert len(inventory.query_splits) == 2
+
+
+@pytest.mark.parametrize(
+    "split", ("train", "dev", "in-range-test", "extrapolation-test")
+)
+def test_duplicate_fallback_is_fifth_attempt_and_training_only(
+    api, monkeypatch, tmp_path, split
+):
+    (tmp_path / "audit").mkdir()
+    slot = next(s for s in policy.schedule() if s.split == split)
+    keys = {"query_key": "same", "scene_key": "scene"}
+    inventory = shared.Inventory()
+    inventory.add(keys, split, "family")
+    calls = []
+
+    def construct(s, alternative):
+        calls.append(alternative)
+        return None, object(), "family", shared.Direction.NORTH
+
+    monkeypatch.setattr(api, "construct", construct)
+    monkeypatch.setattr(shared, "identities", lambda p: keys)
+    if split == "train":
+        jobs = api.preflight([slot], inventory, tmp_path)
+        assert jobs[0]["training_duplicate"] is True
+        assert jobs[0]["alternative"] == 4
+        assert len(inventory.query_splits) == 1
+    else:
+        with pytest.raises(ValueError, match="no refill"):
+            api.preflight([slot], inventory, tmp_path)
+    assert calls == list(range(5))
+
+
+@pytest.mark.parametrize("overlap", ("query", "scene", "family"))
+def test_training_duplicate_cannot_hide_heldout_overlap(overlap):
+    inventory = shared.Inventory()
+    inventory.add({"query_key": "train-q", "scene_key": "train-s"}, "train", "train-f")
+    inventory.add({"query_key": "held-q", "scene_key": "held-s"}, "dev", "held-f")
+    keys = {
+        "query_key": "held-q" if overlap == "query" else "train-q",
+        "scene_key": "held-s" if overlap == "scene" else "train-s",
+    }
+    family = "held-f" if overlap == "family" else "train-f"
+    assert not inventory.training_duplicate_allowed(keys, "train", family)
+    with pytest.raises(ValueError, match="inventory conflict"):
+        inventory.add(keys, "train", family, allow_training_duplicate=True)
+    assert inventory.query_splits["held-q"] == "dev"
+
+
+def test_training_duplicate_flag_survives_admission_and_inventory_audit(api, tokens):
+    first = next(
+        s
+        for s in policy.schedule()
+        if s.split == "train" and s.kind == "direction" and s.case == "A-D"
+    )
+    original = api.generate_one(make_job(api, first))
+    assert original["status"] == "passed", original
+    second = next(
+        s
+        for s in policy.schedule()
+        if s.split == first.split
+        and s.kind == first.kind
+        and s.level == first.level
+        and s.case == first.case
+        and s != first
+        and api.sample_size(s, 4) == api.sample_size(first, 0)
+    )
+    job = make_job(api, second)
+    _, problem, family, direction = api.construct(second, 4)
+    job.update(
+        alternative=4,
+        training_duplicate=True,
+        **shared.identities(problem),
+        anchor_key=family,
+        direction=direction.value,
+    )
+    generated = api.generate_one(job)
+    assert generated["status"] == "passed", generated
+    assert generated["record"]["training_duplicate"] is True
+    # Audit must reject a claimed repeat that does not match an earlier query.
+    with pytest.raises(ValueError, match="invalid training duplicate"):
+        api.audit_inventory(
+            [original["record"], generated["record"]], [first, second], "smoke"
+        )
+    duplicate = deepcopy(original["record"])
+    duplicate.update(slot=policy.asdict(second), alternative=4, training_duplicate=True)
+    duplicate["rows"][0]["base_id"] = f"{second.identity(4)}-{second.kind}"
+    summary = api.audit_inventory(
+        [original["record"], duplicate], [first, second], "smoke"
+    )
+    assert summary["training_duplicates_accepted"] == 1
+    assert summary["canonical_query_frequencies"]["train"] == {
+        original["record"]["query_key"]: 2
+    }
+    duplicate["alternative"] = 3
+    duplicate["rows"][0]["base_id"] = f"{second.identity(3)}-{second.kind}"
+    with pytest.raises(ValueError, match="invalid training duplicate"):
+        api.audit_inventory([original["record"], duplicate], [first, second], "smoke")
 
 
 @pytest.mark.parametrize(
@@ -325,7 +580,7 @@ def test_generated_cases_audit_and_native_tokens(
         for tok in result["tokenized"].values():
             assert len(tok["input_ids"]) == len(tok["labels"])
             assert -100 in tok["labels"]
-            decoded = tokens[1].decode([v for v in tok["labels"] if v != -100])
+            decoded = tokens.decode([v for v in tok["labels"] if v != -100])
             assert "</think>" in decoded and f"Answer: {row['answer']}" in decoded
     mutated = deepcopy(record)
     mutated["rows"][0]["answer"] = "A" if row["answer"] != "A" else "B"
@@ -380,6 +635,78 @@ def test_train_and_dev_disk_exports_are_native_and_gold_free(api, tokens, tmp_pa
         shared.append_json(stream, rows[0])
     with pytest.raises(ValueError, match="gold/audit"):
         api.audit_exports(tmp_path, {"train": 1, "dev": 1})
+
+
+@pytest.mark.parametrize("corruption", ("subgroup", "identity", "gold"))
+def test_combined_benchmark_exports_preserve_subgroups(
+    api, tokens, tmp_path, corruption
+):
+    from contextlib import ExitStack
+
+    subsets = {"in-range-test": 1, "extrapolation-test": 1}
+    results = []
+    for split in subsets:
+        slot = next(s for s in api.config.smoke_slots if s.split == split)
+        result = api.generate_one(make_job(api, slot))
+        assert result["status"] == "passed", result
+        results.append(result)
+    with ExitStack() as stack:
+        handles = shared.open_split(stack, tmp_path, "sft-bench")
+        for result in results:
+            shared.write_synthetic(handles, result)
+    directory = tmp_path / "data/sft-bench"
+    rows = shared.read_jsonl(directory / "references.jsonl")
+    assert rows == [r["record"]["rows"][0] for r in results]
+    assert Counter(r["split"] for r in rows) == subsets
+    assert {p.name for p in (tmp_path / "data").iterdir()} == {"sft-bench"}
+    assert not (directory / "natural-tokenized.jsonl").exists()
+    audit = api.audit_exports(tmp_path, subsets)
+    assert audit["split_counts"] == {"sft-bench": 2}
+    assert audit["generation_split_counts"] == subsets
+    path = directory / "references.jsonl"
+    if corruption == "subgroup":
+        rows[0]["split"] = "train"
+        message = "subgroup counts"
+    elif corruption == "identity":
+        rows[0]["id"] = rows[1]["id"]
+        message = "count/identity"
+    else:
+        path = directory / "natural-inputs.jsonl"
+        rows = shared.read_jsonl(path)
+        rows[0]["answer"] = "A"
+        message = "gold/audit"
+    with path.open("w") as stream:
+        for row in rows:
+            shared.append_json(stream, row)
+    with pytest.raises(ValueError, match=message):
+        api.audit_exports(tmp_path, subsets)
+
+
+def test_benchmark_export_mapping_preserves_counts(api):
+    mapping = api.config.policy["export_splits"]
+    counts = Counter()
+    for slot in policy.schedule():
+        counts[mapping.get(slot.split, slot.split)] += 1
+    assert counts == {"train": 6000, "dev": 1200, "sft-bench": 3600}
+
+
+def test_unmapped_benchmark_exports_keep_historical_layout(api, tokens, tmp_path):
+    from contextlib import ExitStack
+
+    historical_policy = {
+        k: v for k, v in api.config.policy.items() if k != "export_splits"
+    }
+    historical = shared.GenerationWorkflow(
+        replace(api.config, policy=historical_policy)
+    )
+    counts = {"in-range-test": 1, "extrapolation-test": 1}
+    for split in counts:
+        slot = next(s for s in api.config.smoke_slots if s.split == split)
+        result = api.generate_one(make_job(api, slot))
+        assert result["status"] == "passed", result
+        with ExitStack() as stack:
+            shared.write_synthetic(shared.open_split(stack, tmp_path, split), result)
+    assert historical.audit_exports(tmp_path, counts)["split_counts"] == counts
 
 
 def minimal_manifest(api, tmp_path):
@@ -546,12 +873,113 @@ def test_policy_schedule_fingerprint_is_unchanged():
     import hashlib
     import json
 
-    # The menu policy changes, but every slot, seed and quota stays frozen.
+    # Menu policy and retry cap change, but every original slot/seed/quota stays frozen.
     manifest = policy.policy_manifest()
+    assert manifest.pop("export_splits") == {
+        "in-range-test": "sft-bench",
+        "extrapolation-test": "sft-bench",
+    }
+    assert manifest.pop("admission_tokenizer_policy") == "pinned-training-tokenizer-v1"
     assert manifest.pop("menu_policy_version") == "synthetic-count-options-0-4-v1"
     assert manifest.pop("synthetic_count_menu_values") == list(range(5))
+    assert (
+        manifest.pop("scene_policy_version") == "explicit-size-checked-augmentation-v1"
+    )
+    assert manifest.pop("size_policy")["version"] == "linear-coupled-sizes-v1"
+    assert manifest.pop("augmentation_candidate_limit") == 512
+    assert manifest.pop("multiple_which_entailed_objects") == 2
+    assert "varied_context" not in manifest
+    assert (
+        manifest.pop("training_duplicate_policy") == "last-attempt-within-train-only-v1"
+    )
+    assert manifest["construction_candidates_per_slot"] == 5
+    manifest["construction_candidates_per_slot"] = 3
     encoded = json.dumps(manifest, sort_keys=True).encode()
     assert hashlib.sha256(encoded).hexdigest() == POLICY_BASELINE_SHA
+
+
+def test_explicit_size_policy_reaches_every_declared_pair(api):
+    observed = {}
+    for slot in policy.schedule():
+        observed.setdefault(slot.level, set()).add(api.sample_size(slot, 0))
+    for level in range(1, 11):
+        expected = {
+            (n, n + extra)
+            for n in range(2 * level + 4, 2 * level + 9)
+            for extra in range(2, 7)
+        }
+        assert observed[level] == expected
+        assert policy.SIZE_TABLE[str(level)] == {
+            "objects": [2 * level + 4, 2 * level + 8],
+            "premises": [2 * level + 6, 2 * level + 14],
+        }
+
+
+@pytest.mark.parametrize(
+    "identifier,expected",
+    [
+        (
+            "final-v1-extrapolation-test-which-l10-multiple-0000-a0",
+            "38459902958452005953245546424105191186621656683718127745177535629981031273698",
+        ),
+        (
+            "final-v1-extrapolation-test-count-l10-A-D-0004-a0",
+            "61198149903076494997852316741356304880101993749407754686838206335199307858264",
+        ),
+        (
+            "final-v1-in-range-test-which-l02-multiple-0000-a0",
+            "57135732903260282151405340736792605891783273443561062487762196264301397136869",
+        ),
+        (
+            "final-v1-in-range-test-count-l02-A-D-0004-a0",
+            "85989471253802887786963008667235528917000673250537728468729645450719094964498",
+        ),
+        (
+            "final-v1-in-range-test-which-l01-A-D-0000-a0",
+            "164420418524556471117466636013384305485020696655951904774157574833079296155",
+        ),
+        (
+            "final-v1-in-range-test-count-l01-ambiguous-0000-a0",
+            "45801562641526918532257497820503407723629362262884065258065184915480463303207",
+        ),
+    ],
+)
+def test_integrated_constructor_matches_successful_trial(api, identifier, expected):
+    slot = next(s for s in policy.schedule() if s.identity(0) == identifier)
+    problem = api.construct(slot, 0)[1]
+    assert shared.identities(problem)["query_key"] == expected
+
+
+def test_explicit_construction_is_hash_seed_independent():
+    code = """
+import sys, json, hashlib
+sys.path.insert(0, sys.argv[1])
+import generation_policy as policy
+from spatial.v2.entailment_generation import GenerationWorkflow
+from spatial.v2.serialization import tagged_dataclass_to_dict
+workflow = GenerationWorkflow(policy.workflow_config())
+selected = {}
+for slot in policy.schedule():
+    if slot.case == "multiple":
+        selected.setdefault((slot.split, slot.level), slot)
+digest = hashlib.sha256()
+for slot in selected.values():
+    for alternative in (0, 1):
+        story, problem, _, _ = workflow.construct(slot, alternative)
+        digest.update(json.dumps(tagged_dataclass_to_dict(problem), sort_keys=True).encode())
+print(digest.hexdigest())
+"""
+    outputs = [
+        subprocess.check_output(
+            [sys.executable, "-c", code, str(EXP)],
+            cwd=ROOT,
+            env={**os.environ, "PYTHONHASHSEED": seed},
+            text=True,
+        ).strip()
+        for seed in ("7", "42")
+    ]
+    assert len(outputs[0]) == 64
+    assert outputs[0] == outputs[1]
 
 
 def test_count_menu_sampling_law_has_no_category_or_position_cue():
@@ -664,9 +1092,9 @@ def test_workflows_do_not_share_experiment_configuration(api, tmp_path):
         anchor_prefix="other-anchor",
     )
     other = shared.GenerationWorkflow(config)
-    assert other.tokenizers is None
-    other.tokenizers = ("other-admission", "other-active")
-    assert api.tokenizers != other.tokenizers
+    assert other.tokenizer is None
+    other.tokenizer = "other-active"
+    assert api.tokenizer != other.tokenizer
     hashes = other.fingerprints()
     assert set(hashes) == {
         "experiments/other/generate.py",

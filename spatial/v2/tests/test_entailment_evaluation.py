@@ -53,6 +53,33 @@ def test_entailment_contracts_have_distinct_versioned_scores():
     }
 
 
+def test_optional_subgroup_and_level_slices_preserve_overall_score():
+    data = rows()
+    for index, row in enumerate(data):
+        row.update(
+            split="in-range-test" if index < 2 else "extrapolation-test",
+            construction_level=1 if index < 2 else 9,
+            verified_depth=None if index == 1 else (1 if index == 0 else 9),
+        )
+    baseline = score(data, outputs())
+    result = score(
+        data,
+        outputs(),
+        extra_slice_fields=(
+            "split",
+            "construction_level",
+            "verified_depth",
+        ),
+    )
+    assert result["stage1"]["correct"] == baseline["stage1"]["correct"]
+    assert result["stage1"]["slices"]["split"] == {
+        "in-range-test": {"correct": 2, "total": 2},
+        "extrapolation-test": {"correct": 1, "total": 1},
+    }
+    assert result["stage1"]["slices"]["verified_depth"]["None"]["total"] == 1
+    assert "split" not in baseline["stage1"]["slices"]
+
+
 def test_selecting_contingent_option_is_a_false_positive():
     result = score(rows(), outputs("AB"))
     assert (

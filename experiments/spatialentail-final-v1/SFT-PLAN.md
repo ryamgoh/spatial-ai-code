@@ -1,20 +1,21 @@
 # SFT Plan
 
-**Status: generation-first CPU workflow implemented; no training-ready release
-or final-v1 SFT workflow yet.** This document owns the scientific requirements.
+**Status: CPU generation, four-run SFT launchers, epoch Dev callback and final
+evaluation entry points implemented; no training-ready release or validated
+server training run yet.** This document owns the scientific requirements.
 See [README.md](README.md) for generation commands, artifact layout and tested
 scope. Full server generation and remaining release/runtime checks are pending.
 
 ## 1. Objective And Boundaries
 
-Train two matched QLoRA adapters to answer atomic spatial entailment questions:
-Natural explanations versus Symbolic explanations. Measure answer accuracy,
+Train four matched QLoRA adapters to answer atomic spatial entailment questions:
+Natural and Symbolic explanations, each at training seeds 42 and 43. Measure answer accuracy,
 depth generalization and generated-token cost. The primary contribution remains
 the solver-verified dataset; Symbolic is not assumed to be shorter or better.
 
 Preserve the intended composition study. This reset adds an auditable release
-boundary and trainer checks, not a new hypothesis, hyperparameter search,
-multi-seed campaign, answer-only arm, RL phase or possibility-based task.
+boundary and trainer checks, with two training seeds as requested; it does not add
+a new hypothesis, hyperparameter search, answer-only arm, RL phase or possibility-based task.
 The study scope and user-confirmed changes need no separate reapproval.
 Required validation still applies; this plan does not certify that its checks
 are implemented or have passed. Scope changes or exceptions still need an
@@ -30,7 +31,8 @@ Initial source inspection used commit
 `4f3b1db7403730d8495cf6e4edc6ecd79986c041` on 2026-11-02. Shared generation,
 solver, evidence, native-thinking preparation and two-stage evaluation helpers
 are reusable, but their experiment paths and old inventory assumptions need
-parameterization. Epoch dev integration and actual loader checks remain work.
+parameterization. Epoch Dev integration and loader checks are implemented below;
+their full Axolotl/CUDA execution remains to be validated.
 Export equality receipts are not independent SMT verification.
 The candidate-generation workflow now lives in
 `spatial/v2/entailment_generation.py`, configured explicitly by final-v1's
@@ -43,10 +45,15 @@ separate cached script environment. It retains Z3 4.16.0.0; the root GPU
 dependency definitions and lock remain unchanged. Launcher fingerprints bind
 the direct pins, and manifests record installed runtime versions.
 
-Historical admission uses a Qwen3.5 tokenizer before active-model preparation.
-Retaining that gate requires explicit provenance; removing it requires a
-versioned admission change. All final tokens must be checked with the pinned
-active tokenizer regardless. Old audits do not certify new artifacts.
+Admission policy `pinned-training-tokenizer-v1` uses the pinned
+Qwen3-4B-Thinking-2507 tokenizer for admission, final context checks and training
+exports. The workflow downloads and loads one tokenizer snapshot; the inherited
+Qwen3.5 admission tokenizer and non-thinking template guard are removed.
+Admission uses the same native-thinking template, loss-mask, target-length and
+context-reservation checks as final exports. Historical shared callers retain
+their default token guard. This changes token-based admission, not
+the scene schedule or semantic checks. Old audits do not certify new artifacts;
+use a fresh generation run.
 
 ## 3. Semantic Contract
 
@@ -81,9 +88,13 @@ only. Both styles use the same evidence obligations and end with `Answer: X`.
 
 ### Training
 
-6,000 distinct canonical underlying questions, one selected menu each. Each arm
+6,000 admitted training examples, one selected menu per slot. Each arm
 receives exactly these same 6,000 questions, menus, labels, evidence and ordering.
 Only explanation style and the corresponding style instruction differ.
+Prefer distinct canonical questions, but allow the final seeded attempt to repeat
+a training-only canonical question after earlier attempts conflict. Record repeats
+and canonical query frequencies; do not claim 6,000 structurally distinct questions.
+No training repeat may overlap a held-out query, scene or family.
 
 All synthetic splits use the same controlled generation framework, with
 disjoint questions, scenes and families. Per training query, retain 1,400 depth-cohort
@@ -111,11 +122,69 @@ Which multiple-entailment E uses its cheapest two-member certificate. Ambiguity
 and inconsistency do not receive fabricated depth labels. An unseen primary-menu
 explanation cannot supply depth credit to a selected omission view.
 
-Keep the declared deterministic slot schedule and at most three constructions
-per slot: at most 18,000 constructions and exactly 6,000 successful admissions.
+Keep the declared deterministic slot schedule and at most five constructions
+per slot: at most 30,000 training constructions and exactly 6,000 successful
+training admissions (54,000 constructions for all 10,800 synthetic slots).
+The five-attempt cap replaces the original three-attempt cap; the original
+three seeds per slot remain unchanged. On the fifth attempt only, policy
+`last-attempt-within-train-only-v1` permits a duplicate query already confined
+to training, provided neither its scene nor family overlaps any held-out split.
+All other fifth-attempt conflicts fail the run. Dev and test questions remain
+canonically unique. Fallback changes neither quota nor semantic admission checks.
 Fail a release on shortage or rejected selected rows; no silent refill,
 relabeling, quota relaxation or moving failed rows into another split.
 After a fix, create a new candidate version and rerun the complete audit.
+
+Scene policy `explicit-size-checked-augmentation-v1` replaces final-v1's
+recipe-derived `varied-context-v1` sizes. Policy `linear-coupled-sizes-v1`
+declares the table below in `generation_policy.py`. Choose the number of objects
+N uniformly from the level's object range, then choose P-N uniformly from 2-6.
+This samples 25 compatible pairs per level, not independent rectangular ranges.
+Object marginals are uniform and premise marginals are triangular in the sampling
+law. All query kinds and answer cases use the same size law; realized finite
+histograms can differ.
+
+| Level | Distinct Objects | Total Premises |
+|---|---|---|
+| 1 | 6-10 | 8-16 |
+| 2 | 8-12 | 10-18 |
+| 3 | 10-14 | 12-20 |
+| 4 | 12-16 | 14-22 |
+| 5 | 14-18 | 16-24 |
+| 6 | 16-20 | 18-26 |
+| 7 | 18-22 | 20-28 |
+| 8 | 20-24 | 22-30 |
+| 9 | 22-26 | 24-32 |
+| 10 | 24-28 | 26-34 |
+
+The salted size stream retains the successful trial's namespace
+`flexible-core-checked-augmentation-probe-v1/size` deliberately, to preserve its
+tested draws. The production policy version is separate from that seed salt.
+Names are distinct within a scene and reusable across scenes.
+
+Construct the semantic core first, retaining the nonhomogeneous axis-support
+helper. Count needs one depth-bearing membership obligation; additional positive
+members may have direct proofs. Multiple-answer Which now has exactly two
+entailed members, both with the intended support depth, instead of the old
+level-dependent 2-4 members. Contingent Which reuses candidates for its
+unknown/anchor pair. Ambiguity and inconsistency use compact cores; both
+ambiguity variants remain available. Answer quotas and E-subtype quotas do not
+change.
+
+Add candidate relations only when checked full counterexamples, contingent
+possibility witnesses and applicable proof-dependency witnesses remain valid,
+and the shared shortest-support check permits the addition. If those particular
+layouts are too restrictive, evaluate up to 512 fresh candidate relations with
+the solver, preserving the semantic result, contingency and dependency-sensitive
+depth. Inconclusive solver results propagate as errors. Witness selection is
+sorted for reproducibility across worker processes. No target count is silently
+increased and no independent unchecked direction randomization is used.
+
+The existing full admission and independent audits still run after construction,
+including after menu rebinding and presentation changes. Records bind requested
+object/premise counts; inventory auditing checks them against policy and reports
+size counts by split/query/level/case. Historical constructor defaults remain
+unchanged; final-v1 must use a fresh artifact directory.
 
 ### Evaluation
 
@@ -123,6 +192,19 @@ Dev is held-out validation evaluated during SFT at each epoch, not a final
 benchmark or a source of gradient updates. **SFT-Bench** consists only of the
 in-range test and extrapolation test; train and dev are excluded. After training,
 evaluate the selected model on SFT-Bench and separately on SpatialMap-TQA-Corr.
+
+Export SFT-Bench as one 3,600-question dataset at `data/sft-bench/`, not two
+evaluation datasets. Retain each reference row's `split` metadata:
+`in-range-test` (2,400, levels 1-8) or `extrapolation-test` (1,200, levels 9-10).
+The separate construction allocations, canonical exclusions and subgroup audits
+remain unchanged. Do not add subgroup or gold metadata to model messages.
+Evaluate each question once per model/style and report overall accuracy plus
+in-range/extrapolation breakdowns from the same outputs. Overall accuracy is
+sample-weighted (2/3 in-range, 1/3 extrapolation), not an equal-weight mean of
+the two subgroup accuracies. Evaluation utilities must explicitly aggregate these
+breakdowns; retaining metadata alone does not compute them. The implemented
+entry point reuses the existing two-stage vLLM runner and shared scoring utility.
+Registration as an lm-eval-harness task remains pending.
 
 Use one selected menu per underlying question in every split. To construct F,
 generate a valid sole-answer question and omit its correct answer from A-D;
@@ -256,6 +338,12 @@ SpatialMap-TQA-Corr evaluates 1,500 corrected questions from 500 scenes under th
 companions, alter menus to manufacture F cases, rebalance labels, or require
 coverage of all answer types in SFT-Bench. Its answer distribution is determined
 by the corrected dataset, not synthetic benchmark quotas.
+
+Preserve each question's original A-D values and order, and display the shared
+E ("Cannot be determined") and F ("None of the above") options. Their meanings
+follow Section 3, not the historical possibility-based contract. Adding these
+two answer choices does not add questions: external evaluation remains 1,500
+questions per selected adapter.
 
 Pin the corrected source artifact and question/menu/label hashes. Do not assume
 that removing companions from an old external artifact recovers this dataset.
@@ -400,10 +488,15 @@ defaults:
 | Initialization | Fresh adapter on pinned BF16 base; no old adapter/resume |
 | Method | QLoRA, 4-bit loading, BF16 compute |
 | LoRA | Rank 64, alpha 128; q/k/v/o and gate/down/up projections |
-| Epochs / seeds | 2 / training and data seed 42 |
+| LoRA dropout / bias | 0.0 / none, matching pinned Axolotl defaults |
+| Quantization | NF4, double quantization, BF16 compute and quantized storage |
+| Epochs / training seeds | 2 / 42 and 43 for each explanation style |
+| Dataset generation seed | 42; one frozen dataset shared by all four runs |
+| Trainer data-order seed | Match the run's training seed; same order across styles within a seed |
 | LR / optimizer | 5e-5 / `paged_adamw_8bit` |
+| Adam betas / epsilon / weight decay | 0.9, 0.999 / 1e-8 / 0.0 |
 | Schedule / warmup | Cosine / 0.05 |
-| Microbatch / accumulation | 1 / 8 on one GPU per arm |
+| Microbatch / accumulation | 1 / 8 on one GPU per run |
 | Gradient clipping | 0.05, retained from intended config |
 | Attention / checkpointing | SDPA / non-reentrant gradient checkpointing |
 | Sequence length | 8,192; no truncation |
@@ -433,7 +526,8 @@ collator, including a mixed-length diagnostic batch for padding even though the
 training microbatch is one. Assert fixed-dev identity and no random split.
 
 Verify model revision, trainable LoRA targets, device, quantization and effective
-config equality with an explicit style/path/logging allowlist. Add finite-loss
+config equality within each seed with an explicit style/path/logging allowlist.
+Across seed pairs, only training/data-order seeds additionally differ. Add finite-loss
 and finite-gradient abort checks; `logging_nan_inf_filter: false` is not one.
 Observe the first 20 optimizer steps, gradient norms, LR, supervised tokens,
 memory and W&B connectivity inside each actual training job. No separate GPU
@@ -446,7 +540,7 @@ Any recovery must preserve release/config identity and disclose changed exposure
 ## 7. Evaluation And Interpretation
 
 Have the current-model evaluator prepared and regression-tested before training.
-Integrate fixed-dev evaluation into the SFT epoch workflow for each arm:
+Integrate fixed-dev evaluation into the SFT epoch workflow for each style/seed run:
 teacher-forced loss and generated Stage-1 accuracy, with no gradient updates
 from dev. Record both epochs' results and select highest Unique Stage-1 accuracy
 over the fixed 1,200 dev examples, earlier epoch on ties. Teacher-forced dev loss
@@ -454,7 +548,8 @@ is diagnostic only. Do not defer ordinary dev validation to a separate
 post-training campaign; reusing saved-checkpoint evaluation helpers still
 requires integration into this epoch workflow.
 
-After training and checkpoint selection, evaluate each selected adapter and two
+Select an epoch independently for all four runs; do not select a winning seed.
+After training and checkpoint selection, evaluate all four selected adapters and two
 style-matched untuned baselines on SFT-Bench (in-range and extrapolation) and
 SpatialMap-TQA-Corr. Same model revision, prompts, limits and decoding policy:
 greedy (`temperature=0`), seed 42, provisional 4,096 Stage-1 new tokens and
@@ -462,6 +557,10 @@ greedy (`temperature=0`), seed 42, provisional 4,096 Stage-1 new tokens and
 Validate length/format behavior on synthetic dev before final evaluation and
 freeze the result. A budget change applies to both arms, all epochs and baselines;
 rerun affected comparisons, never selectively grant one system more tokens.
+
+Dev generation uses the live 4-bit QLoRA model; final evaluation loads the
+original BF16 base plus the adapter. Document and validate this inference
+transition on Dev rather than assuming checkpoint rankings are identical.
 
 Stage 2 must retain exact Stage-1 generated token context. Test normal,
 unfinished-thinking, malformed and length-exhausted responses; record any
@@ -477,7 +576,9 @@ uncertainty, keeping related scene/family questions together. There is one menu
 per question, so per-example and per-question accuracy are identical within
 each split. Report verified proof-depth slices separately from semantic-case
 construction-level slices; do not put null-depth E cases into L9-L10 proof-depth
-averages. A single training seed does not estimate training-seed variance.
+averages. Report each seed's results, the two-seed mean for each style and
+Natural-versus-Symbolic differences paired by training seed. Two seeds give only
+a limited view of training variability, not a precise variance estimate.
 Fixed test labels and external data never
 control checkpoint selection or data repair.
 
@@ -503,7 +604,7 @@ intervals over evaluation samples do not estimate training-seed uncertainty.
    tampered payloads, mixed arms, stale caches and wrong model revisions.
 6. Implement loader/collator and numerical checks, in-training epoch dev loss
    and generated accuracy, checkpoint reload and final evaluation (G5).
-7. After release validation passes, submit both training jobs against the sealed release.
+7. After release validation passes, submit all four training jobs against the sealed release.
    Evaluate dev at each epoch during SFT. Use the recorded dev results to select
    the checkpoint, then run SFT-Bench and SpatialMap-TQA-Corr after training.
 
@@ -512,7 +613,7 @@ Future layout: `releases/<release-id>/` for immutable data and receipts;
 Large generated data and weights belong on the training server's artifact
 storage, with small manifests and review reports retained here.
 
-Generation and training are separate commands/jobs. A future submitter must
+Generation and training are separate commands/jobs. The SFT submitter must
 require the explicit release path and verify passing audit receipts and hashes;
 no "latest candidate" discovery or training from an unvalidated generation job.
 No additional manual sign-off is needed for the agreed experiment. Use a fixed
@@ -530,8 +631,41 @@ checkout for each run; never pull into it.
   identities, confidence level, bootstrap seed and replicate count. Compare
   tuned arms with their style-matched untuned baselines and each other, keeping
   split results separate. These analysis details must be fixed before results.
-- Effective trainer defaults, pinned environment, enforced data-release checks,
-  in-training dev evaluation, checkpoint reload and Stage-2 runtime validation.
+- Full server validation of the pinned environment, actual Axolotl loader,
+  CUDA model checks, epoch Dev generation, checkpoint reload and Stage-2 runtime.
+- Data-release promotion that binds completed review and diagnostic receipts.
+  Current launchers intentionally reject candidates; do not manually flip flags.
+  Separate completed data-release checks from GPU checks performed inside the
+  SFT job before its first optimizer update, avoiding circular launch prerequisites.
+
+### SFT Implementation
+
+`sft.py` delegates to `spatial/v2/entailment_sft.py`. Preparation emits four
+matched configurations referencing the same frozen artifacts, not regenerated
+or copied datasets. Campaign receipts bind configs, seeds, release identity,
+source files and the unchanged GPU dependency lock. Preparation can preview a
+smoke artifact; training and final evaluation require a full validated release.
+No implicit resume, latest-run discovery, or automatic release promotion exists.
+
+`entailment_sft_plugin.py` uses the pinned Axolotl extension interface.
+It explicitly forwards data seed, loss-only teacher-forced evaluation and
+disabled NaN-log filtering. `entailment_sft_runtime.py` checks loaded tokens,
+sidecar order, collator padding, effective arguments and model configuration.
+Finite-loss and gradient checks run before optimizer updates. The opening steps
+and per-epoch example/supervised-token accounting are recorded.
+
+After each epoch save, the callback generates Stage-1 responses for all 1,200
+Dev questions using the live model and no reference reasoning. It restores
+training/padding/cache and RNG state afterward, records predictions and accuracy,
+and retains the epoch's adapter hash. After epoch 2 it exercises PEFT loading
+for both saved adapters before writing the selected-epoch receipt.
+
+Final evaluation verifies selection/prediction/checkpoint provenance, then
+reuses `entailment_evaluation.run` for raw Stage-1 token replay into Stage 2.
+It reports one combined SFT-Bench result and subgroup/depth breakdowns from the
+same outputs. Slurm submission is separate: four SFT jobs, then eight
+selected-adapter benchmark jobs plus four style-matched untuned benchmark jobs.
+Cross-seed aggregation and the paired uncertainty procedure remain analysis work.
 
 ### Generation Status
 
@@ -540,8 +674,8 @@ artifacts), not a sealed training release. It checks new labels/evidence,
 one-menu allocation, overlap, native tokens and export integrity. Ambiguity and
 inconsistency have verified semantics, not a claim of increasing difficulty
 across construction levels. No semantic-difficulty scaling gate is required.
-Shortcut probes, paired-example review and trainer/evaluation integration
-remain pending; `training_ready` remains false.
+Shortcut probes, paired-example review, release promotion and server
+trainer/evaluation validation remain pending; `training_ready` remains false.
 
 Generation does not submit training, install the GPU environment, modify
 historical payloads, or claim that local tests certify server execution. A later
