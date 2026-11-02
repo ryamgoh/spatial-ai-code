@@ -913,6 +913,13 @@ def test_failed_manifest_and_extra_payload_rejected(api, tmp_path):
         api.verify(tmp_path)
 
 
+@pytest.mark.parametrize("script", ["generate.sh", "train.sh", "evaluate.sh"])
+def test_workers_email_on_start_end_failure_and_time_limit(script):
+    worker = (EXP / "slurm" / script).read_text()
+    assert "#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT" in worker.splitlines()
+    assert "#SBATCH --mail-user=e0958116@u.nus.edu" in worker.splitlines()
+
+
 def test_launcher_is_cpu_generation_only():
     launch = (EXP / "slurm/submit-generation.sh").read_text()
     worker = (EXP / "slurm/generate.sh").read_text()

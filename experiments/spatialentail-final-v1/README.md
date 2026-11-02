@@ -107,7 +107,11 @@ Smoke output is explicitly marked and is never a full dataset.
 
 Each submission prints its job ID and artifact path. Monitor it with
 `squeue -j JOB_ID` and the `generation-JOB_ID.out` / `.err` files in the printed
-run directory. Slurm email delivery itself has not been verified.
+run directory. Generation, training, and evaluation workers request email to
+`e0958116@u.nus.edu` for `BEGIN,END,FAIL,TIME_LIMIT`: job start, termination,
+failure, and reaching the time limit. Slurm calls the start event `BEGIN`,
+not `START`. These directives apply to new submissions; queued jobs retain
+their submitted script copies. Slurm email delivery itself has not been verified.
 `FINAL_GENERATION_WORKERS` can override the worker count within the CPU allocation.
 Preflight construction and synthetic admission use separate, sequential worker
 pools, not 256 concurrent workers. Preflight keeps at most one pending candidate
@@ -310,6 +314,13 @@ IDs and output directories, submitted in seed-paired order: `natural-seed-42`,
 start order; no dependencies are added between jobs. Defaults are the existing cluster's
 `gpu-long` partition and one `h100-47` GPU, eight CPUs, 64 GB RAM, 24 hours.
 These resource/time defaults have not been measured with epoch Dev generation.
+
+Training and evaluation workers use the repository working directory set by
+the submitters' `sbatch --chdir`, not their own script path: Slurm copies worker
+scripts into its spool directory. Direct `sbatch` calls must also set
+`--chdir=/absolute/repository`. After an early worker-path failure, retain the
+data and release receipt and resubmit once the old jobs have failed or been
+cancelled. Updating a checkout does not update already-submitted script copies.
 
 W&B uses `sft-<campaign-path-hash>-<style>-seed-<seed>` for run names/IDs,
 with the shared `sft-<campaign-path-hash>` group set by the Python launcher.

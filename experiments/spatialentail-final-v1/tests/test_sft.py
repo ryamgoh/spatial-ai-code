@@ -457,6 +457,99 @@ def test_epoch_callback_saves_selects_and_reloads_real_adapters(
         sft.selected_checkpoint(directory)
 
 
+@pytest.mark.parametrize("spooled", (False, True))
+@pytest.mark.parametrize(
+    "script,mode",
+    [("train.sh", None), ("evaluate.sh", "selected"), ("evaluate.sh", "untuned")],
+)
+def test_workers_resolve_repository_after_slurm_copies_script(
+    tmp_path, script, mode, spooled
+):
+    root = tmp_path / "repo with spaces"
+    exp = root / "experiments/spatialentail-final-v1"
+    (exp / "slurm").mkdir(parents=True)
+    (root / "slurm/lib").mkdir(parents=True)
+    (root / "slurm/lib/pin-srun-cpus.sh").write_text(
+        (ROOT / "slurm/lib/pin-srun-cpus.sh").read_text()
+    )
+    common = root / "experiments/15-v2-ablation/jobs/common.bash"
+    common.parent.mkdir(parents=True)
+    common.write_text("load_wandb_credentials() { export CREDENTIALS_LOADED=1; }\n")
+    (exp / "sft.py").write_text("")
+    worker = (
+        tmp_path / "var/lib/slurm/slurmd/job1064849/slurm_script"
+        if spooled
+        else exp / "slurm" / script
+    )
+    worker.parent.mkdir(parents=True, exist_ok=True)
+    worker.write_text((EXP / "slurm" / script).read_text())
+    bins = tmp_path / "bin"
+    bins.mkdir()
+    for name, body in (
+        ("srun", '#!/bin/bash\nexec "$@"\n'),
+        ("nvidia-smi", "#!/bin/bash\nexit 0\n"),
+        (
+            "uv",
+            (
+                '#!/bin/bash\nprintf "%s\\n" "$@" > "$CAPTURE"\n'
+                'printf "%s\\n" "$PYTHONPATH" "$SRUN_CPUS_PER_TASK" '
+                '"${CREDENTIALS_LOADED:-unset}" > "$ENV_CAPTURE"\n'
+            ),
+        ),
+    ):
+        path = bins / name
+        path.write_text(body)
+        path.chmod(0o755)
+    run = tmp_path / "campaign elsewhere/natural-seed-42"
+    run.mkdir(parents=True)
+    capture, environment = tmp_path / "args", tmp_path / "environment"
+    arguments = [str(run)] if mode is None else [str(run), "sft-bench", mode]
+    result = subprocess.run(
+        ["bash", str(worker), *arguments],
+        cwd=root,
+        env={
+            **os.environ,
+            "PATH": f"{bins}:{os.environ['PATH']}",
+            "PYTHONPATH": "existing-path",
+            "CAPTURE": str(capture),
+            "ENV_CAPTURE": str(environment),
+            "SLURM_JOB_ID": "1064849",
+            "SLURM_SUBMIT_DIR": str(tmp_path),
+            "SLURM_TRES_PER_TASK": "cpu=8",
+            "SLURM_CPUS_PER_TASK": "64",
+            "SLURM_SRUN_CPUS_PINNED": "",
+            "CREDENTIALS_LOADED": "",
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    resolved = root.resolve()
+    expected = [
+        "run",
+        "--project",
+        str(resolved),
+        "--frozen",
+        "--no-sync",
+        "python",
+        str(resolved / "experiments/spatialentail-final-v1/sft.py"),
+        "train" if mode is None else "evaluate",
+        "--run",
+        str(run),
+    ]
+    if mode is not None:
+        expected += ["--benchmark", "sft-bench"]
+    if mode == "untuned":
+        expected += ["--untuned"]
+    assert capture.read_text().splitlines() == expected
+    assert environment.read_text().splitlines() == [
+        f"{resolved}:existing-path",
+        "8",
+        "1" if mode is None else "unset",
+    ]
+
+
 @pytest.mark.parametrize(
     "script,count", [("submit-training.sh", 4), ("submit-evaluation.sh", 12)]
 )
@@ -489,6 +582,7 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
     )
     submitted = calls.read_text().splitlines()
     assert len(submitted) == count
+    assert all(f"--chdir={root}" in line for line in submitted)
     if script == "submit-training.sh":
         assert [line.rsplit("/", 1)[-1] for line in submitted] == [
             "natural-seed-42",

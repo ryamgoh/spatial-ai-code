@@ -7,13 +7,14 @@
 #SBATCH --mem=64G
 #SBATCH --time=24:00:00
 #SBATCH --gres=gpu:h100-47:1
-#SBATCH --mail-type=END,FAIL,TIME_LIMIT
+#SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
 #SBATCH --mail-user=e0958116@u.nus.edu
 
 set -euo pipefail
 : "${SLURM_JOB_ID:?Run inside a Slurm allocation}"
 RUN=${1:?Pass the explicit style/seed run directory}
-ROOT=$(dirname "$(dirname "$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")")")
+# The submitter sets --chdir; Slurm relocates this script into its spool directory.
+ROOT=$(pwd -P)
 source "$ROOT/slurm/lib/pin-srun-cpus.sh"
 source "$ROOT/experiments/15-v2-ablation/jobs/common.bash"
 load_wandb_credentials
