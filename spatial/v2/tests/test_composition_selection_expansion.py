@@ -1,3 +1,6 @@
+import hashlib
+import json
+import random
 from collections import Counter
 
 import pytest
@@ -5,7 +8,13 @@ import pytest
 from spatial.v2.composition_balance import query_profile
 from spatial.v2.composition_contracts import analyze
 from spatial.v2.composition_depth import measure_depth
-from spatial.v2.composition_selection_expansion import PATTERNS, deduplicate, schedule
+from spatial.v2.composition_selection_expansion import (
+    PATTERNS,
+    deduplicate,
+    make_story,
+    schedule,
+)
+from spatial.v2.serialization import tagged_dataclass_to_dict
 
 
 def test_fixed_bounded_schedule():
@@ -18,6 +27,21 @@ def test_fixed_bounded_schedule():
     }
     assert len({s.source_family for s, _ in entries}) == 6
     assert all(not s.distractors for s, _ in entries)
+
+
+def test_historical_schedule_fingerprint_is_unchanged():
+    data = [
+        (s.story_id, s.source_family, d, tagged_dataclass_to_dict(s.problems()[1]))
+        for s, d in schedule()
+    ]
+    assert hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest() == (
+        "7568a21d0b5631d0aab639c932cfc0d2f2e2675dde9eab8b984a35829a8cdcf4"
+    )
+
+
+def test_bad_direction_rejected():
+    with pytest.raises(ValueError, match="must be a Direction"):
+        make_story("match-chain", 3, 0, random.Random(1), direction="Northeast")
 
 
 @pytest.mark.parametrize("index", range(60))

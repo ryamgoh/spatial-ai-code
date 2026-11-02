@@ -3,6 +3,7 @@ import unittest
 from experiments.tasks.utils import process_results_v2_answer
 from spatial.v2.evaluation_chat import encode_chat_input
 from spatial.v2.study.analyze_randomized import (
+    HELDOUT_TRANSITIONS,
     aggregate,
     answer_set,
     error_type,
@@ -13,6 +14,16 @@ from spatial.v2.study.analyze_randomized import (
 
 
 class ResearchDiagnosticsTests(unittest.TestCase):
+    def test_frozen_seed42_transitions_survive_generator_retirement(self):
+        self.assertEqual(HELDOUT_TRANSITIONS, {
+            "disjunctive-syllogism->iff-elimination",
+            "double-negation->iff-elimination",
+            "iff-elimination->double-negation",
+            "iff-elimination->iff-elimination",
+            "iff-elimination->modus-ponens",
+            "modus-ponens->axis-transitivity",
+        })
+
     def test_answer_sets_require_canonical_order_and_no_duplicates(self):
         self.assertEqual(answer_set("reason\nAnswer: A, C"), frozenset("AC"))
         self.assertFalse(answer_set("Answer: C, A"))

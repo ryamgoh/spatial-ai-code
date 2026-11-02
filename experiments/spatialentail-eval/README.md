@@ -1,5 +1,10 @@
 # SpatialEntail-SINGLE frozen benchmark evaluation
 
+Historical workflow: preparation and the submission driver have been retired.
+The commands below require a historical checkout (source available at `a85c6c7`).
+Results, summaries, and shared inference backends remain available. Current
+evaluation uses [Composition v1](../spatialentail-composition-v1/slurm/README.md).
+
 The current provisional measurements and open analysis items are tracked in
 [`RESULTS.md`](RESULTS.md).
 

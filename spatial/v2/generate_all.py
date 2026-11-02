@@ -1,7 +1,7 @@
 """Generate atomic-only V2 workloads, retaining the existing V2 answer interface.
 
-This CLI does not implement the composition study's pending release gates.
-Historical Boolean workloads use spatial.v2.legacy.generate_all.
+This generic CLI is not the composition study's dataset launcher.
+Historical Boolean workloads require their original source checkout.
 """
 
 from __future__ import annotations

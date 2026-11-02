@@ -37,16 +37,17 @@ contracts or Corr SINGLE.
 
 ## Historical Workflows
 
-The [legacy namespace](legacy/README.md) contains the retired Boolean
-curriculum, mixed-rule compositions, randomized proofs, possibility skeletons,
-and benchmark/matrix runners. Historical `study/` workflows and tests import
-that namespace. The old benchmark YAML files retain their paths.
+The legacy Boolean/random-proof generators and benchmark/matrix runners have
+been removed with their exclusive launchers and tests. Frozen historical YAML
+files retain their paths for provenance; they are not runnable current workloads.
+`study/` now retains only historical result-analysis and token-audit utilities.
+Its dataset/job orchestration and the HITL package have been retired; original
+source remains available in Git at `a85c6c7`. Saved results and receipts remain intact.
 
 ```sh
 python -m spatial.v2.generate_all --help
-python -m spatial.v2.legacy.check_registry spatial/v2/benchmark-cells.yaml --probe
 python -m pytest spatial/v2 -q
 ```
 
-Do not import `spatial.v1` or `spatial.v2.legacy` into the active generation path.
-Historical reproduction uses those packages explicitly.
+Do not import `spatial.v1` into the active generation path.
+Historical reproduction requires its original source checkout, not this package.

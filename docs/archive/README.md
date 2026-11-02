@@ -7,10 +7,16 @@ audit receipts, or drafts. "Archived" means supporting material, not necessarily
 obsolete. Original claims, dates, and limitations remain in each document;
 relative links were rebased when files moved.
 
+Historical `study/` orchestration, HITL, and legacy curriculum implementation have since been
+retired. Commands and source links in archived guides describe their original
+revisions, not runnable current workflows; pre-retirement source is available
+in Git at `a85c6c7`. Retained result-analysis tools may require the original
+source snapshot to satisfy frozen environment hashes.
+
 ## Superseded plans and presentations
 
 These documents are explicitly retired by the
-[composition pivot](../../experiments/spatialentail-composition-v1/pivot_20261026.md),
+[Unique-only specification](../../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md),
 not alternative plans for new work:
 
 - [Research canvas](research/research-plan.md),

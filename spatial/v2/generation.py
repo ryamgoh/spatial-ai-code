@@ -6,9 +6,9 @@ an explicit answer contract, and round-trips the rendered prompt before a row
 may be emitted.  Coordinates are retained only as audit witnesses.  Every row
 records the actual proposal route: world-first, premise-first, or proof-template-first.
 Premise-first labels come only from solving the proposed visible constraints.
-This retains the existing V2 menu/rendering contract; it is not yet the
-composition pivot's six-option release pipeline. Historical curricula live
-under spatial.v2.legacy.
+This retains the generic V2 menu/rendering contract; the composition study uses
+entailment_generator instead. Historical curricula require their original
+source checkout.
 """
 
 from __future__ import annotations

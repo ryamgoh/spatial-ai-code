@@ -1,4 +1,4 @@
-"""Paired diagnostic labels and layouts must preserve the solved problem."""
+"""Historical transfer results retain paired effects and archive integrity."""
 
 import io
 import json
@@ -12,60 +12,25 @@ import yaml
 
 from experiments.tasks.utils import process_results_v2_answer
 from spatial.v2.study.analyze_randomized import archive_digest
-from spatial.v2.study.prepare_transfer_diagnostic import generate, preparation_source_hashes
 from spatial.v2.study.summarize_randomized import digest
 from spatial.v2.study.summarize_transfer_diagnostic import paired_effects, summarize
-from spatial.v2.text import SpatialTextAdapter
 
 
 class TransferDiagnosticTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.rows, cls.audits, cls.rejected = generate(1, 890026, set())
-
-    def test_balanced_complete_pairing(self):
-        self.assertEqual(len(self.rows), 24)
-        self.assertEqual(len(self.audits), 6)
-        self.assertEqual(len({a["structure_signature"] for a in self.audits}), 6)
-        self.assertEqual({a["solver"] for a in self.audits}, {"z3"})
-        self.assertEqual(self.rejected, 0)
-
-    def test_only_policy_and_layout_change(self):
-        parser = SpatialTextAdapter()
-        for audit in self.audits:
-            views = [r for r in self.rows if r["base_id"] == audit["base_id"]]
-            parsed = [parser.parse(r["text"]) for r in views]
-            self.assertTrue(all(p.problem == parsed[0].problem for p in parsed))
-            self.assertTrue(all(p.options == audit["options"] for p in parsed))
-            self.assertTrue(
-                all(p.options["E"] == "Cannot be determined" for p in parsed)
-            )
-            for mode in ("single", "all-possible"):
-                a, b = [r for r in views if r["answer_mode"] == mode]
-                self.assertEqual(a["oracle_option"], b["oracle_option"])
-                self.assertEqual(a["text"].split(), b["text"].split())
-                gold = set(a["oracle_option"].split(","))
-                if mode == "single" and audit["status"] == "ambiguous":
-                    self.assertEqual(gold, {"E"})
-                else:
-                    self.assertNotIn("E", gold)
-                    self.assertEqual(len(gold), len(audit["possible_values"]))
-            self.assertTrue(
-                all("possible_values" not in r["evaluation_prompt"] for r in views)
-            )
-
-    def test_exclusion_and_determinism(self):
-        forbidden = {self.audits[0]["structure_signature"]}
-        rows, audits, rejected = generate(1, 890026, forbidden)
-        self.assertGreaterEqual(rejected, 1)
-        self.assertFalse(forbidden & {a["structure_signature"] for a in audits})
-        repeated, _, _ = generate(1, 890026, forbidden)
-        self.assertEqual(rows, repeated)
-
     def test_paired_effect_direction(self):
         rows = [
-            {**r, "strict_acc": int(r["answer_mode"] == "all-possible")}
-            for r in self.rows
+            {
+                "base_id": f"{kind}-{status}",
+                "query_kind": kind,
+                "status": status,
+                "answer_mode": mode,
+                "layout": layout,
+                "strict_acc": int(mode == "all-possible"),
+            }
+            for kind in ("direction", "which", "count")
+            for status in ("unique", "ambiguous")
+            for mode in ("single", "all-possible")
+            for layout in ("paragraph", "lines")
         ]
         effects = paired_effects(rows)
         self.assertTrue(
@@ -143,6 +108,26 @@ class TransferDiagnosticTests(unittest.TestCase):
             members[prefix + "COMPLETED"] = b""
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "fixture.tar.gz"
+            historical_root = Path(folder) / "source"
+            required = set(receipt["environment_sha256"]) | {
+                job["config"] for job in receipt["jobs"]
+            }
+            # Reconstruct only named inputs; never bypass frozen hash checks or
+            # extract an archive over the working tree.
+            with tarfile.open(snapshot) as archive:
+                for name in required:
+                    relative = Path(name)
+                    self.assertFalse(relative.is_absolute() or ".." in relative.parts)
+                    target = historical_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    if (root / relative).is_file():
+                        content = (root / relative).read_bytes()
+                    else:
+                        source = archive.extractfile(name)
+                        self.assertIsNotNone(source)
+                        with source:
+                            content = source.read()
+                    target.write_bytes(content)
 
             def write_archive():
                 with tarfile.open(path, "w:gz") as archive:
@@ -152,7 +137,7 @@ class TransferDiagnosticTests(unittest.TestCase):
                         archive.addfile(info, io.BytesIO(content))
 
             write_archive()
-            report = summarize(path, prepared, root)
+            report = summarize(path, prepared, historical_root)
             self.assertEqual(len(report["models"]), 7)
             self.assertTrue(
                 all(
@@ -165,14 +150,7 @@ class TransferDiagnosticTests(unittest.TestCase):
             members[response_key] += members[response_key].splitlines(keepends=True)[0]
             write_archive()
             with self.assertRaisesRegex(ValueError, "Duplicate"):
-                summarize(path, prepared, root)
-
-    def test_new_preparation_hashes_include_legacy_dependencies(self):
-        root = Path(__file__).resolve().parents[3]
-        hashes = preparation_source_hashes(root)
-        for name in ("generation", "possibility", "benchmark_registry"):
-            path = f"spatial/v2/legacy/{name}.py"
-            self.assertEqual(hashes[path], digest(root / path))
+                summarize(path, prepared, historical_root)
 
 
 if __name__ == "__main__":

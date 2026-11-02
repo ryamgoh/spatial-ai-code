@@ -11,11 +11,9 @@ from spatial.v2.composition_contracts import (
     VerificationError,
     encode,
     parse_answer,
-    render_prompt,
 )
 from spatial.v2.composition_evidence import build_evidence
 from spatial.v2.composition_evidence import render_pair as legacy_pair
-from spatial.v2.composition_rerender import rerender_record
 from spatial.v2.grading import AnswerMode
 from spatial.v2.serialization import tagged_dataclass_to_dict
 from spatial.v2.solver import (
@@ -23,7 +21,6 @@ from spatial.v2.solver import (
     Direction,
     DirectionQuery,
     SpatialProblem,
-    SpatialSolverV2,
     direction_constraint,
 )
 from spatial.v2.tests.test_pivot_evidence import BY_ID, VIEWS
@@ -118,45 +115,3 @@ def test_corrupted_full_audit_evidence_is_rejected_not_hidden_by_compaction():
         render_pair(
             changed, ("North", "East", "South", "West"), AnswerMode.ALL_POSSIBLE
         )
-
-
-def test_replay_preserves_source_rows_and_enforces_whole_pair_token_admission(
-    monkeypatch,
-):
-    problem = chain(Direction.NORTH, 2)
-    evidence = build_evidence(problem)
-    menu = ("North", "East", "South", "West")
-    mode = AnswerMode.ALL_POSSIBLE
-    row = {
-        "id": "test",
-        "prompt": render_prompt(problem, menu, mode),
-        "menu": list(menu),
-        "contract": mode.value,
-        "semantic_case": "unique",
-        "answer": "A",
-        "references": legacy_pair(evidence, menu, mode),
-    }
-    original = {
-        "status": "accepted",
-        "problem": tagged_dataclass_to_dict(problem),
-        "data": {"rows": [row], "evidence": tagged_dataclass_to_dict(evidence)},
-    }
-    snapshot = deepcopy(original)
-    monkeypatch.setattr(
-        "spatial.v2.composition_rerender.token_measurement",
-        lambda tokenizer, row, style: {"admitted": style == "symbolic"},
-    )
-    result = rerender_record(original, None, SpatialSolverV2(backend="z3"))
-    assert original == snapshot
-    assert result["status"] == "token-rejected"
-    for key in ("prompt", "menu", "contract", "answer", "semantic_case"):
-        assert result["data"]["rows"][0][key] == row[key]
-    assert result["data"]["rows"][0]["references"] != row["references"]
-    original["data"]["rows"][0]["answer"] = "B"
-    with pytest.raises(ValueError, match="gold"):
-        rerender_record(original, None, SpatialSolverV2(backend="z3"))
-
-
-def test_replay_retains_unsupported_attempts():
-    original = {"status": "unsupported", "reason": "example"}
-    assert rerender_record(original, None, None) == original

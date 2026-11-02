@@ -13,9 +13,8 @@ from spatial.v2.answer_certificates import (
     DirectionEntailmentCertificate,
 )
 from spatial.v2.count_certificates import CountAnswerSetCertificate
-from spatial.v2.legacy.generate_all import WorkloadSpec, app, generate_workload
-from spatial.v2.legacy.generation import (
-    BooleanShape,
+from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
+from spatial.v2.generation import (
     GenerationMode,
     GenerationPolicy,
     GenerationProvenance,
@@ -297,119 +296,12 @@ def test_answer_only_and_corrupted_trace_controls_preserve_the_gold_answer() -> 
     )
 
 
-@pytest.mark.parametrize(
-    ("shape", "rule", "minimum_uses"),
-    [
-        (BooleanShape.MODUS_PONENS, ProofRule.MODUS_PONENS, 1),
-        (BooleanShape.IFF, ProofRule.IFF_ELIMINATION, 1),
-        (BooleanShape.DOUBLE_NEGATION, ProofRule.DOUBLE_NEGATION, 1),
-        (
-            BooleanShape.DISJUNCTIVE_SYLLOGISM,
-            ProofRule.DISJUNCTIVE_SYLLOGISM,
-            1,
-        ),
-        (BooleanShape.CASE_SPLIT, ProofRule.CASE_SPLIT, 1),
-        (BooleanShape.NESTED_CASE_SPLIT, ProofRule.CASE_SPLIT, 2),
-    ],
-)
-@pytest.mark.parametrize("target_direction", list(Direction))
-def test_generator_constructs_proof_first_boolean_curriculum(
-    shape: BooleanShape,
-    rule: ProofRule,
-    minimum_uses: int,
-    target_direction: Direction,
-) -> None:
-    sample = SpatialGeneratorV2(seed=1720).generate(
-        GenerationPolicy(
-            query_kind=QueryKind.DIRECTION,
-            semantic_shape=SemanticShape.UNIQUE,
-            boolean_shape=shape,
-            target_direction=target_direction,
-            num_entities=6,
-            num_premises=7,
-        ),
-        max_attempts=1,
-    )
-
-    possible = next(item for item in sample.certificate.candidates if item.possible)
-    assert isinstance(possible.evidence, DirectionEntailmentCertificate)
-    assert possible.direction is target_direction
-    assert (
-        sum(step.rule is rule for step in possible.evidence.proof.steps) >= minimum_uses
-    )
-    assert SpatialTextAdapter().parse(sample.prompt).problem == sample.problem
-    assert sample.policy.boolean_shape is shape
-    assert len(set(sample.problem.premise.operands)) == len(
-        sample.problem.premise.operands
-    )
 
 
-def test_boolean_curriculum_rejects_ambiguous_semantics() -> None:
-    with pytest.raises(ValueError, match="require unique"):
-        GenerationPolicy(
-            query_kind=QueryKind.WHICH,
-            semantic_shape=SemanticShape.AMBIGUOUS,
-            boolean_shape=BooleanShape.MODUS_PONENS,
-        )
 
 
-def test_boolean_curriculum_does_not_construct_premises_from_coordinates(
-    monkeypatch,
-) -> None:
-    generator = SpatialGeneratorV2(seed=1720)
-
-    def reject_world_first_generation(_objects):
-        raise AssertionError("Boolean curriculum requested a privileged world")
-
-    monkeypatch.setattr(generator, "_coordinates", reject_world_first_generation)
-
-    sample = generator.generate(
-        GenerationPolicy(
-            query_kind=QueryKind.DIRECTION,
-            semantic_shape=SemanticShape.UNIQUE,
-            boolean_shape=BooleanShape.NESTED_CASE_SPLIT,
-            num_entities=6,
-            num_premises=7,
-        ),
-        max_attempts=1,
-    )
-
-    assert sample.analysis.possible_directions
 
 
-@pytest.mark.parametrize("query_kind", (QueryKind.WHICH, QueryKind.COUNT))
-@pytest.mark.parametrize(
-    "shape",
-    tuple(shape for shape in BooleanShape if shape is not BooleanShape.ATOMIC),
-)
-def test_boolean_curriculum_supports_membership_query_families(
-    query_kind: QueryKind,
-    shape: BooleanShape,
-) -> None:
-    sample = SpatialGeneratorV2(seed=1722).generate(
-        GenerationPolicy(
-            query_kind=query_kind,
-            semantic_shape=SemanticShape.UNIQUE,
-            boolean_shape=shape,
-            query_direction=Direction.EAST,
-            trace_format=TraceFormat.SYMBOLIC,
-            num_entities=6,
-            num_premises=7,
-        ),
-        max_attempts=1,
-    )
-
-    if query_kind is QueryKind.WHICH:
-        assert sample.analysis.possible_entities == (
-            sample.problem.query.candidates[0],
-        )
-        assert sample.analysis.entailed_entities == (
-            sample.problem.query.candidates[0],
-        )
-        assert '"schema":"spatial-which-trace-v1"' in sample.trace
-    else:
-        assert sample.analysis.possible_counts == (1,)
-        assert '"schema":"spatial-count-trace-v2"' in sample.trace
 
 
 def test_generator_targets_multiple_certain_selection() -> None:
@@ -438,45 +330,8 @@ def test_multiple_certain_shape_is_selection_only() -> None:
         )
 
 
-def test_generator_targets_joint_count_dependency() -> None:
-    sample = SpatialGeneratorV2(seed=1724).generate(
-        GenerationPolicy(
-            query_kind=QueryKind.COUNT,
-            semantic_shape=SemanticShape.UNIQUE,
-            boolean_shape=BooleanShape.CASE_SPLIT,
-            generation_mode=GenerationMode.PROOF_TEMPLATE_FIRST,
-            query_direction=Direction.EAST,
-            trace_format=TraceFormat.SYMBOLIC,
-            num_entities=6,
-            num_premises=7,
-            require_joint_count_dependency=True,
-        ),
-        max_attempts=100,
-    )
-
-    assert sample.analysis.possible_counts == (1,)
-    assert sample.difficulty["joint_count_dependency"] is True
-    assert len(sample.certificate.fixed_memberships) < len(
-        sample.problem.query.candidates
-    )
-    assert (
-        parse_symbolic_training_trace(
-            sample.problem,
-            sample.trace,
-            sample.menu_answer,
-        ).reasoning
-        is not None
-    )
 
 
-def test_joint_count_dependency_is_count_only() -> None:
-    with pytest.raises(
-        ValueError, match="joint count dependency applies only to Count"
-    ):
-        GenerationPolicy(
-            query_kind=QueryKind.WHICH,
-            require_joint_count_dependency=True,
-        )
 
 
 def test_generator_supports_removable_selection_distractors() -> None:
@@ -499,9 +354,6 @@ def test_generator_supports_removable_selection_distractors() -> None:
     assert sample.analysis.possible_entities == sample.analysis.entailed_entities
 
 
-def test_workload_rejects_boolean_cross_product_with_incompatible_cells() -> None:
-    with pytest.raises(ValueError, match="require unique"):
-        WorkloadSpec(boolean_shapes=(BooleanShape.MODUS_PONENS,))
 
 
 def test_workload_defaults_to_natural_sft_view_only() -> None:
@@ -1116,34 +968,6 @@ def test_balanced_workload_writes_unique_verified_rows_without_audit(tmp_path) -
     assert all("audit" not in row for row in rows)
 
 
-def test_workload_emits_each_requested_boolean_shape(tmp_path) -> None:
-    train_path, _, _ = generate_workload(
-        tmp_path / "boolean.jsonl",
-        WorkloadSpec(
-            samples_per_cell=1,
-            query_kinds=(QueryKind.DIRECTION,),
-            semantic_shapes=(SemanticShape.UNIQUE,),
-            trace_formats=(TraceFormat.SYMBOLIC,),
-            boolean_shapes=(
-                BooleanShape.MODUS_PONENS,
-                BooleanShape.NESTED_CASE_SPLIT,
-            ),
-            target_directions=(Direction.NORTH,),
-            num_entities=6,
-            num_premises=7,
-            test_split=0,
-        ),
-    )
-
-    rows = [json.loads(line) for line in train_path.read_text().splitlines()]
-    assert {row["metadata"]["boolean_shape"] for row in rows} == {
-        "modus-ponens",
-        "nested-case-split",
-    }
-    assert all(
-        '"schema":"spatial-direction-trace-v2"' in row["messages"][2]["content"]
-        for row in rows
-    )
 
 
 def test_cli_rejects_unknown_policy_dimensions(tmp_path) -> None:
@@ -1274,7 +1098,6 @@ def test_premise_first_samples_without_world_or_proof_template(monkeypatch, quer
 
     for name in (
         "_coordinates",
-        "_boolean_problem",
         "_controlled_direction_problem",
         "_controlled_membership_problem",
     ):
@@ -1372,22 +1195,6 @@ def test_structure_key_marks_bounded_coarse_fallback_and_keeps_invariance():
     assert coarse == canonical_structure_profile(second, max_permutations=1)
 
 
-@pytest.mark.parametrize("shape", tuple(BooleanShape))
-def test_premise_first_boolean_families_replay_without_target_templates(shape):
-    sample = SpatialGeneratorV2(713).generate(
-        GenerationPolicy(
-            generation_mode="premise-first",
-            boolean_shape=shape,
-            num_entities=4,
-            num_premises=3,
-            trace_format=TraceFormat.SYMBOLIC,
-        ),
-        max_attempts=100,
-    )
-    assert sample.generation_provenance is GenerationProvenance.PREMISE_FIRST
-    assert score_symbolic_training_trace(
-        sample.problem, sample.trace, sample.menu_answer
-    ).fully_valid
 
 
 def test_constructive_no_match_preserves_all_candidate_exclusions():

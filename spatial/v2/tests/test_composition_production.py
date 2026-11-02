@@ -967,3 +967,72 @@ def test_all_legacy_targeted_families_are_development_lineages(policy):
         production.preflight(
             entries, {"family_ids": sorted(excluded), "story_keys": []}
         )
+
+
+@pytest.fixture
+def explicit_seed_policy():
+    # Keep scheduler guards independent of the retired allocation compiler.
+    policy = json.loads(
+        (
+            ROOT
+            / "experiments/spatialentail-composition-v1/entailment-config-frozen-v1.json"
+        ).read_text()
+    )
+    policy["source_batches"] = [
+        {
+            "generator": "sampled-forest",
+            "seed": 3,
+            "count": 2,
+            "seeds": [3, 7],
+            "split": "train",
+            "query_kinds": ["count"],
+            "depth": 2,
+            "matches": 0,
+            "proof_pattern": "axis-split",
+            "direction": "Northeast",
+        }
+    ]
+    return policy
+
+
+def test_explicit_seed_schedule_preserves_draws_and_index_filter(explicit_seed_policy):
+    from spatial.v2.composition_scene_sampler import sample_scene
+
+    policy = explicit_seed_policy
+    before = production.schedule(policy)
+    assert len(before) == 2
+    for entry, seed in zip(before, (3, 7), strict=True):
+        original = sample_scene(
+            seed,
+            2,
+            matches=0,
+            proof_pattern="axis-split",
+            direction=Direction.NORTHEAST,
+        )
+        assert replace(entry.story, story_id=original.story_id) == original
+    policy["source_batches"][0]["indices"] = [1]
+    assert production.schedule(policy) == (before[1],)
+    policy["source_batches"][0]["indices"] = []
+    assert production.schedule(policy) == ()
+
+
+@pytest.mark.parametrize("seeds", ([3], [3, 3], [-1, 3], [True, 3], "3,7"))
+def test_explicit_seed_schedule_rejects_invalid_seeds(explicit_seed_policy, seeds):
+    explicit_seed_policy["source_batches"][0]["seeds"] = seeds
+    with pytest.raises(ValueError, match="batch seeds"):
+        production.schedule(explicit_seed_policy)
+
+
+@pytest.mark.parametrize("indices", ([2], [-1], [0, 0], [1, 0], [False], "0"))
+def test_explicit_seed_schedule_rejects_invalid_indices(explicit_seed_policy, indices):
+    explicit_seed_policy["source_batches"][0]["indices"] = indices
+    with pytest.raises(ValueError, match="batch indices"):
+        production.schedule(explicit_seed_policy)
+
+
+def test_explicit_seed_schedule_rejects_non_sampled_generator(explicit_seed_policy):
+    explicit_seed_policy["source_batches"][0].update(
+        generator="random-world", depth=None
+    )
+    with pytest.raises(ValueError, match="only supported"):
+        production.schedule(explicit_seed_policy)

@@ -1,6 +1,5 @@
 """Depth, family isolation, strict/equality paths, and bounded pilot checks."""
 
-import json
 import random
 from dataclasses import replace
 from itertools import combinations, pairwise, permutations
@@ -21,7 +20,6 @@ from spatial.v2.composition_feasibility import (
     split_conflicts,
     summarize,
 )
-from spatial.v2.composition_feasibility_report import report
 from spatial.v2.composition_pilot import renamed_problem
 from spatial.v2.difficulty import Axis, _axis_path
 from spatial.v2.solver import (
@@ -201,14 +199,6 @@ def test_empty_summary_does_not_invent_results():
     assert all(
         v["prediction_from_train_only"] is None for v in result["baseline"].values()
     )
-
-
-def test_report_refuses_incomplete_pilot(tmp_path):
-    (tmp_path / "manifest.json").write_text(json.dumps({"attempt_budget": 1}))
-    (tmp_path / "summary.json").write_text(json.dumps(summarize([])))
-    (tmp_path / "attempts.jsonl").write_text("")
-    with pytest.raises(ValueError, match="incomplete pilot"):
-        report(tmp_path)
 
 
 @pytest.mark.parametrize("seed", range(12))

@@ -1,5 +1,12 @@
 # SpatialEntail randomized proof-graph v2
 
+Historical experiment: dataset/job preparation drivers have been retired.
+The preparation commands below describe the original workflow and require its
+original source revision (available in Git before this retirement, at `a85c6c7`).
+Saved results, prepared packages, result summarizers, and token auditing are
+retained. For new runs, use
+[Composition v1](../spatialentail-composition-v1/README.md).
+
 Track remaining required, optional, and deferred work in [CHECKLIST.md](CHECKLIST.md).
 
 ## Research analysis

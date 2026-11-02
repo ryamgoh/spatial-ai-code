@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from spatial.v2.legacy.generate_all import WorkloadSpec, generate_workload
-from spatial.v2.legacy.generation import BooleanShape, QueryKind, SemanticShape
+from spatial.v2.generate_all import WorkloadSpec, generate_workload
+from spatial.v2.generation import QueryKind, SemanticShape
 from spatial.v2.grading import AnswerMode
 from spatial.v2.supervision_controls import SupervisionArm
 from spatial.v2.trace import TraceFormat
@@ -272,16 +272,15 @@ def test_workload_forwards_proof_controls_into_manifest(tmp_path) -> None:
     assert manifest["difficulty"]["y_depth"] in ({"2": 1}, {"3": 1}, {"4": 1})
 
 
-def test_generated_structural_workload_holds_out_proof_shapes(tmp_path) -> None:
+def test_generated_structural_workload_holds_out_atomic_structures(tmp_path) -> None:
     train_path, _, test_path = generate_workload(
         tmp_path / "structural-generated.jsonl",
         WorkloadSpec(
-            samples_per_cell=1,
+            samples_per_cell=4,
             query_kinds=(QueryKind.DIRECTION,),
             answer_modes=(AnswerMode.SINGLE,),
             semantic_shapes=(SemanticShape.UNIQUE,),
             trace_formats=(TraceFormat.SYMBOLIC,),
-            boolean_shapes=(BooleanShape.MODUS_PONENS, BooleanShape.CASE_SPLIT),
             num_entities=4,
             num_premises=3,
             test_split=0.5,
@@ -315,7 +314,6 @@ def test_workload_emits_paired_control_arms_and_volume_report(tmp_path) -> None:
                 SupervisionArm.ANSWER_ONLY,
                 SupervisionArm.CORRUPTED_TRACE,
             ),
-            boolean_shapes=(BooleanShape.MODUS_PONENS,),
             num_entities=4,
             num_premises=3,
             test_split=0,

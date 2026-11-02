@@ -1,5 +1,11 @@
 # Experiment 15: Spatial V2 SFT integration pilot (Part II)
 
+Retired workflow: `submit.py`, `jobs/generate.sh`, and the legacy generator have
+been removed. Commands below document the historical setup and require its
+original checkout (source available at `a85c6c7`). Saved configs and result
+summarization are retained. `jobs/common.bash` remains shared infrastructure
+used by current composition training and must not be removed.
+
 This is a preparation and integration pilot for conventional SFT. It contains
 no model results. The checked-in run compares verified Natural worked solutions
 with answer-only targets on paired base problems, with prompt-matched untuned

@@ -26,6 +26,16 @@ SENSITIVE = re.compile(
     r"hidden_possible_values|<audit>|\"audit\"\s*:"
 )
 
+# Frozen output of the retired seed-42 transition partition, not a new split.
+HELDOUT_TRANSITIONS = frozenset({
+    "disjunctive-syllogism->iff-elimination",
+    "double-negation->iff-elimination",
+    "iff-elimination->double-negation",
+    "iff-elimination->iff-elimination",
+    "iff-elimination->modus-ponens",
+    "modus-ponens->axis-transitivity",
+})
+
 
 def answer_set(text: str, *, bare: bool = False) -> frozenset[str]:
     match = FOOTER.search(text) or (BARE.search(text) if bare else None)
@@ -97,13 +107,7 @@ def audit_sources(benchmark: Path, training: Path, receipt_path: Path, expected:
         manifest = json.load(archive.extractfile(manifest_member))
         if manifest["benchmark_jsonl_sha256"] != expected:
             raise ValueError("Training manifest excludes a different benchmark")
-        # Manifest uses abbreviations; the proof profile uses full rule labels.
-        from spatial.v2.legacy.random_proof import PROOF_RULE_LABELS, deterministic_transition_partition
-
-        heldout = {
-            f"{PROOF_RULE_LABELS[a]}->{PROOF_RULE_LABELS[b]}"
-            for a, b in deterministic_transition_partition(42).heldout
-        }
+        heldout = HELDOUT_TRANSITIONS
         report["heldout_transitions"] = sorted(heldout)
         report["benchmark_transition_violations"] = sum(
             (len(proof_edges(r) & heldout) != 1

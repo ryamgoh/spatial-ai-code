@@ -1,6 +1,7 @@
 """Active atomic generation boundary; historical curricula have separate callers."""
 
 import ast
+import hashlib
 import importlib
 from dataclasses import fields
 from pathlib import Path
@@ -18,8 +19,6 @@ from spatial.v2.generation import (
     _system_prompt,
 )
 from spatial.v2.grading import AnswerMode
-from spatial.v2.legacy.generation import GenerationPolicy as LegacyPolicy
-from spatial.v2.legacy.generation import _system_prompt as legacy_system_prompt
 from spatial.v2.solver import And, RelationConstraint
 
 
@@ -69,14 +68,16 @@ def test_retired_controls_are_not_active_policy_fields(name, value):
         GenerationPolicy(**{name: value})
 
 
-def test_legacy_policy_cannot_bypass_atomic_boundary():
+def test_foreign_policy_cannot_bypass_atomic_boundary():
     with pytest.raises(TypeError, match="atomic GenerationPolicy"):
-        SpatialGeneratorV2(seed=42).generate(LegacyPolicy())
+        SpatialGeneratorV2(seed=42).generate(object())
     assert not hasattr(SpatialGeneratorV2, "generate_randomized")
 
 
 def test_frozen_corr_prompt_helper_is_unchanged():
-    assert _system_prompt(AnswerMode.SINGLE) == legacy_system_prompt(AnswerMode.SINGLE)
+    assert hashlib.sha256(_system_prompt(AnswerMode.SINGLE).encode()).hexdigest() == (
+        "8d7be03bd9ee0f40d081ceed860d2b41417afc6dd5f245a1a070bdf7e9935ac9"
+    )
 
 
 def test_active_cli_has_no_boolean_curriculum_options():
