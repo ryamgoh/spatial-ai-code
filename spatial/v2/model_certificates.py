@@ -9,8 +9,6 @@ from typing import Any
 from spatial.v2.serialization import tagged_dataclass_to_dict
 from spatial.v2.solver import (
     And,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -107,16 +105,6 @@ def _evaluate(
         return all(_evaluate(operand, coordinates) for operand in formula.operands)
     if isinstance(formula, Or):
         return any(_evaluate(operand, coordinates) for operand in formula.operands)
-    if isinstance(formula, Implies):
-        return not _evaluate(formula.antecedent, coordinates) or _evaluate(
-            formula.consequent,
-            coordinates,
-        )
-    if isinstance(formula, Iff):
-        return _evaluate(formula.left, coordinates) == _evaluate(
-            formula.right,
-            coordinates,
-        )
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
 

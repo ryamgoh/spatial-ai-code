@@ -20,8 +20,6 @@ from spatial.v2.solver import (
     Direction,
     DirectionAnalysis,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -257,27 +255,17 @@ def test_propositional_disjunctive_syllogism(backend: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "formula_builder",
+    "formula",
     [
-        lambda premise, conclusion: And((Implies(premise, conclusion), premise)),
-        lambda premise, conclusion: And((Iff(premise, conclusion), premise)),
+        "IF (A is North of B) THEN (C is East of D)",
+        "(A is North of B) IFF (C is East of D)",
+        "A is North of B IFF C is East of D",
+        "NOT (IF (A is North of B) THEN (C is East of D))",
     ],
 )
-@pytest.mark.parametrize("backend", ["reference", "z3"])
-def test_implication_and_biconditional_reasoning(backend: str, formula_builder) -> None:
-    if backend == "z3":
-        pytest.importorskip("z3")
-    premise = atom("A", Direction.NORTHEAST, "B")
-    conclusion = atom("C", Direction.SOUTHWEST, "D")
-    problem = SpatialProblem(
-        objects=("A", "B", "C", "D"),
-        premise=formula_builder(premise, conclusion),
-        query=DirectionQuery("C", "D"),
-    )
-
-    analysis = SpatialSolverV2(backend=backend).analyze(problem)
-
-    assert analysis.possible_directions == (Direction.SOUTHWEST,)
+def test_text_adapter_rejects_retired_implication_and_equivalence(formula):
+    with pytest.raises(ValueError):
+        TEXT_ADAPTER.parse(prompt([formula + "."]))
 
 
 def test_empty_boolean_connective_is_rejected() -> None:
@@ -294,10 +282,7 @@ def test_controlled_boolean_formula_round_trips() -> None:
     east = RelationConstraint("C", "D", frozenset({Direction.EAST}))
     south = RelationConstraint("E", "F", frozenset({Direction.SOUTH}))
     west = RelationConstraint("G", "H", frozenset({Direction.WEST}))
-    formula = Iff(
-        Implies(And((north, east)), south),
-        Not(Or((west, north))),
-    )
+    formula = Or((And((north, east, south)), Not(Or((west, north)))))
 
     rendered = render_spatial_formula(formula)
     parsed = TEXT_ADAPTER.parse(prompt([rendered + "."]))

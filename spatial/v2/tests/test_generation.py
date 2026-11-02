@@ -10,12 +10,10 @@ from typer.testing import CliRunner
 
 from spatial.v2.answer_certificates import (
     DirectionAnswerSetCertificate,
-    DirectionEntailmentCertificate,
 )
 from spatial.v2.count_certificates import CountAnswerSetCertificate
 from spatial.v2.generate_all import WorkloadSpec, app, generate_workload
 from spatial.v2.generation import (
-    GenerationMode,
     GenerationPolicy,
     GenerationProvenance,
     MenuCoverage,
@@ -24,7 +22,6 @@ from spatial.v2.generation import (
     SpatialGeneratorV2,
 )
 from spatial.v2.grading import AnswerMode, encode_menu_answer, resolve_answer
-from spatial.v2.proofs import ProofRule
 from spatial.v2.solver import (
     CountQuery,
     Direction,
@@ -1129,8 +1126,6 @@ def test_premise_first_samples_without_world_or_proof_template(monkeypatch, quer
 def test_structure_key_ignores_renaming_and_commutative_orders():
     from spatial.v2.solver import (
         And,
-        Iff,
-        Implies,
         Not,
         Or,
         SpatialProblem,
@@ -1143,7 +1138,7 @@ def test_structure_key_ignores_renaming_and_commutative_orders():
     c = direction_constraint("C", "R", Direction.SOUTHWEST)
     problem = SpatialProblem(
         ("A", "B", "C", "R"),
-        And((Iff(a, b), Or((Not(b), c)), Implies(c, a))),
+        And((a, b, Or((Not(b), c)))),
         WhichQuery(frozenset({Direction.NORTH}), "R", ("A", "B", "C")),
     )
     renamed_a = direction_constraint("Zulu", "Anchor", Direction.NORTH)
@@ -1153,19 +1148,20 @@ def test_structure_key_ignores_renaming_and_commutative_orders():
         ("Anchor", "Alpha", "Beta", "Zulu"),
         And(
             (
-                Implies(renamed_c, renamed_a),
+                renamed_a,
                 Or((renamed_c, Not(renamed_b))),
-                Iff(renamed_b, renamed_a),
+                renamed_b,
             )
         ),
         WhichQuery(frozenset({Direction.NORTH}), "Anchor", ("Beta", "Zulu", "Alpha")),
     )
     assert canonical_structure_profile(problem) == canonical_structure_profile(renamed)
-    reversed_implication = replace(
-        problem, premise=And((Iff(a, b), Or((Not(b), c)), Implies(a, c)))
+    reversed_relation = replace(
+        problem,
+        premise=And((replace(a, subject="R", reference="A"), b, Or((Not(b), c)))),
     )
     assert canonical_structure_profile(problem) != canonical_structure_profile(
-        reversed_implication
+        reversed_relation
     )
 
 

@@ -1,38 +1,18 @@
 """Ordinary names preserve all claims and support multiword places end to end."""
 
-from pathlib import Path
-
 import pytest
 
 from spatial.v2.composition_contracts import validate_problem as legacy_validate
-from spatial.v2.composition_execution_benchmark import development_jobs
-from spatial.v2.composition_training import REVISION
 from spatial.v2.entailment_contracts import Contract, parse_prompt, render_prompt
-from spatial.v2.entailment_dataset import build_attempt
 from spatial.v2.entailment_evidence import build_evidence, render_pair
 from spatial.v2.entailment_names import (
     NAMES,
-    rename_record,
     rename_structure,
     story_name_map,
 )
 from spatial.v2.tests.test_entailment_artifact_audit import AUDIT
 from spatial.v2.tests.test_entailment_positions import fixture_record
 from spatial.v2.tests.test_pivot_evidence import BY_ID
-
-
-@pytest.fixture(scope="module")
-def tokenizer():
-    from transformers import AutoTokenizer
-
-    path = (
-        Path.home()
-        / ".cache/huggingface/hub/models--Qwen--Qwen3.5-4B/snapshots"
-        / REVISION
-    )
-    if not path.is_dir():
-        pytest.skip("pinned local tokenizer unavailable")
-    return AutoTokenizer.from_pretrained(path, local_files_only=True)
 
 
 def test_fixed_vocabulary_covers_31_objects_without_collisions():
@@ -110,20 +90,3 @@ def test_multiword_places_parse_and_have_checked_matched_evidence(name):
         assert parse_prompt(prompt) == (problem, menu, contract)
         pair = render_pair(evidence, menu, contract)
         assert all("Object" not in text for text in pair.values())
-
-
-@pytest.mark.parametrize("index", range(6))
-def test_real_admission_name_revision_keeps_labels_and_proof_metadata(index, tokenizer):
-    _, entry, problem = development_jobs()[index]
-    original = build_attempt(
-        entry.story, problem, None, tokenizer, omission_percent=100
-    )
-    assert original["status"] == "accepted"
-    revised = rename_record(original, tokenizer)
-    assert revised["base_id"] == original["base_id"]
-    assert revised["family_id"] == original["family_id"]
-    assert [row["answer"] for row in revised["rows"]] == [
-        row["answer"] for row in original["rows"]
-    ]
-    assert all(token["admitted"] for token in revised["tokens"])
-    assert revised["measurement"]["depth"] == original["measurement"]["depth"]

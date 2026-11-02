@@ -25,8 +25,6 @@ from spatial.v2.solver import (
     And,
     Direction,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -104,7 +102,7 @@ def test_contingency_certificate_checks_supporting_and_falsifying_models() -> No
     json.dumps(contingency_certificate_to_dict(certificate))
 
 
-def test_model_checker_evaluates_the_full_boolean_formula_language() -> None:
+def test_model_checker_evaluates_conjunction_alternatives_and_negation() -> None:
     northeast = atom("A", Direction.NORTHEAST, "B")
     northwest = atom("A", Direction.NORTHWEST, "B")
     southwest = atom("A", Direction.SOUTHWEST, "B")
@@ -112,8 +110,6 @@ def test_model_checker_evaluates_the_full_boolean_formula_language() -> None:
         (
             Or((northeast, northwest)),
             Not(southwest),
-            Implies(northeast, Not(southwest)),
-            Iff(northwest, northwest),
         )
     )
     problem = SpatialProblem(

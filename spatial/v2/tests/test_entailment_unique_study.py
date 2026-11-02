@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from spatial.v2.composition_evaluation import score, select_epoch
-from spatial.v2.composition_training import MODEL, REVISION, messages
+from spatial.v2.composition_evaluation import score
+from spatial.v2.composition_training import messages
 from spatial.v2.entailment_contracts import VERSION, Contract
+from spatial.v2.entailment_evaluation import choose
 from spatial.v2.entailment_scene_protocol import SCOPE
 from spatial.v2.entailment_scene_protocol import VERSION as PROMPT_VERSION
+from spatial.v2.entailment_thinking_training import MODEL, REVISION
 from spatial.v2.entailment_unique_study import (
     PAIR_FLAGS,
     STUDY_SCOPE,
@@ -124,20 +126,23 @@ def test_unique_checkpoint_selection_uses_stage_one_and_earliest_tie():
             "epoch": epoch,
             "split": "dev",
             "style": "natural",
-            "manifest_sha256": "manifest",
+            "benchmark_sha256": "benchmark",
+            "limits": {"context": 8192, "stage1": 4096, "stage2": 16},
             "model": MODEL,
             "revision": REVISION,
             "adapter": f"adapter-{epoch}",
             "adapter_sha256": f"hash-{epoch}",
-            "outputs": outputs(rows, correct=epoch == 2),
+            "scores": score(rows, outputs(rows, correct=epoch == 2)),
         }
         for epoch in (1, 2)
     ]
-    assert select_epoch(rows, runs, "natural", "manifest")["epoch"] == 2
-    runs[0]["outputs"] = outputs(rows)
-    selected = select_epoch(rows, runs, "natural", "manifest")
+    assert choose(runs)["epoch"] == 2
+    runs[0]["scores"] = score(rows, outputs(rows))
+    selected = choose(runs)
     assert selected["epoch"] == 1
-    assert selected["rule"].startswith("Unique Stage-1")
+    runs[0]["split"] = "in-range-test"
+    with pytest.raises(ValueError, match="dev"):
+        choose(runs)
 
 
 def test_training_messages_reject_retired_contract_in_unique_study():

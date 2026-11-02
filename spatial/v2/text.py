@@ -10,8 +10,6 @@ from spatial.v2.solver import (
     CountQuery,
     Direction,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -147,23 +145,14 @@ def _split_top_level(expression: str, keyword: str) -> tuple[str, ...]:
 def _parse_formula(expression: str, objects: set[str]) -> SpatialFormula:
     expression = _strip_outer_parentheses(expression)
     upper = expression.upper()
-    if upper.startswith("IF "):
-        parts = _split_top_level(expression[3:].strip(), "THEN")
-        if len(parts) != 2:
-            raise ValueError("IF requires exactly one top-level THEN")
-        return Implies(
-            _parse_formula(parts[0], objects),
-            _parse_formula(parts[1], objects),
-        )
-    for keyword, formula_type in (("IFF", Iff), ("OR", Or), ("AND", And)):
+    # Otherwise the permissive atom regex can absorb retired syntax into names.
+    if re.search(r"\b(?:IF|THEN|IFF)\b", upper):
+        raise ValueError("implication and equivalence syntax is no longer supported")
+    for keyword, formula_type in (("OR", Or), ("AND", And)):
         parts = _split_top_level(expression, keyword)
         if len(parts) == 1:
             continue
         operands = tuple(_parse_formula(part, objects) for part in parts)
-        if formula_type is Iff:
-            if len(operands) != 2:
-                raise ValueError("IFF requires exactly two operands")
-            return Iff(*operands)
         return formula_type(operands)
     if upper.startswith("NOT "):
         return Not(_parse_formula(expression[4:].strip(), objects))
@@ -194,14 +183,6 @@ def spatial_formula_objects(formula: SpatialFormula) -> frozenset[str]:
             for operand in formula.operands
             for obj in spatial_formula_objects(operand)
         )
-    if isinstance(formula, Implies):
-        return spatial_formula_objects(formula.antecedent) | spatial_formula_objects(
-            formula.consequent
-        )
-    if isinstance(formula, Iff):
-        return spatial_formula_objects(formula.left) | spatial_formula_objects(
-            formula.right
-        )
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
 
@@ -218,7 +199,7 @@ def _relation_phrase(constraint: RelationConstraint) -> str:
 
 
 def render_spatial_formula(formula: SpatialFormula) -> str:
-    """Render one formula in the canonical controlled Boolean grammar."""
+    """Render a spatial formula with conjunction, alternatives, or negation."""
     if isinstance(formula, RelationConstraint):
         return (
             f"{formula.subject} is {_relation_phrase(formula)} of {formula.reference}"
@@ -229,16 +210,6 @@ def render_spatial_formula(formula: SpatialFormula) -> str:
         operator = " AND " if isinstance(formula, And) else " OR "
         return operator.join(
             f"({render_spatial_formula(operand)})" for operand in formula.operands
-        )
-    if isinstance(formula, Implies):
-        return (
-            f"IF ({render_spatial_formula(formula.antecedent)}) THEN "
-            f"({render_spatial_formula(formula.consequent)})"
-        )
-    if isinstance(formula, Iff):
-        return (
-            f"({render_spatial_formula(formula.left)}) IFF "
-            f"({render_spatial_formula(formula.right)})"
         )
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 

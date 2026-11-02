@@ -1,7 +1,7 @@
 """Canonical visible-problem structure for conservative dataset grouping.
 
 Entity names, object/candidate order, and commutative operand order are ignored.
-Directions and implication order remain content. Refinement is invariant but
+Directions and ordered relation endpoints remain content. Refinement is invariant but
 not a complete graph-isomorphism test; large unresolved symmetry classes use
 a coarse key that can merge distinct structures rather than split renamed ones.
 """
@@ -16,8 +16,6 @@ from math import factorial, prod
 from spatial.v2.solver import (
     And,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -48,22 +46,6 @@ def _formula(formula: SpatialFormula, names: dict[str, int]) -> tuple:
                     (_formula(child, names) for child in formula.operands), key=_encode
                 )
             ),
-        )
-    if isinstance(formula, Iff):
-        return (
-            "iff",
-            tuple(
-                sorted(
-                    (_formula(formula.left, names), _formula(formula.right, names)),
-                    key=_encode,
-                )
-            ),
-        )
-    if isinstance(formula, Implies):
-        return (
-            "implies",
-            _formula(formula.antecedent, names),
-            _formula(formula.consequent, names),
         )
     raise TypeError(f"unsupported formula: {type(formula).__name__}")
 

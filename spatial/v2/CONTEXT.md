@@ -3,7 +3,7 @@
 ## Current study
 
 Follow the
-[composition pivot](../../experiments/spatialentail-composition-v1/pivot_20261026.md)
+[Unique-only specification](../../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md)
 for all new research work. This package contains reusable infrastructure and
 historical workflows; package version `v2` does not select randomized-v2 as the
 active experiment.
@@ -11,8 +11,12 @@ active experiment.
 The vocabulary below is historical. In the new study, use chain length,
 verified distractor count, and semantic case, not redefined `L/X/G` or the
 MATCHED/OOD campaign. Natural and Symbolic are required matched supervision
-arms, rendered from the same verified evidence. Shared Boolean solver support
-does not imply Boolean premises belong in the new dataset.
+arms, rendered from the same verified evidence. Visible premises must be flat
+conjunctions of exact spatial relations. Implication/equivalence formulas and
+their proof rules have been retired from the solver, parsers, and renderers.
+Internal conjunction, negation, and alternatives remain for semantic checks
+and joint-count evidence. Historical terminology below describes saved studies,
+not supported current inputs; replay their old traces at the original revision.
 
 ## Dataset lifecycle
 

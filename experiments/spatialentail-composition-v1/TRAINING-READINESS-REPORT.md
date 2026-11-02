@@ -9,6 +9,13 @@ Cleanup note: superseded local prepared packages were subsequently deleted.
 Their measurements below are historical observations, not instructions to
 reuse a currently available prepared directory.
 
+Historical status: findings and source line references below describe the reviewed
+commit, not current readiness. The thinking-model evaluator and post-training dev
+selection now live in `spatial/v2/entailment_evaluation.py`. The obsolete
+`composition_evaluation.run_gpu` and its selection/CLI entry points have been
+removed; shared scoring remains. This update does not supply GPU verification
+for the original report's other gaps.
+
 ## Verdict
 
 **The data and local supervision preparation have substantial verification.

@@ -20,8 +20,6 @@ from spatial.v2.proofs import (
 )
 from spatial.v2.solver import (
     And,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -29,12 +27,9 @@ from spatial.v2.solver import (
     SpatialProblem,
 )
 
-
 SEMANTIC_RULES = frozenset(
     {
-        ProofRule.MODUS_PONENS,
         ProofRule.DISJUNCTIVE_SYLLOGISM,
-        ProofRule.IFF_ELIMINATION,
         ProofRule.DOUBLE_NEGATION,
         ProofRule.CASE_SPLIT,
         ProofRule.AXIS_TRANSITIVITY,
@@ -111,18 +106,6 @@ def _formula_measurements(
             depths.append(child_depth)
         counts["and" if isinstance(formula, And) else "or"] += 1
         return atoms, counts, 1 + max(depths, default=0)
-    if isinstance(formula, Implies):
-        left = _formula_measurements(formula.antecedent)
-        right = _formula_measurements(formula.consequent)
-        counts = left[1] + right[1]
-        counts["implies"] += 1
-        return left[0] + right[0], counts, 1 + max(left[2], right[2])
-    if isinstance(formula, Iff):
-        left = _formula_measurements(formula.left)
-        right = _formula_measurements(formula.right)
-        counts = left[1] + right[1]
-        counts["iff"] += 1
-        return left[0] + right[0], counts, 1 + max(left[2], right[2])
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
 

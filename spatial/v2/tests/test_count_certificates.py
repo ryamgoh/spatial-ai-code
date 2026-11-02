@@ -26,6 +26,7 @@ from spatial.v2.proofs import (
     ProofConstructionError,
     ProofRule,
     ProofStep,
+    build_formula_refutation,
     check_formula_refutation,
     formula_refutation_to_dict,
 )
@@ -33,8 +34,8 @@ from spatial.v2.solver import (
     And,
     CountQuery,
     Direction,
-    Iff,
     Not,
+    Or,
     RelationConstraint,
     SpatialProblem,
     SpatialSolverV2,
@@ -54,76 +55,7 @@ def refute_assignment(
     query = problem.query
     assert isinstance(query, CountQuery)
     claim = count_assignment_formula(query, members)
-    branch = f"refute-count-{len(members)}"
-    steps = [
-        ProofStep("P1", ProofRule.PREMISE, problem.premise, premise_index=0),
-        ProofStep(
-            "A0",
-            ProofRule.REFUTATION_ASSUMPTION,
-            claim,
-            branch=branch,
-        ),
-    ]
-
-    membership = {
-        candidate: RelationConstraint(
-            candidate,
-            query.reference,
-            query.directions,
-        )
-        for candidate in query.candidates
-    }
-    for index, candidate in enumerate(query.candidates, start=1):
-        conclusion = (
-            membership[candidate]
-            if candidate in members
-            else Not(membership[candidate])
-        )
-        steps.append(
-            ProofStep(
-                f"E{index}",
-                ProofRule.AND_ELIMINATION,
-                conclusion,
-                ("A0",),
-                branch=branch,
-            )
-        )
-
-    first, second = query.candidates
-    if not members:
-        derived = membership[first]
-        inputs = ("P1", "E2")
-        contradiction_inputs = ("E1", "D1")
-    else:
-        assert members == query.candidates
-        derived = Not(membership[second])
-        inputs = ("P1", "E1")
-        contradiction_inputs = ("E2", "D1")
-    steps.extend(
-        (
-            ProofStep(
-                "D1",
-                ProofRule.IFF_ELIMINATION,
-                derived,
-                inputs,
-                branch=branch,
-            ),
-            ProofStep(
-                "C1",
-                ProofRule.CONTRADICTION,
-                Contradiction(),
-                contradiction_inputs,
-                branch=branch,
-            ),
-        )
-    )
-    certificate = FormulaRefutationCertificate(
-        problem,
-        claim,
-        tuple(steps),
-        "A0",
-        "C1",
-    )
+    certificate = build_formula_refutation(problem, claim)
     check_formula_refutation(certificate)
     return certificate
 
@@ -133,7 +65,7 @@ def correlated_problem() -> tuple[SpatialProblem, dict[str, tuple[int, int]]]:
     b_member = atom("B", Direction.NORTHEAST, "R")
     problem = SpatialProblem(
         objects=("A", "B", "R"),
-        premise=Iff(a_member, Not(b_member)),
+        premise=Or((And((a_member, Not(b_member))), And((Not(a_member), b_member)))),
         query=CountQuery(
             frozenset({Direction.NORTHEAST}),
             "R",
@@ -401,9 +333,21 @@ def test_compact_count_preserves_correlated_contingent_assignments() -> None:
             (
                 atom("A", Direction.NORTHEAST, "R"),
                 atom("B", Direction.SOUTHWEST, "R"),
-                Iff(
-                    atom("C", Direction.NORTHEAST, "R"),
-                    Not(atom("D", Direction.NORTHEAST, "R")),
+                Or(
+                    (
+                        And(
+                            (
+                                atom("C", Direction.NORTHEAST, "R"),
+                                Not(atom("D", Direction.NORTHEAST, "R")),
+                            )
+                        ),
+                        And(
+                            (
+                                Not(atom("C", Direction.NORTHEAST, "R")),
+                                atom("D", Direction.NORTHEAST, "R"),
+                            )
+                        ),
+                    )
                 ),
             )
         ),

@@ -54,8 +54,6 @@ from spatial.v2.solver import (
     CountQuery,
     Direction,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -134,18 +132,6 @@ def _formula_payload(formula: SpatialFormula) -> dict[str, Any]:
         return {
             "kind": "and" if isinstance(formula, And) else "or",
             "operands": [_formula_payload(item) for item in formula.operands],
-        }
-    if isinstance(formula, Implies):
-        return {
-            "kind": "implies",
-            "antecedent": _formula_payload(formula.antecedent),
-            "consequent": _formula_payload(formula.consequent),
-        }
-    if isinstance(formula, Iff):
-        return {
-            "kind": "iff",
-            "left": _formula_payload(formula.left),
-            "right": _formula_payload(formula.right),
         }
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
@@ -452,15 +438,6 @@ def _formula(value: Any) -> SpatialFormula:
                 raise SymbolicProofError(f"{kind} operands must be a list")
             operands = tuple(_formula(item) for item in raw_operands)
             return And(operands) if kind == "and" else Or(operands)
-        if kind == "implies":
-            _keys(payload, {"kind", "antecedent", "consequent"}, "implication")
-            return Implies(
-                _formula(payload["antecedent"]),
-                _formula(payload["consequent"]),
-            )
-        if kind == "iff":
-            _keys(payload, {"kind", "left", "right"}, "equivalence")
-            return Iff(_formula(payload["left"]), _formula(payload["right"]))
     except (KeyError, TypeError, ValueError) as exc:
         if isinstance(exc, SymbolicProofError):
             raise
@@ -471,7 +448,7 @@ def _formula(value: Any) -> SpatialFormula:
 def _conclusion(value: Any) -> ProofConclusion:
     payload = _object(value, "conclusion")
     kind = payload.get("kind")
-    if kind in {"relation", "not", "and", "or", "implies", "iff"}:
+    if kind in {"relation", "not", "and", "or"}:
         return _formula(payload)
     try:
         if kind == "axis":

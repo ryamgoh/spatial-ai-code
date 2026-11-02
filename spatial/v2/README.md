@@ -26,14 +26,19 @@ Retired repair, reserve-assembly, and migration diagnostics have been removed.
 ## Shared Infrastructure
 
 Keep `solver.py`, `proofs.py`, the certificate modules, `text.py`, `grading.py`,
-and existing renderers available to shared and historical callers.
-Internal logical operations support semantic checks and evidence even when
-visible premises are atomic. Existing Symbolic NDJSON is an audit grammar,
+and existing renderers for current semantic checks and evidence.
+Visible study premises are flat conjunctions of exact spatial relations.
+Internal `And`, `Not`, and `Or` remain for entailment, counterexamples, and
+joint-count certificates. Implication/equivalence formula types, their parser
+and codec support, and modus-ponens/iff-elimination proof rules are removed.
+Old text and trace payloads using them are rejected, not converted.
+Existing Symbolic NDJSON is an audit grammar,
 not automatically the new study's Symbolic supervision format.
 
-Software contracts in [docs/spatialentail](../../docs/spatialentail/) describe
-existing behavior. Version the new interface without changing frozen historical
-contracts or Corr SINGLE.
+Software contracts in [docs/spatialentail](../../docs/spatialentail/) include
+historical interfaces. They do not imply that retired formula types remain
+supported. Replay old Boolean traces under their original source revision;
+frozen artifacts and Corr SINGLE are not rewritten by this cleanup.
 
 ## Historical Workflows
 

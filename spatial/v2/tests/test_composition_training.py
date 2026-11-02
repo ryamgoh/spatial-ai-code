@@ -16,11 +16,9 @@ from spatial.v2.composition_evaluation import (
     allowed_answers,
     replay_tokens,
     score,
-    select_epoch,
 )
 from spatial.v2.composition_evidence import build_evidence, render_pair
 from spatial.v2.composition_training import (
-    MODEL,
     REVISION,
     audit_selection,
     completion_suffix,
@@ -130,32 +128,14 @@ def examples_and_outputs():
     return rows, outputs
 
 
-def test_selection_uses_stage1_dev_only_with_earliest_tie():
+def test_scoring_keeps_stage_accuracy_and_token_totals_separate():
     rows, outputs = examples_and_outputs()
-    runs = [
-        {
-            "epoch": epoch,
-            "split": "dev",
-            "style": "natural",
-            "manifest_sha256": "hash",
-            "model": MODEL,
-            "revision": REVISION,
-            "adapter": f"checkpoint-{epoch}",
-            "adapter_sha256": f"adapter-hash-{epoch}",
-            "outputs": outputs,
-        }
-        for epoch in (2, 1)
-    ]
-    assert select_epoch(rows, runs, "natural", "hash")["epoch"] == 1
     result = score(rows, outputs)
     assert result["stage1"]["macro_accuracy"] == 1
     assert result["stage2"]["macro_accuracy"] == 0
     assert result["generated_tokens"] == {"stage1": 6, "stage2": 3, "total": 9}
     assert result["input_tokens"] == {"stage1": 30, "stage2": 60}
     assert result["regressions"] == 3
-    runs[0]["split"] = "test"
-    with pytest.raises(ValueError, match="provenance"):
-        select_epoch(rows, runs, "natural", "hash")
 
 
 def test_adapter_hash_detects_changed_weights(tmp_path):

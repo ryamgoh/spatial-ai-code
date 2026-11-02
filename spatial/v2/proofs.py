@@ -2,7 +2,7 @@
 
 This module is deliberately independent of the SMT implementation. It builds
 and checks typed derivations from the structured premises themselves. The
-automatic builder performs deterministic Boolean closure, bounded case splits,
+automatic builder simplifies conjunctions and negations, performs bounded case splits,
 axis reasoning, and formula refutation. The checker remains the independent
 acceptance seam. Direction, Which, and Count answer sets are assembled by
 certificate layers rather than solver-status fallbacks.
@@ -21,8 +21,6 @@ from spatial.v2.solver import (
     And,
     Direction,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -47,9 +45,7 @@ class ProofRule(str, Enum):
     REFUTATION_ASSUMPTION = "refutation-assumption"
     AND_ELIMINATION = "and-elimination"
     AND_INTRODUCTION = "and-introduction"
-    MODUS_PONENS = "modus-ponens"
     DISJUNCTIVE_SYLLOGISM = "disjunctive-syllogism"
-    IFF_ELIMINATION = "iff-elimination"
     DOUBLE_NEGATION = "double-negation"
     CONTRADICTION = "contradiction"
     EXPLOSION = "explosion"
@@ -345,9 +341,7 @@ def _check_step(
         ProofRule.ASSUMPTION,
         ProofRule.AND_ELIMINATION,
         ProofRule.AND_INTRODUCTION,
-        ProofRule.MODUS_PONENS,
         ProofRule.DISJUNCTIVE_SYLLOGISM,
-        ProofRule.IFF_ELIMINATION,
         ProofRule.DOUBLE_NEGATION,
         ProofRule.CONTRADICTION,
     } and len(input_formulas) != len(resolved_inputs):
@@ -389,25 +383,6 @@ def _check_step(
             raise ProofCheckError(f"{step.id} constructs the wrong conjunction")
         return
 
-    if step.rule is ProofRule.MODUS_PONENS:
-        if len(input_formulas) != 2:
-            raise ProofCheckError(f"{step.id} requires an implication and antecedent")
-        implication = next(
-            (formula for formula in input_formulas if isinstance(formula, Implies)),
-            None,
-        )
-        if implication is None:
-            raise ProofCheckError(f"{step.id} has no implication input")
-        antecedents = tuple(
-            formula for formula in input_formulas if formula is not implication
-        )
-        if (
-            antecedents != (implication.antecedent,)
-            or step.conclusion != implication.consequent
-        ):
-            raise ProofCheckError(f"{step.id} is not a valid modus ponens step")
-        return
-
     if step.rule is ProofRule.DISJUNCTIVE_SYLLOGISM:
         if len(input_formulas) != 2:
             raise ProofCheckError(f"{step.id} requires a disjunction and negation")
@@ -431,28 +406,6 @@ def _check_step(
         )
         if not remaining or step.conclusion != expected:
             raise ProofCheckError(f"{step.id} concludes the wrong remaining disjunct")
-        return
-
-    if step.rule is ProofRule.IFF_ELIMINATION:
-        if len(input_formulas) != 2:
-            raise ProofCheckError(f"{step.id} requires an equivalence and one side")
-        equivalence = next(
-            (formula for formula in input_formulas if isinstance(formula, Iff)),
-            None,
-        )
-        if equivalence is None:
-            raise ProofCheckError(f"{step.id} has no equivalence input")
-        known = next(
-            formula for formula in input_formulas if formula is not equivalence
-        )
-        if known == equivalence.left:
-            expected = equivalence.right
-        elif known == equivalence.right:
-            expected = equivalence.left
-        else:
-            raise ProofCheckError(f"{step.id} proves neither side of the equivalence")
-        if step.conclusion != expected:
-            raise ProofCheckError(f"{step.id} concludes the wrong equivalent formula")
         return
 
     if step.rule is ProofRule.DOUBLE_NEGATION:
@@ -1023,74 +976,7 @@ def _saturate_formula_steps(
                 )
 
         known = _accessible_formula_steps(steps, branch)
-        conjunctions = []
-        for formula in known:
-            candidates = (
-                (formula.antecedent,)
-                if isinstance(formula, Implies)
-                else (formula.left, formula.right)
-                if isinstance(formula, Iff)
-                else ()
-            )
-            for candidate in candidates:
-                if isinstance(candidate, And) and candidate not in conjunctions:
-                    conjunctions.append(candidate)
-        for conjunction in conjunctions:
-            if all(operand in known for operand in conjunction.operands):
-                changed |= _append_formula_step(
-                    steps,
-                    ProofRule.AND_INTRODUCTION,
-                    conjunction,
-                    tuple(known[operand] for operand in conjunction.operands),
-                    branch,
-                )
-
-        known = _accessible_formula_steps(steps, branch)
-        if branch is None:
-            # Only materialize spatial atoms demanded by logical premises.
-            # Each new atom can unlock another Boolean step in this fixed point.
-            demanded = set()
-            for formula in known:
-                sides = (
-                    (formula.antecedent,)
-                    if isinstance(formula, Implies)
-                    else (formula.left, formula.right)
-                    if isinstance(formula, Iff)
-                    else ()
-                )
-                for side in sides:
-                    operands = side.operands if isinstance(side, And) else (side,)
-                    demanded.update(
-                        atom
-                        for atom in operands
-                        if isinstance(atom, RelationConstraint)
-                        and len(atom.allowed) == 1
-                    )
-            for atom in sorted(demanded - set(known), key=repr):
-                changed |= _append_demanded_spatial_atom(steps, atom)
-            known = _accessible_formula_steps(steps, branch)
         for formula, source_id in tuple(known.items()):
-            if isinstance(formula, Implies) and formula.antecedent in known:
-                changed |= _append_formula_step(
-                    steps,
-                    ProofRule.MODUS_PONENS,
-                    formula.consequent,
-                    (source_id, known[formula.antecedent]),
-                    branch,
-                )
-            if isinstance(formula, Iff):
-                for known_side, conclusion in (
-                    (formula.left, formula.right),
-                    (formula.right, formula.left),
-                ):
-                    if known_side in known:
-                        changed |= _append_formula_step(
-                            steps,
-                            ProofRule.IFF_ELIMINATION,
-                            conclusion,
-                            (source_id, known[known_side]),
-                            branch,
-                        )
             if isinstance(formula, Or):
                 for operand in formula.operands:
                     negation = Not(operand)
@@ -1114,60 +1000,6 @@ def _saturate_formula_steps(
                         branch,
                     )
     return _accessible_formula_steps(steps, branch)
-
-
-def _append_demanded_spatial_atom(
-    steps: list[ProofStep], atom: RelationConstraint
-) -> bool:
-    """Derive a logical antecedent from checked axis paths, without an SMT oracle."""
-    _append_axis_decompositions(steps)
-    objects = tuple(
-        sorted(
-            {
-                name
-                for step in steps
-                if isinstance(step.conclusion, AxisFact)
-                for name in (step.conclusion.subject, step.conclusion.reference)
-            }
-            | {atom.subject, atom.reference}
-        )
-    )
-    paths = {}
-    for axis, sign in zip(
-        ProofAxis, direction_signs(next(iter(atom.allowed))), strict=True
-    ):
-        path = _find_axis_path(
-            _proof_graph(objects, tuple(steps), axis),
-            atom.subject,
-            atom.reference,
-            sign,
-        )
-        if not path:
-            return False
-        paths[axis] = path
-    inputs = []
-    for axis in ProofAxis:
-        start = len(steps)
-        result = _derive_axis_path(axis, paths[axis], steps)
-        # Axis-path builders use local IDs; give appended steps fresh global IDs.
-        appended = steps[start:]
-        del steps[start:]
-        renamed = {}
-        for step in appended:
-            identifier = _fresh_step_id(steps, "ATOM")
-            renamed[step.id] = identifier
-            steps.append(
-                ProofStep(
-                    identifier,
-                    step.rule,
-                    step.conclusion,
-                    tuple(renamed.get(item, item) for item in step.inputs),
-                )
-            )
-        inputs.append(renamed.get(result, result))
-    return _append_formula_step(
-        steps, ProofRule.ATOM_RECOMPOSITION, atom, tuple(inputs), None
-    )
 
 
 def _append_formula_contradiction(
@@ -1232,14 +1064,6 @@ def _mentions_pair(formula: SpatialFormula, pair: set[str]) -> bool:
         return _mentions_pair(formula.operand, pair)
     if isinstance(formula, (And, Or)):
         return any(_mentions_pair(operand, pair) for operand in formula.operands)
-    if isinstance(formula, Implies):
-        return _mentions_pair(formula.antecedent, pair) or _mentions_pair(
-            formula.consequent, pair
-        )
-    if isinstance(formula, Iff):
-        return _mentions_pair(formula.left, pair) or _mentions_pair(
-            formula.right, pair
-        )
     return False
 
 
@@ -1502,15 +1326,6 @@ def build_direction_proof(
     candidates = [item for item in candidates if item in query.candidate_directions]
     steps = _premise_steps(problem)
     _saturate_formula_steps(steps)
-    # Case conclusions may supply an intermediate relation for axis composition.
-    intermediates = {
-        step.conclusion.consequent
-        for step in tuple(steps)
-        if isinstance(step.conclusion, Implies)
-        and isinstance(step.conclusion.consequent, RelationConstraint)
-    }
-    for intermediate in sorted(intermediates, key=repr):
-        _derive_formula(steps, intermediate)
     formula_steps = {}
     for candidate in candidates:
         result = _derive_formula(

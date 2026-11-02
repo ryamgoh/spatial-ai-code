@@ -21,8 +21,6 @@ from spatial.v2.proofs import (
 from spatial.v2.solver import (
     And,
     Direction,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -93,14 +91,6 @@ def _formula_text(
             f"({_formula_text(operand, labels, symbolic=symbolic)})"
             for operand in formula.operands
         )
-    if isinstance(formula, Implies):
-        left = _formula_text(formula.antecedent, labels, symbolic=symbolic)
-        right = _formula_text(formula.consequent, labels, symbolic=symbolic)
-        return f"({left}) -> ({right})" if symbolic else f"if {left}, then {right}"
-    if isinstance(formula, Iff):
-        left = _formula_text(formula.left, labels, symbolic=symbolic)
-        right = _formula_text(formula.right, labels, symbolic=symbolic)
-        return f"({left}) <-> ({right})" if symbolic else f"{left} exactly when {right}"
     raise TypeError(f"unsupported proof formula: {type(formula).__name__}")
 
 
@@ -160,9 +150,7 @@ def _natural_step(step, labels: Mapping[str, str]) -> str:
     if step.rule in {
         ProofRule.AND_ELIMINATION,
         ProofRule.AND_INTRODUCTION,
-        ProofRule.MODUS_PONENS,
         ProofRule.DISJUNCTIVE_SYLLOGISM,
-        ProofRule.IFF_ELIMINATION,
         ProofRule.DOUBLE_NEGATION,
     }:
         assert isinstance(conclusion, SpatialFormula)

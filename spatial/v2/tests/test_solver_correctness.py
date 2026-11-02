@@ -31,8 +31,6 @@ from spatial.v2.solver import (
     Direction,
     DirectionAnalysis,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -90,10 +88,6 @@ def holds(formula, world):
         return all(holds(operand, world) for operand in formula.operands)
     if isinstance(formula, Or):
         return any(holds(operand, world) for operand in formula.operands)
-    if isinstance(formula, Implies):
-        return not holds(formula.antecedent, world) or holds(formula.consequent, world)
-    if isinstance(formula, Iff):
-        return holds(formula.left, world) == holds(formula.right, world)
     raise AssertionError(f"unsupported oracle formula: {formula!r}")
 
 
@@ -111,15 +105,10 @@ def formula_cases():
         ("not-cardinal", Not(atom("A", "B", Direction.EAST))),
         ("and", And((p, q))),
         ("or", Or((p, q))),
-        ("implication", Implies(p, q)),
-        ("equivalence", Iff(p, q)),
         ("tautology", Or((p, Not(p)))),
         ("contradiction", And((p, Not(p)))),
-        ("modus-ponens", And((p, Implies(p, q)))),
-        ("vacuous-implication", And((Not(p), Implies(p, q)))),
-        ("equivalence-negative", And((Iff(p, q), Not(p)))),
         ("de-morgan", Not(And((p, q)))),
-        ("case-split", And((Or((p, q)), Implies(p, r), Implies(q, r)))),
+        ("case-split", Or((And((p, r)), And((q, r))))),
         ("disjunctive-syllogism", And((Or((p, q)), Not(p)))),
         ("correlated-xor", And((Or((p, q)), Not(And((p, q)))))),
         (
@@ -143,17 +132,13 @@ def formula_cases():
             subject, reference = rng.sample(OBJECTS, 2)
             domain = frozenset(rng.sample(tuple(Direction), rng.randint(1, 8)))
             return RelationConstraint(subject, reference, domain)
-        operator = rng.choice((Not, And, Or, Implies, Iff))
+        operator = rng.choice((Not, And, Or))
         if operator is Not:
             return Not(sampled(depth - 1))
         left, right = sampled(depth - 1), sampled(depth - 1)
         if operator is And:
             return And((left, right))
-        if operator is Or:
-            return Or((left, right))
-        if operator is Implies:
-            return Implies(left, right)
-        return Iff(left, right)
+        return Or((left, right))
 
     cases.extend((f"nested-{index}", sampled(3)) for index in range(20))
     return tuple(cases)
@@ -258,7 +243,7 @@ def test_arbitrary_claim_assessment_matches_all_ranked_worlds(backend, name, pre
     if backend == "z3":
         pytest.importorskip("z3")
     problem = SpatialProblem(OBJECTS, premise, DirectionQuery("A", "B"))
-    claim = Implies(atom("A", "B"), Not(atom("C", "B")))
+    claim = And((atom("A", "B"), Not(atom("C", "B"))))
     worlds = tuple(world for world in ranked_worlds(OBJECTS) if holds(premise, world))
     assessment = SpatialSolverV2(backend=backend).assess(problem, claim)
     assert assessment.error is None, name
@@ -384,10 +369,7 @@ def boolean_rule_cases():
     return (
         (ProofRule.AND_ELIMINATION, (And((p, q)),), p),
         (ProofRule.AND_INTRODUCTION, (p, q), And((p, q))),
-        (ProofRule.MODUS_PONENS, (Implies(p, q), p), q),
         (ProofRule.DISJUNCTIVE_SYLLOGISM, (Or((p, q)), Not(p)), q),
-        (ProofRule.IFF_ELIMINATION, (Iff(p, q), p), q),
-        (ProofRule.IFF_ELIMINATION, (Iff(p, q), q), p),
         (ProofRule.DOUBLE_NEGATION, (Not(Not(p)),), p),
         (ProofRule.CONTRADICTION, (p, Not(p)), Contradiction()),
     )
@@ -419,7 +401,7 @@ def test_boolean_checker_rules_preserve_truth_in_all_ranked_worlds(
 
 
 @pytest.mark.parametrize(
-    "name", ("modus-ponens", "disjunctive-syllogism", "case-split", "axis-equality")
+    "name", ("disjunctive-syllogism", "case-split", "axis-equality")
 )
 def test_accepted_proofs_and_refutations_agree_with_independent_worlds(name):
     premise = dict(FORMULAS)[name]
@@ -468,10 +450,6 @@ def renderable(formula):
         return And(tuple(renderable(operand) for operand in formula.operands))
     if isinstance(formula, Or):
         return Or(tuple(renderable(operand) for operand in formula.operands))
-    if isinstance(formula, Implies):
-        return Implies(renderable(formula.antecedent), renderable(formula.consequent))
-    if isinstance(formula, Iff):
-        return Iff(renderable(formula.left), renderable(formula.right))
     raise AssertionError(f"unsupported renderable formula: {formula!r}")
 
 

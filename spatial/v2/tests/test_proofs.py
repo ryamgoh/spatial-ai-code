@@ -40,8 +40,6 @@ from spatial.v2.solver import (
     And,
     Direction,
     DirectionQuery,
-    Iff,
-    Implies,
     Not,
     Or,
     RelationConstraint,
@@ -178,26 +176,11 @@ def test_refutation_builder_rejects_a_possible_direction() -> None:
         build_direction_refutation(problem, Direction.NORTHEAST)
 
 
-def test_automatic_builder_applies_modus_ponens() -> None:
-    antecedent = atom("A", Direction.NORTH, "B")
-    consequent = atom("C", Direction.SOUTHWEST, "D")
-    problem = SpatialProblem(
-        objects=("A", "B", "C", "D"),
-        premise=And((antecedent, Implies(antecedent, consequent))),
-        query=DirectionQuery("C", "D"),
-    )
-
-    proof = build_direction_proof(problem)
-
-    assert proof.conclusion.direction is Direction.SOUTHWEST
-    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
-
-
-def test_automatic_builder_accepts_parsed_controlled_boolean_text() -> None:
+def test_automatic_builder_accepts_parsed_spatial_text() -> None:
     prompt = (
         "Consider a map with multiple locations:\n\n"
         "A is to the North of B. "
-        "IF (A is to the North of B) THEN (C is to the East of D).\n\n"
+        "C is to the East of D.\n\n"
         "Question: In which direction is C relative to D?"
     )
     problem = SpatialTextAdapter().parse(prompt).problem
@@ -205,48 +188,13 @@ def test_automatic_builder_accepts_parsed_controlled_boolean_text() -> None:
     proof = build_direction_proof(problem)
 
     assert proof.conclusion.direction is Direction.EAST
-    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
 
 
-def test_automatic_builder_constructs_conjunctive_antecedent() -> None:
-    north = atom("A", Direction.NORTH, "B")
-    east = atom("C", Direction.EAST, "D")
-    consequent = atom("E", Direction.SOUTHWEST, "F")
-    problem = SpatialProblem(
-        objects=("A", "B", "C", "D", "E", "F"),
-        premise=And((north, east, Implies(And((north, east)), consequent))),
-        query=DirectionQuery("E", "F"),
-    )
-
-    proof = build_direction_proof(problem)
-
-    assert proof.conclusion.direction is Direction.SOUTHWEST
-    assert any(step.rule is ProofRule.AND_INTRODUCTION for step in proof.steps)
-    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
-
-
-def test_boolean_derived_atom_feeds_axis_transitivity() -> None:
-    antecedent = atom("A", Direction.NORTHEAST, "B")
-    derived = atom("B", Direction.NORTH, "C")
-    problem = SpatialProblem(
-        objects=("A", "B", "C"),
-        premise=And((antecedent, Implies(antecedent, derived))),
-        query=DirectionQuery("A", "C"),
-    )
-
-    proof = build_direction_proof(problem)
-
-    assert proof.conclusion.direction is Direction.NORTHEAST
-    assert any(step.rule is ProofRule.MODUS_PONENS for step in proof.steps)
-    assert any(step.rule is ProofRule.AXIS_TRANSITIVITY for step in proof.steps)
-
-
-def test_automatic_builder_applies_iff_and_double_negation() -> None:
-    left = atom("A", Direction.EAST, "B")
+def test_automatic_builder_applies_double_negation() -> None:
     right = atom("C", Direction.SOUTH, "D")
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
-        premise=And((Iff(left, right), Not(Not(left)))),
+        premise=Not(Not(right)),
         query=DirectionQuery("C", "D"),
     )
 
@@ -254,7 +202,6 @@ def test_automatic_builder_applies_iff_and_double_negation() -> None:
 
     assert proof.conclusion.direction is Direction.SOUTH
     assert any(step.rule is ProofRule.DOUBLE_NEGATION for step in proof.steps)
-    assert any(step.rule is ProofRule.IFF_ELIMINATION for step in proof.steps)
 
 
 def test_automatic_builder_applies_disjunctive_syllogism() -> None:
@@ -278,13 +225,7 @@ def test_automatic_builder_performs_complete_case_split() -> None:
     east = atom("C", Direction.EAST, "D")
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
-        premise=And(
-            (
-                Or((northeast, northwest)),
-                Implies(northeast, east),
-                Implies(northwest, east),
-            )
-        ),
+        premise=Or((And((northeast, east)), And((northwest, east)))),
         query=DirectionQuery("C", "D"),
     )
 
@@ -302,12 +243,11 @@ def test_automatic_case_split_closes_contradictory_branch() -> None:
     east = atom("C", Direction.EAST, "D")
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
-        premise=And(
+        premise=Or(
             (
-                Or((northeast, northwest, southwest)),
-                Implies(northwest, Not(northwest)),
-                Implies(northeast, east),
-                Implies(southwest, east),
+                And((northeast, east)),
+                And((northwest, Not(northwest))),
+                And((southwest, east)),
             )
         ),
         query=DirectionQuery("C", "D"),
@@ -329,13 +269,10 @@ def test_automatic_builder_handles_nested_case_splits() -> None:
     east = atom("C", Direction.EAST, "D")
     problem = SpatialProblem(
         objects=("A", "B", "C", "D", "E", "F"),
-        premise=And(
+        premise=Or(
             (
-                Or((northeast, northwest)),
-                Implies(northeast, Or((north, south))),
-                Implies(north, east),
-                Implies(south, east),
-                Implies(northwest, east),
+                And((northeast, Or((And((north, east)), And((south, east)))))),
+                And((northwest, east)),
             )
         ),
         query=DirectionQuery("C", "D"),
@@ -369,14 +306,9 @@ def test_nested_case_search_is_bounded_by_formula_structure_not_magic_depth() ->
         )
         for index in range(5)
     ]
-    premises: list[SpatialFormula] = [Or(levels[0])]
-    for index, (left, right) in enumerate(levels):
-        premises.append(Implies(right, target))
-        premises.append(
-            Implies(left, Or(levels[index + 1]))
-            if index + 1 < len(levels)
-            else Implies(left, target)
-        )
+    premise = target
+    for left, right in reversed(levels):
+        premise = Or((And((left, premise)), And((right, target))))
     objects = (
         "T",
         "R",
@@ -384,7 +316,7 @@ def test_nested_case_search_is_bounded_by_formula_structure_not_magic_depth() ->
     )
     problem = SpatialProblem(
         objects=objects,
-        premise=And(tuple(premises)),
+        premise=premise,
         query=DirectionQuery("T", "R"),
     )
 
@@ -398,13 +330,12 @@ def test_automatic_direction_refutation_uses_boolean_contradiction() -> None:
     south = atom("A", Direction.SOUTH, "B")
     problem = SpatialProblem(
         objects=("A", "B"),
-        premise=Implies(south, Not(south)),
+        premise=Not(south),
         query=DirectionQuery("A", "B"),
     )
 
     refutation = build_direction_refutation(problem, Direction.SOUTH)
 
-    assert any(step.rule is ProofRule.MODUS_PONENS for step in refutation.steps)
     assert refutation.steps[-1].rule is ProofRule.CONTRADICTION
 
 
@@ -414,7 +345,7 @@ def test_automatic_formula_refutation_preserves_boolean_correlation() -> None:
     claim = And((Not(a_member), Not(b_member)))
     problem = SpatialProblem(
         objects=("A", "B", "R"),
-        premise=Iff(a_member, Not(b_member)),
+        premise=Or((And((a_member, Not(b_member))), And((Not(a_member), b_member)))),
         query=DirectionQuery("A", "R"),
     )
 
@@ -424,8 +355,7 @@ def test_automatic_formula_refutation_preserves_boolean_correlation() -> None:
     symbolic = render_formula_refutation(refutation, TraceFormat.SYMBOLIC)
     assert parse_symbolic_formula_refutation(problem, symbolic) == refutation
     assert refutation.claim == claim
-    assert any(step.rule is ProofRule.IFF_ELIMINATION for step in refutation.steps)
-    assert refutation.steps[-1].rule is ProofRule.CONTRADICTION
+    assert refutation.steps[-1].rule is ProofRule.CASE_SPLIT
 
     invalid_claim = replace(
         refutation,
@@ -501,6 +431,38 @@ def test_symbolic_proof_parser_rejects_unknown_fields() -> None:
     payload["unexpected"] = True
 
     with pytest.raises(SymbolicProofError, match="unexpected or missing fields"):
+        parse_symbolic_direction_proof(problem, json.dumps(payload))
+
+
+@pytest.mark.parametrize("kind", ("implies", "iff"))
+@pytest.mark.parametrize("nested", (False, True))
+def test_symbolic_proof_parser_rejects_retired_formula_kinds(kind, nested):
+    problem = SpatialProblem(
+        ("A", "B"), atom("A", Direction.NORTH, "B"), DirectionQuery("A", "B")
+    )
+    payload = json.loads(
+        render_direction_proof(build_direction_proof(problem), TraceFormat.SYMBOLIC)
+    )
+    operand = payload["steps"][0]["conclusion"]
+    fields = ("antecedent", "consequent") if kind == "implies" else ("left", "right")
+    retired = {"kind": kind, **dict.fromkeys(fields, operand)}
+    payload["steps"][0]["conclusion"] = (
+        {"kind": "not", "operand": retired} if nested else retired
+    )
+    with pytest.raises(SymbolicProofError, match="unknown .*kind"):
+        parse_symbolic_direction_proof(problem, json.dumps(payload))
+
+
+@pytest.mark.parametrize("rule", ("modus-ponens", "iff-elimination"))
+def test_symbolic_proof_parser_rejects_retired_rules(rule):
+    problem = SpatialProblem(
+        ("A", "B"), atom("A", Direction.NORTH, "B"), DirectionQuery("A", "B")
+    )
+    payload = json.loads(
+        render_direction_proof(build_direction_proof(problem), TraceFormat.SYMBOLIC)
+    )
+    payload["steps"][-1]["rule"] = rule
+    with pytest.raises(SymbolicProofError):
         parse_symbolic_direction_proof(problem, json.dumps(payload))
 
 
@@ -580,52 +542,6 @@ def test_disjunctive_syllogism_derives_a_spatial_atom_and_direction() -> None:
     assert proof.conclusion.direction is Direction.NORTHEAST
 
 
-def test_modus_ponens_derives_a_spatial_atom() -> None:
-    antecedent = atom("A", Direction.NORTH, "B")
-    consequent = atom("C", Direction.SOUTHWEST, "D")
-    implication = Implies(antecedent, consequent)
-    problem = SpatialProblem(
-        objects=("A", "B", "C", "D"),
-        premise=And((antecedent, implication)),
-        query=DirectionQuery("C", "D"),
-    )
-    proof = certificate_from_atom_step(
-        problem,
-        (
-            *premise_steps(antecedent, implication),
-            ProofStep("S1", ProofRule.MODUS_PONENS, consequent, ("P1", "P2")),
-        ),
-        "S1",
-        consequent,
-    )
-
-    check_direction_proof(proof)
-    assert proof.conclusion.direction is Direction.SOUTHWEST
-
-
-def test_iff_elimination_derives_the_other_spatial_atom() -> None:
-    left = atom("A", Direction.EAST, "B")
-    right = atom("C", Direction.SOUTH, "D")
-    equivalence = Iff(left, right)
-    problem = SpatialProblem(
-        objects=("A", "B", "C", "D"),
-        premise=And((equivalence, left)),
-        query=DirectionQuery("C", "D"),
-    )
-    proof = certificate_from_atom_step(
-        problem,
-        (
-            *premise_steps(equivalence, left),
-            ProofStep("S1", ProofRule.IFF_ELIMINATION, right, ("P1", "P2")),
-        ),
-        "S1",
-        right,
-    )
-
-    check_direction_proof(proof)
-    assert proof.conclusion.direction is Direction.SOUTH
-
-
 def test_conjunction_rules_and_double_negation_are_replayable() -> None:
     northeast = atom("A", Direction.NORTHEAST, "B")
     west = atom("C", Direction.WEST, "D")
@@ -684,14 +600,11 @@ def test_explicit_contradiction_step_is_checked() -> None:
 def test_checker_rejects_invalid_boolean_rule_applications() -> None:
     northeast = atom("A", Direction.NORTHEAST, "B")
     northwest = atom("A", Direction.NORTHWEST, "B")
-    southwest = atom("C", Direction.SOUTHWEST, "D")
     premises = (
         northeast,
         northwest,
         Or((northeast, northwest)),
         Not(northwest),
-        Implies(northeast, southwest),
-        Iff(northeast, southwest),
         Not(Not(northeast)),
     )
     problem = SpatialProblem(
@@ -715,10 +628,6 @@ def test_checker_rejects_invalid_boolean_rule_applications() -> None:
             "wrong conjunction",
         ),
         (
-            ProofStep("BAD", ProofRule.MODUS_PONENS, northwest, ("P1", "P5")),
-            "not a valid modus ponens",
-        ),
-        (
             ProofStep(
                 "BAD",
                 ProofRule.DISJUNCTIVE_SYLLOGISM,
@@ -728,11 +637,7 @@ def test_checker_rejects_invalid_boolean_rule_applications() -> None:
             "wrong remaining disjunct",
         ),
         (
-            ProofStep("BAD", ProofRule.IFF_ELIMINATION, northwest, ("P6", "P1")),
-            "wrong equivalent formula",
-        ),
-        (
-            ProofStep("BAD", ProofRule.DOUBLE_NEGATION, northwest, ("P7",)),
+            ProofStep("BAD", ProofRule.DOUBLE_NEGATION, northwest, ("P5",)),
             "not a valid double-negation",
         ),
         (
@@ -990,14 +895,10 @@ def test_case_split_cannot_discharge_refutation_assumptions() -> None:
 
 
 def test_case_split_recombines_two_spatial_proof_branches() -> None:
-    northeast = atom("A", Direction.NORTHEAST, "B")
-    northwest = atom("A", Direction.NORTHWEST, "B")
     east = atom("C", Direction.EAST, "D")
-    premises = (
-        Or((northeast, northwest)),
-        Implies(northeast, east),
-        Implies(northwest, east),
-    )
+    northeast = And((atom("A", Direction.NORTHEAST, "B"), east))
+    northwest = And((atom("A", Direction.NORTHWEST, "B"), east))
+    premises = (Or((northeast, northwest)),)
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
         premise=And(premises),
@@ -1016,9 +917,9 @@ def test_case_split_recombines_two_spatial_proof_branches() -> None:
             ),
             ProofStep(
                 "B1-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B1-A", "P2"),
+                ("B1-A",),
                 branch="northeast-case",
             ),
             ProofStep(
@@ -1030,9 +931,9 @@ def test_case_split_recombines_two_spatial_proof_branches() -> None:
             ),
             ProofStep(
                 "B2-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B2-A", "P3"),
+                ("B2-A",),
                 branch="northwest-case",
             ),
             ProofStep(
@@ -1056,13 +957,12 @@ def test_case_split_recombines_two_spatial_proof_branches() -> None:
 
 
 def test_case_split_can_close_one_branch_by_contradiction() -> None:
-    northeast = atom("A", Direction.NORTHEAST, "B")
     northwest = atom("A", Direction.NORTHWEST, "B")
     east = atom("C", Direction.EAST, "D")
+    northeast = And((atom("A", Direction.NORTHEAST, "B"), east))
     premises = (
         Or((northeast, northwest)),
         Not(northwest),
-        Implies(northeast, east),
     )
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
@@ -1082,9 +982,9 @@ def test_case_split_can_close_one_branch_by_contradiction() -> None:
             ),
             ProofStep(
                 "B1-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B1-A", "P3"),
+                ("B1-A",),
                 branch="open-case",
             ),
             ProofStep(
@@ -1125,14 +1025,10 @@ def test_case_split_can_close_one_branch_by_contradiction() -> None:
 
 
 def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> None:
-    northeast = atom("A", Direction.NORTHEAST, "B")
-    northwest = atom("A", Direction.NORTHWEST, "B")
     east = atom("C", Direction.EAST, "D")
-    premises = (
-        Or((northeast, northwest)),
-        Implies(northeast, east),
-        Implies(northwest, east),
-    )
+    northeast = And((atom("A", Direction.NORTHEAST, "B"), east))
+    northwest = And((atom("A", Direction.NORTHWEST, "B"), east))
+    premises = (Or((northeast, northwest)),)
     problem = SpatialProblem(
         objects=("A", "B", "C", "D"),
         premise=And(premises),
@@ -1149,9 +1045,9 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
         ),
         ProofStep(
             "B1-S",
-            ProofRule.MODUS_PONENS,
+            ProofRule.AND_ELIMINATION,
             east,
-            ("B1-A", "P2"),
+            ("B1-A",),
             branch="case-1",
         ),
     )
@@ -1168,9 +1064,9 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
             ),
             ProofStep(
                 "B2-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B1-A", "P3"),
+                ("B1-A",),
                 branch="case-2",
             ),
         ),
@@ -1193,9 +1089,9 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
             ),
             ProofStep(
                 "B2-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B2-A", "P2"),
+                ("B2-A",),
                 branch="case-2",
             ),
             ProofStep(
@@ -1213,7 +1109,6 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
 
     duplicate_premises = (
         Or((northeast, northwest)),
-        Implies(northeast, east),
         And((east, northeast)),
     )
     duplicate_problem = SpatialProblem(
@@ -1241,16 +1136,16 @@ def test_checker_rejects_cross_branch_dependencies_and_incomplete_cases() -> Non
             ),
             ProofStep(
                 "B1-S",
-                ProofRule.MODUS_PONENS,
+                ProofRule.AND_ELIMINATION,
                 east,
-                ("B1-A1", "P2"),
+                ("B1-A1",),
                 branch="case-1",
             ),
             ProofStep(
                 "B2-S",
                 ProofRule.AND_ELIMINATION,
                 east,
-                ("P3",),
+                ("P2",),
                 branch="case-2",
             ),
             ProofStep(
@@ -1403,7 +1298,7 @@ def test_formula_rule_cannot_hide_unused_axis_evidence_as_an_extra_input():
 
 def test_inert_tautology_fillers_do_not_explode_case_split_search() -> None:
     from spatial.v2 import proofs
-    from spatial.v2.solver import Implies, Not, Or
+    from spatial.v2.solver import Not, Or
 
     def atom(subject, direction, reference):
         return RelationConstraint(subject, reference, frozenset({direction}))
@@ -1416,14 +1311,21 @@ def test_inert_tautology_fillers_do_not_explode_case_split_search() -> None:
         ("A", "B", "R", "T", "U", "V", "W", "X"),
         And(
             (
-                Or((atom("A", Direction.NORTH, "B"), atom("A", Direction.SOUTH, "B"))),
-                Implies(
-                    atom("A", Direction.NORTH, "B"),
-                    atom("T", Direction.NORTHEAST, "R"),
-                ),
-                Implies(
-                    atom("A", Direction.SOUTH, "B"),
-                    atom("T", Direction.SOUTHEAST, "R"),
+                Or(
+                    (
+                        And(
+                            (
+                                atom("A", Direction.NORTH, "B"),
+                                atom("T", Direction.NORTHEAST, "R"),
+                            )
+                        ),
+                        And(
+                            (
+                                atom("A", Direction.SOUTH, "B"),
+                                atom("T", Direction.SOUTHEAST, "R"),
+                            )
+                        ),
+                    )
                 ),
                 filler("U", "V"),
                 filler("V", "W"),

@@ -129,18 +129,6 @@ class Or(SpatialFormula):
     operands: tuple[SpatialFormula, ...]
 
 
-@dataclass(frozen=True)
-class Implies(SpatialFormula):
-    antecedent: SpatialFormula
-    consequent: SpatialFormula
-
-
-@dataclass(frozen=True)
-class Iff(SpatialFormula):
-    left: SpatialFormula
-    right: SpatialFormula
-
-
 def conjunctive_atoms(
     formula: SpatialFormula,
 ) -> tuple[RelationConstraint, ...] | None:
@@ -284,14 +272,6 @@ def _walk_formulas(formula: SpatialFormula) -> tuple[SpatialFormula, ...]:
         return (formula,) + tuple(
             child for operand in formula.operands for child in _walk_formulas(operand)
         )
-    if isinstance(formula, Implies):
-        return (
-            (formula,)
-            + _walk_formulas(formula.antecedent)
-            + _walk_formulas(formula.consequent)
-        )
-    if isinstance(formula, Iff):
-        return (formula,) + _walk_formulas(formula.left) + _walk_formulas(formula.right)
     raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
 
@@ -643,14 +623,6 @@ class _ReferenceEngine:
                 _ReferenceEngine._evaluate_formula(operand, assignments)
                 for operand in formula.operands
             )
-        if isinstance(formula, Implies):
-            return not _ReferenceEngine._evaluate_formula(
-                formula.antecedent, assignments
-            ) or _ReferenceEngine._evaluate_formula(formula.consequent, assignments)
-        if isinstance(formula, Iff):
-            return _ReferenceEngine._evaluate_formula(
-                formula.left, assignments
-            ) == _ReferenceEngine._evaluate_formula(formula.right, assignments)
         raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
     def _find_formula_witness(
@@ -896,15 +868,6 @@ class _Z3Engine:
         if isinstance(formula, Or):
             return z3.Or(
                 *(self._formula(x, y, operand) for operand in formula.operands)
-            )
-        if isinstance(formula, Implies):
-            return z3.Implies(
-                self._formula(x, y, formula.antecedent),
-                self._formula(x, y, formula.consequent),
-            )
-        if isinstance(formula, Iff):
-            return self._formula(x, y, formula.left) == self._formula(
-                x, y, formula.right
             )
         raise TypeError(f"unsupported spatial formula: {type(formula).__name__}")
 
