@@ -9,19 +9,18 @@ from multiprocessing import get_context
 from pathlib import Path
 
 import run_all_controlled_prototype as tokenizer_loader
-from audit_entailment_candidate import replay_counterexample, replay_paths
 from build_controlled_training import export
 from review_unique_pretraining import digest
 
 from spatial.v2.composition_feasibility import token_measurement
 from spatial.v2.composition_solver_reuse import QuestionSolver
+from spatial.v2.entailment_artifact_audit import independent_plan_check
 from spatial.v2.entailment_contracts import Contract
 from spatial.v2.entailment_dataset import audit_row
 from spatial.v2.entailment_evidence import SPATIAL_PROSE_VERSION, render_pair
-from spatial.v2.entailment_readable_v3 import audit_plan, make_plan
+from spatial.v2.entailment_readable_v3 import make_plan
 from spatial.v2.entailment_replacement_allocation import validate_records
 from spatial.v2.entailment_saved import load_evidence
-from spatial.v2.solver import CountQuery, DirectionQuery
 
 EXP = Path(__file__).resolve().parent
 ROOT = EXP.parents[1]
@@ -35,38 +34,6 @@ def preserved_projection(record):
         row.pop("references")
         row.pop("reference_version")
     return result
-
-
-def independent_plan_check(evidence, plan):
-    problem = evidence.semantics.problem
-    for value in plan["values"]:
-        support = evidence.positive_support[value]
-        if isinstance(problem.query, CountQuery):
-            for member in support["memberships"]:
-                replay_paths(
-                    problem,
-                    member["paths"],
-                    member["candidate"],
-                    problem.query.reference,
-                    next(iter(problem.query.directions)).value,
-                    member["qualifies"],
-                )
-        else:
-            replay_paths(
-                problem,
-                support["paths"],
-                problem.query.target
-                if isinstance(problem.query, DirectionQuery)
-                else value,
-                problem.query.reference,
-                value
-                if isinstance(problem.query, DirectionQuery)
-                else next(iter(problem.query.directions)).value,
-                True,
-            )
-    for value in plan["witness_keys"]:
-        replay_counterexample(problem, value, evidence.semantics.counterexamples[value])
-    audit_plan(evidence, plan)
 
 
 def rerender(original):

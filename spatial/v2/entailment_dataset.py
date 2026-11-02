@@ -45,7 +45,7 @@ from spatial.v2.entailment_scene_protocol import (
     render_prompt as render_scene_prompt,
 )
 from spatial.v2.serialization import tagged_dataclass_to_dict
-from spatial.v2.solver import And, Direction, DirectionQuery, WhichQuery
+from spatial.v2.solver import And, CountQuery, Direction, DirectionQuery, WhichQuery
 
 
 def signature(semantics):
@@ -180,10 +180,22 @@ def measure_depth(problem, *, solver=None):
     raise UnsupportedEvidence("deepest support does not change the entailed-answer set")
 
 
-def menus_for(semantics, seed, *, omission_percent=20):
+def menus_for(semantics, seed, *, omission_percent=20, count_menu_values=None):
     if type(omission_percent) is not int or not 0 <= omission_percent <= 100:
         raise ValueError("omission percent must be an integer in 0-100")
     domain = answer_domain(semantics.problem)
+    if count_menu_values is not None:
+        pool = tuple(count_menu_values)
+        if (
+            not isinstance(semantics.problem.query, CountQuery)
+            or any(type(v) is not int for v in pool)
+            or len(pool) != len(set(pool))
+            or not set(pool) <= set(domain)
+            or not semantics.entailed <= set(pool)
+        ):
+            raise ValueError("invalid Count menu pool or entailed value outside pool")
+        # This restricts displayed options only, never the solver's answer domain.
+        domain = pool
     if len(domain) < 4:
         raise UnsupportedEvidence("four real menu values are required")
     entailed = [v for v in domain if v in semantics.entailed]
@@ -295,6 +307,7 @@ def build_attempt(
     omission_percent=20,
     prompt_version=None,
     display_names=None,
+    count_menu_values=None,
 ):
     if prompt_version not in (None, *PLAIN_VERSIONS):
         raise ValueError("unknown spatial prompt protocol")
@@ -359,7 +372,10 @@ def build_attempt(
         rows, tokens = [], []
         record["stage"] = "render-and-audit"
         menus = menus_for(
-            semantics, stable_int(base_id), omission_percent=omission_percent
+            semantics,
+            stable_int(base_id),
+            omission_percent=omission_percent,
+            count_menu_values=count_menu_values,
         )
         for index, menu in enumerate(menus):
             for contract in (

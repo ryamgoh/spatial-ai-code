@@ -1,8 +1,10 @@
 # Spatial V2
 
-The active research direction is
-[Composition v1](../../experiments/spatialentail-composition-v1/README.md),
-governed by its [Unique-only specification](../../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md).
+The current experiment is
+[SpatialEntail Final v1](../../experiments/spatialentail-final-v1/README.md).
+Its [SFT plan](../../experiments/spatialentail-final-v1/SFT-PLAN.md) records the
+current overrides to the inherited
+[Unique-only specification](../../experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md).
 
 ## Active Generation
 
@@ -11,15 +13,23 @@ Current entry points:
 | Module | Responsibility |
 |---|---|
 | `entailment_generator.py` | SceneRequest / build_scene interface |
+| `entailment_generation.py` | Configured candidate build, export, verification and worker orchestration |
+| `entailment_artifact_audit.py` | Independent SMT, counterexample, path, selected-depth and render-plan audits |
 | `entailment_scene_protocol.py` | All-scene questions and system rules |
 | `entailment_dataset.py`, `entailment_evidence.py` | Verified labels and paired explanations |
 | `entailment_thinking_training.py` | Native Qwen3 thinking serialization and training preparation |
 | `entailment_evaluation.py` | Batched two-stage inference, dev selection and resumable results |
 | `composition_depth.py` | Supporting atomic-axis path depth |
 
-Server generation and internal evaluation preparation are driven by
+Final-v1's `generate.py` is a thin CLI launcher; its `generation_policy.py`
+supplies experiment-specific quotas, identities and paths to the shared
+`GenerationWorkflow`. Outputs remain under the experiment's run directory.
+Shared generation imports no experiment implementation. Historical audit
+entry points re-export the shared auditor for existing callers.
+
+Historical composition generation and internal evaluation preparation use
 `experiments/spatialentail-composition-v1/generate_and_prepare.py` and
-`prepare_evaluation.py`. Use that experiment's Slurm instructions.
+`prepare_evaluation.py`. Do not use those launchers for final-v1.
 The generic `generate_all.py` CLI is not the current study's dataset launcher.
 Retired repair, reserve-assembly, and migration diagnostics have been removed.
 The old CPU coordinator, timing runner, coverage-draft compiler, and menu

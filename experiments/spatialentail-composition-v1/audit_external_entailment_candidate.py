@@ -140,7 +140,8 @@ def main():
         "artifact_sha256": {p.name: digest(p) for p in args.candidate.glob("*.jsonl")},
         "auditor_sha256": digest(Path(__file__)),
         "atomic_checker_sha256": digest(
-            Path(__file__).with_name("audit_entailment_candidate.py")
+            Path(__file__).resolve().parents[2]
+            / "spatial/v2/entailment_artifact_audit.py"
         ),
         "independent_of": [
             "production solver",

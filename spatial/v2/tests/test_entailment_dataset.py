@@ -98,3 +98,66 @@ def test_selection_empty_entailment_not_forced_into_depth_quota():
 
     with pytest.raises(UnsupportedEvidence):
         measure_depth(BY_ID["S2"].problem())
+
+
+@pytest.mark.parametrize("case", ("sole", "no-entailed", "inconsistent"))
+@pytest.mark.parametrize("count", range(5))
+def test_count_pool_changes_options_not_complete_semantics(case, count):
+    from spatial.v2.composition_contracts import answer_domain
+    from spatial.v2.entailment_contracts import encode
+    from spatial.v2.entailment_generator import SceneRequest, build_scene
+
+    _, problem = build_scene(
+        SceneRequest(1, Direction.NORTH, "count", case, count),
+        identity=f"count-menu-{case}-{count}",
+        family="menu-test",
+        structure_seed=1234,
+    )
+    semantics = analyze(problem)
+    assert len(answer_domain(problem)) > 5
+    assert set(semantics.counterexamples) == (
+        set(answer_domain(problem)) - semantics.entailed
+        if semantics.consistent
+        else set()
+    )
+    legacy = menus_for(semantics, 42, omission_percent=100)
+    assert legacy == menus_for(
+        semantics, 42, omission_percent=100, count_menu_values=None
+    )
+    for seed in range(20):
+        menus = menus_for(
+            semantics, seed, omission_percent=100, count_menu_values=range(5)
+        )
+        assert all(len(menu) == len(set(menu)) == 4 for menu in menus)
+        assert all(set(menu) <= set(range(5)) for menu in menus)
+        if case == "sole":
+            assert len(menus) == 2
+            full, omission = menus
+            assert count in full and count not in omission
+            assert sum(a != b for a, b in zip(full, omission)) == 1
+            assert encode(semantics, full, Contract.UNIQUE).letters in "ABCD"
+            assert encode(semantics, omission, Contract.UNIQUE).letters == "F"
+        else:
+            assert len(menus) == 1
+            assert encode(semantics, menus[0], Contract.UNIQUE).letters == "E"
+
+
+@pytest.mark.parametrize("pool", ((0, 1, 2, 2, 3), (False, 1, 2, 3, 4), (0, 1, 2, 99)))
+def test_count_menu_pool_rejects_invalid_values(pool):
+    semantics = analyze(BY_ID["C2"].problem())
+    with pytest.raises(ValueError, match="invalid Count menu pool"):
+        menus_for(semantics, 0, count_menu_values=pool)
+
+
+def test_count_menu_pool_rejects_non_count_or_hidden_entailed_value():
+    from spatial.v2.composition_contracts import answer_domain
+
+    semantics = analyze(BY_ID["D1"].problem())
+    with pytest.raises(ValueError, match="invalid Count menu pool"):
+        menus_for(semantics, 0, count_menu_values=range(5))
+    semantics = analyze(BY_ID["C2"].problem())
+    excluded = tuple(
+        v for v in answer_domain(semantics.problem) if v not in semantics.entailed
+    )
+    with pytest.raises(ValueError, match="entailed value outside pool"):
+        menus_for(semantics, 0, count_menu_values=excluded)

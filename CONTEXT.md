@@ -2,11 +2,75 @@
 
 ## Current research authority
 
-The active study is
+The current planning target is
+[`spatialentail-final-v1`](experiments/spatialentail-final-v1/README.md), a clean
+restart of the intended composition SFT study. Read its
+[SFT plan](experiments/spatialentail-final-v1/SFT-PLAN.md) before implementation.
+The folder now has a CPU-only generation workflow and run-local candidate
+exports. It does not yet have a training-ready release or final-v1 SFT launcher.
+The agreed scope needs no manual reapproval; validation remains required.
+
+The inherited scientific requirements are recorded in
 [`spatialentail-composition-v1`](experiments/spatialentail-composition-v1/README.md).
 Read its [Unique-only specification](experiments/spatialentail-composition-v1/UNIQUE-ONLY-v1.md)
-before planning or changing research code. It is the source of truth for the
-new study; the vocabulary below records earlier designs and does not override it.
+before planning or changing research code. It is the baseline for inherited
+semantics and historical allocation. The final-v1 plan and user-confirmed
+overrides below take precedence for the new experiment. The historical
+vocabulary does not override them. Preserve old artifacts and receipts unchanged.
+
+For final-v1, the user's external-evaluation clarification takes precedence:
+SpatialMap-TQA-Corr is exactly 1,500 corrected SpatialMap-TQA questions under
+`unique-entailed`, with no added omission companions and no requirement to cover
+all SFT-Bench answer types. Do not inherit the old augmented external inventory.
+
+Dev is held-out validation evaluated during SFT, not a final benchmark.
+For final-v1 it is a new all-controlled set of 1,200 questions, one menu each,
+with no omission companions and no question, scene or family overlap with
+train or test. It matches train's query/answer/subtype proportions: 400 per
+query, including 240 A-D, 120 E and 40 F. Retain 280 depth-cohort and 120
+semantic-cohort examples per query, with 10 families per applicable proof-depth
+stratum. The old independent per-depth tables and span-1-only contingent cases
+are superseded by the joint level/semantic-case policy below.
+
+SFT-Bench contains only the in-range test and extrapolation test, excluding
+train and dev. SFT-Bench and SpatialMap-TQA-Corr evaluate the selected model
+after training.
+
+The latest final-v1 distribution policy is
+`matched-controlled-uniform-levels-v2`: train, dev, in-range test
+and extrapolation test all have 60% A-D, 30% E and 10% F per query, with the
+same query-specific E-subtype proportions. Each question has one menu;
+SFT-Bench is exactly 2,400 + 1,200 examples, not augmented menu views.
+New test inventories and exclusion fingerprints are required; never relabel
+old questions to fill quotas or use model results to select new test questions.
+
+Final-v1 synthetic Count menus now use `synthetic-count-options-0-4-v1`: four
+distinct options from 0-4 for every answer case. F omits the sole entailed
+answer; the full Count semantics/domain is unchanged. This removes the
+demonstrated large-number distractor cue without changing quotas or scene
+seeds. Historical defaults and external menus are unchanged. Review sampling
+now covers split/query/levels, contingent cases, Count values and longest
+examples, with an explicit selected-not-reviewed receipt. Actual review remains
+pending. Direction/variant seed coupling is unchanged: it is a coverage
+limitation, not a demonstrated correctness defect.
+
+Every applicable semantic case must span every assigned construction level
+(1-8 in-range; 9-10 extrapolation), including inconsistent and no-entailment
+cases and sole Which with contingent alternatives. Construction level is
+not verified proof depth: inconsistent/ambiguous examples have null proof
+depth. They require checked semantic evidence and coverage across levels, not
+increasing contradiction or ambiguity difficulty. A short valid contradiction
+at a higher level is not a defect; no semantic-difficulty scaling release gate
+is required. Positive support depth remains checked, including semantic-cohort
+sole Which (whose full verified depth stays null). Joint integer tables are
+implemented in `generation_policy.py`; full-corpus feasibility, shortcut probes,
+paired review and trainer validation remain pending. Generation never silently
+promotes a candidate to a training-ready release.
+All synthetic splits use the same controlled generation framework. Train,
+dev and in-range use uniform construction levels 1-8; extrapolation uses
+equal levels 9 and 10. This supersedes weighted train/dev levels and mixed-source
+in-range targets. Balance correct A/B/C/D positions per split/query where
+feasible. Rare subtype cells provide coverage, not precise per-level estimates.
 
 The research direction is settled: a solver-verified atomic spatial-composition
 dataset is the primary contribution, with matched Natural/Symbolic supervision

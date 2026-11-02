@@ -1,0 +1,716 @@
+"""Regression tests for final-v1 allocation, native exports and fail-closed runs."""
+
+import ast
+import os
+import subprocess
+import sys
+from collections import Counter
+from copy import deepcopy
+from dataclasses import replace
+from pathlib import Path
+
+import pytest
+
+EXP = Path(__file__).resolve().parents[1]
+ROOT = EXP.parents[1]
+sys.path.insert(0, str(EXP))
+import generation_policy as policy
+
+from spatial.v2 import entailment_generation as shared
+
+POLICY_BASELINE_SHA = "c405773afe4d97fef2df7dd00f60024b6baf1a9c0117e8353eba99efaa8620ef"
+
+
+@pytest.fixture(scope="module")
+def api():
+    return shared.GenerationWorkflow(policy.workflow_config())
+
+
+@pytest.fixture(scope="module")
+def tokens(api):
+    from transformers import AutoTokenizer
+
+    pair = tuple(
+        AutoTokenizer.from_pretrained(model, revision=rev, local_files_only=True)
+        for model, rev in (
+            (policy.ADMISSION_MODEL, policy.ADMISSION_REVISION),
+            (policy.MODEL["model_id"], policy.MODEL["revision"]),
+        )
+    )
+    api.tokenizers = pair
+    return pair
+
+
+def make_job(api, slot):
+    _, problem, family, direction = api.construct(slot, 0)
+    return {
+        "slot": policy.asdict(slot),
+        "alternative": 0,
+        **shared.identities(problem),
+        "anchor_key": family,
+        "direction": direction.value,
+    }
+
+
+def test_full_schedule_exact_and_deterministic():
+    slots = policy.schedule()
+    assert slots == policy.schedule()
+    assert len(slots) == 10800
+    assert Counter(s.split for s in slots) == policy.SPLITS
+    assert len({s.identity(a) for s in slots for a in range(3)}) == 32400
+    for split, total in policy.SPLITS.items():
+        for kind in policy.KINDS:
+            rows = [s for s in slots if (s.split, s.kind) == (split, kind)]
+            assert Counter(s.case for s in rows) == policy.case_counts(kind, total // 3)
+            for level in policy.levels(split):
+                cell = [s for s in rows if s.level == level]
+                assert sum(s.case == "A-D" for s in cell) == len(cell) * 6 // 10
+                assert sum(s.case == "F" for s in cell) == len(cell) // 10
+                assert all(
+                    sum(s.case == c for s in cell) > 0
+                    for c in policy.case_counts(kind, total // 3)
+                )
+                if kind == "count":
+                    for case in ("A-D", "F"):
+                        counts = Counter(s.count_value for s in cell if s.case == case)
+                        assert set(counts) == set(range(5))
+                        assert max(counts.values()) - min(counts.values()) <= 1
+                if kind == "which":
+                    assert any(s.contingent for s in cell)
+
+
+def test_schedule_rejects_missing_or_duplicated_slot():
+    slots = policy.schedule()
+    with pytest.raises(ValueError):
+        policy.validate_schedule(slots[:-1])
+    with pytest.raises(ValueError, match="duplicate"):
+        policy.validate_schedule([*slots, slots[0]])
+
+
+def test_no_fake_semantic_depth():
+    for s in policy.schedule():
+        if s.case in ("ambiguous", "inconsistent") or s.contingent:
+            assert s.requested_depth is None
+
+
+def planned_logic_slots():
+    """Exercise actual scheduled seeds in every split/level/semantic cell."""
+    selected = {}
+    for slot in policy.schedule():
+        key = (
+            slot.split,
+            slot.kind,
+            slot.level,
+            slot.case,
+            slot.cohort,
+            slot.contingent,
+            slot.count_value
+            if slot.kind == "count" and slot.case in ("A-D", "F")
+            else None,
+        )
+        selected.setdefault(key, slot)
+    result = list(selected.values())
+    directions = {(s.split, s.kind, s.seed(0) % 8) for s in result}
+    for slot in policy.schedule():
+        key = (slot.split, slot.kind, slot.seed(0) % 8)
+        if key not in directions:
+            result.append(slot)
+            directions.add(key)
+    return tuple(result)
+
+
+def test_logic_matrix_covers_all_directions_per_split_and_query():
+    assert {(s.split, s.kind, s.seed(0) % 8) for s in planned_logic_slots()} == {
+        (split, kind, direction)
+        for split in policy.SPLITS
+        for kind in policy.KINDS
+        for direction in range(8)
+    }
+
+
+@pytest.mark.parametrize(
+    "slot", planned_logic_slots(), ids=lambda slot: slot.identity(0)
+)
+def test_every_planned_logic_cell_passes_real_admission(api, tokens, slot):
+    result = api.generate_one(make_job(api, slot))
+    assert result["status"] == "passed", result
+    record = result["record"]
+    assert len(record["rows"]) == 1
+    row = record["rows"][0]
+    problem, menu, contract = shared.parse_row(row)
+    evidence = shared.load_evidence(record)
+    semantics = evidence.semantics
+
+    assert contract.value == "unique-entailed"
+    assert len(menu) == len(set(menu)) == 4
+    assert semantics.consistent == (slot.case != "inconsistent")
+    assert row["construction_level"] == slot.level
+    assert row["verified_depth"] == slot.requested_depth
+    assert record["independent_audit"] == "passed"
+    assert record["semantic_complexity_status"] == (
+        "verified-semantics-no-depth-claim"
+        if slot.cohort == "semantic"
+        else "verified-answer-support"
+    )
+    if slot.kind != "direction":
+        assert set(problem.query.candidates) == (
+            set(problem.objects) - {problem.query.reference}
+        )
+    if slot.kind == "count":
+        assert set(menu) <= set(range(5))
+        assert len(problem.query.candidates) > 4
+        # Both previously investigated <=4 rules now reduce to a fixed choice.
+        assert next(i for i, value in enumerate(menu) if value <= 4) == 0
+    if slot.case in ("A-D", "F"):
+        assert len(semantics.entailed) == 1
+        value = next(iter(semantics.entailed))
+        if slot.kind == "count":
+            assert value == slot.count_value
+        if slot.case == "F":
+            assert value not in menu
+            assert row["answer"] == "F"
+        else:
+            assert menu["ABCD".index(row["answer"])] == value
+            assert row["answer"] == slot.answer_position
+        assert row["selected_explanation_depth"] == slot.level
+    else:
+        assert row["answer"] == "E"
+        if slot.case == "multiple":
+            assert slot.kind == "which"
+            assert len(semantics.entailed) >= 2
+            assert row["selected_explanation_depth"] == slot.level
+        else:
+            assert not semantics.entailed
+            assert row["selected_explanation_depth"] is None
+    if slot.contingent:
+        assert row["sole_entailed_with_contingent"]
+        assert row["verified_depth"] is None
+    assert set(result["tokenized"]) == (
+        {"natural", "symbolic"} if slot.split in ("train", "dev") else set()
+    )
+    assert all(t["stage2_reserved_tokens"] <= 8192 for t in record["tokens"])
+    assert all(
+        text.endswith(f"Answer: {row['answer']}") for text in row["references"].values()
+    )
+
+
+@pytest.mark.parametrize("contingent", (False, True))
+def test_semantic_positive_cannot_claim_a_deeper_construction_level(
+    api, tokens, monkeypatch, contingent
+):
+    slot = next(
+        s
+        for s in policy.schedule()
+        if s.kind == "which"
+        and s.case == "A-D"
+        and s.cohort == "semantic"
+        and s.level == 8
+        and s.contingent == contingent
+    )
+    original = api.construct
+
+    def shallow_construction(requested, alternative):
+        return original(replace(requested, level=1), alternative)
+
+    monkeypatch.setattr(api, "construct", shallow_construction)
+    result = api.generate_one(make_job(api, slot))
+    assert result["status"] == "failed"
+    assert (
+        "selected positive support differs from construction level" in result["reason"]
+    )
+
+
+def test_release_checks_do_not_require_semantic_difficulty_scaling(api):
+    assert api.config.pending_release_checks == (
+        "nuisance-shortcut-probes-and-paired-example-review",
+        "actual-axolotl-loader-collator-and-gpu-validation",
+        "final-v1-training-and-epoch-evaluation-integration",
+    )
+
+
+def test_smoke_is_not_a_full_release():
+    chosen = policy.smoke_schedule(policy.schedule())
+    assert 30 < len(chosen) < 10800
+    assert {s.level for s in chosen} == {1, 8, 9, 10}
+    assert {s.split for s in chosen} == set(policy.SPLITS)
+    assert {s.case for s in chosen} == {
+        "A-D",
+        "F",
+        "ambiguous",
+        "multiple",
+        "inconsistent",
+    }
+
+
+def test_inventory_canonical_exclusions(api):
+    inventory = shared.Inventory()
+    keys = {"query_key": "q", "scene_key": "scene"}
+    inventory.add(keys, "dev", "family")
+    assert inventory.conflict(keys, "train") == "duplicate-query"
+    assert (
+        inventory.conflict({"query_key": "q2", "scene_key": "scene"}, "train")
+        == "cross-split-scene"
+    )
+    assert (
+        inventory.conflict({"query_key": "q2", "scene_key": "s2"}, "train", "family")
+        == "cross-split-family"
+    )
+
+
+def test_three_attempts_then_fail_no_refill(api, monkeypatch, tmp_path):
+    (tmp_path / "audit").mkdir()
+    slot = policy.schedule()[0]
+    calls = []
+    monkeypatch.setattr(
+        api, "construct", lambda s, a: (None, object(), "fam", shared.Direction.NORTH)
+    )
+    monkeypatch.setattr(
+        shared, "identities", lambda p: {"query_key": "same", "scene_key": "same"}
+    )
+    inventory = shared.Inventory()
+    inventory.add({"query_key": "same", "scene_key": "same"}, "external-test")
+    original = inventory.conflict
+
+    def conflict(*args):
+        calls.append(args)
+        return original(*args)
+
+    monkeypatch.setattr(inventory, "conflict", conflict)
+    with pytest.raises(ValueError, match="no refill"):
+        api.preflight([slot], inventory, tmp_path)
+    assert len(calls) == 3
+    assert len(shared.read_jsonl(tmp_path / "audit/constructions.jsonl")) == 3
+
+
+@pytest.mark.parametrize(
+    "kind,case,level,contingent",
+    [
+        ("direction", "A-D", 1, False),
+        ("direction", "F", 8, False),
+        ("direction", "ambiguous", 10, False),
+        ("direction", "inconsistent", 9, False),
+        ("which", "A-D", 8, True),
+        ("which", "F", 10, False),
+        ("which", "multiple", 9, False),
+        ("which", "ambiguous", 1, False),
+        ("which", "inconsistent", 10, False),
+        ("count", "A-D", 10, False),
+        ("count", "F", 8, False),
+        ("count", "ambiguous", 9, False),
+        ("count", "inconsistent", 1, False),
+    ],
+)
+def test_generated_cases_audit_and_native_tokens(
+    api, tokens, kind, case, level, contingent
+):
+    slot = next(
+        s
+        for s in policy.schedule()
+        if (s.kind, s.case, s.level, s.contingent) == (kind, case, level, contingent)
+        and (kind != "count" or s.count_value == 0)
+    )
+    result = api.generate_one(make_job(api, slot))
+    assert result["status"] == "passed", result
+    record = result["record"]
+    assert len(record["rows"]) == 1
+    row = record["rows"][0]
+    assert row["split"] == slot.split
+    assert row["answer"] == (
+        slot.answer_position if case == "A-D" else "F" if case == "F" else "E"
+    )
+    assert row["verified_depth"] == slot.requested_depth
+    assert record["independent_audit"] == "passed"
+    assert all(t["stage2_reserved_tokens"] <= 8192 for t in record["tokens"])
+    if slot.split in ("train", "dev"):
+        for tok in result["tokenized"].values():
+            assert len(tok["input_ids"]) == len(tok["labels"])
+            assert -100 in tok["labels"]
+            decoded = tokens[1].decode([v for v in tok["labels"] if v != -100])
+            assert "</think>" in decoded and f"Answer: {row['answer']}" in decoded
+    mutated = deepcopy(record)
+    mutated["rows"][0]["answer"] = "A" if row["answer"] != "A" else "B"
+    with pytest.raises(ValueError):
+        shared.audit_record(mutated)
+
+
+def test_external_preserves_source_options_and_source_provenance(api, tokens):
+    sources = shared.verify_source_export(
+        ROOT / "data/spatialeval_org.jsonl",
+        ROOT
+        / "experiments/spatialentail-randomized-v2/prepared-corr-eval/data/corr.jsonl",
+        ROOT
+        / "experiments/spatialentail-randomized-v2/prepared-corr-eval/correction-summary.json",
+    )
+    assert len(sources) == 1500
+    for suffix in (".0", ".1", ".2"):
+        source = next(s for s in sources if s["id"].endswith(suffix))
+        original = deepcopy(source)
+        item = api.external_one(source)
+        row = item["row"]
+        assert source == original
+        assert row["base_id"] == source["id"]
+        assert row["dataset"] == "SpatialMap-TQA-Corr"
+        assert row["menu_origin"] == "source-A-D"
+        parsed = shared.SpatialTextAdapter().parse(source["text"])
+        visible = [row.get("display_names", {}).get(v, str(v)) for v in row["menu"]]
+        assert visible == [parsed.options[c] for c in "ABCD"]
+        shared.verify_view(row)
+
+
+def test_train_and_dev_disk_exports_are_native_and_gold_free(api, tokens, tmp_path):
+    from contextlib import ExitStack
+
+    for split in ("train", "dev"):
+        slot = next(
+            s
+            for s in policy.schedule()
+            if s.split == split and s.kind == "direction" and s.case == "A-D"
+        )
+        result = api.generate_one(make_job(api, slot))
+        assert result["status"] == "passed", result
+        assert set(result["tokenized"]) == {"natural", "symbolic"}
+        with ExitStack() as stack:
+            handles = shared.open_split(stack, tmp_path, split)
+            shared.write_synthetic(handles, result)
+    assert api.audit_exports(tmp_path, {"train": 1, "dev": 1})["status"] == "passed"
+    path = tmp_path / "data/dev/natural-inputs.jsonl"
+    rows = shared.read_jsonl(path)
+    rows[0]["gold"] = "A"
+    with path.open("w") as stream:
+        shared.append_json(stream, rows[0])
+    with pytest.raises(ValueError, match="gold/audit"):
+        api.audit_exports(tmp_path, {"train": 1, "dev": 1})
+
+
+def minimal_manifest(api, tmp_path):
+    for name in ("inputs", "data", "audit", "tokenizers"):
+        (tmp_path / name).mkdir()
+    (tmp_path / "data/payload.jsonl").write_text("{}\n")
+    manifest = {
+        "schema": "spatialentail-final-candidate-v1",
+        "status": "candidate-audited",
+        "training_ready": False,
+        "pending_release_checks": list(api.config.pending_release_checks),
+        "payload_sha256": shared.payload_hashes(tmp_path),
+        "source_sha256": api.fingerprints(),
+    }
+    shared.atomic_json(tmp_path / "manifest.json", manifest)
+    shared.atomic_json(
+        tmp_path / "generation.json",
+        {
+            "status": manifest["status"],
+            "manifest_sha256": shared.digest(tmp_path / "manifest.json"),
+        },
+    )
+    return manifest
+
+
+def test_candidate_verification_never_authorizes_training(api, tmp_path):
+    minimal_manifest(api, tmp_path)
+    assert not api.verify(tmp_path)["training_ready"]
+    with pytest.raises(ValueError, match="not a training release"):
+        api.verify(tmp_path, require_training_ready=True)
+    (tmp_path / "data/payload.jsonl").write_text('{"changed":true}\n')
+    with pytest.raises(ValueError, match="payload changed"):
+        api.verify(tmp_path)
+
+
+def test_failed_manifest_and_extra_payload_rejected(api, tmp_path):
+    manifest = minimal_manifest(api, tmp_path)
+    (tmp_path / "data/unexpected.jsonl").write_text("{}\n")
+    with pytest.raises(ValueError, match="inventory changed"):
+        api.verify(tmp_path)
+    manifest["status"] = "failed"
+    shared.atomic_json(tmp_path / "manifest.json", manifest)
+    with pytest.raises(ValueError, match="did not finish"):
+        api.verify(tmp_path)
+
+
+def test_launcher_is_cpu_generation_only():
+    launch = (EXP / "slurm/submit-generation.sh").read_text()
+    worker = (EXP / "slurm/generate.sh").read_text()
+    assert launch.count("sbatch --parsable") == 1
+    assert "--dependency" not in launch
+    assert "--partition=normal" in worker
+    assert "#SBATCH --cpus-per-task=64" in worker
+    assert "#SBATCH --mem=128G" in worker
+    assert "--gres" not in worker
+    assert "uv sync" not in worker
+    assert worker.count('--script "$FINAL_EXPERIMENT_DIR/generate.py"') == 2
+    assert worker.count("--no-project") == 2
+    assert "UV_PROJECT_ENVIRONMENT" not in worker
+    assert "--with-requirements" not in worker
+    for path in (EXP / "slurm").glob("*.sh"):
+        subprocess.run(["bash", "-n", str(path)], check=True)
+
+
+@pytest.mark.parametrize(
+    ("cpus", "override", "expected"),
+    [("64", "", "64"), ("16", "", "16"), ("64", "8", "8"), ("64", "65", None)],
+)
+def test_worker_count_follows_allocation(cpus, override, expected):
+    script = (EXP / "slurm/generate.sh").read_text()
+    start = script.index("WORKERS=")
+    end = script.index('echo "Generation only:')
+    env = {
+        **os.environ,
+        "SLURM_CPUS_PER_TASK": cpus,
+        "FINAL_GENERATION_WORKERS": override,
+    }
+    result = subprocess.run(
+        ["bash", "-c", script[start:end] + '\nprintf "%s" "$WORKERS"'],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if expected is None:
+        assert result.returncode == 2
+        assert "Workers must fit" in result.stderr
+    else:
+        assert result.returncode == 0
+        assert result.stdout == expected
+
+
+def test_submitter_records_one_job_and_paths(tmp_path):
+    root = tmp_path / "repo with spaces"
+    exp = root / "experiments/spatialentail-final-v1"
+    scripts = exp / "slurm"
+    scripts.mkdir(parents=True)
+    for name in ("submit-generation.sh", "generate.sh"):
+        (scripts / name).write_text((EXP / "slurm" / name).read_text())
+    for name in (
+        "data/spatialeval_org.jsonl",
+        "experiments/spatialentail-randomized-v2/prepared-corr-eval/data/corr.jsonl",
+        "experiments/spatialentail-randomized-v2/prepared-corr-eval/correction-summary.json",
+    ):
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}\n")
+    bins = tmp_path / "bin"
+    bins.mkdir()
+    capture = tmp_path / "calls"
+    for name, body in (
+        ("uv", "#!/bin/bash\nexit 0\n"),
+        (
+            "sbatch",
+            '#!/bin/bash\nprintf "%s\\n" "$@" >> "$CAPTURE"\necho "12345;cluster"\n',
+        ),
+    ):
+        path = bins / name
+        path.write_text(body)
+        path.chmod(0o755)
+    env = {
+        **os.environ,
+        "PATH": f"{bins}:{os.environ['PATH']}",
+        "CAPTURE": str(capture),
+    }
+    result = subprocess.run(
+        ["bash", str(scripts / "submit-generation.sh"), "smoke"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    (run,) = (exp / "runs").iterdir()
+    assert "generation_job=12345" in (run / "submission.txt").read_text()
+    assert f"run_dir={run}/artifacts" in (run / "submission.txt").read_text()
+    assert not (run / "artifacts").exists()
+    assert str(root) in capture.read_text()
+    assert "Generation job: 12345" in result.stdout
+
+
+def test_verify_rejects_unbound_completion_receipt(api, tmp_path):
+    minimal_manifest(api, tmp_path)
+    shared.atomic_json(
+        tmp_path / "generation.json", {"status": "failed", "manifest_sha256": "invalid"}
+    )
+    with pytest.raises(ValueError, match="receipt differs"):
+        api.verify(tmp_path)
+
+
+def test_shared_module_import_does_not_load_experiments():
+    script = """
+import sys
+before = tuple(sys.path)
+from spatial.v2 import entailment_generation, entailment_artifact_audit
+assert tuple(sys.path) == before
+assert 'generation_policy' not in sys.modules
+assert 'audit_entailment_candidate' not in sys.modules
+assert 'rerender_controlled_training' not in sys.modules
+"""
+    subprocess.run([sys.executable, "-c", script], cwd=ROOT, check=True)
+
+
+def test_policy_schedule_fingerprint_is_unchanged():
+    import hashlib
+    import json
+
+    # The menu policy changes, but every slot, seed and quota stays frozen.
+    manifest = policy.policy_manifest()
+    assert manifest.pop("menu_policy_version") == "synthetic-count-options-0-4-v1"
+    assert manifest.pop("synthetic_count_menu_values") == list(range(5))
+    encoded = json.dumps(manifest, sort_keys=True).encode()
+    assert hashlib.sha256(encoded).hexdigest() == POLICY_BASELINE_SHA
+
+
+def test_count_menu_sampling_law_has_no_category_or_position_cue():
+    from itertools import permutations
+
+    pool = policy.policy_manifest()["synthetic_count_menu_values"]
+    # Enumerate the sampling law, with equally weighted sole values and letters.
+    # For each ordered menu, A-D, E and F have identical menu probabilities.
+    ad, f = Counter(), Counter()
+    for gold in pool:
+        others = [v for v in pool if v != gold]
+        for distractors in permutations(others, 3):
+            for position in range(4):
+                menu = list(distractors)
+                menu.insert(position, gold)
+                ad[tuple(menu), "ABCD"[position]] += 1
+        for menu in permutations(others):
+            f[menu] += 1
+    e = Counter(permutations(pool, 4))
+    assert len(e) == 120
+    for menu in e:
+        assert f[menu] == e[menu] == 1
+        assert [ad[menu, letter] for letter in "ABCD"] == [1] * 4
+    # Actual finite-seed distributions still require diagnostics; this proves
+    # that the menu sampling law itself no longer leaks the true value range.
+    for split, size in policy.SPLITS.items():
+        rows = [s for s in policy.schedule() if s.split == split and s.kind == "count"]
+        assert len(rows) == size // 3
+        # Every displayed option is <=4: the old rules become always E / always A.
+        assert sum(s.case not in ("A-D", "F") for s in rows) == len(rows) * 30 // 100
+        assert sum(s.answer_position == "A" for s in rows) == len(rows) * 15 // 100
+
+
+def test_review_packet_covers_policy_and_actual_longest_rows():
+    records = [
+        {
+            "rows": [{"id": s.identity(0)}],
+            "split": s.split,
+            "query_kind": s.kind,
+            "construction_level": s.level,
+            "case": s.case,
+            "slot": policy.asdict(s),
+            "tokens": [
+                {"style": "natural", "training_tokens": i + 1},
+                {"style": "symbolic", "training_tokens": 20000 - i},
+            ],
+        }
+        for i, s in enumerate(policy.schedule())
+    ]
+    selected, receipt = shared.select_review_records(records)
+    assert (selected, receipt) == shared.select_review_records(records[::-1])
+    ids = {r["rows"][0]["id"] for r in selected}
+    assert len(ids) == len(selected) == receipt["selected_count"]
+    assert receipt["status"] == "selected-not-reviewed"
+    assert {
+        (r["split"], r["query_kind"], r["construction_level"]) for r in selected
+    } == {(r["split"], r["query_kind"], r["construction_level"]) for r in records}
+    cases = Counter((r["query_kind"], r["case"]) for r in selected)
+    assert len(cases) == 13
+    assert min(cases.values()) >= 10
+    for split in policy.SPLITS:
+        for level in policy.levels(split):
+            cell = [
+                r
+                for r in selected
+                if r["split"] == split and r["construction_level"] == level
+            ]
+            assert any(r["slot"]["contingent"] for r in cell)
+            assert {
+                r["slot"]["count_value"]
+                for r in cell
+                if r["query_kind"] == "count" and r["case"] in ("A-D", "F")
+            } == set(range(5))
+        members = [r for r in records if r["split"] == split]
+        for index in (0, 1):
+            longest = max(members, key=lambda r: r["tokens"][index]["training_tokens"])
+            assert longest["rows"][0]["id"] in ids
+
+
+def test_review_packet_handles_small_smoke_without_claiming_full_coverage():
+    records = [
+        {
+            "rows": [{"id": "only"}],
+            "split": "train",
+            "query_kind": "direction",
+            "construction_level": 1,
+            "case": "A-D",
+            "slot": {"contingent": False},
+            "tokens": [{"style": "natural", "training_tokens": 5}],
+        }
+    ]
+    selected, receipt = shared.select_review_records(records)
+    assert selected == records
+    assert receipt["available_case_counts"] == {"case/direction/A-D": 1}
+    assert receipt["status"] == "selected-not-reviewed"
+
+
+def test_workflows_do_not_share_experiment_configuration(api, tmp_path):
+    exp = tmp_path / "experiments/other"
+    exp.mkdir(parents=True)
+    (exp / "generate.py").write_text("# separate experiment\n")
+    coverage = exp / "coverage.json"
+    coverage.write_text('{"policy": {"coverage_minima": []}}\n')
+    config = replace(
+        api.config,
+        root=tmp_path,
+        experiment=exp,
+        coverage_policy=coverage,
+        family_prefix="other",
+        anchor_prefix="other-anchor",
+    )
+    other = shared.GenerationWorkflow(config)
+    assert other.tokenizers is None
+    other.tokenizers = ("other-admission", "other-active")
+    assert api.tokenizers != other.tokenizers
+    hashes = other.fingerprints()
+    assert set(hashes) == {
+        "experiments/other/generate.py",
+        "experiments/other/coverage.json",
+    }
+    assert api.config.experiment == EXP
+
+
+def test_historical_audit_imports_use_shared_implementations():
+    import importlib.util
+
+    from spatial.v2 import entailment_artifact_audit
+
+    for filename, names in (
+        ("audit_entailment_candidate.py", ("audit_record", "replay_paths", "label")),
+        ("audit_selected_explanation_depth.py", ("replay", "certificate_depth")),
+    ):
+        spec = importlib.util.spec_from_file_location(
+            "compatibility_test",
+            ROOT / "experiments/spatialentail-composition-v1" / filename,
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for name in names:
+            assert getattr(module, name) is getattr(entailment_artifact_audit, name)
+
+
+def test_experiment_launcher_has_no_generation_implementation():
+    tree = ast.parse((EXP / "generate.py").read_text())
+    assert not any(isinstance(n, (ast.FunctionDef, ast.ClassDef)) for n in tree.body)
+    assert len((EXP / "generate.py").read_text().splitlines()) < 40
+
+
+def test_script_dependencies_preserve_isolated_generation_versions():
+    import tomllib
+
+    text = (EXP / "generate.py").read_text()
+    metadata = text.split("# /// script\n", 1)[1].split("# ///", 1)[0]
+    config = tomllib.loads(
+        "\n".join(line.removeprefix("# ") for line in metadata.splitlines())
+    )
+    assert config["requires-python"] == ">=3.12,<3.13"
+    assert "z3-solver==4.16.0.0" in config["dependencies"]
+    assert len(config["dependencies"]) == 7
+    assert not any(
+        dep.startswith(("torch", "vllm", "axolotl")) for dep in config["dependencies"]
+    )
