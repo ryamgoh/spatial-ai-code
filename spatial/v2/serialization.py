@@ -2,10 +2,22 @@
 
 from __future__ import annotations
 
+import json
+import os
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from typing import Any
+
+
+def atomic_json(path, value):
+    """Replace a JSON artifact only after its complete contents reach disk."""
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("w") as stream:
+        stream.write(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
 
 
 def _json_value(value: Any) -> Any:

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 from copy import deepcopy
 from pathlib import Path
 
@@ -20,7 +21,49 @@ from spatial.v2.entailment_external import (
     verify_view,
 )
 from spatial.v2.entailment_scene_protocol import VERSION as SCENE_VERSION
+from spatial.v2.serialization import atomic_json
 from spatial.v2.tests.test_pivot_evidence import BY_ID
+
+
+def test_atomic_json_preserves_encoding_and_syncs_before_replace(tmp_path, monkeypatch):
+    path = tmp_path / "manifest.json"
+    path.write_text("old")
+    calls = []
+    fsync, replace = os.fsync, os.replace
+
+    def synced(fd):
+        calls.append("fsync")
+        fsync(fd)
+
+    def replaced(source, destination):
+        assert path.read_text() == "old"
+        assert calls == ["fsync"]
+        calls.append("replace")
+        replace(source, destination)
+
+    monkeypatch.setattr(os, "fsync", synced)
+    monkeypatch.setattr(os, "replace", replaced)
+    value = {"z": [1, True], "a": "\u00e9"}
+    atomic_json(path, value)
+    assert path.read_bytes() == b'{"a":"\\u00e9","z":[1,true]}\n'
+    assert calls == ["fsync", "replace"]
+    assert not path.with_suffix(".json.tmp").exists()
+
+
+@pytest.mark.parametrize("failure", ("encoding", "replace"))
+def test_atomic_json_failure_preserves_previous_file(tmp_path, monkeypatch, failure):
+    path = tmp_path / "manifest.json"
+    path.write_text("previous complete manifest")
+    value = {"unsupported": object()} if failure == "encoding" else {"valid": True}
+    if failure == "replace":
+
+        def interrupted(*args):
+            raise OSError("interrupted replace")
+
+        monkeypatch.setattr(os, "replace", interrupted)
+    with pytest.raises(TypeError if failure == "encoding" else OSError):
+        atomic_json(path, value)
+    assert path.read_text() == "previous complete manifest"
 
 
 def source(case="S5"):

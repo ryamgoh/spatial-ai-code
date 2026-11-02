@@ -10,7 +10,6 @@ from enum import Enum
 from pathlib import Path
 
 from spatial.v2.composition_contracts import UnsupportedEvidence, VerificationError
-from spatial.v2.composition_execution import atomic_json
 from spatial.v2.composition_feasibility import stable_int, token_measurement
 from spatial.v2.composition_solver_reuse import QuestionSolver
 from spatial.v2.composition_training import (
@@ -53,7 +52,7 @@ from spatial.v2.entailment_scene_protocol import (
 from spatial.v2.entailment_scene_protocol import (
     render_prompt as render_scene_prompt,
 )
-from spatial.v2.serialization import tagged_dataclass_to_dict
+from spatial.v2.serialization import atomic_json, tagged_dataclass_to_dict
 from spatial.v2.solver import And, Direction, DirectionQuery, WhichQuery
 from spatial.v2.text import SpatialTextAdapter
 

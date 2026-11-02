@@ -14,6 +14,7 @@ from spatial.v2.composition_contracts import Semantics, analyze
 from spatial.v2.composition_feasibility import depth_story
 from spatial.v2.composition_pilot import renamed_problem, story_key
 from spatial.v2.composition_selection_expansion import make_story
+from spatial.v2.composition_solver_reuse import QuestionSolver
 from spatial.v2.composition_training import REVISION
 from spatial.v2.solver import Direction, SpatialSolverV2
 from spatial.v2.tests import composition_policy
@@ -411,6 +412,7 @@ def test_admission_with_actual_pinned_tokenizer(
     record = production.admit(
         e, problem, policy, tokenizer, SpatialSolverV2(backend="z3")
     )
+    assert production.admit(e, problem, policy, tokenizer, QuestionSolver()) == record
     assert record["status"] == "accepted", record.get("reason")
     assert len(record["tokens"]) == (12 if paired_percent else 6)
     assert all(t["admitted"] and t["target_tokens"] > 0 for t in record["tokens"])

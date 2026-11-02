@@ -22,6 +22,10 @@ Server generation and internal evaluation preparation are driven by
 `prepare_evaluation.py`. Use that experiment's Slurm instructions.
 The generic `generate_all.py` CLI is not the current study's dataset launcher.
 Retired repair, reserve-assembly, and migration diagnostics have been removed.
+The old CPU coordinator, timing runner, coverage-draft compiler, and menu
+selection/export workflow are also removed. Current allocation owns its answer
+classifier; `serialization.py` owns the atomic JSON writer. The experiment's
+current generation and evaluation-preparation entry points remain unchanged.
 
 ## Shared Infrastructure
 

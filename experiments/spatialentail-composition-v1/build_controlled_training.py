@@ -25,6 +25,7 @@ from spatial.v2.entailment_evidence import CONCISE_VERSION, render_pair
 from spatial.v2.entailment_generator import SceneRequest, build_scene
 from spatial.v2.entailment_replacement_allocation import (
     Slot,
+    answer_category,
     policy_from,
     schedule,
     validate_records,
@@ -32,7 +33,6 @@ from spatial.v2.entailment_replacement_allocation import (
 from spatial.v2.entailment_saved import load_evidence
 from spatial.v2.entailment_scene_protocol import SHORT_VERSION
 from spatial.v2.entailment_scene_recipes import map_fixed_slots
-from spatial.v2.entailment_training_selection import answer_category
 from spatial.v2.entailment_unique_study import training_allocation_policy
 from spatial.v2.solver import And, Direction, direction_constraint
 

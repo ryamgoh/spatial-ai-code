@@ -6,11 +6,25 @@ from dataclasses import dataclass
 from spatial.v2 import composition_production as historical
 from spatial.v2.composition_production import allocate
 from spatial.v2.entailment_retention import matches
-from spatial.v2.entailment_training_selection import answer_category
 from spatial.v2.entailment_unique_study import training_allocation_policy
 
 VERSION = "all-controlled-training-allocation-v1"
 CONSTRUCTION_CANDIDATES_PER_SLOT = 3
+
+
+def answer_category(row):
+    if row["answer"] in ("A", "B", "C", "D"):
+        return "A-D"
+    reason = row["escape_reason"]
+    if row["answer"] == "F" and reason == "unique-unlisted":
+        return reason
+    if row["answer"] == "E" and reason in (
+        "multiple-entailed",
+        "no-entailed-answer",
+        "inconsistent",
+    ):
+        return reason
+    raise ValueError("invalid Unique answer category")
 
 
 def policy_from(frozen):

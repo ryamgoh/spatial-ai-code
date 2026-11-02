@@ -10,12 +10,43 @@ import pytest
 
 from spatial.v2.entailment_replacement_allocation import (
     CONSTRUCTION_CANDIDATES_PER_SLOT,
+    answer_category,
     policy_from,
     schedule,
     validate_schedule,
 )
 
 EXP = Path(__file__).resolve().parents[3] / "experiments/spatialentail-composition-v1"
+
+
+@pytest.mark.parametrize(
+    "answer,reason,expected",
+    [
+        *((letter, None, "A-D") for letter in "ABCD"),
+        ("F", "unique-unlisted", "unique-unlisted"),
+        *(
+            ("E", reason, reason)
+            for reason in ("multiple-entailed", "no-entailed-answer", "inconsistent")
+        ),
+    ],
+)
+def test_answer_categories_preserve_quota_labels(answer, reason, expected):
+    assert answer_category({"answer": answer, "escape_reason": reason}) == expected
+
+
+@pytest.mark.parametrize(
+    "answer,reason",
+    [
+        ("F", None),
+        ("F", "inconsistent"),
+        ("E", "unique-unlisted"),
+        ("E", None),
+        ("G", None),
+    ],
+)
+def test_invalid_answer_categories_cannot_enter_quotas(answer, reason):
+    with pytest.raises(ValueError, match="invalid Unique answer category"):
+        answer_category({"answer": answer, "escape_reason": reason})
 
 
 @pytest.fixture(scope="module")
@@ -113,11 +144,16 @@ def test_existing_output_blocks_generation(tmp_path, monkeypatch, existing):
     assert len(list(tmp_path.iterdir())) == 1
 
 
-def test_preflight_reports_shortage_instead_of_counting_duplicate_questions(monkeypatch):
+def test_preflight_reports_shortage_instead_of_counting_duplicate_questions(
+    monkeypatch,
+):
     module = runner()
     story, problem = module.build_scene(
-        module.SceneRequest(1, module.Direction.NORTH, "direction", "sole", size="compact"),
-        identity="cap-fixture", family="fixture",
+        module.SceneRequest(
+            1, module.Direction.NORTH, "direction", "sole", size="compact"
+        ),
+        identity="cap-fixture",
+        family="fixture",
     )
     calls = []
 

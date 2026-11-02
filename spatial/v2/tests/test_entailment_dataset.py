@@ -4,11 +4,38 @@ from pathlib import Path
 
 import pytest
 
-from spatial.v2.composition_execution_benchmark import development_jobs
+from spatial.v2.composition_production import Entry
+from spatial.v2.composition_scene_sampler import sample_scene
 from spatial.v2.composition_training import ENTAILMENT_STYLES, REVISION, messages
 from spatial.v2.entailment_contracts import VERSION, Contract, analyze
 from spatial.v2.entailment_dataset import build_attempt, menus_for
+from spatial.v2.solver import Direction
 from spatial.v2.tests.test_pivot_evidence import BY_ID
+
+
+def development_jobs():
+    """The same six admission cases formerly owned by the CPU timing runner."""
+    scenes = [
+        sample_scene(3, 2, matches=2),
+        sample_scene(
+            7,
+            8,
+            direction=Direction.NORTHEAST,
+            proof_pattern="axis-split",
+            matches=0,
+        ),
+    ]
+    jobs = []
+    for story in scenes:
+        entry = Entry(
+            story,
+            "train",
+            2 if story == scenes[0] else 8,
+            ("direction", "which", "count"),
+        )
+        for problem in story.problems():
+            jobs.append((len(jobs), entry, problem))
+    return jobs
 
 
 @pytest.fixture(scope="module")
