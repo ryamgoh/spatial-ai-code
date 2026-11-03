@@ -1366,8 +1366,16 @@ def main(config, argv=None):
     release_audit.add_argument("--evidence", type=Path, required=True)
     release_audit.add_argument("--generation-revision", required=True)
     release_audit.add_argument("--workers", type=int, default=4)
+    evaluation_check = commands.add_parser("verify-evaluation")
+    evaluation_check.add_argument("--run", type=Path, required=True)
+    evaluation_check.add_argument("--training-revision")
     args = parser.parse_args(argv)
-    if args.command == "audit-release":
+    if args.command == "verify-evaluation":
+        from spatial.v2.entailment_final_evaluation import verify_campaign
+
+        verify_campaign(args.run.resolve(), training_revision=args.training_revision)
+        print("Selections, evaluation policy and all prompt budgets verified.")
+    elif args.command == "audit-release":
         from spatial.v2.entailment_release import verify_candidate
         from spatial.v2.entailment_release_checks import (
             data_profile,

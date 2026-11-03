@@ -934,6 +934,38 @@ def test_gpu_workers_match_cluster_partition_limits(script, partition, gpu, time
     assert f"#SBATCH --time={time}" in lines
 
 
+def test_evaluation_preflight_uses_cpu_script_environment():
+    launch = (EXP / "slurm/submit-evaluation.sh").read_text()
+    assert '--script "$EXP/generate.py" verify-evaluation' in launch
+    assert "--native-tls" in launch and "--no-project" in launch
+    assert '--project "$ROOT"' not in launch
+    worker = (EXP / "slurm/evaluate.sh").read_text()
+    assert '--project "$ROOT" --frozen --no-sync' in worker
+
+
+def test_cpu_evaluation_command_delegates_without_generating(tmp_path, monkeypatch):
+    from spatial.v2 import entailment_final_evaluation as final
+
+    calls = []
+    monkeypatch.setattr(final, "verify_campaign", lambda *a, **k: calls.append((a, k)))
+    monkeypatch.setattr(
+        shared.GenerationWorkflow,
+        "generate",
+        lambda *a, **k: pytest.fail("verification must not generate data"),
+    )
+    shared.main(
+        policy.workflow_config(),
+        [
+            "verify-evaluation",
+            "--run",
+            str(tmp_path),
+            "--training-revision",
+            "a" * 40,
+        ],
+    )
+    assert calls == [((tmp_path.resolve(),), {"training_revision": "a" * 40})]
+
+
 def test_launcher_is_cpu_generation_only():
     launch = (EXP / "slurm/submit-generation.sh").read_text()
     worker = (EXP / "slurm/generate.sh").read_text()

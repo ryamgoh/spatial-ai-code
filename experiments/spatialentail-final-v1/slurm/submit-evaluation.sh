@@ -8,7 +8,9 @@ TRAINING_REVISION=${2:-}
 command -v sbatch >/dev/null
 check=(--run "$CAMPAIGN")
 [[ -z "$TRAINING_REVISION" ]] || check+=(--training-revision "$TRAINING_REVISION")
-uv run --project "$ROOT" --frozen --no-sync python "$EXP/sft.py" verify-evaluation "${check[@]}"
+# Tokenizer-only preflight must not import the GPU stack on the login node.
+uv --native-tls run --python 3.12 --no-project \
+    --script "$EXP/generate.py" verify-evaluation "${check[@]}"
 SUBMISSION=$(mktemp -d "$CAMPAIGN/eval-submission-XXXXXXXX")
 printf 'campaign=%s\n' "$CAMPAIGN" > "$SUBMISSION/jobs.txt"
 trap 'echo "Submission stopped; existing jobs were not cancelled. See '"$SUBMISSION"'/jobs.txt" >&2' ERR

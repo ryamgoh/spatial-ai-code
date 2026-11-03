@@ -376,7 +376,11 @@ For a campaign prepared at `db3a966`, obtain the full value with
 `git rev-parse db3a966`; do not assume that revision for another campaign.
 
 The submitter verifies all four selections and every prompt budget before its
-first `sbatch`. It submits seven jobs, all on `gpu` with eight CPUs, 64 GB RAM,
+first `sbatch`. This tokenizer-only preflight uses `generate.py verify-evaluation`
+in the existing pinned CPU script environment, not the root GPU environment.
+It generates no data and avoids importing PyTorch on login nodes. GPU workers
+still use the unchanged root lock and runtime checks.
+It submits seven jobs, all on `gpu` with eight CPUs, 64 GB RAM,
 and a three-hour limit:
 
 | Jobs | GPU Per Job | Evaluations Per Job |
