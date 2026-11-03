@@ -19,6 +19,7 @@ import generation_policy as policy
 
 from spatial.v2 import entailment_sft as sft
 from spatial.v2 import entailment_sft_runtime as runtime
+from spatial.v2 import entailment_final_evaluation as final
 from spatial.v2.entailment_generation import GenerationWorkflow, payload_hashes
 from spatial.v2.entailment_thinking_training import tokenize
 from spatial.v2.serialization import atomic_json
@@ -129,6 +130,235 @@ def test_wandb_ids_differ_across_submitter_shaped_campaigns(tmp_path):
                 )
                 identities.append(cfg["wandb_run_id"])
     assert len(set(identities)) == 8
+
+
+def test_final_evaluation_matrix_and_training_budgets_unchanged(tmp_path):
+    assert final.POLICY["stage1"] == 8192
+    assert final.POLICY["context"] == 16384
+    assert policy.MODEL["stage1_max_new_tokens"] == 4096
+    assert policy.MODEL["context_length"] == 8192
+    tuned = [
+        final.tasks(tmp_path / sft.run_key(style, seed))
+        for seed in sft.SEEDS
+        for style in sft.STYLES
+    ]
+    base = [
+        final.tasks(tmp_path / "natural-seed-42", untuned=True, shots=shots)
+        for shots in (0, 1, 3)
+    ]
+    assert [len(t) for t in tuned + base] == [2, 2, 2, 2, 4, 4, 4]
+    assert sum(map(len, tuned + base)) == 20
+    with pytest.raises(ValueError, match="zero-shot"):
+        final.tasks(tmp_path / "natural-seed-42", shots=3)
+
+
+@pytest.fixture
+def fewshot_rows(monkeypatch):
+    rows = [
+        {
+            "id": kind,
+            "split": "train",
+            "query_kind": kind,
+            "answer": "A",
+            "prompt": f"{kind} question",
+            "references": {
+                style: f"{style} {kind} proof.\n\nAnswer: A" for style in sft.STYLES
+            },
+        }
+        for kind in ("direction", "which", "count")
+    ]
+    monkeypatch.setattr(
+        final,
+        "messages",
+        lambda r, s: [
+            {"role": "system", "content": f"Use {s} reasoning."},
+            {"role": "user", "content": r["prompt"]},
+        ],
+    )
+    return rows
+
+
+def test_fixed_demonstrations_are_train_only_and_order_independent(
+    fewshot_rows, monkeypatch, tmp_path
+):
+    monkeypatch.setitem(final.COUNTS, "train", 3)
+    monkeypatch.setattr(final, "read_jsonl", lambda p: list(fewshot_rows))
+    chosen = final.demonstrations(tmp_path)
+    fewshot_rows.reverse()
+    assert final.demonstrations(tmp_path) == chosen
+    assert [r["query_kind"] for r in chosen] == ["direction", "which", "count"]
+    fewshot_rows[0]["split"] = "dev"
+    with pytest.raises(ValueError, match="Train-only"):
+        final.demonstrations(tmp_path)
+
+
+@pytest.mark.parametrize("shots", (0, 1, 3))
+@pytest.mark.parametrize("style", sft.STYLES)
+def test_native_fewshot_prompt_keeps_demonstration_thinking(
+    tokenizer, fewshot_rows, shots, style
+):
+    query = {"id": "held-out", "prompt": "Only this is the test question."}
+    ids = final.prompt_ids(tokenizer, query, style, fewshot_rows[:shots])
+    text = tokenizer.decode(ids, skip_special_tokens=False)
+    assert text.count("<|im_start|>system") == 1
+    assert text.count("<|im_start|>user") == shots + 1
+    assert text.count("</think>") == shots
+    assert text.count("Answer: A") == shots
+    assert text.endswith("<|im_start|>assistant\n<think>\n")
+    for row in fewshot_rows[:shots]:
+        assert f"{style} {row['query_kind']} proof." in text
+    assert "Only this is the test question." in text
+
+
+def test_preflight_rejects_full_replay_overflow(
+    tokenizer, fewshot_rows, monkeypatch, tmp_path
+):
+    query = {"id": "held-out", "prompt": "test"}
+    monkeypatch.setattr(final, "read_jsonl", lambda p: [query])
+    monkeypatch.setitem(final.COUNTS, "sft-bench", 1)
+    monkeypatch.setattr(final, "prompt_ids", lambda *a: [1] * final.POLICY["context"])
+    with pytest.raises(ValueError, match="context overflow"):
+        final.prepare_tasks(
+            tmp_path / "natural-seed-42",
+            tokenizer,
+            {"artifacts": str(tmp_path)},
+            benchmark="sft-bench",
+        )
+
+
+@pytest.mark.parametrize(
+    "untuned,shots,count", [(False, 0, 2), (True, 0, 4), (True, 1, 4), (True, 3, 4)]
+)
+def test_evaluation_job_reuses_one_engine(
+    tmp_path, monkeypatch, tokenizer, untuned, shots, count
+):
+    import types
+
+    directory = tmp_path / "natural-seed-42"
+    directory.mkdir()
+    (tmp_path / "campaign.json").write_text('{"source_sha256": {}}')
+    train = tmp_path / "data/train"
+    train.mkdir(parents=True)
+    (train / "references.jsonl").write_text("sealed training")
+    meta = {
+        "artifacts": str(tmp_path),
+        "model": policy.MODEL,
+        "seed": 42,
+        "generation_manifest_sha256": "sealed",
+    }
+    verifications = []
+
+    def verify(*args, **kwargs):
+        verifications.append(kwargs)
+        return meta
+
+    monkeypatch.setattr(final, "verify_run", verify)
+    monkeypatch.setattr(
+        final,
+        "selected_checkpoint",
+        lambda *a, **k: (verify(*a, **k), tmp_path / "adapter", 2),
+    )
+    monkeypatch.setattr(final, "verify_environment", lambda: None)
+    monkeypatch.setattr(final, "version", lambda n: "0.28.0")
+    monkeypatch.setattr(AutoTokenizer, "from_pretrained", lambda *a, **k: tokenizer)
+    monkeypatch.setattr(
+        final,
+        "prepare_tasks",
+        lambda *a, **k: (
+            [],
+            [
+                (s, b, tmp_path, [{"id": "test", "split": b}])
+                for s, b in final.tasks(directory, untuned=untuned, shots=shots)
+            ],
+        ),
+    )
+    engines, calls = [], []
+    vllm = types.ModuleType("vllm")
+
+    def engine(**kwargs):
+        engines.append(kwargs)
+        return object()
+
+    vllm.LLM = engine
+    monkeypatch.setitem(sys.modules, "vllm", vllm)
+
+    def run(
+        engine, tok, rows, data, output, style, name, adapter, epoch, limits, **kwargs
+    ):
+        calls.append((engine, style, name, adapter, limits, kwargs))
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text("{}")
+        return {
+            "outputs": [
+                {
+                    "id": "test",
+                    "stage1": {"token_ids": [5], "finish_reason": "length"},
+                    "stage2": {"token_ids": [6], "finish_reason": "stop"},
+                }
+            ]
+        }
+
+    monkeypatch.setattr(final, "run", run)
+    monkeypatch.setattr(final, "score", lambda *a, **k: {})
+    final.evaluate_job(directory, untuned=untuned, shots=shots)
+    assert verifications == [{"training_revision": None}]
+    assert len(engines) == 1 and len(calls) == count
+    assert len({id(c[0]) for c in calls}) == 1
+    assert engines[0]["max_model_len"] == 16384
+    assert engines[0]["enable_lora"] == (not untuned)
+    assert all(
+        c[4]["stage1"] == 8192 and c[5]["prompt_provenance"]["shots"] == shots
+        for c in calls
+    )
+    summaries = list((tmp_path / "evaluation").rglob("*.summary.json"))
+    assert len(summaries) == count
+    assert all(
+        json.loads(p.read_text())["token_profile"]["stage1"]["length_finish_count"] == 1
+        for p in summaries
+    )
+
+
+def test_token_profile_preserves_lengths_and_unclosed_thinking():
+    tokenizer = SimpleNamespace(convert_tokens_to_ids=lambda token: 2)
+    outputs = [
+        {
+            "stage1": {"token_ids": first, "finish_reason": reason},
+            "stage2": {"token_ids": second, "finish_reason": "stop"},
+        }
+        for first, reason, second in (
+            ([5, 6, 2, 7], "stop", [9]),
+            ([5], "length", [9, 10]),
+            ([2, 7], "length", [9, 10, 11]),
+        )
+    ]
+    profile = final.token_profile(outputs, tokenizer)
+    assert profile["stage1"] == pytest.approx(
+        {
+            "mean": 7 / 3,
+            "median": 2,
+            "p95": 3.8,
+            "max": 4,
+            "length_finish_count": 2,
+        }
+    )
+    assert profile["stage2"] == pytest.approx(
+        {
+            "mean": 2,
+            "median": 2,
+            "p95": 2.9,
+            "max": 3,
+            "length_finish_count": 0,
+        }
+    )
+    assert profile["thinking"] == pytest.approx(
+        {
+            "mean": 1,
+            "median": 1,
+            "p95": 1.9,
+            "max": 2,
+            "unclosed_count": 1,
+        }
+    )
 
 
 def test_training_group_matches_config_and_overrides_stale_environment(
@@ -279,6 +509,36 @@ def test_prepare_does_not_authorize_smoke_or_overwrite(campaign):
                 sft.verify_run(directory)
     with pytest.raises(ValueError, match="fresh campaign"):
         sft.prepare(policy.workflow_config(), campaign.parent / "artifacts", campaign)
+
+
+def test_historical_evaluation_verifies_original_training_sources(
+    campaign, monkeypatch
+):
+    from spatial.v2 import entailment_release
+
+    revision = "a" * 40
+    captured = []
+
+    def verify_original(root, receipt, commit):
+        captured.append((root, receipt["source_sha256"], commit))
+        return receipt["source_sha256"]
+
+    monkeypatch.setattr(entailment_release, "original_sources", verify_original)
+    directory = campaign / "natural-seed-42"
+    assert (
+        sft.verify_run(directory, require_ready=False, training_revision=revision)[
+            "seed"
+        ]
+        == 42
+    )
+    assert captured[0][2] == revision and captured[0][1]
+
+    def reject(*args):
+        raise ValueError("generation commit does not match candidate")
+
+    monkeypatch.setattr(entailment_release, "original_sources", reject)
+    with pytest.raises(ValueError, match="commit does not match"):
+        sft.verify_run(directory, require_ready=False, training_revision="b" * 40)
 
 
 @pytest.mark.parametrize("name", ("config.yaml", "run.json"))
@@ -602,7 +862,7 @@ def test_workers_resolve_repository_after_slurm_copies_script(
     run = tmp_path / "campaign elsewhere/natural-seed-42"
     run.mkdir(parents=True)
     capture, environment = tmp_path / "args", tmp_path / "environment"
-    arguments = [str(run)] if mode is None else [str(run), "sft-bench", mode]
+    arguments = [str(run)] if mode is None else [str(run), mode, "0"]
     result = subprocess.run(
         ["bash", str(worker), *arguments],
         cwd=root,
@@ -638,7 +898,7 @@ def test_workers_resolve_repository_after_slurm_copies_script(
         str(run),
     ]
     if mode is not None:
-        expected += ["--benchmark", "sft-bench"]
+        expected += ["--shots", "0"]
     if mode == "untuned":
         expected += ["--untuned"]
     assert capture.read_text().splitlines() == expected
@@ -650,7 +910,7 @@ def test_workers_resolve_repository_after_slurm_copies_script(
 
 
 @pytest.mark.parametrize(
-    "script,count", [("submit-training.sh", 4), ("submit-evaluation.sh", 12)]
+    "script,count", [("submit-training.sh", 4), ("submit-evaluation.sh", 7)]
 )
 def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script, count):
     root = tmp_path / "repo with spaces"
@@ -690,6 +950,17 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
             "symbolic-seed-43",
         ]
         assert all("--dependency" not in line for line in submitted)
+    else:
+        assert sum("--gres=gpu:h100-47:1" in line for line in submitted) == 4
+        assert sum("--gres=gpu:h200-141:1" in line for line in submitted) == 3
+        assert [line.split("evaluate.sh ", 1)[1].strip() for line in submitted[:4]] == [
+            f"{argument}/{style}-seed-{seed} selected 0"
+            for seed in (42, 43)
+            for style in ("natural", "symbolic")
+        ]
+        assert [line.split("evaluate.sh ", 1)[1].strip() for line in submitted[4:]] == [
+            f"{argument}/natural-seed-42 untuned {shots}" for shots in (0, 1, 3)
+        ]
     calls.unlink()
     result = subprocess.run(
         ["bash", str(exp / "slurm" / script), *arguments],

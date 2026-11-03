@@ -178,6 +178,9 @@ def run(
     epoch,
     limits,
     batch_size=16,
+    *,
+    prompt_builder=None,
+    prompt_provenance=None,
 ):
     output.parent.mkdir(parents=True, exist_ok=True)
     # A second submission must not append to the same result journal.
@@ -198,6 +201,8 @@ def run(
             epoch,
             limits,
             batch_size,
+            prompt_builder=prompt_builder,
+            prompt_provenance=prompt_provenance,
         )
 
 
@@ -213,6 +218,9 @@ def run_locked(
     epoch,
     limits,
     batch_size=16,
+    *,
+    prompt_builder=None,
+    prompt_provenance=None,
 ):
     require(batch_size > 0, "batch size must be positive")
     from vllm import SamplingParams
@@ -232,10 +240,17 @@ def run_locked(
         "limits": limits,
         "benchmark_sha256": benchmark_hash,
     }
+    require(
+        (prompt_builder is None) == (prompt_provenance is None),
+        "custom prompts require explicit provenance",
+    )
+    if prompt_provenance is not None:
+        provenance["prompt_provenance"] = prompt_provenance
     if output.exists():
         result = json.loads(output.read_text())
         require(
-            all(result.get(k) == v for k, v in provenance.items()),
+            all(result.get(k) == v for k, v in provenance.items())
+            and result.get("prompt_provenance") == prompt_provenance,
             "completed result provenance mismatch",
         )
         require(
@@ -296,10 +311,13 @@ def run_locked(
             batch = rows[offset : offset + batch_size]
             prompts = []
             for row in batch:
-                prefix = tokenizer.apply_chat_template(
-                    messages(row, style), tokenize=False, add_generation_prompt=True
-                )
-                ids = tokenizer.encode(prefix, add_special_tokens=False)
+                if prompt_builder is None:
+                    prefix = tokenizer.apply_chat_template(
+                        messages(row, style), tokenize=False, add_generation_prompt=True
+                    )
+                    ids = tokenizer.encode(prefix, add_special_tokens=False)
+                else:
+                    ids = prompt_builder(row)
                 require(
                     len(ids) + limits["stage1"] <= limits["context"], "Stage-1 overflow"
                 )
@@ -392,15 +410,7 @@ def run_locked(
                 flush=True,
             )
     result = {
-        "model": MODEL,
-        "revision": REVISION,
-        "style": style,
-        "split": split,
-        "adapter": str(adapter) if adapter else None,
-        "adapter_sha256": fingerprint,
-        "epoch": epoch,
-        "limits": limits,
-        "benchmark_sha256": benchmark_hash,
+        **provenance,
         "outputs": records,
         "scores": score(rows, records),
         "runtime_versions": {n: version(n) for n in ("torch", "vllm", "transformers")},

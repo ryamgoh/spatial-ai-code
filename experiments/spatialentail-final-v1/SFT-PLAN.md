@@ -559,14 +559,25 @@ post-training campaign; reusing saved-checkpoint evaluation helpers still
 requires integration into this epoch workflow.
 
 Select an epoch independently for all four runs; do not select a winning seed.
-After training and checkpoint selection, evaluate all four selected adapters and two
-style-matched untuned baselines on SFT-Bench (in-range and extrapolation) and
-SpatialMap-TQA-Corr. Same model revision, prompts, limits and decoding policy:
-greedy (`temperature=0`), seed 42, provisional 4,096 Stage-1 new tokens and
-16 Stage-2 new tokens within 8,192 context. These are not certified budgets.
-Validate length/format behavior on synthetic dev before final evaluation and
-freeze the result. A budget change applies to both arms, all epochs and baselines;
-rerun affected comparisons, never selectively grant one system more tokens.
+After training and checkpoint selection, evaluate all four selected adapters and
+style-matched untuned baselines at zero-, one-, and three-shot on SFT-Bench
+(in-range and extrapolation) and SpatialMap-TQA-Corr. Final evaluation uses
+greedy (`temperature=0`), seed 42, 8,192 Stage-1 new tokens and 16 Stage-2 new
+tokens within 16,384 context for every model. Stage 1 includes thinking and the
+final answer. These user-approved final-only budgets supersede the earlier
+4,096 cap; frozen data, training and historical in-epoch Dev budgets remain
+unchanged. Checkpoint selection remains based on the completed Dev runs, not
+reselected at the larger final cap. Validate the inference transition on Dev;
+the final runner does not yet perform that validation.
+
+Few-shot demonstrations are selected once from hash-ranked A-D Train examples:
+one Direction, one Which, one Count, in that order. One-shot uses Direction;
+three-shot uses the same complete trio. Both styles use identical demonstration
+questions/menus/labels with their corresponding reference explanations and
+preserved native thinking. No held-out demonstrations or result-based tuning.
+Report this as one fixed demonstration set, not an average over choices.
+Check all prompt lengths with the full Stage-1 and Stage-2 reserves before
+loading the engine; never truncate prompts or replayed generated reasoning.
 
 Dev generation uses the live 4-bit QLoRA model; final evaluation loads the
 original BF16 base plus the adapter. Document and validate this inference
@@ -673,8 +684,16 @@ for both saved adapters before writing the selected-epoch receipt.
 Final evaluation verifies selection/prediction/checkpoint provenance, then
 reuses `entailment_evaluation.run` for raw Stage-1 token replay into Stage 2.
 It reports one combined SFT-Bench result and subgroup/depth breakdowns from the
-same outputs. Slurm submission is separate: four SFT jobs, then eight
-selected-adapter benchmark jobs plus four style-matched untuned benchmark jobs.
+same outputs. Slurm submission is separate: four SFT jobs, then four selected
+adapter jobs on one H100-47 each and three untuned shot-setting jobs on one
+H200-141 each. All evaluation jobs use `gpu`, three hours, eight CPUs and
+64 GB RAM. Each engine is loaded once and reused for two tuned evaluations or
+four untuned evaluations, giving 20 results across seven jobs. Runtime within
+the three-hour allocation is not yet measured. Partial journals support
+provenance-checked restarts at completed batch boundaries.
+Evaluation checks frozen training-source hashes against the explicitly supplied
+full training Git revision when the checkout has changed; it records current
+evaluation sources and the final policy separately without editing campaigns.
 Cross-seed aggregation and the paired uncertainty procedure remain analysis work.
 
 ### Generation Status

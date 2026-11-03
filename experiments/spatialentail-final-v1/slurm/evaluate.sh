@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --gres=gpu:h200-141:1
+#SBATCH --gres=gpu:h100-47:1
 #SBATCH --time=03:00:00
 #SBATCH --mail-type=BEGIN,END,FAIL,TIME_LIMIT
 #SBATCH --mail-user=e0958116@u.nus.edu
@@ -13,14 +13,16 @@
 set -euo pipefail
 : "${SLURM_JOB_ID:?Run inside a Slurm allocation}"
 RUN=${1:?Pass the explicit style/seed run directory}
-BENCHMARK=${2:?Pass sft-bench or external-test}
-MODE=${3:-selected}
-args=(--run "$RUN" --benchmark "$BENCHMARK")
+MODE=${2:-selected}
+SHOTS=${3:-0}
+TRAINING_REVISION=${4:-}
+args=(--run "$RUN" --shots "$SHOTS")
 case "$MODE" in
     selected) ;;
     untuned) args+=(--untuned) ;;
     *) echo "Unknown evaluation mode: $MODE" >&2; exit 2 ;;
 esac
+[[ -z "$TRAINING_REVISION" ]] || args+=(--training-revision "$TRAINING_REVISION")
 # The submitter sets --chdir; Slurm relocates this script into its spool directory.
 ROOT=$(pwd -P)
 source "$ROOT/slurm/lib/pin-srun-cpus.sh"

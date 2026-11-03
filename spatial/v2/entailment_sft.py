@@ -10,9 +10,9 @@ from pathlib import Path
 
 import yaml
 
-from spatial.v2.composition_evaluation import adapter_hash, parse_or_none, score
+from spatial.v2.composition_evaluation import adapter_hash, parse_or_none
 from spatial.v2.entailment_generation import GenerationWorkflow, digest, read_jsonl
-from spatial.v2.entailment_release import COUNTS, verify_release
+from spatial.v2.entailment_release import verify_release
 from spatial.v2.entailment_thinking_training import require, training_config
 from spatial.v2.serialization import atomic_json
 
@@ -152,7 +152,7 @@ def prepare(generation_config, artifacts, output, *, release=None):
     return campaign
 
 
-def verify_run(directory, *, require_ready=True):
+def verify_run(directory, *, require_ready=True, training_revision=None):
     directory = directory.resolve()
     campaign = json.loads((directory.parent / "campaign.json").read_text())
     require(campaign["schema"] == SCHEMA, "wrong SFT campaign")
@@ -172,10 +172,15 @@ def verify_run(directory, *, require_ready=True):
         directory.name == run_key(meta["style"], meta["seed"]), "mixed run identity"
     )
     root, artifacts = Path(meta["root"]), Path(meta["artifacts"])
-    for name, sha in campaign["source_sha256"].items():
-        path = (root / name).resolve()
-        require(path.is_relative_to(root.resolve()), "invalid source path")
-        require(digest(path) == sha, f"training source changed: {name}")
+    if training_revision is not None:
+        from spatial.v2.entailment_release import original_sources
+
+        original_sources(root, campaign, training_revision)
+    else:
+        for name, sha in campaign["source_sha256"].items():
+            path = (root / name).resolve()
+            require(path.is_relative_to(root.resolve()), "invalid source path")
+            require(digest(path) == sha, f"training source changed: {name}")
     require(
         digest(artifacts / "manifest.json")
         == meta["generation_manifest_sha256"]
@@ -249,8 +254,12 @@ def train_run(directory):
     selected_checkpoint(directory)
 
 
-def selected_checkpoint(directory):
-    meta = verify_run(directory)
+def selected_checkpoint(directory, *, training_revision=None):
+    meta = (
+        verify_run(directory)
+        if training_revision is None
+        else verify_run(directory, training_revision=training_revision)
+    )
     result = json.loads((directory / "selection.json").read_text())
     require(
         result["style"] == meta["style"]
@@ -326,89 +335,6 @@ def choose_epoch(epochs):
     return max(epochs, key=lambda e: (Fraction(e["correct"], e["total"]), -e["epoch"]))
 
 
-def evaluate_run(directory, benchmark, *, untuned=False, batch_size=16):
-    meta = verify_run(directory)
-    verify_environment()
-    from importlib.metadata import version
-
-    require(version("vllm") == "0.28.0", "use pinned vLLM")
-    from transformers import AutoTokenizer
-    from vllm import LLM
-
-    from spatial.v2.entailment_evaluation import run
-
-    require(benchmark in ("sft-bench", "external-test"), "unknown final benchmark")
-    checkpoint, epoch = None, None
-    if not untuned:
-        meta, checkpoint, epoch = selected_checkpoint(directory)
-    artifacts = Path(meta["artifacts"])
-    data = artifacts / "data" / benchmark
-    rows = read_jsonl(data / "references.jsonl")
-    require(len(rows) == COUNTS[benchmark], "incomplete benchmark")
-    model = meta["model"]
-    tokenizer = AutoTokenizer.from_pretrained(
-        artifacts / "tokenizers/active", local_files_only=True
-    )
-    engine = LLM(
-        model=model["model_id"],
-        revision=model["revision"],
-        tokenizer=str(artifacts / "tokenizers/active"),
-        dtype="bfloat16",
-        max_model_len=model["context_length"],
-        enable_lora=not untuned,
-        max_lora_rank=64,
-        seed=42,
-        gpu_memory_utilization=0.85,
-    )
-    output = (
-        directory / "evaluation" / f"{'untuned-' if untuned else ''}{benchmark}.json"
-    )
-    result = run(
-        engine,
-        tokenizer,
-        rows,
-        data,
-        output,
-        meta["style"],
-        benchmark,
-        checkpoint,
-        epoch,
-        {
-            "context": model["context_length"],
-            "stage1": model["stage1_max_new_tokens"],
-            "stage2": model["stage2_max_new_tokens"],
-        },
-        batch_size=batch_size,
-    )
-    breakdowns = {}
-    for subset in sorted({row["split"] for row in rows}):
-        selected = [row for row in rows if row["split"] == subset]
-        ids = {row["id"] for row in selected}
-        breakdowns[subset] = score(
-            selected, [r for r in result["outputs"] if r["id"] in ids]
-        )
-    atomic_json(
-        output.with_suffix(".summary.json"),
-        {
-            "style": meta["style"],
-            "training_seed": None if untuned else meta["seed"],
-            "generation_manifest_sha256": meta["generation_manifest_sha256"],
-            "result_sha256": digest(output),
-            "scores": score(
-                rows,
-                result["outputs"],
-                extra_slice_fields=(
-                    "split",
-                    "construction_level",
-                    "verified_depth",
-                    "case",
-                ),
-            ),
-            "by_subgroup": breakdowns,
-        },
-    )
-
-
 def main(generation_config):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -422,11 +348,14 @@ def main(generation_config):
         if name == "verify":
             command.add_argument("--selected", action="store_true")
         if name == "evaluate":
-            command.add_argument(
-                "--benchmark", choices=("sft-bench", "external-test"), required=True
-            )
+            command.add_argument("--benchmark", choices=("sft-bench", "external-test"))
             command.add_argument("--untuned", action="store_true")
+            command.add_argument("--shots", type=int, choices=(0, 1, 3), default=0)
+            command.add_argument("--training-revision")
             command.add_argument("--batch-size", type=int, default=16)
+    check = commands.add_parser("verify-evaluation")
+    check.add_argument("--run", required=True, type=Path)
+    check.add_argument("--training-revision")
     args = parser.parse_args()
     if args.command == "prepare":
         prepare(generation_config, args.artifacts, args.output, release=args.release)
@@ -439,11 +368,20 @@ def main(generation_config):
         print("Training release and four-run campaign verified.")
     elif args.command == "train":
         train_run(args.run.resolve())
+    elif args.command == "verify-evaluation":
+        from spatial.v2.entailment_final_evaluation import verify_campaign
+
+        verify_campaign(args.run.resolve(), training_revision=args.training_revision)
+        print("Selections, evaluation policy and all prompt budgets verified.")
     else:
+        from spatial.v2.entailment_final_evaluation import evaluate_job
+
         require(args.batch_size > 0, "batch size must be positive")
-        evaluate_run(
+        evaluate_job(
             args.run.resolve(),
-            args.benchmark,
             untuned=args.untuned,
+            shots=args.shots,
+            benchmark=args.benchmark,
+            training_revision=args.training_revision,
             batch_size=args.batch_size,
         )

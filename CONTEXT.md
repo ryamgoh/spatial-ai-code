@@ -31,6 +31,16 @@ Never toggle candidate readiness flags or regenerate good data merely because
 SFT implementation files changed. The submitter now requires artifacts and
 release.json paths. G5 checks remain mandatory inside SFT, not before submission.
 
+Final evaluation uses a separate 8,192-token Stage-1 cap and 16,384 context for
+all models; do not edit the completed training or generation budgets. Submit
+four H100-47 tuned jobs (both benchmarks each) and three H200-141 untuned jobs
+(zero/one/three-shot, both styles and benchmarks each), all `gpu`, three hours.
+Each job reuses one engine. Few-shot uses one fixed hash-ranked Train-only trio
+in Direction/Which/Count order, paired across styles. Changed checkout sources
+are checked separately from historical training sources, which must match the
+explicit full training Git revision. Runtime and the BF16/budget transition on
+Dev remain unvalidated.
+
 Final-v1 admission policy `pinned-training-tokenizer-v1` uses only the pinned
 Qwen3-4B-Thinking-2507 tokenizer for admission and exports. Its native-thinking
 template and token budgets are checked at admission and after menu rebinding.

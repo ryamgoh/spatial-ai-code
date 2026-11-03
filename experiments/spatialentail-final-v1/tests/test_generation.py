@@ -923,7 +923,7 @@ def test_workers_email_on_start_end_failure_and_time_limit(script):
 @pytest.mark.parametrize(
     "script,partition,gpu,time",
     [
-        ("evaluate.sh", "gpu", "h200-141", "03:00:00"),
+        ("evaluate.sh", "gpu", "h100-47", "03:00:00"),
         ("train.sh", "gpu-long", "h100-47", "24:00:00"),
     ],
 )

@@ -165,3 +165,35 @@ def test_concurrent_writer_is_rejected(setup_runner):
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         with pytest.raises(ValueError, match="already running"):
             evaluation.run(Engine(), *args, batch_size=2)
+
+
+def test_fewshot_prompt_provenance_binds_resume_and_raw_replay(setup_runner):
+    Engine, args = setup_runner
+    provenance = {"shots": 3, "demonstration_ids": ["train-1", "train-2", "train-3"]}
+    builder = lambda row: [int(row["id"])]
+    with pytest.raises(RuntimeError, match="interrupted"):
+        evaluation.run(
+            Engine(fail_at=3),
+            *args,
+            batch_size=2,
+            prompt_builder=builder,
+            prompt_provenance=provenance,
+        )
+    with pytest.raises(ValueError, match="mismatch"):
+        evaluation.run(
+            Engine(),
+            *args,
+            batch_size=2,
+            prompt_builder=builder,
+            prompt_provenance={**provenance, "shots": 1},
+        )
+    result = evaluation.run(
+        Engine(),
+        *args,
+        batch_size=2,
+        prompt_builder=builder,
+        prompt_provenance=provenance,
+    )
+    assert result["prompt_provenance"] == provenance
+    with pytest.raises(ValueError, match="provenance mismatch"):
+        evaluation.run(Engine(), *args, batch_size=2)

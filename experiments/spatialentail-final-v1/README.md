@@ -364,18 +364,60 @@ never selected against one another. No test questions enter training or selectio
 After all four training jobs finish:
 
 ```bash
-bash experiments/spatialentail-final-v1/slurm/submit-evaluation.sh /absolute/campaign
+bash experiments/spatialentail-final-v1/slurm/submit-evaluation.sh \
+  /absolute/campaign FULL_TRAINING_COMMIT
 ```
 
-This checks all selections first, then submits eight tuned evaluations
-(four adapters times two benchmarks), plus four untuned evaluations (two styles
-times two benchmarks). Untuned baselines do not need repetition by training seed.
-Defaults are one `h200-141` GPU on `gpu`, eight CPUs, 64 GB RAM and 3 hours,
-matching the cluster's `gpu` partition limit. Full evaluation runtime within
-that limit has not yet been measured.
+Use the full Git commit used to prepare the completed training campaign.
+It must reproduce every recorded training-source hash; evaluation code changes
+do not require modifying old campaign receipts or retraining. The revision can
+be omitted only when the current checkout still matches those training hashes.
+For a campaign prepared at `db3a966`, obtain the full value with
+`git rev-parse db3a966`; do not assume that revision for another campaign.
+
+The submitter verifies all four selections and every prompt budget before its
+first `sbatch`. It submits seven jobs, all on `gpu` with eight CPUs, 64 GB RAM,
+and a three-hour limit:
+
+| Jobs | GPU Per Job | Evaluations Per Job |
+|---|---|---|
+| Four selected adapters | `h100-47:1` | SFT-Bench and external |
+| Untuned zero-shot | `h200-141:1` | Both styles on both benchmarks |
+| Untuned one-shot | `h200-141:1` | Both styles on both benchmarks |
+| Untuned three-shot | `h200-141:1` | Both styles on both benchmarks |
+
+Each job loads one BF16 engine and reuses it sequentially, producing 20 result
+files in total. Untuned baselines are not repeated by training seed.
+Final policy `final-v1-evaluation-8192-fewshot-v1` gives every model 8,192
+Stage-1 tokens, 16 Stage-2 tokens, and a 16,384-token context allowance. Stage 1
+includes both thinking and the final answer, not 8,192 thinking tokens plus an
+extra answer allowance. Training and historical in-epoch Dev budgets stay
+unchanged at 8,192 context / 4,096 Stage-1 tokens. This final budget change does
+not reselect checkpoints. The BF16/longer-budget transition remains unvalidated
+on Dev; full evaluation time within three hours remains unmeasured.
+
+Demonstrations are fixed before inference: hash-rank A-D Train examples, choose
+one Direction, one Which, and one Count, in that order. One-shot uses the first
+Direction example; three-shot uses all three. Both styles share question IDs,
+menus and labels but use their matching reference explanations. This single
+fixed demonstration set is not an estimate over demonstration choices. Native
+thinking in demonstrations is preserved, and no held-out reference enters a
+prompt. All prompts reserve the full Stage-1 cap, Stage-2 suffix and Stage-2 cap;
+overflow fails before model loading instead of truncating.
+
+Results live under `campaign/evaluation/final-v1-evaluation-8192-fewshot-v1/`,
+separated by trained model or untuned shot setting, then style and benchmark.
+Resume journals bind policy, demonstration IDs, Train reference hash, training
+revision and evaluation-source hashes. Re-running the same command resumes
+completed batches without mixing older budgets or prompts. Already-submitted
+jobs retain their old scripts; use the updated launcher for new submissions.
 The existing raw-token Stage-1/Stage-2 replay runner is reused. Each result has
 a `.summary.json` with release identity, training seed, subgroup and separate
-construction-level/verified-depth slices. Cross-seed statistical reporting and
+construction-level/verified-depth slices, generated-token mean/median/p95/max,
+length-finish counts and thinking-token lengths before `</think>`.
+Token counts are comparable across the hardware split; wall-clock latency is
+not a matched H100-versus-H200 comparison.
+Cross-seed statistical reporting and
 lm-eval-harness task registration remain separate work.
 
 ## Local Tests
