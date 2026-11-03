@@ -427,6 +427,30 @@ not a matched H100-versus-H200 comparison.
 Cross-seed statistical reporting and
 lm-eval-harness task registration remain separate work.
 
+### Collect Results While Baselines Run
+
+From the repository root on the Slurm server:
+
+```bash
+sbatch experiments/spatialentail-final-v1/slurm/collect-results.sh
+```
+
+The default input is
+`experiments/spatialentail-final-v1/runs/sft-y63EhpI5/campaign/evaluation/final-v1-evaluation-8192-fewshot-v1/`.
+Pass another evaluation directory as the first argument when needed.
+This CPU-only job uses `normal`, one CPU, 2 GB RAM and no GPU. It needs only
+`python3` and does not modify or wait for running evaluations.
+
+The job prints a 20-result status/accuracy table to
+`spatialentail-results-JOBID.out`. It writes a timestamped directory and
+`.tar.gz` archive under `campaign/result-reports/`. Send back that archive for
+analysis, or paste its `report.txt`. The archive includes full summary metrics,
+subgroup/depth slices, token profiles, provenance, selection/Dev receipts,
+bounded evaluation log tails and available Slurm status. Raw model responses
+and adapters are excluded. Completed result hashes are checked against their
+summaries; partial journal counts are live progress only, never final scores.
+Re-submit later to collect a fresh snapshot after the baselines finish.
+
 ## Local Tests
 
 In a Python 3.12 environment containing the dependency pins from `generate.py`
