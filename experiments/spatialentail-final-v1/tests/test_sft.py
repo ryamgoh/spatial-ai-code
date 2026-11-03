@@ -929,13 +929,31 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
     bins = tmp_path / "bin"
     bins.mkdir()
     calls = tmp_path / "calls"
-    (bins / "uv").write_text('#!/bin/bash\n[[ "${FAIL_VERIFY:-}" != 1 ]]\n')
+    preflight = tmp_path / "preflight"
+    (bins / "uv").write_text(
+        "#!/bin/bash\n"
+        'if [[ "$*" == *verify-evaluation* ]]; then\n'
+        '  [[ "${IN_SLURM_PREFLIGHT:-}" == 1 ]] || exit 2\n'
+        "fi\n"
+        '[[ "${FAIL_VERIFY:-}" != 1 ]]\n'
+    )
+    (bins / "srun").write_text(
+        '#!/bin/bash\nprintf "%s\\n" "$*" > "$PREFLIGHT"\n'
+        'while [[ "$1" != uv ]]; do shift; done\n'
+        'export IN_SLURM_PREFLIGHT=1\nexec "$@"\n'
+    )
     (bins / "sbatch").write_text(
         '#!/bin/bash\nprintf "%s\\n" "$*" >> "$CALLS"\necho "12345;cluster"\n'
     )
     for file in bins.iterdir():
         file.chmod(0o755)
-    env = {**os.environ, "PATH": f"{bins}:{os.environ['PATH']}", "CALLS": str(calls)}
+    env = {
+        **os.environ,
+        "PATH": f"{bins}:{os.environ['PATH']}",
+        "CALLS": str(calls),
+        "PREFLIGHT": str(preflight),
+        "IN_SLURM_PREFLIGHT": "",
+    }
     subprocess.run(
         ["bash", str(exp / "slurm" / script), *arguments], env=env, check=True
     )
@@ -951,6 +969,18 @@ def test_submitters_count_jobs_and_stop_on_failed_verification(tmp_path, script,
         ]
         assert all("--dependency" not in line for line in submitted)
     else:
+        allocation = preflight.read_text()
+        for setting in (
+            "--partition=normal",
+            "--nodes=1",
+            "--ntasks=1",
+            "--cpus-per-task=2",
+            "--mem=8G",
+            "--time=00:30:00",
+            f"--chdir={root}",
+        ):
+            assert setting in allocation
+        assert "--gres" not in allocation
         assert sum("--gres=gpu:h100-47:1" in line for line in submitted) == 4
         assert sum("--gres=gpu:h200-141:1" in line for line in submitted) == 3
         assert [line.split("evaluate.sh ", 1)[1].strip() for line in submitted[:4]] == [

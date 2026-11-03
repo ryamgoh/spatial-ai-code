@@ -6,10 +6,14 @@ ROOT=$(dirname "$(dirname "$EXP")")
 CAMPAIGN=$(realpath "${1:?Usage: bash submit-evaluation.sh /absolute/campaign [full-training-commit]}")
 TRAINING_REVISION=${2:-}
 command -v sbatch >/dev/null
+command -v srun >/dev/null
 check=(--run "$CAMPAIGN")
 [[ -z "$TRAINING_REVISION" ]] || check+=(--training-revision "$TRAINING_REVISION")
-# Tokenizer-only preflight must not import the GPU stack on the login node.
-uv --native-tls run --python 3.12 --no-project \
+# Run the CPU-only checks on a compute node, not on the login node.
+echo "Preflight: requesting 2 CPUs and 8 GB RAM on normal; waiting for allocation."
+srun --job-name=spatialentail-eval-preflight --partition=normal \
+    --nodes=1 --ntasks=1 --cpus-per-task=2 --mem=8G --time=00:30:00 \
+    --chdir="$ROOT" uv --native-tls run --python 3.12 --no-project \
     --script "$EXP/generate.py" verify-evaluation "${check[@]}"
 SUBMISSION=$(mktemp -d "$CAMPAIGN/eval-submission-XXXXXXXX")
 printf 'campaign=%s\n' "$CAMPAIGN" > "$SUBMISSION/jobs.txt"
